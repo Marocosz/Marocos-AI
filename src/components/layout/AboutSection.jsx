@@ -15,8 +15,8 @@ const AboutSection = () => {
       {/* --- O BACKGROUND FICA AQUI --- */}
       <div className="about-background">
         <Squares
-          direction='diagonal'
-          speed={0.3}
+          direction='down'
+          speed={2.5}
           borderColor='#222'
           squareSize={40}
           hoverFillColor='#060630'
