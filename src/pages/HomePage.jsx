@@ -1,15 +1,12 @@
 import React from 'react';
 import Hero from '../components/layout/Hero';
+import AboutSection from '../components/layout/AboutSection'; // 1. IMPORTAR
 
 const HomePage = () => {
   return (
     <main>
       <Hero />
-      {/* Aqui você adicionará suas outras seções no futuro:
-        <AboutSection />
-        <ProjectsSection />
-        <ContactSection />
-      */}
+      <AboutSection /> {/* 2. ADICIONAR AQUI */}
     </main>
   );
 };

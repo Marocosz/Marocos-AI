@@ -1,14 +1,11 @@
 /* Reset básico e definição da fonte */
 :root {
-  /* Aplicando a nova fonte */
   font-family: 'Poppins', sans-serif;
   line-height: 1.5;
   font-weight: 400;
-
   color-scheme: light dark;
   color: rgba(255, 255, 255, 0.87);
-  background-color: #242424;
-
+  background-color: #242424; 
   font-synthesis: none;
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
@@ -19,6 +16,7 @@ body {
   margin: 0;
   padding: 0;
   min-width: 320px;
+  background-color: #000000;
 }
 
 * {
@@ -26,7 +24,6 @@ body {
 }
 
 /* --- Estilos da Hero Section --- */
-
 .hero-section {
   position: relative; 
   width: 100%;
@@ -35,6 +32,7 @@ body {
   align-items: center;
   justify-content: center;
   overflow: hidden;
+  background-color: #000000;
 }
 
 .hero-background {
@@ -46,36 +44,121 @@ body {
   z-index: 1; 
 }
 
-/* ESTILOS DO CONTEÚDO ATUALIZADOS */
+/* --- 1. MUDANÇA DE LOCAL ---
+  O gradiente agora é aplicado no container do canvas
+  para garantir que ele cubra a animação.
+*/
+.hero-background::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 150px; /* Altura do fade. */
+  background: linear-gradient(
+    to bottom, 
+    rgba(0, 0, 0, 0),  /* Começa transparente */
+    rgba(0, 0, 0, 1)   /* Termina 100% preto */
+  );
+  pointer-events: none;
+}
+
+
 .hero-content {
   position: relative; 
-  z-index: 2; 
-  text-align: center;
   
-  /* Removemos o 'quadrado' (fundo, borda, etc.) */
-  background-color: none;
-  backdrop-filter: none;
-  border-radius: 0;
-  border: none;
-  padding: 1rem; /* Apenas um leve padding */
+  /* --- 2. Z-INDEX REVERTIDO --- 
+     Agora pode voltar para 2, pois o gradiente
+     está "dentro" do background (z-index 1).
+  */
+  z-index: 2; /* <- MUDADO DE 3 PARA 2 */
+
+  text-align: center;
+  padding: 1rem;
 }
 
 .hero-content h1 {
-  /* Estilo grande e impactante */
-  font-size: 5rem; /* Tamanho bem grande */
-  font-weight: 900; /* O mais pesado da fonte */
-  line-height: 1.0; /* Junta as duas linhas */
-  text-transform: uppercase; /* Caixa alta */
+  font-size: 5.5rem; 
+  font-weight: 900; 
+  line-height: 1.0; 
+  text-transform: uppercase; 
   letter-spacing: 2px;
   color: #ffffff;
   margin: 0;
 }
-
 .hero-content p {
-  /* Estilo do subtítulo */
   font-size: 1.25rem;
-  font-weight: 400; /* Peso normal */
+  font-weight: 400;
   color: rgba(255, 255, 255, 0.8);
   margin-top: 1rem;
   letter-spacing: 1px;
+}
+
+/* --- Estilos da Seção Sobre Mim --- */
+/* (Nenhuma mudança aqui, tudo permanece igual) */
+
+.about-section {
+  position: relative;
+  width: 100%;
+  min-height: 70vh;
+  padding: 5rem 2rem;
+  background-color: #000000; 
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  border-top: none;
+}
+.about-background {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 1;
+}
+.about-content {
+  position: relative;
+  z-index: 2;
+  width: 100%;
+  max-width: 1200px;
+  color: #f0f0f0;
+  padding: 0 1rem;
+  text-align: center;
+}
+.about-content h2 {
+  font-size: 3rem;
+  font-weight: 700;
+  margin: 0 0 2.5rem 0;
+  padding-bottom: 0.5rem;
+  border-bottom: none;
+  display: block;
+}
+.about-main {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+}
+.about-image {
+  flex-basis: 35%;
+  padding-right: 2rem;
+}
+.about-image img {
+  width: 100%;
+  height: auto;
+  border-radius: 0;
+  border: none;
+}
+.about-text {
+  flex-basis: 62%;
+}
+.about-text p {
+  font-size: 1.15rem;
+  line-height: 1.7;
+  color: rgba(255, 255, 255, 0.9);
+  text-align: justify; 
+}
+.about-text p:not(:last-child) {
+  margin-bottom: 1.5rem;
 }
