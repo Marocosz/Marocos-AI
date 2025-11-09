@@ -1,5 +1,6 @@
 import React from 'react';
 import DarkVeil from '../backgrounds/DarkVeil';
+import DecryptedText from '../effects/DecryptedText'; // 1. IMPORTAR
 
 const Hero = () => {
   return (
@@ -9,15 +10,9 @@ const Hero = () => {
       {/* O background animado fica aqui */}
       <div className="hero-background">
         <DarkVeil 
-          // --- Agora você pode alterar todas as props aqui ---
-          
-          speed={3}             // Velocidade da animação
-          warpAmount={3.5}        // Nível de distorção (warp)
-          noiseIntensity={0}     // Intensidade do ruído (0.0 a 1.0)
-          scanlineIntensity={1}   // Intensidade das "scanlines" (0.0 a 1.0)
-          scanlineFrequency={5}   // Frequência (tamanho) das scanlines
-          hueShift={0}            // Mudança de cor (0.0 a 360.0)
-          resolutionScale={1}       // Escala da resolução (deixe 1 para performance)
+          speed={0.3} 
+          warpAmount={0.1}
+          noiseIntensity={0.03}
         />
       </div>
       
@@ -26,9 +21,17 @@ const Hero = () => {
         <h1>
           Marcos<br />Rodrigues
         </h1>
-        <p>
-          Desenvolvedor - IA & Automação & FullStack
-        </p>
+        
+        {/* 2. SUBSTITUIR O <p> PELO DecryptedText */}
+        <DecryptedText
+          // Usamos 'parentClassName' para aplicar o estilo do CSS
+          parentClassName="hero-subtitle" 
+          text="Desenvolvedor - IA, Automação & FullStack"
+          animateOn="view" // Anima assim que a página carregar
+          sequential={true}  // Letra por letra
+          speed={40}         // Velocidade (pode ajustar)
+          useOriginalCharsOnly={true}
+        />
       </div>
 
     </section>
