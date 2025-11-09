@@ -111,20 +111,15 @@ body {
   text-align: center;
 }
 
-/* 3. MUDANÇA: de 'h2' para '.section-title' */
 .about-content .section-title {
   font-size: 3rem;
   font-weight: 700;
   margin-bottom: 2.5rem;
   padding-bottom: 0.5rem;
   border-bottom: none;
-  
-  /* Centraliza o container <p> (que é display:flex) */
   width: fit-content; 
   margin-left: auto;
   margin-right: auto;
-
-  /* Centraliza as palavras "Sobre" "Mim" DENTRO do container flex */
   justify-content: center; 
 }
 
@@ -146,13 +141,23 @@ body {
 }
 .about-text {
   flex-basis: 62%;
+  /* Alinha os blocos de parágrafo à esquerda */
+  text-align: left;
 }
-.about-text p {
+
+/* 4. SELETOR E PROPRIEDADES ATUALIZADOS */
+.about-text .paragraph-blur {
   font-size: 1.15rem;
   line-height: 1.7;
   color: rgba(255, 255, 255, 0.9);
-  text-align: justify; 
+  
+  /* O 'text-align: justify' foi removido */
+
+  /* Garante que o texto dentro do flex comece à esquerda */
+  justify-content: flex-start !important; 
 }
-.about-text p:not(:last-child) {
+
+/* 5. ESPAÇAMENTO ENTRE OS PARÁGRAFOS */
+.about-text .paragraph-blur:not(:last-child) {
   margin-bottom: 1.5rem;
 }
