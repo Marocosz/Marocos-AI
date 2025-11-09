@@ -44,35 +44,21 @@ body {
   z-index: 1; 
 }
 
-/* --- 1. MUDANÇA DE LOCAL ---
-  O gradiente agora é aplicado no container do canvas
-  para garantir que ele cubra a animação.
-*/
 .hero-background::after {
   content: '';
   position: absolute;
   bottom: 0;
   left: 0;
   width: 100%;
-  height: 150px; /* Altura do fade. */
-  background: linear-gradient(
-    to bottom, 
-    rgba(0, 0, 0, 0),  /* Começa transparente */
-    rgba(0, 0, 0, 1)   /* Termina 100% preto */
-  );
+  height: 150px;
+  background: linear-gradient( to bottom, rgba(0, 0, 0, 0), rgba(0, 0, 0, 1) );
   pointer-events: none;
 }
 
 
 .hero-content {
   position: relative; 
-  
-  /* --- 2. Z-INDEX REVERTIDO --- 
-     Agora pode voltar para 2, pois o gradiente
-     está "dentro" do background (z-index 1).
-  */
-  z-index: 2; /* <- MUDADO DE 3 PARA 2 */
-
+  z-index: 2;
   text-align: center;
   padding: 1rem;
 }
@@ -95,8 +81,6 @@ body {
 }
 
 /* --- Estilos da Seção Sobre Mim --- */
-/* (Nenhuma mudança aqui, tudo permanece igual) */
-
 .about-section {
   position: relative;
   width: 100%;
@@ -126,14 +110,24 @@ body {
   padding: 0 1rem;
   text-align: center;
 }
-.about-content h2 {
+
+/* 3. MUDANÇA: de 'h2' para '.section-title' */
+.about-content .section-title {
   font-size: 3rem;
   font-weight: 700;
-  margin: 0 0 2.5rem 0;
+  margin-bottom: 2.5rem;
   padding-bottom: 0.5rem;
   border-bottom: none;
-  display: block;
+  
+  /* Centraliza o container <p> (que é display:flex) */
+  width: fit-content; 
+  margin-left: auto;
+  margin-right: auto;
+
+  /* Centraliza as palavras "Sobre" "Mim" DENTRO do container flex */
+  justify-content: center; 
 }
+
 .about-main {
   display: flex;
   align-items: center;

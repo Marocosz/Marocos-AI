@@ -1,7 +1,7 @@
 import React from 'react';
-// import RippleGrid from '../backgrounds/RippleGrid'; // 1. REMOVIDO
-import Squares from '../backgrounds/Squares';      // 2. ADICIONADO
+import Squares from '../backgrounds/Squares';
 import profileImage from '../../assets/profile.png'; 
+import BlurText from '../effects/BlurText'; // 1. IMPORTAR O NOVO COMPONENTE
 
 const AboutSection = () => {
   return (
@@ -9,23 +9,25 @@ const AboutSection = () => {
       
       {/* --- O BACKGROUND FICA AQUI --- */}
       <div className="about-background">
-        
-        {/* 3. COMPONENTE TROCADO */}
         <Squares
-          // --- EDITE TODAS AS VARIÁVEIS AQUI ---
-          direction='down'
+          direction='up'
           speed={2}
-          borderColor='#19191aff'      // Cor da borda (cinza escuro sutil)
+          borderColor='#1b1b1bff'
           squareSize={40}
-          hoverFillColor='#171616ff' // Cor do hover (seu azul)
+          hoverFillColor='#232323ff'
         />
-
       </div>
       
-      {/* --- O CONTEÚDO (IMAGEM E TEXTO) CONTINUA IDÊNTICO --- */}
+      {/* --- O CONTEÚDO (TEXTO) FICA AQUI --- */}
       <div className="about-content">
         
-        <h2>Sobre Mim</h2>
+        {/* 2. SUBSTITUIR O H2 PELO BLURTEXT */}
+        <BlurText
+          text="Sobre Mim"
+          className="section-title" // Usamos uma classe para o CSS
+          animateBy="words"
+          delay={150}
+        />
         
         <div className="about-main">
           
