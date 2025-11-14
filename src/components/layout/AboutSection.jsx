@@ -1,6 +1,6 @@
 import React from 'react';
-import { motion } from 'motion/react';
-// 1. IMPORT 'SQUARES' REMOVIDO
+import { motion } from 'motion/react'; 
+import Particles from '../backgrounds/Particles'; 
 import profileImageBw from '../../assets/profile.png';
 import profileImageColor from '../../assets/profile-color.png';
 import BlurText from '../effects/BlurText';
@@ -12,35 +12,50 @@ const AboutSection = () => {
   return (
     <section className="about-section">
 
-      {/* 2. O 'div.about-background' FOI REMOVIDO DAQUI */}
-
+      <div className="about-background">
+        <Particles
+          // --- VALORES ATUALIZADOS ---
+          particleCount={150}         // Mais partículas
+          particleSpread={7}
+          speed={0.2}                 // Um pouco mais rápidas
+          particleColors={['#FFFFFF']} 
+          moveParticlesOnHover={true}
+          particleHoverFactor={0.2}   
+          alphaParticles={true}      // <-- MUDADO: Serão quadrados (mais visíveis)
+          particleBaseSize={100}       // <-- MUDADO: Tamanho 5x maior
+          sizeRandomness={1}
+          cameraDistance={15}
+          disableRotation={false}
+        />
+      </div>
+      
       <div className="about-content">
-
+        
         <BlurText
           text="Sobre Mim"
           className="section-title"
           animateBy="words"
           delay={150}
         />
-
+        
         <div className="about-main">
-
-          <motion.div
+          
+          <motion.div 
             className="about-image"
-            initial={{ opacity: 0, y: 50 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ margin: "-100px" }}
+            initial={{ opacity: 0, y: 50 }} 
+            whileInView={{ opacity: 1, y: 0 }} 
+            viewport={{ margin: "-100px" }} 
             transition={{ duration: 0.6, ease: "easeOut" }}
           >
             <GlitchImage
               srcBw={profileImageBw}
               srcColor={profileImageColor}
               alt="Marcos Rodrigues - Desenvolvedor Full-Stack"
-              glitchChance={0.8}
+              glitchChance={0.8} 
             />
           </motion.div>
 
-          <motion.div
+          <motion.div 
             className="about-text"
             initial={{ opacity: 0, y: 50 }}
             whileInView={{ opacity: 1, y: 0 }}
@@ -57,7 +72,7 @@ const AboutSection = () => {
                 useOriginalCharsOnly={true}
               />
             </p>
-
+            
             <p>
               <DecryptedText
                 text="Essa paixão por empoderar pessoas com tecnologia é o que me move profissionalmente. Em meus projetos, busco aplicar os mesmos princípios: seja desenvolvendo soluções de IA que traduzem dados complexos em respostas claras , ou criando aplicações full-stack que automatizam tarefas e otimizam a tomada de decisão. Minha formação e experiência em desenvolvimento de inovação se unem no objetivo de criar ferramentas que sejam não apenas inteligentes, mas genuinamente úteis."

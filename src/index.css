@@ -3,6 +3,7 @@ html {
   scroll-behavior: smooth;
   scrollbar-width: thin;
   scrollbar-color: #333 #000;
+  /* Cursor: none foi removido para o mouse voltar */
 }
 
 body::-webkit-scrollbar {
@@ -43,11 +44,33 @@ body {
   padding: 0;
   min-width: 320px;
   background-color: #000000;
+  /* Fundo preto base */
 }
 
 * {
   box-sizing: border-box;
 }
+
+/* --- ESTILOS DA LUZ DO MOUSE --- */
+.mouse-light-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+  background: radial-gradient(300px circle at var(--mouse-x, 50%) var(--mouse-y, 50%),
+      rgba(255, 255, 255, 0.6) 0%,
+      rgba(255, 255, 255, 0.1) 35%,
+      transparent 70%);
+}
+
+.main-content {
+  position: relative;
+  z-index: 2;
+  /* Conteúdo fica na frente da luz */
+}
+
+/* --- FIM DOS ESTILOS --- */
+
 
 /* --- Estilos da Hero Section --- */
 .hero-section {
@@ -58,7 +81,8 @@ body {
   align-items: center;
   justify-content: center;
   overflow: hidden;
-  background-color: #000000;
+  background-color: transparent;
+  /* Transparente para a luz passar */
 }
 
 .hero-background {
@@ -113,7 +137,8 @@ body {
   width: 100%;
   min-height: 70vh;
   padding: 5rem 2rem;
-  background-color: #000000;
+  background-color: transparent;
+  /* Transparente para a luz passar */
   display: flex;
   align-items: center;
   justify-content: center;
@@ -121,11 +146,23 @@ body {
   border-top: none;
 }
 
-/* 1. REGRA '.about-background' REMOVIDA */
+/* ### ESTA É A REGRA QUE CONSERTA O BUG ###
+  Ela estica o div das partículas para preencher o fundo
+*/
+.about-background {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 1;
+  /* Fica atrás do .about-content */
+}
 
 .about-content {
   position: relative;
   z-index: 2;
+  /* Fica na frente do .about-background */
   width: 100%;
   max-width: 1200px;
   color: #f0f0f0;
@@ -181,22 +218,33 @@ body {
 }
 
 
-/* --- Estilos da Seção Jornada (MODIFICADO) --- */
-
+/* --- Estilos da Seção Jornada --- */
 .journey-section {
   position: relative;
   width: 100%;
   height: 70vh;
   min-height: 500px;
   padding: 3rem 2rem;
-  background-color: #000;
+  background-color: transparent;
+  /* Transparente para a luz passar */
   display: flex;
   align-items: center;
   justify-content: center;
   overflow: hidden;
 }
 
-/* 2. REGRA '.journey-background' REMOVIDA */
+/* ### ESTA É A REGRA QUE CONSERTA O BUG ###
+  Ela estica o div das partículas para preencher o fundo
+*/
+.journey-background {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 1;
+  /* Fica atrás do .journey-container */
+}
 
 .journey-container {
   display: flex;
@@ -204,10 +252,10 @@ body {
   height: 100%;
   max-width: 1200px;
   z-index: 2;
+  /* Fica na frente do .journey-background */
 }
 
 .journey-content-left {
-  /* 3. ROBÔ MAIOR: Texto ocupa 40% */
   flex-basis: 40%;
   display: flex;
   flex-direction: column;
@@ -232,7 +280,6 @@ body {
 }
 
 .journey-content-right {
-  /* 4. ROBÔ MAIOR: Robô ocupa 60% */
   flex-basis: 60%;
   position: relative;
   height: 100%;

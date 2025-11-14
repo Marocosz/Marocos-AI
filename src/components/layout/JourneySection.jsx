@@ -1,12 +1,27 @@
 import React, { Suspense } from 'react';
 import Spline from '@splinetool/react-spline';
-// 1. IMPORT 'SQUARES' REMOVIDO
+import Particles from '../backgrounds/Particles';
 
 export default function JourneySection() {
     return (
         <section className="journey-section">
 
-            {/* 2. O 'div.journey-background' FOI REMOVIDO DAQUI */}
+            <div className="journey-background">
+                <Particles
+                    // --- VALORES ATUALIZADOS ---
+                    particleCount={150}         // Mais partículas
+                    particleSpread={7}
+                    speed={0.2}                 // Um pouco mais rápidas
+                    particleColors={['#FFFFFF']}
+                    moveParticlesOnHover={true}
+                    particleHoverFactor={0.2}
+                    alphaParticles={true}      // <-- MUDADO: Serão quadrados (mais visíveis)
+                    particleBaseSize={100}       // <-- MUDADO: Tamanho 5x maior
+                    sizeRandomness={1}
+                    cameraDistance={15}
+                    disableRotation={false}
+                />
+            </div>
 
             <div className="journey-container">
                 {/* Lado Esquerdo (Texto) */}
