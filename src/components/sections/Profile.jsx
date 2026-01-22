@@ -3,10 +3,11 @@ import { motion } from "motion/react";
 import DecryptedText from "../effects/DecryptedText";
 import { profileData } from "../../data/content";
 import "./Profile.css";
+// import Avatar3D from './Avatar3D';
+import { SplineScene } from '../ui/SplineScene';
 
 // IMPORTANTE: Mude o nome do arquivo aqui para sua nova imagem horizontal
 // import profileImgHorizontal from "../../assets/profile-horizontal.png";
-import Avatar3D from './Avatar3D';
 
 const Profile = () => {
   // Duplicamos a lista de skills para garantir que o scroll infinito não tenha buracos
@@ -46,7 +47,7 @@ const Profile = () => {
             <p className="bio-body">{profileData.bio_full}</p>
           </motion.div>
 
-          {/* LADO DIREITO: ROBÔ 3D INTERATIVO */}
+          {/* LADO DIREITO: SPLINE 3D SCENE */}
           <motion.div
             className="profile-img-container"
             initial={{ opacity: 0, x: 50 }}
@@ -54,7 +55,12 @@ const Profile = () => {
             viewport={{ once: true }}
             transition={{ duration: 0.8, delay: 0.2 }}
           >
-            <Avatar3D />
+             <div style={{ width: '100%', height: '100%', position: 'relative' }}>
+                <SplineScene 
+                  scene="https://prod.spline.design/kZDDjO5HuC9GJUM2/scene.splinecode"
+                  className="spline-canvas"
+                />
+             </div>
           </motion.div>
         </div>
       </div>

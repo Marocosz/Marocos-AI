@@ -11,6 +11,9 @@
   },
   "dependencies": {
     "@react-three/fiber": "^9.5.0",
+    "@splinetool/react-spline": "^4.1.0",
+    "@splinetool/runtime": "^1.12.39",
+    "framer-motion": "^12.29.0",
     "lucide-react": "^0.553.0",
     "motion": "^12.23.24",
     "ogl": "^1.0.11",
