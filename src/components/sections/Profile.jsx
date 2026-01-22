@@ -5,7 +5,8 @@ import { profileData } from "../../data/content";
 import "./Profile.css";
 
 // IMPORTANTE: Mude o nome do arquivo aqui para sua nova imagem horizontal
-import profileImgHorizontal from "../../assets/profile-horizontal.png";
+// import profileImgHorizontal from "../../assets/profile-horizontal.png";
+import Avatar3D from './Avatar3D';
 
 const Profile = () => {
   // Duplicamos a lista de skills para garantir que o scroll infinito não tenha buracos
@@ -29,7 +30,6 @@ const Profile = () => {
             transition={{ duration: 0.8 }}
           >
             <div className="terminal-header">
-              <span className="terminal-line"></span>
               <span>{profileData.title}</span>
             </div>
 
@@ -46,7 +46,7 @@ const Profile = () => {
             <p className="bio-body">{profileData.bio_full}</p>
           </motion.div>
 
-          {/* LADO DIREITO: IMAGEM HORIZONTAL INTEGRADA */}
+          {/* LADO DIREITO: ROBÔ 3D INTERATIVO */}
           <motion.div
             className="profile-img-container"
             initial={{ opacity: 0, x: 50 }}
@@ -54,11 +54,7 @@ const Profile = () => {
             viewport={{ once: true }}
             transition={{ duration: 0.8, delay: 0.2 }}
           >
-            <img
-              src={profileImgHorizontal}
-              alt="Profile"
-              className="horizontal-profile-img"
-            />
+            <Avatar3D />
           </motion.div>
         </div>
       </div>
