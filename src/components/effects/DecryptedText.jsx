@@ -4,7 +4,8 @@ import { motion } from 'motion/react';
 const styles = {
   wrapper: {
     display: 'inline-block',
-    whiteSpace: 'pre-wrap'
+    whiteSpace: 'pre-wrap',
+    position: 'relative',
   },
   srOnly: {
     position: 'absolute',

@@ -1,0 +1,252 @@
+/* src/components/sections/Journey.css */
+
+.journey-section {
+  position: relative;
+  width: 100%;
+  /* Padding generoso em cima e embaixo */
+  padding: 8rem 0 10rem 0; 
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  
+  /* --- CORREÇÃO DO SCROLL/CORTE --- */
+  /* NUNCA use overflow hidden aqui, senão corta o conteúdo longo */
+  overflow: visible; 
+  height: auto; 
+  min-height: 100vh; /* Garante tamanho mínimo, mas deixa crescer */
+}
+
+/* --- HEADER DA SEÇÃO --- */
+.journey-header {
+  text-align: center;
+  margin-bottom: 6rem;
+  z-index: 2;
+  position: relative; /* Importante para z-index funcionar */
+}
+
+/* Mantenha o resto das classes igual... */
+.section-label {
+  font-family: 'Courier New', monospace;
+  color: #a855f7;
+  font-size: 0.9rem;
+  margin-bottom: 0.5rem;
+  display: block;
+  letter-spacing: 2px;
+  font-weight: 600;
+}
+
+.section-title-large {
+  font-size: 3rem;
+  font-weight: 800;
+  color: #fff;
+  margin: 0;
+  line-height: 1.1;
+  letter-spacing: -1px;
+}
+
+/* --- TIMELINE CONTAINER --- */
+.timeline-container {
+  position: relative;
+  width: 100%;
+  max-width: 1000px;
+  padding: 0 2rem;
+  display: flex;
+  flex-direction: column;
+  /* Garante que nada corte as sombras brilhantes */
+  overflow: visible; 
+}
+
+/* A LINHA (TRILHO) */
+.timeline-rail {
+  position: absolute;
+  left: 50%;
+  top: 0;
+  bottom: 0;
+  width: 2px;
+  background: rgba(255, 255, 255, 0.1); 
+  transform: translateX(-50%);
+  z-index: 1;
+}
+
+/* A LINHA (PROGRESSO) */
+.timeline-fill {
+  position: absolute;
+  left: 50%;
+  top: 0;
+  width: 2px;
+  background: #a855f7; 
+  box-shadow: 0 0 15px #a855f7;
+  transform: translateX(-50%);
+  transform-origin: top; 
+  z-index: 2;
+}
+
+/* --- COMMIT ROW (Item da lista) --- */
+.commit-row {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  position: relative;
+  margin-bottom: 8rem; /* Aumentei o espaço para não encavalar */
+  width: 100%;
+}
+
+/* NÓ (A bolinha do commit) */
+.commit-node {
+  position: absolute;
+  left: 50%;
+  width: 16px;
+  height: 16px;
+  background: #000;
+  border: 2px solid #333;
+  border-radius: 50%;
+  transform: translate(-50%, 0);
+  z-index: 10;
+  transition: all 0.4s ease;
+}
+
+.commit-node.active {
+  border-color: #a855f7;
+  background: #a855f7;
+  box-shadow: 0 0 20px rgba(168, 85, 247, 0.6);
+  transform: translate(-50%, 0) scale(1.2);
+}
+
+/* --- O CARD DE EXPERIÊNCIA (Glass) --- */
+.journey-card {
+  width: 45%; 
+  position: relative;
+  z-index: 5;
+  
+  background: rgba(20, 20, 20, 0.4);
+  backdrop-filter: blur(16px) brightness(0.3);
+  -webkit-backdrop-filter: blur(16px) brightness(0.3);
+  
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 12px;
+  padding: 1.5rem;
+  
+  transition: all 0.3s ease;
+}
+
+.journey-card:hover {
+  border-color: rgba(168, 85, 247, 0.3);
+  background: rgba(25, 25, 25, 0.5);
+  transform: translateY(-2px);
+}
+
+.commit-row.left .journey-card {
+  margin-right: auto; 
+  text-align: right;
+}
+
+.commit-row.right .journey-card {
+  margin-left: auto; 
+  text-align: left;
+}
+
+/* CONTEÚDO DO CARD */
+.commit-header {
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+  margin-bottom: 1rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+  padding-bottom: 0.8rem;
+}
+
+.commit-row.left .commit-header {
+  align-items: flex-end;
+}
+
+.commit-hash {
+  font-family: 'Courier New', monospace;
+  font-size: 0.75rem;
+  color: #666;
+  background: rgba(255,255,255,0.05);
+  padding: 2px 6px;
+  border-radius: 4px;
+  width: fit-content;
+}
+
+.commit-date {
+  font-size: 0.8rem;
+  color: #a855f7;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.commit-title {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: #fff;
+  margin: 0.2rem 0;
+}
+
+.commit-org {
+  font-size: 0.9rem;
+  color: #ccc;
+  font-style: italic;
+}
+
+.commit-description {
+  font-size: 0.95rem;
+  color: #bbb;
+  line-height: 1.6;
+  margin-bottom: 1rem;
+}
+
+/* Tags */
+.commit-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.commit-row.left .commit-tags {
+  justify-content: flex-end;
+}
+
+.tag-sm {
+  font-size: 0.7rem;
+  padding: 0.2rem 0.6rem;
+  border: 1px solid rgba(255,255,255,0.1);
+  border-radius: 100px;
+  color: #888;
+}
+
+/* --- RESPONSIVIDADE --- */
+@media (max-width: 768px) {
+  .timeline-container {
+    padding-left: 3rem; 
+    padding-right: 1rem;
+  }
+
+  .timeline-rail, .timeline-fill {
+    left: 1.5rem; 
+    transform: none;
+  }
+
+  .commit-node {
+    left: 1.5rem;
+    transform: translate(-50%, 0);
+  }
+  
+  .commit-row {
+    justify-content: flex-start; 
+    margin-bottom: 4rem;
+  }
+
+  .journey-card {
+    width: 100%;
+    text-align: left !important;
+    margin-left: 1rem !important; 
+    margin-right: 0 !important;
+  }
+
+  .commit-header, .commit-tags {
+    align-items: flex-start !important;
+    justify-content: flex-start !important;
+  }
+}

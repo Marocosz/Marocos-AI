@@ -3,6 +3,7 @@ import Hero from '../components/sections/Hero';
 import Profile from '../components/sections/Profile'; 
 import Silk from '../components/backgrounds/Silk';
 import Projects from '../components/sections/Projects';
+import Journey from '../components/sections/Journey';
 
 const HomePage = () => {
   return (
@@ -49,6 +50,7 @@ const HomePage = () => {
       }}>
         <Profile />
         <Projects />
+        <Journey />
         
         {/* Espaço extra no final para garantir que o scroll vá até o fim sem cortes */}
         <div style={{ height: '100px', pointerEvents: 'none' }}></div>
