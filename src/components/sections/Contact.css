@@ -442,3 +442,31 @@
   color: #111;
   font-weight: 600;
 }
+
+/* Hosting Service Card Light Mode */
+.theme-light .hosting-service-card {
+  background: rgba(255, 255, 255, 0.6);
+  border: 1px solid rgba(0, 0, 0, 0.1);
+  border-left: 4px solid #a855f7;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
+}
+
+.theme-light .hosting-title {
+  color: #1a1a1a;
+}
+
+.theme-light .hosting-description {
+  color: #4a4a4a;
+}
+
+.theme-light .feature-tag {
+  background: rgba(0, 0, 0, 0.03);
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  color: #555;
+}
+
+.theme-light .feature-tag:hover {
+  background: rgba(168, 85, 247, 0.1);
+  border-color: rgba(168, 85, 247, 0.3);
+  color: #a855f7;
+}
