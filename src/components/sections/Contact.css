@@ -198,3 +198,70 @@
     font-size: 2.5rem;
   }
 }
+
+/* ========================================
+   THEME LIGHT OVERRIDES
+   ======================================== */
+
+.theme-light .contact-desc {
+  color: #555;
+}
+
+/* Terminal Light Mode */
+.theme-light .terminal-window {
+  background: #ffffff;
+  border: 1px solid rgba(0, 0, 0, 0.1);
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.1);
+}
+
+.theme-light .terminal-header-bar {
+  background: #f0f0f0;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+}
+
+.theme-light .terminal-title {
+  color: #555;
+}
+
+.theme-light .terminal-body {
+  color: #333;
+}
+
+.theme-light .cmd-text {
+  color: #000;
+}
+
+.theme-light .prompt-symbol {
+  color: #555;
+}
+
+.theme-light .cmd-response {
+  color: #666;
+}
+
+/* Contact Cards Light Mode */
+.theme-light .contact-card {
+  background: rgba(255, 255, 255, 0.6);
+  border: 1px solid rgba(0, 0, 0, 0.1);
+}
+
+.theme-light .contact-card:hover {
+  background: #fff;
+  border-color: rgba(168, 85, 247, 0.4);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
+  transform: translateX(5px);
+}
+
+.theme-light .icon-box {
+  background: rgba(0, 0, 0, 0.05);
+  color: #a855f7;
+}
+
+.theme-light .contact-label {
+  color: #777;
+}
+
+.theme-light .contact-value {
+  color: #111;
+  font-weight: 600;
+}

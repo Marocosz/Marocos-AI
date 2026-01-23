@@ -293,3 +293,88 @@
   
   .card-col { padding: 1.5rem; }
 }
+
+/* ========================================
+   THEME LIGHT OVERRIDES
+   ======================================== */
+
+.theme-light .project-card {
+  border-color: rgba(0, 0, 0, 0.1);
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.1);
+}
+
+.theme-light .project-card.active {
+  box-shadow: 0 0 40px rgba(168, 85, 247, 0.15), 0 30px 60px rgba(0,0,0,0.1);
+}
+
+.theme-light .card-header-glass {
+  background: rgba(255, 255, 255, 0.8);
+  border-color: rgba(0, 0, 0, 0.1);
+}
+
+.theme-light .project-title {
+  color: #111;
+}
+
+.theme-light .project-year {
+  color: #555;
+  font-weight: 700;
+}
+
+.theme-light .card-body-split {
+  background: #ffffff;
+}
+
+.theme-light .left-col {
+  border-right: 1px solid rgba(0, 0, 0, 0.08);
+}
+
+.theme-light .project-description {
+  color: #444;
+}
+
+.theme-light .body-label {
+  color: #777;
+}
+
+.theme-light .tech-tag {
+  color: #555;
+  border-color: rgba(0, 0, 0, 0.15);
+  background: rgba(0, 0, 0, 0.03);
+}
+
+.theme-light .project-card.active .tech-tag:hover {
+  border-color: #a855f7;
+  background: rgba(168, 85, 247, 0.1);
+  color: #000;
+}
+
+.theme-light .github-btn {
+  background: #111;
+  color: #fff;
+}
+
+.theme-light .github-btn:hover {
+  background: #333;
+  color: #fff;
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+}
+
+.theme-light .nav-btn-floating {
+  background: rgba(0, 0, 0, 0.05);
+  border: 1px solid rgba(0, 0, 0, 0.1);
+  color: #333;
+}
+
+.theme-light .nav-btn-floating:hover {
+  background: #111;
+  color: #fff;
+}
+
+/* Ajuste específico para mobile no light mode */
+@media (max-width: 1024px) {
+  .theme-light .left-col {
+    border-right: none;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.08);
+  }
+}

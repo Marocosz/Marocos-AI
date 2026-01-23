@@ -1,9 +1,76 @@
+/* src/index.css */
+
+/* --- VARIÁVEIS DE TEMA --- */
+:root {
+  font-family: 'Poppins', sans-serif;
+  line-height: 1.5;
+  font-weight: 400;
+  color-scheme: light dark;
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+
+  /* Variáveis Padrão (Dark Mode) */
+  --bg-color: #000000;
+  --text-primary: rgba(255, 255, 255, 0.87);
+  --text-secondary: rgba(255, 255, 255, 0.6);
+  --accent-color: #a855f7;
+  
+  --card-bg: rgba(10, 10, 10, 0.6);
+  --card-border: rgba(255, 255, 255, 0.08);
+  
+  --scrollbar-track: #000000;
+  --scrollbar-thumb: #222;
+  --scrollbar-thumb-hover: #444;
+}
+
+/* --- TEMA CLARO (Quando a classe .theme-light é ativada no main) --- */
+.theme-light {
+  --bg-color: #ffffff; /* Fundo claro caso o canvas falhe */
+  --text-primary: #1a1a1a !important; /* Preto quase puro */
+  --text-secondary: #4a4a4a !important; /* Cinza escuro */
+  
+  --card-bg: rgba(255, 255, 255, 0.4) !important; /* Vidro branco */
+  --card-border: rgba(0, 0, 0, 0.1) !important; /* Borda sutil escura */
+  
+  --scrollbar-track: #f0f0f0;
+  --scrollbar-thumb: #ccc;
+  --scrollbar-thumb-hover: #aaa;
+}
+
+/* FORÇAR CORES NO MODO CLARO (Hack para garantir legibilidade imediata) */
+.theme-light h1, 
+.theme-light h2, 
+.theme-light h3, 
+.theme-light h4,
+.theme-light p, 
+.theme-light span,
+.theme-light li,
+.theme-light div {
+  color: var(--text-primary);
+}
+
+.theme-light .section-label,
+.theme-light .card-year,
+.theme-light .card-date {
+  color: var(--accent-color) !important; /* Mantém o roxo de destaque */
+}
+
+.theme-light .card-description,
+.theme-light .card-company,
+.theme-light .contact-desc,
+.theme-light .section-subtitle,
+.theme-light .card-org,
+.theme-light .project-tech {
+   color: var(--text-secondary) !important;
+}
+
 /* --- ESTILOS GLOBAIS DE SCROLL --- */
 html {
   scroll-behavior: smooth;
   scrollbar-width: thin;
-  scrollbar-color: #333 #000;
-  /* Cursor: none foi removido para o mouse voltar */
+  scrollbar-color: var(--scrollbar-thumb) var(--scrollbar-track);
 }
 
 body::-webkit-scrollbar {
@@ -11,40 +78,28 @@ body::-webkit-scrollbar {
 }
 
 body::-webkit-scrollbar-track {
-  background: #000000;
+  background: var(--scrollbar-track);
 }
 
 body::-webkit-scrollbar-thumb {
-  background-color: #222;
+  background-color: var(--scrollbar-thumb);
   border-radius: 4px;
-  border: 1px solid #000;
+  border: 1px solid var(--scrollbar-track);
 }
 
 body::-webkit-scrollbar-thumb:hover {
-  background-color: #444;
+  background-color: var(--scrollbar-thumb-hover);
 }
 
-/* --- FIM DOS ESTILOS DE SCROLL --- */
-
-:root {
-  font-family: 'Poppins', sans-serif;
-  line-height: 1.5;
-  font-weight: 400;
-  color-scheme: light dark;
-  color: rgba(255, 255, 255, 0.87);
-  background-color: #000000;
-  font-synthesis: none;
-  text-rendering: optimizeLegibility;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-}
-
+/* --- ESTILOS GERAIS --- */
 body {
   margin: 0;
   padding: 0;
   min-width: 320px;
-  background-color: #000000;
-  overflow-x: hidden;
+  background-color: var(--bg-color);
+  color: var(--text-primary);
+  overflow-x: hidden; /* Evita scroll horizontal indesejado */
+  transition: background-color 0.3s ease, color 0.3s ease;
 }
 
 * {
@@ -61,18 +116,16 @@ body {
       rgba(255, 255, 255, 0.6) 0%,
       rgba(255, 255, 255, 0.1) 35%,
       transparent 70%);
+  /* No modo claro, a luz pode atrapalhar ou ser invisível, ajustamos se necessário */
+  mix-blend-mode: overlay; 
 }
 
 .main-content {
   position: relative;
   z-index: 2;
-  /* Conteúdo fica na frente da luz */
 }
 
-/* --- FIM DOS ESTILOS --- */
-
-
-/* --- Estilos da Hero Section --- */
+/* --- ESTILOS DA HERO SECTION --- */
 .hero-section {
   position: relative;
   width: 100%;
@@ -82,7 +135,6 @@ body {
   justify-content: center;
   overflow: hidden;
   background-color: transparent;
-  /* Transparente para a luz passar */
 }
 
 .hero-background {
@@ -93,8 +145,6 @@ body {
   height: 100%;
   z-index: 1;
 }
-
-
 
 .hero-content {
   position: relative;
@@ -109,27 +159,26 @@ body {
   line-height: 1.0;
   text-transform: uppercase;
   letter-spacing: 2px;
-  color: #ffffff;
+  color: var(--text-primary); /* Usa variável */
   margin: 0;
 }
 
 .hero-content .hero-subtitle {
   font-size: 1.25rem;
   font-weight: 400;
-  color: rgba(255, 255, 255, 0.8);
+  color: var(--text-secondary); /* Usa variável */
   margin-top: 1rem;
   letter-spacing: 1px;
   display: inline-block;
 }
 
-/* --- Estilos da Seção Sobre Mim --- */
+/* --- ESTILOS DA SEÇÃO SOBRE MIM --- */
 .about-section {
   position: relative;
   width: 100%;
   min-height: 70vh;
   padding: 5rem 2rem;
   background-color: transparent;
-  /* Transparente para a luz passar */
   display: flex;
   align-items: center;
   justify-content: center;
@@ -144,16 +193,14 @@ body {
   width: 100%;
   height: 100%;
   z-index: 1;
-  /* Fica atrás do .about-content */
 }
 
 .about-content {
   position: relative;
   z-index: 2;
-  /* Fica na frente do .about-background */
   width: 100%;
   max-width: 1200px;
-  color: #f0f0f0;
+  color: var(--text-primary);
   padding: 0 1rem;
   text-align: center;
 }
@@ -168,6 +215,7 @@ body {
   margin-left: auto;
   margin-right: auto;
   justify-content: center;
+  color: var(--text-primary);
 }
 
 .about-main {
@@ -197,7 +245,7 @@ body {
 .about-text p {
   font-size: 1.15rem;
   line-height: 1.7;
-  color: rgba(255, 255, 255, 0.9);
+  color: var(--text-primary); /* Ajustado para variável */
   text-align: justify;
 }
 
@@ -205,21 +253,19 @@ body {
   margin-bottom: 1.5rem;
 }
 
-
-/* --- Estilos da Seção Jornada --- */
+/* --- ESTILOS DA SEÇÃO JORNADA --- */
 .journey-section {
   position: relative;
   width: 100%;
-  height: 70vh;
+  /* Height removido aqui pois é controlado inline ou via classe específica no Journey.css */
+  /* height: 70vh; */ 
   min-height: 500px;
   padding: 3rem 2rem;
   background-color: transparent;
-  /* Transparente para a luz passar */
   display: flex;
   align-items: center;
   justify-content: center;
-  overflow: hidden;
-  /* IMPORTANTE: "Corta" o robô que vazar */
+  /* Overflow visível ou hidden depende da lógica do sticky, mas geralmente hidden no pai corta sticky */
 }
 
 .journey-background {
@@ -229,7 +275,6 @@ body {
   width: 100%;
   height: 100%;
   z-index: 1;
-  /* Fica atrás do .journey-container */
 }
 
 .journey-container {
@@ -238,17 +283,14 @@ body {
   height: 100%;
   max-width: 1200px;
   z-index: 2;
-  /* Fica na frente do .journey-background */
 }
 
 .journey-content-left {
-  /* 1. MUDANÇA: Diminuímos o texto para 30% */
   flex-basis: 30%;
   display: flex;
   flex-direction: column;
   justify-content: center;
   padding-right: 2rem;
-  /* Adicionamos z-index para garantir que o texto fique na frente do robô que vazar */
   position: relative;
   z-index: 3;
 }
@@ -256,7 +298,16 @@ body {
 .journey-title {
   font-size: 3.5rem;
   font-weight: 700;
+  /* Gradiente condicional seria ideal, mas fixo por enquanto */
   background-image: linear-gradient(to bottom, #fafafa, #a3a3a3);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+/* Ajuste do título no modo claro */
+.theme-light .journey-title {
+  background-image: linear-gradient(to bottom, #111, #444);
   -webkit-background-clip: text;
   background-clip: text;
   color: transparent;
@@ -265,12 +316,11 @@ body {
 .journey-description {
   margin-top: 1rem;
   font-size: 1.1rem;
-  color: #d1d5db;
+  color: var(--text-secondary);
   max-width: 500px;
 }
 
 .journey-content-right {
-  /* 2. MUDANÇA: Aumentamos o container do robô para 70% */
   flex-basis: 70%;
   position: relative;
   height: 100%;
@@ -279,9 +329,6 @@ body {
 .spline-canvas {
   width: 100% !important;
   height: 100% !important;
-
-  /* 3. MUDANÇA: Aumentamos o robô em 30% e empurramos 100px para a direita */
-
 }
 
 .spline-loading {
@@ -290,6 +337,34 @@ body {
   display: flex;
   align-items: center;
   justify-content: center;
-  color: white;
+  color: var(--text-primary);
   font-family: 'Poppins', sans-serif;
+}
+
+/* --- COMPONENTES UI ADICIONAIS --- */
+
+/* Botão de Tema na Navbar */
+.theme-toggle-btn {
+  background: transparent;
+  border: none;
+  color: var(--text-primary);
+  cursor: pointer;
+  padding: 6px;
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.2s, color 0.2s;
+}
+
+.theme-toggle-btn:hover {
+  background: rgba(125, 125, 125, 0.2);
+  color: var(--accent-color);
+}
+
+.tray-divider {
+  width: 1px;
+  height: 20px;
+  background: rgba(125, 125, 125, 0.3);
+  margin: 0 8px;
 }

@@ -170,3 +170,57 @@
     grid-template-columns: 1fr; /* Lista vertical em telas muito pequenas */
   }
 }
+
+/* ========================================
+   THEME LIGHT OVERRIDES
+   ======================================== */
+
+.theme-light .tech-category-card {
+  background: rgba(255, 255, 255, 0.6);
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
+}
+
+.theme-light .tech-category-card:hover {
+  background: rgba(255, 255, 255, 0.8);
+  border-color: rgba(168, 85, 247, 0.3);
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+}
+
+.theme-light .category-header {
+  border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+}
+
+.theme-light .category-icon-wrapper {
+  background: rgba(0, 0, 0, 0.03);
+  border: 1px solid rgba(0, 0, 0, 0.05);
+  color: #a855f7;
+}
+
+.theme-light .category-title {
+  color: #111;
+}
+
+.theme-light .category-desc {
+  color: #555;
+}
+
+.theme-light .tech-item {
+  background: rgba(255, 255, 255, 0.5);
+  border: 1px solid rgba(0, 0, 0, 0.08);
+}
+
+.theme-light .tech-item:hover {
+  background: #fff;
+  border-color: rgba(168, 85, 247, 0.3);
+  transform: translateY(-2px);
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+}
+
+.theme-light .tech-name {
+  color: #444;
+}
+
+.theme-light .tech-item:hover .tech-name {
+  color: #000;
+}

@@ -203,3 +203,32 @@
     display: none; /* Simplifica no mobile, focando na navegação */
   }
 }
+
+/* src/components/ui/Navbar.css */
+
+/* Adicione no final do arquivo */
+
+.theme-toggle-btn {
+  background: transparent;
+  border: none;
+  color: #fff;
+  cursor: pointer;
+  padding: 6px;
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.2s;
+}
+
+.theme-toggle-btn:hover {
+  background: rgba(255, 255, 255, 0.1);
+  color: #a855f7;
+}
+
+.tray-divider {
+  width: 1px;
+  height: 20px;
+  background: rgba(255,255,255,0.1);
+  margin: 0 8px;
+}

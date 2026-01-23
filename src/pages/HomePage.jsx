@@ -1,7 +1,8 @@
-import React from 'react';
+import React, { useState } from 'react';
 import Hero from '../components/sections/Hero'; 
 import Profile from '../components/sections/Profile'; 
 import Silk from '../components/backgrounds/Silk';
+import Iridescence from '../components/backgrounds/Iridescence'; // IMPORTAR
 import Projects from '../components/sections/Projects';
 import Journey from '../components/sections/Journey';
 import TechStack from '../components/sections/TechStack';
@@ -9,10 +10,20 @@ import Contact from '../components/sections/Contact';
 import Navbar from '../components/ui/Navbar';
 
 const HomePage = () => {
+  const [isDarkMode, setIsDarkMode] = useState(true);
+
+  const toggleTheme = () => {
+    setIsDarkMode(!isDarkMode);
+  };
+
   return (
-    <main style={{ position: 'relative', width: '100%' }}>
+    // Adiciona classe light-mode se necessário
+    <main 
+      className={isDarkMode ? 'theme-dark' : 'theme-light'} 
+      style={{ position: 'relative', width: '100%' }}
+    >
       
-      {/* 1. BACKGROUND FIXO BLINDADO */}
+      {/* 1. BACKGROUND FIXO (CONDICIONAL) */}
       <div style={{
         position: 'fixed',
         top: 0, 
@@ -21,69 +32,60 @@ const HomePage = () => {
         height: '100dvh', 
         zIndex: 0,
         pointerEvents: 'none',
-        transform: 'translateZ(0)' 
+        transform: 'translateZ(0)',
+        transition: 'opacity 0.5s ease'
       }}>
-        <Silk 
-          color="#661ea8" 
-          speed={10} 
-          scale={1} 
-          rotation={3} 
-          noiseIntensity={6.15} 
-        />
+        {isDarkMode ? (
+          <Silk 
+            color="#661ea8" 
+            speed={10} 
+            scale={1} 
+            rotation={3} 
+            noiseIntensity={6.15} 
+          />
+        ) : (
+          <Iridescence
+            color={[0.9, 0.9, 0.95]} // Cor clarinha (prata/azulado)
+            mouseReact={true}
+            amplitude={0.1}
+            speed={1}
+          />
+        )}
       </div>
 
-      {/* 2. HERO SECTION */}
+      {/* 2. CONTEÚDO */}
       <div id="hero" style={{ position: 'relative', zIndex: 10 }}>
         <Hero />
       </div>
 
-      {/* 3. CONTEÚDO PRINCIPAL */}
       <div style={{ position: 'relative', zIndex: 5 }}>
+        <div id="profile"><Profile /></div>
+        <div id="projects"><Projects /></div>
         
-        <div id="profile">
-          <Profile />
-        </div>
-        
-        <div id="projects">
-          <Projects />
-        </div>
-        
-        {/* --- SPACER DE SEGURANÇA --- 
-            Evita que a Journey comece antes da hora por causa do sticky
-        */}
         <div style={{ height: '150px', width: '100%' }}></div>
 
-        <div id="journey">
-          <Journey />
-        </div>
+        <div id="journey"><Journey /></div>
+        <div id="tech"><TechStack /></div>
+        <div id="contact"><Contact /></div>
         
-        <div id="tech">
-          <TechStack />
-        </div>
-        
-        <div id="contact">
-          <Contact />
-        </div>
-        
-        {/* --- FOOTER --- */}
         <div style={{ 
           height: '150px', 
           display: 'flex', 
           flexDirection: 'column',
           alignItems: 'center', 
           justifyContent: 'center',
-          color: '#444',
+          // Cor do texto do footer ajustável via CSS da classe theme
+          color: isDarkMode ? '#444' : '#666',
           fontSize: '0.8rem',
           marginTop: '4rem',
           paddingBottom: '2rem'
         }}>
           <p>© 2026 Marcos Rodrigues. Built with React & Framer Motion.</p>
         </div>
-
       </div>
       
-      {/* 4. BARRA DE NAVEGAÇÃO FLUTUANTE */}
-      <Navbar />
+      {/* 3. NAVBAR COM TOGGLE */}
+      <Navbar isDarkMode={isDarkMode} toggleTheme={toggleTheme} />
 
     </main>
   );
