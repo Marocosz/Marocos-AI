@@ -232,3 +232,68 @@
   background: rgba(255,255,255,0.1);
   margin: 0 8px;
 }
+
+/* ========================================
+   THEME LIGHT OVERRIDES
+   ======================================== */
+
+.theme-light .taskbar-container {
+  background: rgba(245, 245, 245, 0.7); /* Vidro claro tipo Windows 11 Light */
+  border-top: 1px solid rgba(0, 0, 0, 0.08);
+  box-shadow: 0 -5px 20px rgba(0, 0, 0, 0.05);
+}
+
+.theme-light .taskbar-btn {
+  color: #555;
+}
+
+.theme-light .taskbar-btn:hover {
+  background: rgba(0, 0, 0, 0.05); /* Hover escurece levemente no light mode */
+  color: #000;
+  box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.05);
+}
+
+.theme-light .taskbar-btn.active {
+  background: rgba(0, 0, 0, 0.04);
+  color: #a855f7;
+}
+
+.theme-light .taskbar-btn:active {
+  background: rgba(0, 0, 0, 0.08);
+}
+
+.theme-light .taskbar-tooltip {
+  background: rgba(255, 255, 255, 0.95);
+  border: 1px solid rgba(0, 0, 0, 0.1);
+  color: #333;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+}
+
+/* Tray Area Light */
+.theme-light .tray-icon-hover {
+  color: #333;
+}
+
+.theme-light .tray-icons:hover,
+.theme-light .tray-clock:hover,
+.theme-light .theme-toggle-btn:hover {
+  background: rgba(0, 0, 0, 0.05);
+}
+
+.theme-light .time,
+.theme-light .date,
+.theme-light .theme-toggle-btn {
+  color: #333;
+}
+
+.theme-light .tray-divider {
+  background: rgba(0, 0, 0, 0.1);
+}
+
+.theme-light .show-desktop-line {
+  border-left: 1px solid rgba(0, 0, 0, 0.1);
+}
+
+.theme-light .show-desktop-line:hover {
+  background: rgba(0, 0, 0, 0.05);
+}
