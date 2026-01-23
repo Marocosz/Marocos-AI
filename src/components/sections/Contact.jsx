@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { motion } from 'motion/react';
-import { Loader2 } from 'lucide-react';
+import { Loader2, Server } from 'lucide-react';
 import { contactData } from '../../data/contact';
 import './Contact.css';
 
@@ -45,6 +45,32 @@ const Contact = () => {
           </p>
         </motion.div>
       </div>
+
+      {/* HOSTING SERVICE CARD */}
+      <motion.div 
+        className="hosting-service-card"
+        initial={{ opacity: 0, y: -20 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        viewport={{ once: true }}
+        transition={{ duration: 0.6, delay: 0.2 }}
+      >
+        <div className="hosting-card-header">
+          <Server size={20} className="hosting-icon" />
+          <span className="hosting-badge">HOSTING SERVICE</span>
+        </div>
+        <h3 className="hosting-title">Professional VPS Hosting Available</h3>
+        <p className="hosting-description">
+          I offer complete end-to-end web hosting solutions through my own VPS infrastructure. 
+          From deployment to monitoring, database management to SSL certificates, I handle everything. 
+          Perfect for small to medium projects that need reliable, custom hosting with direct support from the developer.
+        </p>
+        <div className="hosting-features">
+          <span className="feature-tag">✓ Custom Configuration</span>
+          <span className="feature-tag">✓ 24/7 Monitoring</span>
+          <span className="feature-tag">✓ Direct Support</span>
+          <span className="feature-tag">✓ SSL & Security</span>
+        </div>
+      </motion.div>
 
       {/* TERMINAL WINDOW */}
       <motion.div 
