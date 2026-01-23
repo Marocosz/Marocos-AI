@@ -27,6 +27,10 @@ const Projects = () => {
       <div className="projects-header">
         <span className="section-label">03. / PORTFOLIO</span>
         <h2 className="section-title-large">Selected Work</h2>
+        <p className="section-subtitle">
+            Uma seleção de projetos demonstrando minhas habilidades em Full-Stack e IA.
+            Clique nos cards para ver detalhes.
+        </p>
       </div>
 
       <div className="carousel-viewport">

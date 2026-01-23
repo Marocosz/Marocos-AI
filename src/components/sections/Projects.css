@@ -14,7 +14,7 @@
   padding: 0 4rem;
   margin-bottom: 3rem;
   width: 100%;
-  text-align: left;
+  text-align: center;
 
 }
 
@@ -34,6 +34,15 @@
   margin: 0;
   line-height: 1.1;
   letter-spacing: -1px;
+}
+
+.section-subtitle {
+  font-size: 1rem;
+  color: #999;
+  line-height: 1.6;
+  margin: 1rem auto 0;
+  font-weight: 300;
+  max-width: 600px;
 }
 
 /* --- ÁREA DO CARROSSEL --- */

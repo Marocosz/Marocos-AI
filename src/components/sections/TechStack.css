@@ -37,6 +37,15 @@
   letter-spacing: -2px;
 }
 
+.section-subtitle {
+  font-size: 1rem;
+  color: #999;
+  line-height: 1.6;
+  margin: 1rem auto 0;
+  font-weight: 300;
+  max-width: 600px;
+}
+
 /* --- GRID PRINCIPAL (BENTO GRID) --- */
 .tech-grid {
   display: grid;

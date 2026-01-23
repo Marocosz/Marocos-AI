@@ -32,6 +32,9 @@ const TechStack = () => {
         >
           <span className="section-label">05. / ARSENAL</span>
           <h2 className="section-title-large">Tech Stack</h2>
+          <p className="section-subtitle">
+            Linguagens, frameworks e ferramentas que utilizo para construir soluções robustas.
+          </p>
         </motion.div>
       </div>
 

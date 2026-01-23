@@ -44,7 +44,7 @@
   padding: 0 4rem;
   /* Margem superior para afastar do topo da tela, mas dentro do viewport */
   margin: 4rem auto 3rem auto; 
-  text-align: left;
+  text-align: center;
 }
 
 .section-label {
@@ -71,7 +71,7 @@
   font-size: 1rem;
   color: #999;
   line-height: 1.6;
-  margin: 0;
+  margin: 0 auto;
   font-weight: 300;
   max-width: 600px;
 }
