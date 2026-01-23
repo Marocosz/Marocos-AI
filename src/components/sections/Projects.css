@@ -14,7 +14,7 @@
   padding: 0 4rem;
   margin-bottom: 3rem;
   width: 100%;
-  text-align: center; /* Centralizado para combinar com o carrossel */
+  text-align: left; /* MANTIDO A ESQUERDA COMO PEDIDO */
   z-index: 20;
 }
 
@@ -39,75 +39,79 @@
 /* --- ÁREA DO CARROSSEL --- */
 .carousel-viewport {
   width: 100%;
-  height: 600px; /* Altura suficiente para os cards verticais */
+  height: 600px; /* Altura aumentada para comportar os cards maiores */
   position: relative;
   display: flex;
   align-items: center;
   justify-content: center;
-  perspective: 1000px; /* Para dar profundidade 3D se necessário */
+  perspective: 1000px;
 }
 
 /* A trilha que se move */
 .carousel-track {
   display: flex;
   align-items: center;
-  gap: 4rem; /* Espaço generoso entre os cards */
+  gap: 4rem; /* Espaço entre cards */
   position: absolute;
-  left: 50%; /* Começa do meio da tela */
-  /* O transform será controlado via Inline Style no React */
-  transition: transform 0.6s cubic-bezier(0.25, 1, 0.5, 1);
-  will-change: transform;
+  left: 50%; /* Ponto de partida no centro da tela */
+  /* O movimento é feito via Framer Motion no JSX */
 }
 
-/* --- O CARD VERTICAL --- */
+/* --- O CARD HORIZONTAL (ULTRA WIDE) --- */
 .project-card {
-  /* Tamanho Fixo Vertical - Estilo "Poster" */
-  width: 320px; 
-  height: 500px;
-  flex-shrink: 0; /* Impede de esmagar */
+  /* MUDANÇA: Aumentado significativamente */
+  width: 800px;  /* Bastante horizontal */
+  height: 500px; /* Um pouco mais vertical */
+  flex-shrink: 0;
   
-  border-radius: 20px;
+  border-radius: 24px;
   position: relative;
   overflow: hidden;
   
-  /* Vidro Premium */
-  background: rgba(15, 15, 15, 0.6);
+  /* Base escura */
+  background: #050505;
   border: 1px solid rgba(255, 255, 255, 0.08);
-  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5);
+  
+  /* Sombra profunda para dar destaque */
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.6);
   
   display: flex;
   flex-direction: column;
 
-  /* Transições suaves de estado (Foco vs Blur) */
+  /* Transições suaves */
   transition: all 0.6s cubic-bezier(0.25, 1, 0.5, 1);
+  will-change: transform, filter, opacity;
 }
 
-/* --- ESTADOS DO CARD (Manipulados via Classe no JS) --- */
+/* --- ESTADOS DO CARD --- */
 
 /* Card Inativo (Laterais) */
 .project-card.inactive {
-  opacity: 0.4;
-  filter: blur(4px) grayscale(80%);
-  transform: scale(0.9);
-  pointer-events: none; /* Não clicável se não for o central */
+  opacity: 0.5;
+  filter: blur(4px) grayscale(100%); /* Blur + Preto e Branco para não chamar atenção */
+  transform: scale(0.85); /* Menor */
+  pointer-events: none;
 }
 
 /* Card Ativo (Central) */
 .project-card.active {
   opacity: 1;
   filter: blur(0px) grayscale(0%);
-  transform: scale(1.05); /* Leve zoom para destaque */
+  transform: scale(1); /* Tamanho normal */
   z-index: 10;
-  border-color: rgba(168, 85, 247, 0.3);
-  box-shadow: 0 0 30px rgba(168, 85, 247, 0.15), 0 20px 50px rgba(0,0,0,0.5);
+  border-color: rgba(168, 85, 247, 0.4); /* Borda roxa sutil */
+  box-shadow: 0 0 40px rgba(168, 85, 247, 0.1), 0 30px 60px rgba(0,0,0,0.8);
 }
 
-/* --- CONTEÚDO INTERNO DO CARD --- */
+/* --- CONTEÚDO DO CARD --- */
+
 .card-image-wrapper {
   width: 100%;
-  height: 65%; /* Imagem ocupa a maior parte */
-  position: relative;
-  overflow: hidden;
+  height: 100%; /* A imagem ocupa tudo no fundo */
+  position: absolute; /* Absolute para ficar atrás do texto */
+  top: 0;
+  left: 0;
+  z-index: 1;
 }
 
 .card-image {
@@ -117,51 +121,75 @@
   transition: transform 0.8s ease;
 }
 
-/* Hover só funciona no card ativo */
 .project-card.active:hover .card-image {
-  transform: scale(1.1);
+  transform: scale(1.05); /* Zoom suave na imagem ao passar o mouse */
 }
 
+/* Overlay para escurecer a imagem e o texto ficar legível */
 .card-overlay {
   position: absolute;
   inset: 0;
-  background: linear-gradient(to top, rgba(10,10,10,1) 0%, transparent 60%);
+  background: linear-gradient(to top, rgba(0,0,0,0.9) 10%, rgba(0,0,0,0.2) 50%, transparent 100%);
+  z-index: 2;
 }
 
+/* --- O "ESPELHO" (Glass Content) --- */
 .card-content {
-  height: 35%;
-  padding: 1.5rem;
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 45%; /* Ocupa quase metade de baixo */
+  z-index: 3;
+  
+  padding: 1.5rem 2rem;
   display: flex;
   flex-direction: column;
   justify-content: flex-start;
-  position: relative;
-  background: linear-gradient(to bottom, rgba(10,10,10,0.8), rgba(5,5,5,1));
-  border-top: 1px solid rgba(255, 255, 255, 0.05);
+  
+  /* EFEITO DE ESPELHO / VIDRO */
+  background: rgba(20, 20, 20, 0.4); /* Base semi-transparente */
+  backdrop-filter: blur(12px); /* O Blur mágico que faz parecer vidro */
+  -webkit-backdrop-filter: blur(12px);
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
 }
 
-.project-category {
-  font-size: 0.7rem;
-  color: #a855f7;
-  text-transform: uppercase;
-  letter-spacing: 1.5px;
-  font-weight: 600;
+.project-header-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
   margin-bottom: 0.5rem;
 }
 
+.project-category {
+  font-size: 0.75rem;
+  color: #a855f7;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  font-weight: 700;
+}
+
+.project-year {
+    font-size: 0.75rem;
+    color: #666;
+    font-weight: 600;
+}
+
 .project-title {
-  font-size: 1.5rem;
+  font-size: 1.8rem; /* Título maior */
   font-weight: 700;
   color: #fff;
   margin: 0 0 0.5rem 0;
-  line-height: 1.2;
+  letter-spacing: -0.5px;
 }
 
 .project-description {
-  font-size: 0.85rem;
-  color: #888;
-  line-height: 1.5;
+  font-size: 0.95rem;
+  color: #ccc;
+  line-height: 1.6;
+  max-width: 90%;
   
-  /* Limita a 2 linhas com reticências */
+  /* Limita texto */
   display: -webkit-box;
   -webkit-line-clamp: 2;
   line-clamp: 2;
@@ -169,18 +197,24 @@
   overflow: hidden;
 }
 
-/* --- BOTÕES DE NAVEGAÇÃO FLUTUANTES --- */
+/* Link/Botão dentro do card */
+.card-action {
+    margin-top: auto;
+    align-self: flex-start;
+}
+
+/* --- BOTÕES DE NAVEGAÇÃO --- */
 .nav-btn-floating {
   position: absolute;
   top: 50%;
   transform: translateY(-50%);
-  width: 60px;
-  height: 60px;
+  width: 56px;
+  height: 56px;
   border-radius: 50%;
   
-  background: rgba(20, 20, 20, 0.5);
+  background: rgba(255, 255, 255, 0.05);
   border: 1px solid rgba(255, 255, 255, 0.1);
-  backdrop-filter: blur(10px);
+  backdrop-filter: blur(8px);
   color: #fff;
   
   display: flex;
@@ -192,23 +226,31 @@
 }
 
 .nav-btn-floating:hover {
-  background: #a855f7;
-  border-color: #a855f7;
+  background: #fff;
+  color: #000;
   transform: translateY(-50%) scale(1.1);
-  box-shadow: 0 0 20px rgba(168, 85, 247, 0.4);
 }
 
-.nav-btn-floating.prev { left: 5%; }
-.nav-btn-floating.next { right: 5%; }
+/* Botões laterais */
+.nav-btn-floating.prev { left: 4%; }
+.nav-btn-floating.next { right: 4%; }
 
-/* Mobile */
+/* RESPONSIVIDADE */
+@media (max-width: 1024px) {
+  /* Em tablets, diminuímos um pouco para caber */
+  .project-card { width: 600px; height: 450px; }
+  .carousel-track { gap: 2rem; }
+}
+
 @media (max-width: 768px) {
   .carousel-viewport { height: 500px; }
-  .project-card { width: 260px; height: 400px; }
-  .carousel-track { gap: 1.5rem; }
-  .nav-btn-floating { width: 45px; height: 45px; }
-  .nav-btn-floating.prev { left: 2%; }
-  .nav-btn-floating.next { right: 2%; }
+  /* No mobile volta a ser um pouco mais estreito pra caber na tela */
+  .project-card { width: 85vw; height: 420px; } 
+  .carousel-track { gap: 1rem; }
+  
+  .nav-btn-floating { width: 40px; height: 40px; }
+  .nav-btn-floating.prev { left: 1%; }
+  .nav-btn-floating.next { right: 1%; }
   
   .section-title-large { font-size: 2.2rem; }
 }

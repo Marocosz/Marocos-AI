@@ -21,8 +21,8 @@ const CrystalMesh = () => {
             {/* Scale ajustado para ser fino (y=1.8) mas nem tanto (x/z=0.8) */}
             <icosahedronGeometry args={[1, 0]} /> 
             <meshPhysicalMaterial 
-                color="#f3e8ff" // Roxo pálido (lavanda)
-                emissive="#d8b4fe" // Brilho roxo suave
+                color="#6b24b7" // Roxo pálido (lavanda)
+                emissive="#090909" // Brilho roxo suave
                 emissiveIntensity={0.2}
                 roughness={0.15} // Fosco acetinado para parecer orgânico
                 metalness={0.1}
