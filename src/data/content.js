@@ -1,14 +1,14 @@
 export const profileData = {
-  title: ">_ WHOAMI", // Título com visual de terminal/tech
+  title: ">_ WHOAMI", // Terminal/tech style title
   role: "AI Developer & Full-Stack Engineer",
   
-  // O "Elevator Pitch": Curto, impactante e define seu diferencial (Dados + Eng. de Software)
-  bio_highlight: "Transformo dados em inteligência acionável através de Agentes de IA, arquiteturas escaláveis e automação estratégica.",
+  // The "Elevator Pitch": Short, impactful and defines your differential (Data + Software Engineering)
+  bio_highlight: "I transform data into actionable intelligence through AI Agents, scalable architectures and strategic automation.",
   
-  // A História completa: Une sua base acadêmica (UFU/Gestão da Informação) com a prática (Estágio/Freelance)
-  bio_full: "Graduado em Gestão da Informação pela UFU, atuo na interseção entre Ciência de Dados e Engenharia de Software. Minha especialidade é construir ecossistemas robustos que integram LLMs a processos e regras de negócios. Com experiência prática em Python Avançado, Docker e DevOps, desenvolvo desde automações logísticas até produtos SaaS completos, sempre focado em código limpo, performance e entrega de valor real.",
+  // The Full Story: Unites your academic background (UFU/Information Management) with practice (Internship/Freelance)
+  bio_full: "Graduated in Information Management from UFU, I work at the intersection of Data Science and Software Engineering. My specialty is building robust ecosystems that integrate LLMs with business processes and rules. With hands-on experience in Advanced Python, Docker and DevOps, I develop everything from logistics automation to complete SaaS products, always focused on clean code, performance and delivering real value.",
   
-  // Skills mais "vendáveis" baseadas no seu CV e projetos atuais
+  // Most "marketable" skills based on your CV and current projects
   skills_highlight: [
     "Python Expert", 
     "FastAPI", 

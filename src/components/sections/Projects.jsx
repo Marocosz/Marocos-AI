@@ -40,7 +40,7 @@ const Projects = () => {
           <span className="section-label">03. / PORTFOLIO</span>
           <h2 className="section-title-large">Selected Work</h2>
           <p className="section-subtitle">
-            Uma seleção de projetos demonstrando minhas habilidades em Full-Stack e IA.
+            A selection of projects showcasing my Full-Stack and AI skills.
           </p>
         </div>
 
@@ -98,8 +98,8 @@ const Projects = () => {
         <span className="section-label">03. / PORTFOLIO</span>
         <h2 className="section-title-large">Selected Work</h2>
         <p className="section-subtitle">
-            Uma seleção de projetos demonstrando minhas habilidades em Full-Stack e IA.
-            Clique nos cards para ver detalhes.
+            A selection of projects showcasing my Full-Stack and AI skills.
+            Click on cards to see details.
         </p>
       </div>
 

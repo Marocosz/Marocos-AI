@@ -28,7 +28,7 @@ const Hero = () => {
             </div>
             
             <div className="hero-f11-hint">
-                Pressione F11 para melhor experiência
+                Press F11 for best experience
             </div>
 
         </section>

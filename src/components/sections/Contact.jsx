@@ -40,8 +40,8 @@ const Contact = () => {
           <span className="section-label">06. / CONNECT</span>
           <h2 className="section-title-large">Let's Talk</h2>
           <p className="contact-desc">
-            Abaixo estão os melhores canais para me encontrar. 
-            Execute o comando ou clique nos links.
+            Below are the best channels to find me. 
+            Run the command or click the links.
           </p>
         </motion.div>
       </div>
@@ -97,7 +97,7 @@ const Contact = () => {
               
               <div className="cmd-response">
                 <Loader2 className="animate-spin" size={16} />
-                <span>Buscando canais de comunicação...</span>
+                <span>Fetching communication channels...</span>
               </div>
 
               {/* Grid de Cards */}

@@ -2,11 +2,11 @@
 
 export const projectsData = [
   {
-    id: 1, // Pode ajustar o ID conforme necessário na sua lista
+    id: 1,
     title: "Bússola V2",
     category: "Fullstack & AI",
     description:
-      "Aplicação Web Pessoal que unifica Finanças, Saúde e Produtividade. Utiliza Agentes de IA orquestrados (LangGraph) para gerar insights e otimizar rotinas em uma plataforma segura e reativa. O Bússola V2 é a resposta definitiva para a fragmentação da vida moderna.Ele elimina a necessidade de alternar entre múltiplos aplicativos desconexos (planilhas financeiras, apps de treino, notas soltas e agendas), unificando todos os aspectos vitais da sua rotina em uma única plataforma inteligente e segura.",
+      "Personal Web Application that unifies Finance, Health and Productivity. Uses orchestrated AI Agents (LangGraph) to generate insights and optimize routines on a secure and reactive platform. Bússola V2 is the definitive answer to modern life fragmentation. It eliminates the need to switch between multiple disconnected apps (financial spreadsheets, workout apps, scattered notes and calendars), unifying all vital aspects of your routine in a single intelligent and secure platform.",
     techs: [
       "React 19",
       "FastAPI",
@@ -14,51 +14,51 @@ export const projectsData = [
       "Docker",
       "Redis",
       "SQLAlchemy",
-      "Ai Agents",
+      "AI Agents",
     ],
     links: {
       github: "https://github.com/Marocosz/bussola-v2",
-      live: "#", // Se tiver um link de deploy, coloque aqui, senão mantenha # ou remova
+      live: "#",
     },
   },
   {
-    id: 2, // Ajuste o ID conforme a sequência
+    id: 2,
     title: "DataChat BI",
     category: "AI & Analytics",
     description:
-      "DataChat BI é uma solução de Business Intelligence conversacional para logística, baseada em IA generativa. O sistema utiliza LLMs para interpretar perguntas em linguagem natural, gerar consultas SQL dinâmicas e entregar respostas precisas e contextualizadas, incluindo gráficos e KPIs. Com arquitetura modular de prompts e memória de conversa, DataChat BI oferece uma interface inteligente para análise avançada de dados logísticos via dashboard e principalmente chatbot.",
+      "DataChat BI is a conversational Business Intelligence solution for logistics, based on generative AI. The system uses LLMs to interpret questions in natural language, generate dynamic SQL queries and deliver accurate and contextualized answers, including charts and KPIs. With modular prompt architecture and conversation memory, DataChat BI offers an intelligent interface for advanced analysis of logistics data via dashboard and especially chatbot.",
     techs: [
       "FastAPI",
       "LangChain",
       "React",
       "PostgreSQL",
       "LLaMA 3",
-      "Ai Agents",
+      "AI Agents",
     ],
     links: {
-      github: "https://github.com/Marocosz/DataChat-BI", // Link extraído do README
+      github: "https://github.com/Marocosz/DataChat-BI",
       live: "#",
     },
   },
   {
-    id: 3, // Ajuste o ID conforme a sequência
+    id: 3,
     title: "Code Doc Generator",
     category: "AI & Tools",
     description:
-      "API Web que utiliza Inteligência Artificial para analisar arquivos de código-fonte em Python (.py) e Pascal (.pas) e gerar uma documentação técnica completa e bem robusta em formato .docx. O objetivo é automatizar e agilizar o processo de documentação, tornando-o mais eficiente para desenvolvedores e equipes.",
-    techs: ["Python", "Flask", "LangChain", "Ai Agents", "Docker"],
+      "Web API that uses Artificial Intelligence to analyze source code files in Python (.py) and Pascal (.pas) and generate complete and robust technical documentation in .docx format. The goal is to automate and streamline the documentation process, making it more efficient for developers and teams.",
+    techs: ["Python", "Flask", "LangChain", "AI Agents", "Docker"],
     links: {
       github: "https://github.com/Marocosz/gerador_doc_robos",
       live: "#",
     },
   },
   {
-    id: 4, // Ajuste o ID conforme a sequência
-    title: "Code Doc Generator",
+    id: 4,
+    title: "Contract Analyzer",
     category: "AI & Tools",
     description:
-      "API RESTful que utiliza Inteligência Artificial para extrair e organizar informações-chave de contratos nos formatos PDF e DOCX. O objetivo é agilizar a análise documental, tornando o processo mais eficiente para profissionais que lidam com grandes volumes de contratos!",
-    techs: ["Python", "Flask", "LangChain", "Ai Agents", "Docker"],
+      "RESTful API that uses Artificial Intelligence to extract and organize key information from contracts in PDF and DOCX formats. The goal is to streamline document analysis, making the process more efficient for professionals dealing with large volumes of contracts!",
+    techs: ["Python", "Flask", "LangChain", "AI Agents", "Docker"],
     links: {
       github: "https://github.com/Marocosz/Analisador_Contrato",
       live: "#",
@@ -69,12 +69,11 @@ export const projectsData = [
     title: "Marocos Bot 2.0",
     category: "Gaming & Automation",
     description:
-      "Sistema de automação para comunidades competitivas de League of Legends. Gerencia o ciclo de vida completo de partidas personalizadas ('in-houses'): realiza a validação de Elo em tempo real via Riot API, executa algoritmos de permutação para o balanceamento matemático das equipes e gerencia dinamicamente canais de voz e permissões no servidor.",
+      "Automation system for competitive League of Legends communities. Manages the complete lifecycle of custom matches ('in-houses'): performs real-time Elo validation via Riot API, executes permutation algorithms for mathematical team balancing and dynamically manages voice channels and permissions on the server.",
     techs: ["Python", "Discord.py", "Riot API", "Algorithms", "AsyncIO"],
     links: {
       github: "https://github.com/Marocosz/Marocos-BOT-2",
       live: "#",
     },
   }
-  // Adicione mais projetos conforme necessário
 ];

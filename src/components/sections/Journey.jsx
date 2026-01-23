@@ -36,7 +36,7 @@ const Journey = () => {
           <span className="section-label">04. / PROFESSIONAL JOURNEY</span>
           <h2 className="section-title-large">Experience Timeline</h2>
           <p className="section-subtitle">
-            Uma trajetória cronológica através do meu crescimento profissional e marcos importantes.
+            A chronological journey through my professional growth and important milestones.
           </p>
         </div>
 
@@ -77,7 +77,7 @@ const Journey = () => {
             <span className="section-label">04. / PROFESSIONAL JOURNEY</span>
             <h2 className="section-title-large">Experience Timeline</h2>
             <p className="section-subtitle">
-              Uma trajetória cronológica através do meu crescimento profissional e marcos importantes.
+              A chronological journey through my professional growth and important milestones.
             </p>
             
             {/* Drag Intruction Hint */}

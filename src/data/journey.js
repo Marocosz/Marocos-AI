@@ -5,43 +5,43 @@ export const journeyData = [
     id: "step-01",
     date: "2018 - 2021",
     hash: "a1b2c3d",
-    type: "init", // O grande início
-    title: "Fundação Técnica: Hardware & Código",
+    type: "init", // The great beginning
+    title: "Technical Foundation: Hardware & Code",
     org: "ServData & IFTM",
-    description: "Minha jornada começou unindo a prática de infraestrutura na ServData com a lógica de desenvolvimento no curso de Eletrônica no IFTM. Do suporte técnico aos microcontroladores com C++ e Arduino, construí a base que conecta o mundo físico ao digital.",
-    tags: ["Hardware", "C++", "Arduino", "Eletrônica", "Suporte"]
+    description: "My journey began by combining hands-on infrastructure practice at ServData with development logic in the Electronics course at IFTM. From technical support to microcontrollers with C++ and Arduino, I built the foundation that connects the physical world to the digital one.",
+    tags: ["Hardware", "C++", "Arduino", "Electronics", "Support"]
   },
   {
     id: "step-02",
     date: "2022",
     hash: "i7j8k9l",
-    type: "merge", // Representa a união de conhecimentos
-    title: "Imersão Acadêmica & Dados",
-    org: "Universidade Federal de Uberlândia",
+    type: "merge", // Represents the union of knowledge
+    title: "Academic Immersion & Data",
+    org: "Federal University of Uberlândia",
     description:
-      "Ingresso na Universidade Federal de Uberlândia (UFU) no curso de Gestão da Informação. Onde mergulhei em estatística, Machine Learning e na manipulação de bancos de dados, construindo a base analítica para os projetos mais complexos que viriam a seguir. Com isso, tive oportunidades de freelance na área de automação",
+      "Enrolled at the Federal University of Uberlândia (UFU) in Information Management. I dove into statistics, Machine Learning and database manipulation, building the analytical foundation for the more complex projects that would follow. This opened up freelance opportunities in automation.",
     tags: ["Data Science", "SQL", "Academic", "Python"],
   },
   {
     id: "step-03",
     date: "2024",
     hash: "m0n1o2p",
-    type: "release", // Representa o lançamento profissional/estágio
-    title: "Foco em Inteligência Artificial",
+    type: "release", // Represents the professional launch/internship
+    title: "Focus on Artificial Intelligence",
     org: "Supporte Logística",
     description:
-      "Este ano marcou minha especialização em IA. Desenvolvi projetos complexos como uma API RESTful conteinerizada com Docker e FastAPI, incrementando práticas de RAG, Banco de Vetores, Engenharia de Prompt. E tive meus primeiros freelances em automação de processos e web aplicações robustas",
-    tags: ["IA Generativa", "RAG", "Freelance", "FastAPI", "Web"],
+      "This year marked my specialization in AI. I developed complex projects like a containerized RESTful API with Docker and FastAPI, implementing RAG practices, Vector Databases, Prompt Engineering. And I had my first freelance gigs in process automation and robust web applications.",
+    tags: ["Generative AI", "RAG", "Freelance", "FastAPI", "Web"],
   },
   {
     id: "step-04",
     date: "2025",
     hash: "a2b42xt",
     type: "wip", // Work In Progress
-    title: "Desenvolvedor Fullstack & IA",
+    title: "Fullstack & AI Developer",
     org: "Supporte Logística",
     description:
-      "A partir de Agosto de 2025, iniciei como Estagiário de TI na Supporte Logística, focado em projetos de desenvolvimento e inovação com IA. Paralelamente, atundo mais forte como Desenvolvedor Fullstack Freelance, criando aplicações web customizadas, APIs em Python e soluções de automação de dados para clientes.",
+      "Starting in August 2025, I joined as an IT Intern at Supporte Logística, focused on development and innovation projects with AI. Simultaneously, I work more intensely as a Freelance Fullstack Developer, creating custom web applications, Python APIs and data automation solutions for clients.",
     tags: ["PyTorch", "Kubernetes", "MLOps", "Fine-Tuning"],
   },
   {
@@ -52,7 +52,7 @@ export const journeyData = [
     title: "Next Level: AI Engineer",
     org: "Roadmap 2026+",
     description:
-      "Aprofundamento contínuo em aplicações de software com o melhor da IA, Agents, Multi-Agents e Orchestrators. Aprender mais sobre RAG e Fine Tuning de modelos, MLOps e arquitetura de sistemas distribuídos escaláveis para soluções de IA robustas.",
-    tags: ["IA", "Kubernetes", "MLOps", "Fine-Tuning"],
+      "Continuous deepening in software applications with the best of AI, Agents, Multi-Agents and Orchestrators. Learning more about RAG and model Fine Tuning, MLOps and scalable distributed systems architecture for robust AI solutions.",
+    tags: ["AI", "Kubernetes", "MLOps", "Fine-Tuning"],
   },
 ];
