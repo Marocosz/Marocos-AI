@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { motion } from 'motion/react';
 import { 
   Home, User, FolderGit2, Map, Cpu, MessageSquare, 
-  Wifi, Volume2, BatteryMedium, Sun, Moon // Importei Sun e Moon
+  Wifi, Volume2, BatteryMedium, Sun, Moon, Play, Pause // Added Play and Pause
 } from 'lucide-react';
 import './Navbar.css';
 
@@ -15,8 +15,8 @@ const navItems = [
   { id: 'contact', icon: MessageSquare, label: 'Contact' },
 ];
 
-// Agora recebe props de tema
-const Navbar = ({ isDarkMode, toggleTheme }) => {
+// Agora recebe props de tema e animação
+const Navbar = ({ isDarkMode, toggleTheme, isAnimationEnabled, toggleAnimation }) => {
   const [activeId, setActiveId] = useState('hero');
   const [time, setTime] = useState(new Date());
   const visibleSections = useRef({});
@@ -124,6 +124,11 @@ const Navbar = ({ isDarkMode, toggleTheme }) => {
         {/* BOTÃO DE TEMA */}
         <button onClick={toggleTheme} className="theme-toggle-btn" aria-label="Toggle Theme">
           {isDarkMode ? <Moon size={18} /> : <Sun size={18} />}
+        </button>
+
+        {/* BOTÃO DE ANIMAÇÃO */}
+        <button onClick={toggleAnimation} className="theme-toggle-btn" aria-label="Toggle Animation">
+          {isAnimationEnabled ? <Pause size={18} /> : <Play size={18} />}
         </button>
 
         <div className="tray-divider"></div>

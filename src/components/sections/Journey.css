@@ -230,7 +230,7 @@
   position: relative;
   width: 500px; 
   min-width: 500px;
-  height: 450px;
+  min-height: 450px;
   flex-shrink: 0;
   z-index: 5;
   /* Centraliza o card na linha verticalmente */

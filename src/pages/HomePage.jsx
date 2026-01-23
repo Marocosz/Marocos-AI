@@ -11,9 +11,14 @@ import Navbar from '../components/ui/Navbar';
 
 const HomePage = () => {
   const [isDarkMode, setIsDarkMode] = useState(true);
+  const [isAnimationEnabled, setIsAnimationEnabled] = useState(true);
 
   const toggleTheme = () => {
     setIsDarkMode(!isDarkMode);
+  };
+
+  const toggleAnimation = () => {
+    setIsAnimationEnabled(!isAnimationEnabled);
   };
 
   return (
@@ -41,7 +46,8 @@ const HomePage = () => {
             speed={20} 
             scale={1} 
             rotation={3} 
-            noiseIntensity={1.5} 
+            noiseIntensity={1.5}
+            isAnimated={isAnimationEnabled} 
           />
         ) : (
           <Iridescence
@@ -49,6 +55,7 @@ const HomePage = () => {
             mouseReact={true}
             amplitude={0.1}
             speed={1}
+            isAnimated={isAnimationEnabled}
           />
         )}
       </div>
@@ -85,7 +92,12 @@ const HomePage = () => {
       </div>
       
       {/* 3. NAVBAR COM TOGGLE */}
-      <Navbar isDarkMode={isDarkMode} toggleTheme={toggleTheme} />
+      <Navbar 
+        isDarkMode={isDarkMode} 
+        toggleTheme={toggleTheme}
+        isAnimationEnabled={isAnimationEnabled}
+        toggleAnimation={toggleAnimation}
+      />
 
     </main>
   );

@@ -65,9 +65,9 @@ void main() {
 }
 `;
 
-const SilkPlane = forwardRef(function SilkPlane({ uniforms }, ref) {
+const SilkPlane = forwardRef(function SilkPlane({ uniforms, isAnimated }, ref) {
   useFrame((_, delta) => {
-    if (ref.current?.material?.uniforms) {
+    if (ref.current?.material?.uniforms && isAnimated) {
        ref.current.material.uniforms.uTime.value += 0.1 * delta;
     }
   });
@@ -87,7 +87,7 @@ const SilkPlane = forwardRef(function SilkPlane({ uniforms }, ref) {
   );
 });
 
-const Silk = ({ speed = 1, scale = 2, color = '#121212', noiseIntensity = 0.5, rotation = 0 }) => {
+const Silk = ({ speed = 1, scale = 2, color = '#121212', noiseIntensity = 0.5, rotation = 0, isAnimated = true }) => {
   const meshRef = useRef();
   const uniforms = useMemo(
     () => ({
@@ -119,7 +119,7 @@ const Silk = ({ speed = 1, scale = 2, color = '#121212', noiseIntensity = 0.5, r
           depth: false
         }} 
       >
-        <SilkPlane ref={meshRef} uniforms={uniforms} />
+        <SilkPlane ref={meshRef} uniforms={uniforms} isAnimated={isAnimated} />
       </Canvas>
     </div>
   );

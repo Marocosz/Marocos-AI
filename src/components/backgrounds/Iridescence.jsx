@@ -46,9 +46,10 @@ void main() {
 }
 `;
 
-export default function Iridescence({ color = [1, 1, 1], speed = 1.0, amplitude = 0.1, mouseReact = true, ...rest }) {
+export default function Iridescence({ color = [1, 1, 1], speed = 1.0, amplitude = 0.1, mouseReact = true, isAnimated = true, ...rest }) {
   const ctnDom = useRef(null);
   const mousePos = useRef({ x: 0.5, y: 0.5 });
+  const lastTime = useRef(0);
 
   useEffect(() => {
     if (!ctnDom.current) return;
@@ -94,7 +95,12 @@ export default function Iridescence({ color = [1, 1, 1], speed = 1.0, amplitude 
 
     function update(t) {
       animateId = requestAnimationFrame(update);
-      program.uniforms.uTime.value = t * 0.001;
+      if (isAnimated) {
+        program.uniforms.uTime.value = t * 0.001;
+        lastTime.current = t * 0.001;
+      } else {
+        program.uniforms.uTime.value = lastTime.current;
+      }
       renderer.render({ scene: mesh });
     }
     animateId = requestAnimationFrame(update);
@@ -123,7 +129,7 @@ export default function Iridescence({ color = [1, 1, 1], speed = 1.0, amplitude 
       }
       gl.getExtension('WEBGL_lose_context')?.loseContext();
     };
-  }, [color, speed, amplitude, mouseReact]);
+  }, [color, speed, amplitude, mouseReact, isAnimated]);
 
   return <div ref={ctnDom} className="iridescence-container" {...rest} />;
 }
