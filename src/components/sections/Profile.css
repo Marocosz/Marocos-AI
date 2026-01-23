@@ -137,9 +137,6 @@
   opacity: 0.9;
 }
 
-.glass-strip:hover .horizontal-profile-img {
-  filter: grayscale(0%) contrast(1); /* Fica colorido ao passar o mouse na faixa inteira */
-}
 
 /* --- 4. INFINITE SCROLL (MARQUEE) --- */
 .infinite-scroll-wrapper {

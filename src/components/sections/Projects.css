@@ -14,7 +14,7 @@
   padding: 0 4rem;
   margin-bottom: 3rem;
   width: 100%;
-  text-align: left; /* MANTIDO A ESQUERDA COMO PEDIDO */
+  text-align: left;
   z-index: 20;
 }
 
@@ -39,7 +39,7 @@
 /* --- ÁREA DO CARROSSEL --- */
 .carousel-viewport {
   width: 100%;
-  height: 600px; /* Altura aumentada para comportar os cards maiores */
+  height: 600px; 
   position: relative;
   display: flex;
   align-items: center;
@@ -51,110 +51,76 @@
 .carousel-track {
   display: flex;
   align-items: center;
-  gap: 4rem; /* Espaço entre cards */
+  gap: 4rem; 
   position: absolute;
-  left: 50%; /* Ponto de partida no centro da tela */
+  left: 50%; 
   /* O movimento é feito via Framer Motion no JSX */
 }
 
 /* --- O CARD HORIZONTAL (ULTRA WIDE) --- */
 .project-card {
-  /* MUDANÇA: Aumentado significativamente */
-  width: 800px;  /* Bastante horizontal */
-  height: 500px; /* Um pouco mais vertical */
+  width: 800px;  
+  height: 500px; 
   flex-shrink: 0;
   
   border-radius: 24px;
   position: relative;
   overflow: hidden;
   
-  /* Base escura */
-  background: #050505;
+  background: transparent;
   border: 1px solid rgba(255, 255, 255, 0.08);
   
-  /* Sombra profunda para dar destaque */
   box-shadow: 0 20px 50px rgba(0, 0, 0, 0.6);
   
   display: flex;
   flex-direction: column;
 
-  /* Transições suaves */
   transition: all 0.6s cubic-bezier(0.25, 1, 0.5, 1);
   will-change: transform, filter, opacity;
 }
 
 /* --- ESTADOS DO CARD --- */
 
-/* Card Inativo (Laterais) */
 .project-card.inactive {
   opacity: 0.5;
-  filter: blur(4px) grayscale(100%); /* Blur + Preto e Branco para não chamar atenção */
-  transform: scale(0.85); /* Menor */
+  filter: blur(4px) grayscale(100%);
+  transform: scale(0.85);
   pointer-events: none;
 }
 
-/* Card Ativo (Central) */
 .project-card.active {
   opacity: 1;
   filter: blur(0px) grayscale(0%);
-  transform: scale(1); /* Tamanho normal */
+  transform: scale(1);
   z-index: 10;
-  border-color: rgba(168, 85, 247, 0.4); /* Borda roxa sutil */
+  border-color: rgba(168, 85, 247, 0.4);
   box-shadow: 0 0 40px rgba(168, 85, 247, 0.1), 0 30px 60px rgba(0,0,0,0.8);
 }
 
 /* --- CONTEÚDO DO CARD --- */
 
-.card-image-wrapper {
+/* 1. Header (Topo do Card) - Glassmorphism FOSCO */
+.card-header-glass {
   width: 100%;
-  height: 100%; /* A imagem ocupa tudo no fundo */
-  position: absolute; /* Absolute para ficar atrás do texto */
-  top: 0;
-  left: 0;
-  z-index: 1;
-}
-
-.card-image {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  transition: transform 0.8s ease;
-}
-
-.project-card.active:hover .card-image {
-  transform: scale(1.05); /* Zoom suave na imagem ao passar o mouse */
-}
-
-/* Overlay para escurecer a imagem e o texto ficar legível */
-.card-overlay {
-  position: absolute;
-  inset: 0;
-  background: linear-gradient(to top, rgba(0,0,0,0.9) 10%, rgba(0,0,0,0.2) 50%, transparent 100%);
-  z-index: 2;
-}
-
-/* --- O "ESPELHO" (Glass Content) --- */
-.card-content {
-  position: absolute;
-  bottom: 0;
-  left: 0;
-  width: 100%;
-  height: 45%; /* Ocupa quase metade de baixo */
-  z-index: 3;
-  
   padding: 1.5rem 2rem;
+  
+  /* Visual Fosco (High Blur + High Opacity) para compensar a imagem de fundo */
+  background: rgba(20, 20, 20, 0.6);
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
+  
+  /* Bordas idênticas ao Profile (0.08) para consistência visual */
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  box-shadow: none;
+  
   display: flex;
   flex-direction: column;
-  justify-content: flex-start;
-  
-  /* EFEITO DE ESPELHO / VIDRO */
-  background: rgba(20, 20, 20, 0.4); /* Base semi-transparente */
-  backdrop-filter: blur(12px); /* O Blur mágico que faz parecer vidro */
-  -webkit-backdrop-filter: blur(12px);
-  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  justify-content: center;
+  flex-shrink: 0; 
 }
 
-.project-header-row {
+.header-top-row {
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -170,37 +136,125 @@
 }
 
 .project-year {
-    font-size: 0.75rem;
-    color: #666;
-    font-weight: 600;
+  font-size: 0.75rem;
+  color: #666;
+  font-weight: 600;
 }
 
 .project-title {
-  font-size: 1.8rem; /* Título maior */
+  font-size: 2rem;
   font-weight: 700;
   color: #fff;
-  margin: 0 0 0.5rem 0;
+  margin: 0;
   letter-spacing: -0.5px;
 }
 
-.project-description {
-  font-size: 0.95rem;
-  color: #ccc;
-  line-height: 1.6;
-  max-width: 90%;
-  
-  /* Limita texto */
-  display: -webkit-box;
-  -webkit-line-clamp: 2;
-  line-clamp: 2;
-  -webkit-box-orient: vertical;
+/* 2. Corpo Dividido (50% / 50%) - Sólido */
+.card-body-split {
+  flex: 1; 
+  display: flex;
+  width: 100%;
   overflow: hidden;
+  background: #050505; 
 }
 
-/* Link/Botão dentro do card */
-.card-action {
-    margin-top: auto;
-    align-self: flex-start;
+.card-col {
+  flex: 1; 
+  padding: 2rem; 
+  display: flex;
+  flex-direction: column;
+}
+
+.left-col {
+  border-right: 1px solid rgba(255, 255, 255, 0.08); 
+}
+
+.body-label {
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  letter-spacing: 1.5px;
+  color: #666; 
+  margin-bottom: 1rem;
+  font-weight: 600;
+  display: block;
+}
+
+.project-description {
+  font-size: 1rem;
+  color: #ccc;
+  line-height: 1.6;
+  margin-bottom: auto; 
+}
+
+.tech-grid {
+  display: flex;
+  flex-wrap: wrap;
+  align-content: flex-start;
+  gap: 0.75rem;
+}
+
+.tech-tag {
+  font-size: 0.85rem;
+  color: rgba(255, 255, 255, 0.8);
+  padding: 0.5rem 1rem;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: 8px; 
+  transition: all 0.3s ease;
+}
+
+.project-card.active .tech-tag:hover {
+  border-color: #a855f7;
+  background: rgba(168, 85, 247, 0.1);
+  color: #fff;
+  transform: translateY(-2px);
+}
+
+.github-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin-top: 2rem;
+  padding: 0.8rem 1.5rem;
+  background: #fff;
+  color: #000;
+  font-weight: 600;
+  border-radius: 8px;
+  text-decoration: none;
+  transition: all 0.3s ease;
+  width: max-content;
+}
+
+.github-btn:hover {
+  background: #e0e0e0;
+  transform: translateY(-2px);
+  box-shadow: 0 5px 15px rgba(255, 255, 255, 0.15);
+}
+
+.card-image-wrapper {
+  width: 100%;
+  height: 100%; 
+  position: absolute; 
+  top: 0;
+  left: 0;
+  z-index: 1;
+}
+
+.card-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.8s ease;
+}
+
+.project-card.active:hover .card-image {
+  transform: scale(1.05); 
+}
+
+.card-overlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(to top, rgba(0,0,0,0.9) 10%, rgba(0,0,0,0.2) 50%, transparent 100%);
+  z-index: 2;
 }
 
 /* --- BOTÕES DE NAVEGAÇÃO --- */
@@ -211,12 +265,10 @@
   width: 56px;
   height: 56px;
   border-radius: 50%;
-  
   background: rgba(255, 255, 255, 0.05);
   border: 1px solid rgba(255, 255, 255, 0.1);
   backdrop-filter: blur(8px);
   color: #fff;
-  
   display: flex;
   align-items: center;
   justify-content: center;
@@ -231,21 +283,28 @@
   transform: translateY(-50%) scale(1.1);
 }
 
-/* Botões laterais */
 .nav-btn-floating.prev { left: 4%; }
 .nav-btn-floating.next { right: 4%; }
 
 /* RESPONSIVIDADE */
 @media (max-width: 1024px) {
-  /* Em tablets, diminuímos um pouco para caber */
-  .project-card { width: 600px; height: 450px; }
+  .project-card { width: 600px; height: 550px; }
   .carousel-track { gap: 2rem; }
+  
+  .card-body-split {
+    flex-direction: column; 
+    overflow-y: auto; 
+  }
+  
+  .left-col {
+    border-right: none;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  }
 }
 
 @media (max-width: 768px) {
-  .carousel-viewport { height: 500px; }
-  /* No mobile volta a ser um pouco mais estreito pra caber na tela */
-  .project-card { width: 85vw; height: 420px; } 
+  .carousel-viewport { height: 600px; }
+  .project-card { width: 85vw; height: auto; min-height: 500px; } 
   .carousel-track { gap: 1rem; }
   
   .nav-btn-floating { width: 40px; height: 40px; }
@@ -253,4 +312,9 @@
   .nav-btn-floating.next { right: 1%; }
   
   .section-title-large { font-size: 2.2rem; }
+  
+  .card-header-glass { padding: 1rem; }
+  .project-title { font-size: 1.5rem; }
+  
+  .card-col { padding: 1.5rem; }
 }

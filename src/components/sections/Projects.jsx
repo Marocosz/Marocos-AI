@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { motion } from 'motion/react';
-import { ChevronLeft, ChevronRight, ArrowUpRight } from 'lucide-react';
+import { ChevronLeft, ChevronRight, ArrowUpRight, Github } from 'lucide-react';
 import { projectsData } from '../../data/projects';
 import './Projects.css';
 
@@ -52,41 +52,41 @@ const Projects = () => {
                 onClick={() => setActiveIndex(index)} 
               >
                 
-                {/* Imagem de Fundo */}
-                <div className="card-image-wrapper">
-                  <img src={project.image} alt={project.title} className="card-image" />
-                  <div className="card-overlay"></div>
+                {/* 1. Header com Vidro (Título) */}
+                <div className="card-header-glass">
+                    <div className="header-top-row">
+                        <span className="project-category">{project.category}</span>
+                        <span className="project-year">2025</span>
+                    </div>
+                    <h3 className="project-title">{project.title}</h3>
                 </div>
 
-                {/* Conteúdo "Espelho" (Glassmorphism) na parte inferior */}
-                <div className="card-content">
-                  <div className="project-header-row">
-                     <span className="project-category">{project.category}</span>
-                     <span className="project-year">2025</span>
-                  </div>
-                  
-                  <h3 className="project-title">{project.title}</h3>
-                  <p className="project-description">{project.description}</p>
-
-                  {/* Link/Ação - Só aparece visualmente mais forte se ativo */}
-                  {isActive && (
-                    <div className="card-action">
-                        <a href={project.links.live} style={{ 
-                            color: '#fff', 
-                            textDecoration: 'none',
-                            display: 'inline-flex',
-                            alignItems: 'center',
-                            gap: '6px',
-                            marginTop: '1rem',
-                            fontSize: '0.9rem',
-                            fontWeight: 600,
-                            borderBottom: '1px solid #a855f7',
-                            paddingBottom: '2px'
-                        }}>
-                            View Project <ArrowUpRight size={16} />
-                        </a>
+                {/* 2. Corpo Sólido (50% / 50%) */}
+                <div className="card-body-split">
+                    
+                    {/* Lado Esquerdo: Proposta + Botão */}
+                    <div className="card-col left-col">
+                        <span className="body-label">PROPOSAL</span>
+                        <p className="project-description">{project.description}</p>
+                        
+                        {isActive && (
+                            <a href={project.links.github} className="github-btn">
+                                <Github size={18} />
+                                View on GitHub
+                            </a>
+                        )}
                     </div>
-                  )}
+
+                    {/* Lado Direito: Tecnologias */}
+                    <div className="card-col right-col">
+                        <span className="body-label">TECHNOLOGIES</span>
+                        <div className="tech-grid">
+                            {project.techs.map((tech, i) => (
+                                <span key={i} className="tech-tag">{tech}</span>
+                            ))}
+                        </div>
+                    </div>
+
                 </div>
 
               </div>

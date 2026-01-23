@@ -4,10 +4,6 @@ import DecryptedText from "../effects/DecryptedText";
 import { profileData } from "../../data/content";
 import "./Profile.css";
 import CrystalScene from './CrystalScene';
-// import { SplineScene } from '../ui/SplineScene';
-
-// IMPORTANTE: Mude o nome do arquivo aqui para sua nova imagem horizontal
-// import profileImgHorizontal from "../../assets/profile-horizontal.png";
 
 const Profile = () => {
   // Duplicamos a lista de skills para garantir que o scroll infinito não tenha buracos
