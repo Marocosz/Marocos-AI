@@ -38,10 +38,10 @@ const HomePage = () => {
         {isDarkMode ? (
           <Silk 
             color="#661ea8" 
-            speed={10} 
+            speed={20} 
             scale={1} 
             rotation={3} 
-            noiseIntensity={6.15} 
+            noiseIntensity={1.5} 
           />
         ) : (
           <Iridescence
@@ -62,7 +62,7 @@ const HomePage = () => {
         <div id="profile"><Profile /></div>
         <div id="projects"><Projects /></div>
         
-        <div style={{ height: '150px', width: '100%' }}></div>
+
 
         <div id="journey"><Journey /></div>
         <div id="tech"><TechStack /></div>

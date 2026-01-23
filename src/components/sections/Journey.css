@@ -4,34 +4,52 @@
    JOURNEY SECTION - HORIZONTAL SCROLL
    ======================================== */
 
-/* Container Fantasma - Cria o "tempo" de scroll */
+/* Container da Seção */
 .journey-section {
   position: relative;
   width: 100%;
-  height: 100vh; /* Mantemos a altura para o scroll */
-  background: transparent;
-  /* Removed padding here to prevent double spacing */
-  padding: 0; 
-  margin-top: 0; /* Remove top margin if present */
-}
-
-/* Container Sticky - Trava o conteúdo na tela */
-.journey-sticky-container {
-  position: sticky;
-  top: 0;
-  height: 100vh; /* Ocupa a tela toda */
-  width: 100%;
-  overflow: hidden; /* Esconde o que sai para a direita */
-  
-  display: flex;
+  padding: 4rem 0;
   display: flex;
   flex-direction: column;
-  justify-content: center; /* Centraliza verticalmente */
+  align-items: center;
+  overflow: hidden; /* Previne scrollbar global */
+}
+
+/* Removido o Sticky Container complexo, agora é apenas um wrapper */
+.journey-content-wrapper {
+  width: 100%;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Container de Cards com Scroll Horizontal */
+.cards-viewport {
+  width: 100%;
+  overflow-x: auto;
+  overflow-y: hidden;
+  padding: 2rem 0 4rem 4rem; /* Padding esquerdo para o primeiro card não colar */
   
-  padding: 0;
+  /* Esconde Scrollbar (Chrome/Safari/Opera) */
+  scrollbar-width: none; /* Firefox */
+  -ms-overflow-style: none; /* IE/Edge */
   
-  /* Gradiente suave para destacar a seção */
-  background: radial-gradient(circle at center, rgba(168, 85, 247, 0.05), transparent 70%);
+  cursor: grab; /* Indica que é arrastável */
+}
+
+.cards-viewport::-webkit-scrollbar {
+  display: none;
+}
+
+.cards-viewport:active {
+  cursor: grabbing;
+}
+
+.cards-container {
+  display: flex;
+  gap: 4rem;
+  width: max-content; /* Garante que os filhos fiquem em linha */
+  align-items: center;
 }
 
 /* ========================================
@@ -77,6 +95,31 @@
   max-width: 600px;
 }
 
+.drag-instruction {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  margin-top: 1.5rem;
+  font-size: 0.85rem;
+  color: #a855f7;
+  font-weight: 500;
+  opacity: 0.8;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+}
+
+.drag-icon {
+  font-size: 1.2rem;
+  display: inline-block;
+  animation: dragMove 2s infinite ease-in-out;
+}
+
+@keyframes dragMove {
+  0%, 100% { transform: translateX(-4px); }
+  50% { transform: translateX(4px); }
+}
+
 /* ========================================
    VIEWPORT DOS CARDS
    ======================================== */
@@ -92,34 +135,91 @@
 }
 
 /* Container que se move horizontalmente */
+/* Container que se move horizontalmente */
 .cards-container {
   display: flex;
-  gap: 60px;
+  gap: 8rem; /* Reduzido de 12rem para aproximar os cards */
   padding-left: 4rem; 
+  padding-right: 4rem;
   will-change: transform;
-  align-items: center; /* Centraliza cards verticalmente na linha */
+  align-items: center; 
 }
 
 /* ========================================
-   LINHA CONECTORA (TIMELINE)
+   TIMELINE PROGRESS BAR (Top Navigation)
    ======================================== */
 
-.timeline-line {
+.timeline-progress-container {
+  width: 100%;
+  max-width: 800px;
+  margin: 0 auto 3rem auto;
+  padding: 0 2rem;
+  display: flex;
+  justify-content: center;
+}
+
+.timeline-progress-track {
+  width: 100%;
+  height: 6px;
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 3px;
+  overflow: hidden;
+  position: relative;
+  box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.5);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.timeline-progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #a855f7, #ec4899, #f472b6);
+  background-size: 200% 100%;
+  animation: gradientFlow 3s linear infinite;
+  box-shadow: 0 0 15px rgba(168, 85, 247, 0.8), 0 0 5px rgba(236, 72, 153, 0.5);
+  transform-origin: left;
+}
+
+@keyframes gradientFlow {
+  0% { background-position: 100% 0; }
+  100% { background-position: -100% 0; }
+}
+
+/* ========================================
+   CONEXÕES ENTRE CARDS (SVG)
+   ======================================== */
+.connection-container {
   position: absolute;
-  top: 50%;
-  left: 4rem;
-  width: 3000px; 
-  height: 2px;
-  background: linear-gradient(
-    90deg,
-    rgba(168, 85, 247, 0.3) 0%,
-    rgba(168, 85, 247, 0.6) 20%,
-    rgba(168, 85, 247, 0.6) 80%,
-    transparent 100%
-  );
-  transform: translateY(-50%);
-  z-index: 1;
-  box-shadow: 0 0 20px rgba(168, 85, 247, 0.3);
+  /* O SVG será posicionado via JSX/CSS relativo ao gap */
+  width: 8rem; /* Igual ao gap */
+  height: 200px;
+  pointer-events: none;
+  z-index: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: visible;
+  /* Centraliza a conexão entre os cards */
+
+}
+
+.connection-svg {
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+  filter: drop-shadow(0 0 4px rgba(168, 85, 247, 0.5));
+}
+
+.connection-path {
+  fill: none;
+  stroke: url(#gradientStroke);
+  stroke-width: 3;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+/* Theme Light Overrides para Conexões */
+.theme-light .connection-path {
+  stroke: url(#gradientStrokeLight);
+  filter: drop-shadow(0 2px 4px rgba(0,0,0,0.1));
 }
 
 /* ========================================
@@ -137,33 +237,7 @@
   margin-top: 0; 
 }
 
-/* Timeline Node (Bolinha) */
-.timeline-node {
-  position: absolute;
-  top: 50%; 
-  left: -38px; 
-  transform: translateY(-50%);
-  z-index: 10;
-}
 
-.node-inner {
-  width: 16px;
-  height: 16px;
-  border-radius: 50%;
-  background: #a855f7;
-  border: 3px solid rgba(0, 0, 0, 0.8);
-  box-shadow: 
-    0 0 0 4px rgba(168, 85, 247, 0.2),
-    0 0 20px rgba(168, 85, 247, 0.6);
-  transition: all 0.3s ease;
-}
-
-.journey-card:hover .node-inner {
-  transform: scale(1.3);
-  box-shadow: 
-    0 0 0 6px rgba(168, 85, 247, 0.3),
-    0 0 30px rgba(168, 85, 247, 0.8);
-}
 
 /* Card Inner (Conteúdo) */
 .card-inner {
@@ -280,29 +354,7 @@
   transform: translateY(-2px);
 }
 
-/* ========================================
-   SCROLL INDICATOR
-   ======================================== */
 
-.scroll-indicator {
-  position: absolute;
-  bottom: 3rem;
-  left: 50%;
-  transform: translateX(-50%);
-  width: 200px;
-  height: 3px;
-  background: rgba(255, 255, 255, 0.1);
-  border-radius: 2px;
-  overflow: hidden;
-}
-
-.indicator-fill {
-  width: 100%;
-  height: 100%;
-  background: linear-gradient(90deg, #a855f7, #ec4899);
-  transform-origin: left;
-  box-shadow: 0 0 10px rgba(168, 85, 247, 0.6);
-}
 
 /* ========================================
    RESPONSIVE - MOBILE (Desliga o efeito sticky)
@@ -315,7 +367,7 @@
     padding: 6rem 0;
   }
 
-  .journey-sticky-container {
+  .journey-content-wrapper {
     position: relative; 
     height: auto;
     overflow: visible;
@@ -341,15 +393,11 @@
     min-height: 450px;
   }
 
-  .timeline-line {
+  .timeline-progress-container,
+  .connection-container {
     display: none;
   }
-  .timeline-node {
-    display: none;
-  }
-  .scroll-indicator {
-    display: none;
-  }
+
 }
 
 /* RESPONSIVIDADE PARA TELAS BAIXAS (Laptops pequenos ou Zoom alto) */
@@ -380,9 +428,7 @@
     margin-bottom: 1rem;
   }
   
-  .scroll-indicator {
-    bottom: 2vh;
-  }
+
 }
 
 /* ========================================
@@ -393,7 +439,7 @@
   color: var(--text-primary);
 }
 
-.theme-light .journey-sticky-container {
+.theme-light .journey-content-wrapper {
   background: radial-gradient(circle at center, rgba(168, 85, 247, 0.05), rgba(255, 255, 255, 0.9) 70%);
 }
 
@@ -429,24 +475,17 @@
   color: #000;
 }
 
-.theme-light .timeline-line {
-  background: linear-gradient(
-    90deg,
-    rgba(168, 85, 247, 0.4) 0%,
-    rgba(168, 85, 247, 0.8) 20%,
-    rgba(168, 85, 247, 0.8) 80%,
-    transparent 100%
-  );
+
+
+.theme-light .timeline-progress-track {
+  background: rgba(0, 0, 0, 0.05);
+  border: 1px solid rgba(0, 0, 0, 0.1);
+  box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.05);
 }
 
-.theme-light .node-inner {
-  border: 3px solid #fff;
-  box-shadow: 0 0 0 4px rgba(168, 85, 247, 0.2);
-}
 
-.theme-light .scroll-indicator {
-  background: rgba(0, 0, 0, 0.1);
-}
+
+
 
 .theme-light .journey-card:hover .card-inner {
   border-color: rgba(168, 85, 247, 0.4);

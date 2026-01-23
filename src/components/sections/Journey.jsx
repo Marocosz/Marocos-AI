@@ -1,27 +1,25 @@
-import React, { useRef } from 'react';
-import { motion, useScroll, useTransform } from 'motion/react';
+import React, { useRef, useState, useEffect } from 'react';
+import { motion, useMotionValue, useTransform } from 'motion/react';
 import { journeyData } from '../../data/journey';
 import './Journey.css';
 
 const Journey = () => {
-  const containerRef = useRef(null);
+  const carouselRef = useRef(null);
+  const [width, setWidth] = useState(0);
+  const x = useMotionValue(0);
+  const progress = useTransform(x, [0, -width], ["0%", "100%"]);
 
-  // Monitora o scroll da seção inteira (400vh)
-  const { scrollYProgress } = useScroll({
-    target: containerRef,
-  });
-
-  // Cálculo Dinâmico para o scroll horizontal
-  // Queremos mover os cards para a esquerda o suficiente para ver o último card
-  // Ajuste o valor final (-85%) dependendo de quantos cards você tem. 
-  // Para 4 cards largos, -75% a -85% costuma funcionar bem.
-  const x = useTransform(scrollYProgress, [0, 1], ["0%", "-85%"]);
+  useEffect(() => {
+    // Calcula o limite do drag baseado na largura total dos cards
+    if (carouselRef.current) {
+      setWidth(carouselRef.current.scrollWidth - carouselRef.current.offsetWidth);
+    }
+  }, []);
 
   return (
-    <section className="journey-section" ref={containerRef}>
+    <section className="journey-section">
       
-      {/* Container Sticky que trava na tela */}
-      <div className="journey-sticky-container">
+      <div className="journey-content-wrapper">
         
         {/* Header */}
         <div className="journey-header">
@@ -36,42 +34,66 @@ const Journey = () => {
             <p className="section-subtitle">
               Uma trajetória cronológica através do meu crescimento profissional e marcos importantes.
             </p>
+            
+            {/* Drag Intruction Hint */}
+            <div className="drag-instruction">
+              <span className="drag-icon">↔</span> Drag to Explore
+            </div>
           </motion.div>
         </div>
 
-        {/* Viewport dos Cards */}
-        <div className="cards-viewport">
+        {/* Barra de Progresso da Timeline */}
+        <div className="timeline-progress-container">
+          <div className="timeline-progress-track">
+            <motion.div 
+              className="timeline-progress-fill" 
+              style={{ width: progress }} 
+            />
+          </div>
+        </div>
+
+        {/* Carousel Arrastável */}
+        <div className="cards-viewport" ref={carouselRef}>
           
-          {/* Container que se move horizontalmente */}
-          {/* A div extra 'motion.div' aplica a transformação X baseada no scroll Y */}
           <motion.div 
             className="cards-container"
-            style={{ x }} // Aplica o movimento horizontal
+            drag="x"
+            dragConstraints={{ right: 0, left: -width }}
+            whileTap={{ cursor: "grabbing" }}
+            style={{ x }}
           >
-            {/* Linha Conectora (Fundo) */}
-            <div className="timeline-line" />
+            {/* Definições de Gradiente para SVGs (Reutilizável) */}
+            <svg style={{ position: 'absolute', width: 0, height: 0 }}>
+              <defs>
+                <linearGradient id="gradientStroke" x1="0%" y1="0%" x2="100%" y2="0%">
+                  <stop offset="0%" stopColor="#a855f7" />
+                  <stop offset="50%" stopColor="#ec4899" />
+                  <stop offset="100%" stopColor="#3b82f6" />
+                </linearGradient>
+                <linearGradient id="gradientStrokeLight" x1="0%" y1="0%" x2="100%" y2="0%">
+                  <stop offset="0%" stopColor="#cbd5e1" />
+                  <stop offset="50%" stopColor="#94a3b8" />
+                  <stop offset="100%" stopColor="#cbd5e1" />
+                </linearGradient>
+                <marker id="arrowhead" markerWidth="6" markerHeight="6" refX="5" refY="3" orient="auto">
+                  <path d="M 0 0 L 6 3 L 0 6 z" fill="url(#gradientStroke)" />
+                </marker>
+                 <marker id="arrowheadLight" markerWidth="6" markerHeight="6" refX="5" refY="3" orient="auto">
+                  <path d="M 0 0 L 6 3 L 0 6 z" fill="#94a3b8" />
+                </marker>
+              </defs>
+            </svg>
 
-            {/* Renderiza Cards */}
-            {journeyData.map((item) => (
+            {/* Renderiza Cards com Conexões */}
+            {journeyData.map((item, index) => (
               <div key={item.id} className="journey-card">
                 
-                {/* Node da Timeline (Bolinha na esquerda) */}
-                <div className="timeline-node">
-                  <div className="node-inner" />
-                </div>
-
-                {/* Conteúdo do Card */}
                 <div className="card-inner">
-                  
                   <div className="card-year">{item.date}</div>
-                  
                   <h3 className="card-title">{item.title}</h3>
                   <p className="card-company">{item.org}</p>
-                  
                   <div className="card-divider" />
-                  
                   <p className="card-description">{item.description}</p>
-                  
                   <div className="card-tags">
                     {item.tags.map((tag, i) => (
                       <span key={i} className="card-tag">{tag}</span>
@@ -79,23 +101,65 @@ const Journey = () => {
                   </div>
                 </div>
 
+                {/* Renderiza Conexão para o PRÓXIMO card (se não for o último) */}
+                {index < journeyData.length - 1 && (
+                  <div 
+                    className="connection-container" 
+                    style={{ 
+                      position: 'absolute',
+                      left: '100%', 
+                      top: '50%', 
+                      transform: 'translateY(-50%)',
+                      width: '10rem', // Aumentado para criar overlap (Gap é 8rem)
+                      height: '200px',
+                      zIndex: 0 // Garante que fique atrás dos cards
+                    }}
+                  >
+                    <ConnectionArrow variant={index % 2} />
+                  </div>
+                )}
+
               </div>
             ))}
           </motion.div>
-
         </div>
-
-        {/* Progress Indicator (Barra inferior) */}
-        <div className="scroll-indicator">
-          <motion.div 
-            className="indicator-fill"
-            style={{ scaleX: scrollYProgress }}
-          />
-        </div>
-
       </div>
-
     </section>
+  );
+};
+
+// Componente de Conexão SVG
+const ConnectionArrow = ({ variant }) => {
+  // Proporção ajustada para width 10rem (aprox 160px)
+  // ViewBox 0 0 160 100
+  
+  // Curvas MUITO SUTIS (Amplitude reduzida para +/- 10px)
+  // Quase reta, apenas um leve balanço tech
+  
+  const path = variant === 0 
+    ? "M 0,50 C 50,50 50,40 80,40 S 110,50 160,50" // Sobe leve (Y=40)
+    : "M 0,50 C 50,50 50,60 80,60 S 110,50 160,50"; // Desce leve (Y=60)
+
+  return (
+    <svg className="connection-svg" viewBox="0 0 160 100" preserveAspectRatio="none" style={{ overflow: 'visible' }}>
+      {/* Efeito Glow (Stroke mais grosso e borrado atrás) */}
+      <path 
+        d={path} 
+        stroke="#a855f7" 
+        strokeWidth="6" 
+        fill="none" 
+        opacity="0.3"
+        style={{ filter: 'blur(3px)' }}
+        vectorEffect="non-scaling-stroke"
+      />
+      
+      {/* Linha Principal sem Marker */}
+      <path 
+        d={path} 
+        className="connection-path" 
+        vectorEffect="non-scaling-stroke"
+      />
+    </svg>
   );
 };
 
