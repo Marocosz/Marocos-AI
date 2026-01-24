@@ -9,30 +9,30 @@ const Journey = () => {
   const content = getJourneyData(language);
   const carouselRef = useRef(null);
   const [width, setWidth] = useState(0);
-  const [isMobile, setIsMobile] = useState(false);
+  const [isCompact, setIsCompact] = useState(false);
   const x = useMotionValue(0);
   const progress = useTransform(x, [0, -width], ["0%", "100%"]);
 
-  // Detecta mobile
+  // Detect Compact Mode (Mobile/Tablet)
   useEffect(() => {
-    const checkMobile = () => {
-      setIsMobile(window.innerWidth < 768);
+    const checkCompact = () => {
+      setIsCompact(window.innerWidth < 1024);
     };
     
-    checkMobile();
-    window.addEventListener('resize', checkMobile);
-    return () => window.removeEventListener('resize', checkMobile);
+    checkCompact();
+    window.addEventListener('resize', checkCompact);
+    return () => window.removeEventListener('resize', checkCompact);
   }, []);
 
   useEffect(() => {
     // Calcula o limite do drag baseado na largura total dos cards
-    if (carouselRef.current && !isMobile) {
+    if (carouselRef.current && !isCompact) {
       setWidth(carouselRef.current.scrollWidth - carouselRef.current.offsetWidth);
     }
-  }, [isMobile, content.items]); // Recalculate on content change
+  }, [isCompact, content.items]); // Recalculate on content change
 
-  // VERSÃO MOBILE: Lista vertical simples
-  if (isMobile) {
+  // VERSÃO COMPACTA (Mobile/Tablet): Horizontal Scroll Snap
+  if (isCompact) {
     return (
       <section className="journey-section journey-mobile">
         <div className="journey-header">
@@ -43,15 +43,16 @@ const Journey = () => {
           </p>
         </div>
 
-        <div className="journey-list-mobile">
+        {/* Horizontal Scroll Container */}
+        <div className="journey-scroll-snap-container">
           {content.items.map((item) => (
-            <div key={item.id} className="journey-card-mobile">
+            <div key={item.id} className="journey-card-snap">
               
               <div className="git-header-mobile">
                 <span className="commit-hash-mobile">
                    {item.hash}
                 </span>
-                <span className="commit-type-mobile">[{item.type}]</span>
+                <span className={`commit-type-mobile type-${item.type}`}>[{item.type}]</span>
               </div>
 
               <div className="card-year-mobile">{content.dateLabel} {item.date}</div>
@@ -68,6 +69,8 @@ const Journey = () => {
               </div>
             </div>
           ))}
+          {/* Spacer at the end for scrolling */}
+          <div style={{ minWidth: '20px' }} />
         </div>
       </section>
     );
@@ -136,7 +139,7 @@ const Journey = () => {
                 <marker id="arrowhead" markerWidth="6" markerHeight="6" refX="5" refY="3" orient="auto">
                   <path d="M 0 0 L 6 3 L 0 6 z" fill="url(#gradientStroke)" />
                 </marker>
-                 <marker id="arrowheadLight" markerWidth="6" markerHeight="6" refX="5" refY="3" orient="auto">
+                <marker id="arrowheadLight" markerWidth="6" markerHeight="6" refX="5" refY="3" orient="auto">
                   <path d="M 0 0 L 6 3 L 0 6 z" fill="#94a3b8" />
                 </marker>
               </defs>

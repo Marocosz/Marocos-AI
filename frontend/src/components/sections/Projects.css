@@ -274,66 +274,68 @@
 .nav-btn-floating.prev { left: 4%; }
 .nav-btn-floating.next { right: 4%; }
 
-/* --- RESPONSIVIDADE --- */
-@media (max-width: 1024px) {
-  .project-card { width: 600px; height: auto; min-height: 500px; }
-  .carousel-track { gap: 2rem; }
+/* --- COMPACT (MOBILE/TABLET) SCROLL SNAP CONTAINER --- */
+.projects-scroll-snap-container {
+  display: flex;
+  gap: 1.5rem;
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+  padding: 1rem 1.5rem 2rem 1.5rem; /* Padding bottom for shadow */
+  width: 100%;
+  -webkit-overflow-scrolling: touch;
+}
+
+/* Hide scrollbar but keep functionality */
+.projects-scroll-snap-container::-webkit-scrollbar {
+  display: none;
+}
+.projects-scroll-snap-container {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+/* --- COMPACT CARD SNAP --- */
+.project-card-snap {
+  scroll-snap-align: center;
+  flex: 0 0 85vw; /* 85% width on mobile */
+  max-width: 400px; /* Max width for tablets */
   
-  .card-body-split {
-    flex-direction: column; 
-  }
-
-  .main-col {
-    border-right: none;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
-    flex: auto;
-  }
-
-  .tech-col {
-    flex: auto;
-    width: 100%;
-  }
-
-  .card-col {
-    padding: 2rem;
-  }
-}
-
-@media (max-width: 768px) {
-  .project-card { width: 85vw; } 
-  .nav-btn-floating { width: 40px; height: 40px; }
-  .nav-btn-floating.prev { left: 1%; }
-  .nav-btn-floating.next { right: 1%; }
-  .section-title-large { font-size: 2.2rem; }
-  .card-header-glass { padding: 1rem; }
-  .project-title { font-size: 1.5rem; }
-  .card-col { padding: 1.5rem; }
-}
-
-/* --- MOBILE VERSION: Vertical List --- */
-.projects-mobile .projects-header {
-  padding: 0 1.5rem;
-  margin-bottom: 2rem;
-}
-
-.projects-list-mobile {
   display: flex;
   flex-direction: column;
-  gap: 2rem;
-  padding: 0 1.5rem 4rem;
-  max-width: 600px;
-  margin: 0 auto;
-}
-
-.project-card-mobile {
-  background: rgba(10, 10, 10, 0.6);
+  background: rgba(10, 10, 10, 0.85);
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
   border: 1px solid rgba(255, 255, 255, 0.08);
   border-radius: 16px;
   overflow: hidden;
   box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+  
+  /* Smooth transition & GPU Fix */
+  transform: translate3d(0,0,0);
+  will-change: transform;
+  transition: transform 0.3s ease;
 }
+
+/* Tablet Override */
+@media (min-width: 600px) and (max-width: 1024px) {
+  .project-card-snap {
+    flex: 0 0 60vw; /* Slightly less width on tablet */
+    max-width: 500px;
+  }
+}
+
+.project-card-snap:hover {
+  transform: translateY(-5px);
+}
+
+
+/* --- MOBILE/TABLET CONTENT STYLES (Reused from previous mobile) --- */
+.projects-mobile .projects-header {
+  padding: 0 1.5rem;
+  margin-bottom: 2rem;
+}
+
+/* Removed old .projects-list-mobile since we use scroll-snap-container */
 
 .card-header-mobile {
   padding: 1.25rem;
@@ -361,6 +363,7 @@
   display: flex;
   flex-direction: column;
   gap: 1.5rem;
+  flex: 1; /* Stretch to fill */
 }
 
 .mobile-section {
@@ -405,7 +408,7 @@
   border-radius: 8px;
   text-decoration: none;
   transition: all 0.3s ease;
-  margin-top: 0.5rem;
+  margin-top: auto; /* Push to bottom */
 }
 
 .github-btn-mobile:hover {
@@ -414,7 +417,7 @@
 }
 
 /* Mobile Light Theme */
-.theme-light .project-card-mobile {
+.theme-light .project-card-snap {
   background: rgba(255, 255, 255, 0.8);
   border-color: rgba(0, 0, 0, 0.1);
   box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);

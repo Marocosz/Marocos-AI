@@ -9,17 +9,17 @@ const Projects = () => {
   const { language } = useLanguage();
   const content = getProjectsData(language);
   const [activeIndex, setActiveIndex] = useState(1);
-  const [isMobile, setIsMobile] = useState(false);
+  const [isCompact, setIsCompact] = useState(false);
 
-  // Detecta mobile
+  // Detect Compact Mode (Mobile/Tablet)
   useEffect(() => {
-    const checkMobile = () => {
-      setIsMobile(window.innerWidth < 768);
+    const checkCompact = () => {
+      setIsCompact(window.innerWidth < 1024);
     };
     
-    checkMobile();
-    window.addEventListener('resize', checkMobile);
-    return () => window.removeEventListener('resize', checkMobile);
+    checkCompact();
+    window.addEventListener('resize', checkCompact);
+    return () => window.removeEventListener('resize', checkCompact);
   }, []);
 
   // Configurações de Dimensão
@@ -35,8 +35,8 @@ const Projects = () => {
     }
   };
 
-  // VERSÃO MOBILE: Lista vertical simples
-  if (isMobile) {
+  // VERSÃO COMPACTA (Mobile/Tablet): Simple Scroll Snap Carousel
+  if (isCompact) {
     return (
       <section className="projects-section projects-mobile">
         <div className="projects-header">
@@ -47,9 +47,10 @@ const Projects = () => {
           </p>
         </div>
 
-        <div className="projects-list-mobile">
+        {/* Horizontal Scroll Container */}
+        <div className="projects-scroll-snap-container">
           {content.items.map((project) => (
-            <div key={project.id} className="project-card-mobile">
+            <div key={project.id} className="project-card-snap">
               
               {/* Header */}
               <div className="card-header-mobile">
@@ -88,6 +89,8 @@ const Projects = () => {
               </div>
             </div>
           ))}
+          {/* Spacer at the end for better scrolling experience */}
+          <div style={{ minWidth: '20px' }} /> 
         </div>
       </section>
     );

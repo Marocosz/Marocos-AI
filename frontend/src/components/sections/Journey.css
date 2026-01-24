@@ -384,42 +384,195 @@
 }
 
 /* ========================================
-   RESPONSIVE - MOBILE (Desliga o efeito sticky)
+   COMPACT (MOBILE/TABLET) SCROLL SNAP
    ======================================== */
 
+.journey-mobile {
+  padding: 4rem 0;
+}
+
+.journey-mobile .journey-header {
+  padding: 0 1.5rem;
+  margin-bottom: 2rem;
+  text-align: center;
+}
+
+/* New Scroll Snap Container for Mobile */
+.journey-scroll-snap-container {
+  display: flex;
+  gap: 1.5rem;
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+  padding: 1rem 1.5rem 2rem 1.5rem;
+  width: 100%;
+  -webkit-overflow-scrolling: touch;
+}
+
+/* Hide scrollbars */
+.journey-scroll-snap-container::-webkit-scrollbar {
+  display: none;
+}
+.journey-scroll-snap-container {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+/* Card Style for Snap */
+.journey-card-snap {
+  scroll-snap-align: center;
+  flex: 0 0 85vw; /* 85% width on mobile */
+  max-width: 400px;
+  
+  background: rgba(10, 10, 10, 0.85);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 16px;
+  padding: 1.5rem;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+  position: relative;
+  
+  display: flex;
+  flex-direction: column;
+  
+  /* GPU Fix for artifacts */
+  transform: translate3d(0,0,0);
+  will-change: transform;
+}
+
+/* Tablet sizing */
+@media (min-width: 600px) and (max-width: 1024px) {
+  .journey-card-snap {
+    flex: 0 0 60vw;
+    max-width: 500px;
+  }
+}
+
+/* GIT HEADER MOBILE */
+.git-header-mobile {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.5rem;
+  font-family: 'Courier New', monospace;
+  font-size: 0.8rem;
+}
+
+.commit-hash-mobile {
+  color: #888;
+}
+
+.commit-type-mobile {
+  color: #a855f7;
+  font-weight: bold;
+}
+
+.type-init { color: #22c55e; }     
+.type-merge { color: #a855f7; }    
+.type-release { color: #3b82f6; }  
+.type-wip { color: #eab308; }   
+
+.card-year-mobile {
+  font-family: 'Courier New', monospace;
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: #bbb;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  margin-bottom: 0.5rem;
+  display: block;
+}
+
+.card-title-mobile {
+  font-size: 1.35rem;
+  font-weight: 700;
+  color: #fff;
+  margin: 0 0 0.5rem 0;
+  line-height: 1.2;
+}
+
+.card-company-mobile {
+  font-size: 0.95rem;
+  color: #aaa;
+  margin: 0 0 1rem 0;
+  font-family: 'Courier New', monospace;
+}
+
+.card-divider-mobile {
+  width: 100%;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(168, 85, 247, 0.5), transparent);
+  margin: 1rem 0;
+}
+
+.card-description-mobile {
+  font-size: 0.9rem;
+  color: #bbb;
+  line-height: 1.6;
+  margin: 0 0 1.25rem 0;
+}
+
+.card-tags-mobile {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.card-tag-mobile {
+  font-size: 0.7rem;
+  font-weight: 500;
+  padding: 0.4rem 0.8rem;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 6px;
+  color: #999;
+  transition: all 0.2s ease;
+}
+
+.card-tag-mobile:active {
+  transform: scale(0.95);
+}
+
+/* Mobile Light Theme */
+.theme-light .journey-card-snap {
+  background: rgba(255, 255, 255, 0.8);
+  border-color: rgba(0, 0, 0, 0.1);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
+}
+
+.theme-light .card-title-mobile {
+  color: var(--text-primary);
+}
+
+.theme-light .card-company-mobile {
+  color: var(--text-secondary);
+}
+
+.theme-light .card-description-mobile {
+  color: var(--text-secondary);
+}
+
+.theme-light .card-tag-mobile {
+  background: rgba(0, 0, 0, 0.05);
+  border-color: rgba(0, 0, 0, 0.1);
+  color: var(--text-secondary);
+}
+
+.theme-light .git-header-mobile {
+  color: #333;
+}
+
+.theme-light .commit-hash-mobile {
+  color: #666;
+}
+
+.theme-light .commit-type-mobile {
+  /* Colors kept from dark mode or adjusted if needed */
+}
+
+/* Other Media Queries */
 @media (max-width: 1024px) {
-  .journey-section {
-    height: auto; 
-    min-height: auto;
-    padding: 6rem 0;
-  }
-
-  .journey-content-wrapper {
-    position: relative; 
-    height: auto;
-    overflow: visible;
-    padding: 0;
-  }
-
-  .cards-viewport {
-    display: block;
-    padding: 0;
-  }
-
-  .cards-container {
-    padding: 2rem 2rem;
-    gap: 2rem;
-    overflow-x: auto; 
-    width: 100%;
-  }
-
-  .journey-card {
-    width: 300px;
-    min-width: 300px;
-    height: auto;
-    min-height: 450px;
-  }
-
+  /* Reset desktop specific styles to avoid conflicts */
   .timeline-progress-container,
   .connection-container {
     display: none;
@@ -456,7 +609,7 @@
 }
 
 /* ========================================
-   THEME LIGHT OVERRIDES
+   THEME LIGHT OVERRIDES (Desktop)
    ======================================== */
 
 .theme-light .section-title-large {
@@ -530,210 +683,3 @@
 .theme-light .type-merge { color: #9333ea; }    /* Darker Purple */
 .theme-light .type-release { color: #2563eb; }  /* Darker Blue */
 .theme-light .type-wip { color: #ca8a04; }      /* Darker Yellow */
-
-/* ========================================
-   MOBILE VERSION: Vertical Timeline
-   ======================================== */
-
-.journey-mobile {
-  padding: 4rem 0;
-}
-
-.journey-mobile .journey-header {
-  padding: 0 1.5rem;
-  margin-bottom: 3rem;
-  text-align: center;
-}
-
-.journey-list-mobile {
-  display: flex;
-  flex-direction: column;
-  gap: 2.5rem;
-  padding: 0 1.5rem 4rem;
-  max-width: 600px;
-  margin: 0 auto;
-  position: relative;
-}
-
-/* Linha vertical da timeline */
-.journey-list-mobile::before {
-  content: '';
-  position: absolute;
-  left: 2.5rem;
-  top: 0;
-  bottom: 0;
-  width: 2px;
-  background: linear-gradient(180deg, transparent, #a855f7 10%, #a855f7 90%, transparent);
-  opacity: 0.3;
-}
-
-.journey-card-mobile {
-  background: rgba(10, 10, 10, 0.6);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  border-radius: 16px;
-  padding: 1.5rem;
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
-  position: relative;
-  margin-left: 3rem;
-  transition: all 0.3s ease;
-}
-
-/* Bolinha na timeline */
-.journey-card-mobile::before {
-  content: '';
-  position: absolute;
-  left: -3.5rem;
-  top: 2rem; /* Adjusted for larger header */
-  width: 12px;
-  height: 12px;
-  background: #a855f7;
-  border-radius: 50%;
-  border: 3px solid rgba(10, 10, 10, 0.9);
-  box-shadow: 0 0 0 4px rgba(168, 85, 247, 0.2);
-  z-index: 2;
-}
-
-.journey-card-mobile:hover {
-  transform: translateX(8px);
-  border-color: rgba(168, 85, 247, 0.3);
-  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.5);
-}
-
-/* GIT HEADER MOBILE */
-.git-header-mobile {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 0.5rem;
-  font-family: 'Courier New', monospace;
-  font-size: 0.8rem;
-}
-
-.commit-hash-mobile {
-  color: #888;
-}
-
-.commit-type-mobile {
-  color: #a855f7;
-  font-weight: bold;
-}
-
-.card-year-mobile {
-  font-family: 'Courier New', monospace;
-  font-size: 0.75rem;
-  font-weight: 700;
-  color: #bbb;
-  text-transform: uppercase;
-  letter-spacing: 2px;
-  margin-bottom: 0.5rem;
-  display: block;
-}
-
-.card-title-mobile {
-  font-size: 1.35rem;
-  font-weight: 700;
-  color: #fff;
-  margin: 0 0 0.5rem 0;
-  line-height: 1.2;
-}
-
-.card-company-mobile {
-  font-size: 0.95rem;
-  color: #aaa;
-  margin: 0 0 1rem 0;
-  font-family: 'Courier New', monospace;
-}
-
-.card-divider-mobile {
-  width: 100%;
-  height: 1px;
-  background: linear-gradient(90deg, transparent, rgba(168, 85, 247, 0.5), transparent);
-  margin: 1rem 0;
-}
-
-.card-description-mobile {
-  font-size: 0.9rem;
-  color: #bbb;
-  line-height: 1.6;
-  margin: 0 0 1.25rem 0;
-}
-
-.card-tags-mobile {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.5rem;
-}
-
-.card-tag-mobile {
-  font-size: 0.7rem;
-  font-weight: 500;
-  padding: 0.4rem 0.8rem;
-  background: rgba(255, 255, 255, 0.05);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  border-radius: 6px;
-  color: #999;
-  transition: all 0.2s ease;
-}
-
-.card-tag-mobile:active {
-  transform: scale(0.95);
-}
-
-/* Mobile Light Theme */
-.theme-light .journey-list-mobile::before {
-  background: linear-gradient(180deg, transparent, #a855f7 10%, #a855f7 90%, transparent);
-  opacity: 0.2;
-}
-
-.theme-light .journey-card-mobile {
-  background: rgba(255, 255, 255, 0.8);
-  border-color: rgba(0, 0, 0, 0.1);
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
-}
-
-.theme-light .journey-card-mobile::before {
-  background: #a855f7;
-  border-color: rgba(255, 255, 255, 0.9);
-}
-
-.theme-light .journey-card-mobile:hover {
-  border-color: rgba(168, 85, 247, 0.4);
-  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.15);
-}
-
-.theme-light .card-title-mobile {
-  color: var(--text-primary);
-}
-
-.theme-light .card-company-mobile {
-  color: var(--text-secondary);
-}
-
-.theme-light .card-description-mobile {
-  color: var(--text-secondary);
-}
-
-.theme-light .card-tag-mobile {
-  background: rgba(0, 0, 0, 0.05);
-  border-color: rgba(0, 0, 0, 0.1);
-  color: var(--text-secondary);
-}
-
-.theme-light .git-header-mobile {
-  color: #333;
-}
-
-.theme-light .commit-hash-mobile {
-  color: #666;
-}
-
-.theme-light .commit-type-mobile {
-  color: #9333ea;
-}
-
-.theme-light .card-year,
-.theme-light .card-year-mobile {
-  color: var(--text-secondary);
-}

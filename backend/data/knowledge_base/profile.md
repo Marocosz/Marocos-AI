@@ -1,6 +1,6 @@
 # Sobre Marcos Rodrigues
 
-Meu nome é Marcos Rodrigues, nasci em 14 de dezembro de 2003, na cidade de Patrocínio, Minas Gerais, e atualmente moro em Uberlândia – MG. Sou o segundo mais novo entre quatro irmãos — Augusto, Juliana, Paloma e Enzo — e cresci em um ambiente simples, porém extremamente rico em vivências, aprendizados e experiências que moldaram quem sou hoje.
+Meu nome é Marcos Rodrigues, nasci em 14 de dezembro de 2003, na cidade de Patrocínio, Minas Gerais, e atualmente moro sozinho em Uberlândia – MG. Sou o segundo mais novo entre quatro irmãos — Augusto, Juliana, Paloma e Enzo — e cresci em um ambiente simples, porém extremamente rico em vivências, aprendizados e experiências que moldaram quem sou hoje.
 
 Durante a infância, vivi intensamente aquilo que hoje muitos chamam de “infância raiz”. Brincava na rua, jogava bola no asfalto, participava de pique, esconde-esconde e passava tardes inteiras cercado de amigos do bairro. Época boa, daquelas que ficam marcadas. Estávamos sempre nos encontrando para brincar, conversar e inventar coisas juntos.
 
@@ -18,11 +18,46 @@ Após esse ano de experiência, em 2019, ingressei no IFTM – Instituto Federal
 
 No IFTM, todos os anos existia o PAE (Projeto Anual de Eletrônica), no qual grupos eram formados e cada um desenvolvia protótipos de produtos. Infelizmente, parte desse período coincidiu com a pandemia, mas isso não nos impediu de criar. Durante esse momento, junto com alguns amigos, desenvolvemos um curso introdutório de eletrônica para o PAE daquele ano, onde criamos conteúdos sobre Introdução a Microcontroladores, Utilização do Tinkercad, Lógica Básica de Programação no Arduino, Utilização do Eagle, além de projetos práticos como Cardápio com Arduino, Arduino Standalone utilizando Eagle e um Sistema de Alarme utilizando Arduino e Eagle. Todo esse material foi disponibilizado gratuitamente no YouTube, como forma de compartilhar conhecimento e ajudar outras pessoas interessadas na área: https://www.youtube.com/@denki3577
 
-Após o Ensino Médio ja entrei direto a faculdade, em 2022 comecei a cursar Gestão da informação na Universidade Federal de Uberlândia (UFU). É um curso bem interessante e focado na interdisplinaridade entre Administração e Ciência da Computação, mas com um foco totalmente para a área de dados, por exemplo alguamss materias do curso, analise de dados 1, 2, 3 e 4, inteligencia artificial, estrutura de dados 1 e 2, engenharia de software, banco de dados, mineracão de dados... É um curso super interessante e com uma estrutura da faculdade muito boa, bons professores etc... Além da parte academica, a faculdade me possibilitou outras coisas, como por exemplo um projeto de extensão por quase 1 ano onde eu dava aula de informática para crianças no centro comunitário Sal da Terra. Também foi quando comecei a praticar judo pela atlética, esporte esse que me trouxe grande discplina e sou muito grato pelas competicoes e ensinamentos em volta da arte. Agora, estou no final do curso, no ultimo periodo de 8.
+Após a conclusão do Ensino Médio, ingressei diretamente na faculdade. Em 2022, iniciei o curso de Gestão da Informação na Universidade Federal de Uberlândia (UFU). Trata-se de uma graduação bastante interessante, com forte caráter interdisciplinar, unindo conceitos de Administração e Ciência da Computação, porém com foco direcionado para a área de dados.
 
-Consegui meu estágio na Empresa Supporte Logística, onde eu atuo como desenvolvedor full stack voltado para solucoes com Inteligencia Artificial, na área de inovaçao da empresa, onde está 
+Ao longo do curso, tive contato com diversas disciplinas fundamentais, como Análise de Dados I, II, III e IV, Inteligência Artificial, Estrutura de Dados I e II, Engenharia de Software, Banco de Dados e Mineração de Dados, entre outras. É um curso muito completo, com uma estrutura acadêmica sólida, bons professores e um ambiente que estimula o pensamento analítico, técnico e estratégico.
 
-# Formação Acadêmica
+Além da formação acadêmica, a faculdade me proporcionou experiências extremamente enriquecedoras fora da sala de aula. Participei, por quase um ano, de um projeto de extensão, no qual atuei como instrutor, ministrando aulas de informática para crianças no Centro Comunitário Sal da Terra. Essa experiência foi muito importante para o desenvolvimento da comunicação, da empatia e da responsabilidade social.
+
+Foi também durante a graduação que comecei a praticar judô, por meio da atlética da UFU. O esporte me trouxe valores fundamentais como disciplina, respeito, resiliência e autocontrole, além de experiências marcantes em competições e aprendizados que extrapolam o tatame. Sou muito grato por tudo que o judô agregou à minha formação pessoal.
+
+Atualmente, encontro-me no último período da graduação, no 8º período, consolidando todo esse percurso acadêmico e prático.
+
+Paralelamente, em agosto de 2025, conquistei meu estágio na empresa Supporte Logística, onde atuo como desenvolvedor full stack, com foco em soluções envolvendo Inteligência Artificial, dentro da área de inovação da empresa. Nesse ambiente, venho adquirindo um grande volume de conhecimento com o apoio de outros desenvolvedores, especialmente em boas práticas de desenvolvimento, DevOps, arquitetura de sistemas, além de uma vivência mais profunda do contexto corporativo, seus desafios e dinâmicas.
+
+Além dessas experiências, também atuo com serviços freelance, desenvolvendo principalmente aplicações web robustas, pensadas para resolver problemas reais de diferentes naturezas. Grande parte dessas soluções é voltada para automação de processos, otimização de fluxos de trabalho, redução de tarefas manuais e aumento de eficiência operacional, sempre buscando entregar sistemas práticos, escaláveis e bem estruturados.
+
+Nos projetos freelance, costumo participar de todo o ciclo de desenvolvimento: desde o entendimento do problema e levantamento de requisitos, passando pelo planejamento da solução, desenvolvimento do backend e frontend, integração com bancos de dados, APIs externas, serviços em nuvem e, quando necessário, deploy, manutenção e evolução contínua da aplicação. Esse contato direto com o cliente me permite compreender melhor as necessidades do negócio e transformar demandas abstratas em soluções técnicas bem definidas.
+
+Tenho facilidade em adaptar minhas habilidades para diferentes contextos e tecnologias, o que me permite atuar em projetos variados — desde sistemas internos para empresas, dashboards e ferramentas de análise de dados, até plataformas web completas. Mesmo quando a solução exige explorar novas ferramentas ou abordagens, estou sempre disposto a aprender, experimentar e evoluir, mantendo como foco principal a entrega de valor e a resolução eficiente do problema.
+
+Hoje, me vejo como alguém que constrói conhecimento de forma contínua, unindo curiosidade, prática e reflexão. Carrego muito da criança que gostava de observar o mundo com atenção, questionar o que via e tentar entender como as coisas funcionavam — só que agora aplico isso à tecnologia, aos sistemas e aos problemas reais que encontro no dia a dia. Gosto de entender o todo, não apenas escrever código, mas compreender o contexto, o impacto e as consequências das soluções que desenvolvo.
+
+Como desenvolvedor, me identifico com uma atuação generalista, capaz de transitar entre diferentes camadas de um sistema, do backend ao frontend, da lógica de dados à infraestrutura, sempre com preocupação em criar soluções bem pensadas, organizadas e sustentáveis. Tenho especial interesse por dados, automação e inteligência artificial, principalmente quando essas áreas são utilizadas para simplificar processos, apoiar decisões e gerar valor concreto para pessoas e empresas. Mais do que tecnologias específicas, valorizo boas práticas, clareza, arquitetura e aprendizado contínuo.
+
+Também aprendi, ao longo da minha trajetória profissional e acadêmica, que responsabilidade e colaboração são tão importantes quanto conhecimento técnico. Seja no suporte técnico, nos projetos acadêmicos, no estágio ou nos trabalhos freelance, levo muito a sério o compromisso com aquilo que me proponho a fazer — entregar algo que funcione, que faça sentido e que respeite quem vai utilizar a solução. Gosto de aprender com outras pessoas, trocar ideias, receber feedbacks e evoluir em conjunto, entendendo que tecnologia é, antes de tudo, um trabalho coletivo.
+
+Fora do aspecto técnico, acredito que minhas experiências pessoais — como o envolvimento com projetos sociais, o ensino, o judô e o hábito de refletir sobre o mundo — moldaram minha forma de agir com disciplina, empatia e senso crítico. Hoje, busco crescer não apenas como profissional, mas como pessoa, mantendo a curiosidade viva, a mente aberta e a disposição constante para aprender, criar e melhorar.
+
+Também cultivo diversos interesses que fazem parte de quem sou e influenciam minha forma de pensar e criar. Gosto de jogar, não apenas como entretenimento, mas também como forma de observar narrativas, mecânicas, design e construção de mundos. Meu jogo favorito é Elden Ring, o qual eu gosto muito por toda gameplay, mas principalmente pelo design de chefoes e história, acho incrivel também a quantidade de armas, armaduras e possibilidades de vc montar sua propria build, isso me atrai  muito, zerei mais de 7x OBS: minha build favorita foi as duplas katanas de sangramento. Counter Strike e League Of Legends, por mais que nao jogo bastante hoje em dia igual ja foi, sao meus jogos online favoritos, meu maior elo no League of Legends foi diamante 1, sou main Katarina e Irelia. No Counter Strike, na epoca do CSGO ainda, fui AK cruzada apenas. Os ultimos jogos que joguei foram, God Of War Ragnarok, Cyberpunk 2077, Ghost of Tsushima entre outros...
+
+Também tenho uma forte ligação com o desenho, seja por meio de hachuras no papel com nanquim, explorando formas, contrastes e texturas, ou desenhando digitalmente no tablet, onde exercito criatividade, paciência e atenção aos detalhes. Desde criança eu gostava de desenhar, principalmente personagens malucos que vinham da minha mente, e essa paixao, por mais que um pouco fria hoje, ainda ta aq, hoje em dia por influencia de artistas como Kentaro Miura e Takehiko Inoue gosto mt das artes de hachura e com uma pegada mais de trevas.
+
+Além disso, consumo bastante filmes, séries e animes, sempre com interesse em boas histórias, estética, trilha sonora e desenvolvimento de personagens.
+[Placeholder – mencionar obras que te marcaram ou tipos de narrativa que mais te atraem]
+
+Esses hobbies funcionam como fontes constantes de inspiração e reflexão, ajudando a ampliar meu repertório criativo e minha visão de mundo.
+[Placeholder – exemplo de como algum hobby já influenciou seu jeito de pensar, criar ou resolver problemas]
+
+Acredito que esse equilíbrio entre técnica, arte e narrativa contribui diretamente para minha capacidade de resolver problemas de forma mais criativa, sensível e consciente.
+[Placeholder – opinião pessoal ou reflexão final sobre como esse equilíbrio impacta sua vida/profissão]
+
+# Formação Acadêmica e Cursos
 
 - **Graduação:** Gestão da Informação na UFU (Universidade Federal de Uberlândia). Previsão de conclusão: 03/2026.
 - **Técnico:** Eletrônica pelo IFTM (Concluído em 2021). Onde aprendi a base de hardware e lógica com C++ e Arduino.

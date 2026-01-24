@@ -196,6 +196,56 @@
   background: rgba(255, 255, 255, 0.1);
 }
 
+/* --- TRAY POPUP (MOBILE/TABLET) --- */
+.tray-backdrop {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  z-index: 1005;
+  background: transparent;
+}
+
+.tray-menu-popup {
+  position: fixed;
+  bottom: 60px; /* Above navbar */
+  right: 12px;
+  width: 200px;
+  background: rgba(20, 20, 20, 0.95);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: 12px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  padding: 8px;
+  z-index: 1010;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.tray-menu-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 12px;
+  border-radius: 8px;
+  color: #ddd;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.tray-menu-item:hover {
+  background: rgba(255, 255, 255, 0.1);
+  color: #fff;
+}
+
+.tray-menu-label {
+  font-size: 0.9rem;
+  font-weight: 500;
+}
+
 /* --- RESPONSIVIDADE --- */
 
 /* Tablet (600px - 1024px) */
@@ -213,48 +263,15 @@
     width: 38px;
     height: 38px;
   }
-
-  .tray-clock {
-    padding: 0 6px;
-  }
-
-  .time, .date {
-    font-size: 0.7rem;
-  }
-
-  .theme-toggle-btn {
-    padding: 5px;
-  }
-
-  .tray-divider {
-    margin: 0 6px;
-  }
 }
 
 /* Mobile (< 600px) */
 @media (max-width: 600px) {
-  /* No mobile, escondemos a data e deixamos só a hora ou escondemos a tray inteira se faltar espaço */
-  .date {
-    display: none;
-  }
-  
-  .tray-icons {
-    display: none;
-  }
-
-  .tray-divider {
-    display: none;
-  }
-
-  /* Esconde o botão de animação no mobile (já usa gradiente estático) */
-  .theme-toggle-btn:nth-of-type(2) {
-    display: none;
-  }
-  
   .taskbar-center {
     width: 100%;
     justify-content: space-evenly;
     gap: 2px;
+    margin-right: 48px; /* Give space for the More button */
   }
 
   .taskbar-btn {
@@ -268,31 +285,13 @@
   }
   
   .taskbar-right {
-    position: static;
-    padding-right: 8px;
-    min-width: auto;
-  }
-
-  .tray-clock {
-    padding: 0 4px;
-  }
-
-  .time {
-    font-size: 0.7rem;
-  }
-
-  .theme-toggle-btn {
-    padding: 4px;
-  }
-
-  .show-desktop-line {
-    display: none; /* Remove linha no mobile */
+    position: absolute;
+    right: 0;
+    width: 48px;
+    justify-content: center;
+    background: transparent;
   }
 }
-
-/* src/components/ui/Navbar.css */
-
-/* Adicione no final do arquivo */
 
 .theme-toggle-btn {
   background: transparent;
@@ -354,6 +353,22 @@
   border: 1px solid rgba(0, 0, 0, 0.1);
   color: #333;
   box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+}
+
+/* Tray Popover Light */
+.theme-light .tray-menu-popup {
+  background: rgba(255, 255, 255, 0.95);
+  border: 1px solid rgba(0, 0, 0, 0.1);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.15);
+}
+
+.theme-light .tray-menu-item {
+  color: #333;
+}
+
+.theme-light .tray-menu-item:hover {
+  background: rgba(0, 0, 0, 0.05);
+  color: #000;
 }
 
 /* Tray Area Light */
