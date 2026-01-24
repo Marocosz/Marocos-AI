@@ -1,0 +1,1 @@
+# (Futuro) Entrypoint do FastAPI

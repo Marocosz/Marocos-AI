@@ -1,96 +1,155 @@
-# 📂 Planejamento de Design & UX: NoisePortfolio
+# Planejamento Completo: Marcos Persona API
 
-**Conceito Visual:** Dark / Noise / Cyberpunk Minimalista / Tech.
-**Foco:** Python, IA, Backend & Fullstack.
-**Tecnologias Base:** React + Vite, Framer Motion, CSS Modules.
+Este documento consolida todo o planejamento, arquitetura e código inicial para o projeto **Marocos Persona API**. O objetivo é criar um agente de IA integrado ao seu portfólio que responde perguntas sobre sua carreira utilizando dados reais (RAG), otimizado para rodar em uma VPS com poucos recursos.
 
 ---
 
-## 1. Hero Section (✅ Já Implementado)
-**O Cartão de Visitas.**
-* **Visual:** Fundo com efeito `DarkVeil` (fluido, misterioso, distorcido).
-* **Conteúdo:**
-    * Título: "Marcos Rodrigues" (Estático ou animação sutil).
-    * Subtítulo: `DecryptedText` ("Desenvolvedor - IA, Automação & FullStack").
-* **Melhoria de UX:** Adicionar um indicador visual de "Scroll Down" (seta pulsante ou ícone de mouse) na parte inferior para encorajar a navegação.
+## 1. Arquitetura "Serverless RAG"
+
+Para garantir que a aplicação rode leve na sua VPS (sem estourar RAM/CPU), utilizaremos serviços de API para o processamento pesado:
+
+- **Cérebro (LLM):** `Groq` (Modelo: `llama-3.1-8b-instant`).
+  - _Custo:_ Gratuito.
+  - _Função:_ Geração de respostas rápidas.
+- **Memória (Vector Store):** `ChromaDB` (Modo Persistente Local).
+  - _Custo:_ Gratuito (Uso de disco local, pouca RAM).
+  - _Função:_ Armazenar o conhecimento do portfólio.
+- **Vetores (Embeddings):** `Google Generative AI` (`models/embedding-001`).
+  - _Custo:_ Gratuito.
+  - _Função:_ Converter texto em vetores sem usar CPU local.
+- **Orquestração:** `LangGraph` + `LangChain`.
+  - _Função:_ Controle de fluxo e estado do agente.
+- **API:** `FastAPI`.
+  - _Função:_ Interface backend.
 
 ---
 
-## 2. Sobre Mim: "The Glitch Profile"
-**Conexão Humano-Máquina.**
-* **Layout:** Split Screen (Duas colunas).
-* **Lado Esquerdo (Texto):**
-    * Bio curta e impactante.
-    * **Estilo:** Tipografia limpa sans-serif.
-    * **Destaque:** Palavras-chave (Python, IA, Fullstack) em cor Neon (Roxo/Ciano) ou negrito brilhante.
-    * **Animação:** Texto entra com *fade-in* escalonado (staggered) ao rolar a página.
-* **Lado Direito (Visual):**
-    * Foto de Perfil com efeito **GlitchImage**.
-    * **Estado Normal:** Foto em escala de cinza (Grayscale) com alto contraste.
-    * **Interação (Hover):** Ao passar o mouse, a foto sofre distorção digital (RGB shift) e ganha cores momentaneamente.
+## 2. Estrutura de Diretórios
+
+Seguindo princípios de Clean Architecture e Modularidade:
+
+```text
+marocos_persona/
+├── app/
+│   ├── api/
+│   │   └── routes.py          # (Futuro) Endpoints da API
+│   ├── core/
+│   │   ├── config.py          # Gerenciamento de Variáveis de Ambiente
+│   │   └── llm.py             # (Futuro) Fábrica de LLM
+│   ├── graph/                 # (Futuro) Lógica do Agente LangGraph
+│   │   ├── nodes.py
+│   │   ├── state.py
+│   │   └── workflow.py
+│   └── services/
+│       └── rag_service.py     # Lógica de Ingestão e Busca no ChromaDB
+├── data/
+│   └── knowledge_base/        # Arquivos de conhecimento
+│       └── profile.md
+├── .env                       # Chaves de API (Local - não subir pro git)
+├── .gitignore                 # Arquivos para ignorar no git
+├── main.py                    # (Futuro) Entrypoint do FastAPI
+├── ingest.py                  # Script para rodar a ingestão manualmente
+└── requirements.txt           # Dependências do projeto
+```
 
 ---
 
-## 3. Projetos: "The Spotlight & The Archive"
-**A Vitrine de Competência.**
-Divisão hierárquica para focar nos "Big Wins" e ainda mostrar volume de trabalho.
+## 3. Arquivos de Configuração
 
-### A. Destaques (Top 3 Projetos)
-* **Projetos:** *Pauta-Certa, InTec-Access, DataChat-BI*.
-* **Visual:** Carrossel estilo 3D (Coverflow) ou Cards Grandes em destaque.
-* **Estilo do Card:** Glassmorphism (vidro fosco escuro) sobre o fundo noise.
-* **Interação:**
-    * Imagem do projeto grande.
-    * Hover: A imagem escurece, sobe um overlay com ícones das tecnologias (FastAPI, React, Docker).
-    * Botões "Call to Action" brilhantes: [Ver Código] e [Live Demo].
+### `requirements.txt`
 
-### B. O Arquivo (Lista de Outros Projetos)
-* **Visual:** Tabela estilizada como um "File System" ou Logs de Terminal.
-* **Colunas:** `Nome do Projeto` | `Tech Stack` | `Link`.
-* **Estilo:** Fonte monoespaçada, linhas divisórias finas e quase transparentes.
-* **UX:** Hover na linha ilumina o texto, dando sensação de seleção de arquivo.
+Dependências essenciais para o projeto.
 
----
+```text
+fastapi
+uvicorn
+python-dotenv
+pydantic-settings
+langchain
+langchain-community
+langchain-core
+langchain-groq
+langchain-google-genai
+langgraph
+chromadb
+tiktoken
+```
 
-## 4. Skills: "The Glowing Grid"
-**O Arsenal Técnico.**
-Nada de listas simples. Uma experiência visual de grade.
+### `.env` (Template)
 
-* **Layout:** Bento Grid (Grade de caixas de tamanhos variados, mas alinhadas).
-* **Categorias:**
-    1.  **Backend:** Python, FastAPI, Flask, SQL.
-    2.  **AI/Data:** LangChain, LLMs, Pandas, RAG.
-    3.  **DevOps:** Docker, VPS (Coolify), Linux (Zorin/Ubuntu).
-    4.  **Frontend:** React, Nuxt.js.
-* **Efeito Uau (Spotlight Effect):**
-    * Os cards têm bordas cinza escuro quase invisíveis.
-    * **Interação:** Um "brilho" (radial gradient) segue o cursor do mouse. Ele ilumina a borda do card onde o mouse está E levemente as bordas dos cards vizinhos.
-    * Isso cria uma sensação de lanterna iluminando uma grade escura.
+Crie este arquivo na raiz e adicione suas chaves.
 
----
+```text
+GROQ_API_KEY=gsk_...
+GOOGLE_API_KEY=AIza...
+# Na VPS, essas variáveis serão configuradas no painel do Coolify
+```
 
-## 5. Jornada: "The Commit History"
-**A História Profissional.**
-Inspirada em árvores de commits do Git e fluxogramas de processos.
+### `.gitignore`
 
-* **Estrutura:** Linha do tempo vertical centralizada.
-* **Visual:** "Nós" (bolinhas) conectadas por uma linha.
-* **Scroll Trigger (Gatilho de Rolagem):**
-    * A linha começa cinza apagado.
-    * Conforme o usuário desce (scroll), a linha "se preenche" de cor (Roxo Neon ou Verde Terminal) de cima para baixo.
-    * Os cards de experiência (UFU, Estágio, Freelance) aparecem com suavidade nas laterais da linha.
-* **Conteúdo:** Ano/Data de um lado, Título/Cargo do outro.
+Importante para não subir lixo ou segredos para o repositório.
+
+```text
+__pycache__/
+*.pyc
+.env
+.venv/
+venv/
+chroma_db/
+```
 
 ---
 
-## 6. Contato: "Interactive Terminal (CLI)"
-**O Grand Finale.**
-Uma despedida interativa e memorável para recrutadores técnicos.
+## 4. Base de Conhecimento
 
-* **Visual:** Uma `<div>` estilizada como janela de terminal (Barra superior cinza com botões vermelhos/amarelos/verdes de janela).
-* **Fundo:** Preto absoluto ou azul muito escuro.
-* **Prompt:** `visitor@marocos-portfolio:~$` com cursor piscando.
-* **UX Híbrida:**
-    * **Para Techs:** Permite digitar comandos reais: `help`, `email`, `linkedin`, `github`, `clear`.
-    * **Para Pressa/Mobile:** Botões visíveis ("Copiar Email", "Acessar LinkedIn") que, ao clicar, "digitam automaticamente" o comando no terminal e executam a ação.
-* **Output:** O terminal "imprime" a resposta (o link ou o email) com efeito de digitação.
+### `data/knowledge_base/profile.md`
+
+Este arquivo contém os dados que o agente usará para responder. Baseado no seu currículo e histórico.
+
+```markdown
+# Sobre Marcos Rodrigues
+
+Eu sou Marcos Rodrigues, um Desenvolvedor Fullstack e Engenheiro de IA em formação.
+Moro em Uberlândia, MG.
+Atualmente sou estagiário de TI na Supporte Logística (desde Agosto de 2025), focado em inovação e automação.
+Também atuo como Freelancer Fullstack na Intecmídia Soluções.
+Sou apaixonado por tecnologia, especialmente como a IA pode transformar processos complexos em soluções simples.
+
+# Formação Acadêmica
+
+- **Graduação:** Gestão da Informação na UFU (Universidade Federal de Uberlândia). Previsão de conclusão: 03/2026.
+- **Técnico:** Eletrônica pelo IFTM (Concluído em 2021). Onde aprendi a base de hardware e lógica com C++ e Arduino.
+
+# Habilidades Técnicas (Hard Skills)
+
+- **Linguagens de Programação:** Python (Nível Expert - minha linguagem principal), JavaScript (Avançado).
+- **Frameworks Backend:** FastAPI (Expert), Flask, LangChain (Avançado), Discord.py.
+- **Data Science & IA:** Pandas, Scipy, Scikit-learn, RAG (Retrieval-Augmented Generation), Engenharia de Prompt, Integração com LLMs (Gemini, OpenAI, Llama/Groq).
+- **Banco de Dados:** SQL (PostgreSQL, MySQL), NoSQL (MongoDB), ChromaDB (Vetorial).
+- **Infraestrutura & DevOps:** Docker (Expert), Linux (Avançado - uso Zorin OS), Git/GitHub, Coolify (para deploy em VPS).
+- **Frontend:** React, Nuxt, Streamlit (para demos rápidas), HTML/CSS/Tailwind.
+
+# Projetos de Destaque
+
+1. **DataChat BI:**
+   - Descrição: Uma solução de Business Intelligence conversacional para logística. O sistema permite que gestores façam perguntas em linguagem natural e o sistema converte em SQL para consultar o banco de dados.
+   - Tecnologias: Python, FastAPI, LangChain, React, SQL.
+2. **Bússola Hub (V2):**
+   - Descrição: Um "Sistema Operacional Pessoal" web. Une gestão financeira, cofre de senhas criptografado e controle de saúde.
+   - Tecnologias: Flask, SQLAlchemy, Docker.
+
+3. **Analisador de Contratos com IA:**
+   - Descrição: API RESTful para upload de contratos (PDF/DOCX) que utiliza o Google Gemini para extrair cláusulas importantes e riscos automaticamente.
+   - Tecnologias: FastAPI, Docker, Google Gemini API.
+
+4. **Marocos Bot 2.0:**
+   - Descrição: Sistema de automação para Discord focado em League of Legends. Gerencia lobbies, valida elo via Riot API e balanceia times matematicamente.
+   - Tecnologias: Python, Discord.py, Riot API, Algoritmos de Matchmaking.
+
+# Contato e Links
+
+- **LinkedIn:** [https://www.linkedin.com/in/marcosrodriguesptc/](https://www.linkedin.com/in/marcosrodriguesptc/)
+- **GitHub:** [https://github.com/marocosz](https://github.com/marocosz)
+- **Email:** marcosrodriguesepro@gmail.com
+- **Portfólio:** [https://marocos.dev](https://marocos.dev)
+```

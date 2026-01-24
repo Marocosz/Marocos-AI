@@ -1,0 +1,12 @@
+fastapi
+uvicorn
+python-dotenv
+pydantic-settings
+langchain
+langchain-community
+langchain-core
+langchain-groq
+langchain-google-genai
+langgraph
+chromadb
+tiktoken
