@@ -28,18 +28,20 @@ const Hero = () => {
 
             <div className="hero-content">
                 <span className="hero-section-label">01. / PORTFOLIO</span>
-                <h1>
+                <h1 className="os-boot-title">
                     Marcos<br />Rodrigues
                 </h1>
 
-                <DecryptedText
-                    parentClassName="hero-subtitle"
-                    text="AI Developer & Full-Stack Engineer"
-                    animateOn="view" 
-                    sequential={true} 
-                    speed={40}         
-                    useOriginalCharsOnly={true}
-                />
+                <div className="os-boot-subtitle-wrapper">
+                    <DecryptedText
+                        parentClassName="hero-subtitle"
+                        text="AI Developer & Full-Stack Engineer"
+                        animateOn="view" 
+                        sequential={true} 
+                        speed={40}         
+                        useOriginalCharsOnly={true}
+                    />
+                </div>
 
                 <div>
                     <button onClick={scrollToContact} className="hero-contact-link">
