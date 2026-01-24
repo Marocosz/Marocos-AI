@@ -88,8 +88,8 @@
 
 /* --- ESTADOS DO CARD --- */
 .project-card.inactive {
-  opacity: 0.5;
-  filter: blur(4px) grayscale(100%);
+  opacity: 0.3;
+  /* Removed filter to fix Firefox bug with child backdrop-filter */
   transform: scale(0.85);
   pointer-events: none;
 }
