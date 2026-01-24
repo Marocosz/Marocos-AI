@@ -18,21 +18,7 @@ const navItems = [
 // Agora recebe props de tema e animação
 const Navbar = ({ isDarkMode, toggleTheme, isAnimationEnabled, toggleAnimation }) => {
   const [activeId, setActiveId] = useState('hero');
-  const [time, setTime] = useState(new Date());
   const visibleSections = useRef({});
-
-  useEffect(() => {
-    const timer = setInterval(() => setTime(new Date()), 1000);
-    return () => clearInterval(timer);
-  }, []);
-
-  const formatTime = (date) => {
-    return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-  };
-  
-  const formatDate = (date) => {
-    return date.toLocaleDateString([], { day: '2-digit', month: '2-digit', year: 'numeric' });
-  };
 
   const scrollToSection = (id) => {
     const element = document.getElementById(id);
@@ -140,8 +126,7 @@ const Navbar = ({ isDarkMode, toggleTheme, isAnimationEnabled, toggleAnimation }
         </div>
 
         <div className="tray-clock">
-          <div className="time">{formatTime(time)}</div>
-          <div className="date">{formatDate(time)}</div>
+          <Clock />
         </div>
 
         <div className="show-desktop-line"></div>
@@ -150,5 +135,31 @@ const Navbar = ({ isDarkMode, toggleTheme, isAnimationEnabled, toggleAnimation }
     </motion.div>
   );
 };
+
+// Componente Relógio Isolado (Evita re-render da Navbar inteira a cada segundo)
+const Clock = React.memo(() => {
+  const [time, setTime] = useState(new Date());
+
+  useEffect(() => {
+    // Atualiza apenas este componente
+    const timer = setInterval(() => setTime(new Date()), 1000);
+    return () => clearInterval(timer);
+  }, []);
+
+  const formatTime = (date) => {
+    return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+  };
+  
+  const formatDate = (date) => {
+    return date.toLocaleDateString([], { day: '2-digit', month: '2-digit', year: 'numeric' });
+  };
+
+  return (
+    <>
+      <div className="time">{formatTime(time)}</div>
+      <div className="date">{formatDate(time)}</div>
+    </>
+  );
+});
 
 export default Navbar;

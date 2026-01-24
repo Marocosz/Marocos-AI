@@ -60,9 +60,21 @@ export default function Iridescence({ color = [1, 1, 1], speed = 1.0, amplitude 
 
     let program;
 
+    // PERFORMANCE FIX: Cache rect dimensions to avoid Reflow on every mousemove
+    let rect = ctn.getBoundingClientRect();
+
     function resize() {
-      const scale = 1;
+      // PERFORMANCE FIX: Renderiza a 60% da resolução para reduzir carga na GPU
+      // em telas 4k/Retina. O efeito "blur" natural disfarça a baixa resolução.
+      const scale = 0.6; 
       renderer.setSize(ctn.offsetWidth * scale, ctn.offsetHeight * scale);
+      
+      // FIX CRÍTICO: Força o canvas a esticar 100% via CSS inline, 
+      // independente da resolução interna baixa (0.6).
+      // Isso resolve o bug do fundo ficar "pequenininho" no canto.
+      gl.canvas.style.width = '100%';
+      gl.canvas.style.height = '100%';
+
       if (program) {
         program.uniforms.uResolution.value = new Color(
           gl.canvas.width,
@@ -70,6 +82,8 @@ export default function Iridescence({ color = [1, 1, 1], speed = 1.0, amplitude 
           gl.canvas.width / gl.canvas.height
         );
       }
+      // Update cached rect
+      rect = ctn.getBoundingClientRect();
     }
     window.addEventListener('resize', resize, false);
     resize();
@@ -107,7 +121,6 @@ export default function Iridescence({ color = [1, 1, 1], speed = 1.0, amplitude 
     ctn.appendChild(gl.canvas);
 
     function handleMouseMove(e) {
-      const rect = ctn.getBoundingClientRect();
       const x = (e.clientX - rect.left) / rect.width;
       const y = 1.0 - (e.clientY - rect.top) / rect.height;
       mousePos.current = { x, y };
@@ -115,14 +128,14 @@ export default function Iridescence({ color = [1, 1, 1], speed = 1.0, amplitude 
       program.uniforms.uMouse.value[1] = y;
     }
     if (mouseReact) {
-      ctn.addEventListener('mousemove', handleMouseMove);
+      window.addEventListener('mousemove', handleMouseMove); // Listen on window for smoother drag even outside
     }
 
     return () => {
       cancelAnimationFrame(animateId);
       window.removeEventListener('resize', resize);
       if (mouseReact) {
-        ctn.removeEventListener('mousemove', handleMouseMove);
+        window.removeEventListener('mousemove', handleMouseMove);
       }
       if (ctn.contains(gl.canvas)) {
           ctn.removeChild(gl.canvas);

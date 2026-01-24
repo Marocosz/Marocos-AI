@@ -9,7 +9,7 @@ export const journeyData = [
     title: "Technical Foundation: Hardware & Code",
     org: "ServData & IFTM",
     description: "My journey began by combining hands-on infrastructure practice at ServData with development logic in the Electronics course at IFTM. From technical support to microcontrollers with C++ and Arduino, I built the foundation that connects the physical world to the digital one.",
-    tags: ["Hardware", "C++", "Arduino", "Electronics", "Support"]
+    tags: ["Hardware", "Arduino", "Electronics", "Support"]
   },
   {
     id: "step-02",

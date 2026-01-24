@@ -110,6 +110,8 @@ const Silk = ({ speed = 1, scale = 2, color = '#121212', noiseIntensity = 0.5, r
            Como o efeito é de "fumaça", a perda de nitidez é imperceptível e até desejável.
         */
         dpr={0.6} 
+        // PERFORMANCE FIX: Pausa o loop de renderização (0% GPU) se a animação estiver desligada
+        frameloop={isAnimated ? "always" : "demand"}
         resize={{ scroll: false }} 
         gl={{ 
           alpha: true, 

@@ -10,8 +10,17 @@ import Contact from '../components/sections/Contact';
 import Navbar from '../components/ui/Navbar';
 
 const HomePage = () => {
-  const [isDarkMode, setIsDarkMode] = useState(true);
-  const [isAnimationEnabled, setIsAnimationEnabled] = useState(true);
+  // Inicializa estado lendo do LocalStorage (Persistência)
+  const [isDarkMode, setIsDarkMode] = useState(() => {
+    const saved = localStorage.getItem('isDarkMode');
+    return saved !== null ? JSON.parse(saved) : true;
+  });
+
+  const [isAnimationEnabled, setIsAnimationEnabled] = useState(() => {
+    const saved = localStorage.getItem('isAnimationEnabled');
+    return saved !== null ? JSON.parse(saved) : true;
+  });
+
   const [isMobile, setIsMobile] = useState(false);
 
   // Detecta se é mobile
@@ -26,11 +35,19 @@ const HomePage = () => {
   }, []);
 
   const toggleTheme = () => {
-    setIsDarkMode(!isDarkMode);
+    setIsDarkMode(prev => {
+      const newValue = !prev;
+      localStorage.setItem('isDarkMode', JSON.stringify(newValue));
+      return newValue;
+    });
   };
 
   const toggleAnimation = () => {
-    setIsAnimationEnabled(!isAnimationEnabled);
+    setIsAnimationEnabled(prev => {
+      const newValue = !prev;
+      localStorage.setItem('isAnimationEnabled', JSON.stringify(newValue));
+      return newValue;
+    });
   };
 
   return (
@@ -71,7 +88,7 @@ const HomePage = () => {
         ) : (
           <Iridescence
             color={[0.9, 0.9, 0.95]} // Cor clarinha (prata/azulado)
-            mouseReact={true}
+            mouseReact={false}
             amplitude={0.1}
             speed={1}
             isAnimated={isAnimationEnabled}
