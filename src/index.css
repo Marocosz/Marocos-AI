@@ -65,10 +65,33 @@
 }
 
 /* --- ESTILOS GLOBAIS DE SCROLL --- */
+/* --- ESTILOS GLOBAIS DE SCROLL (LENIS / NATIVE) --- */
 html {
-  scroll-behavior: smooth;
+  /* Lenis requer scroll-behavior: auto para funcionar corretamente */
+  scroll-behavior: auto !important;
   scrollbar-width: thin;
   scrollbar-color: var(--scrollbar-thumb) var(--scrollbar-track);
+}
+
+/* LENIS RECOMMENDED STYLES */
+html.lenis, html.lenis body {
+  height: auto;
+}
+
+.lenis.lenis-smooth {
+  scroll-behavior: auto !important;
+}
+
+.lenis.lenis-smooth [data-lenis-prevent] {
+  overscroll-behavior: contain;
+}
+
+.lenis.lenis-stopped {
+  overflow: hidden;
+}
+
+.lenis.lenis-scrolling iframe {
+  pointer-events: none;
 }
 
 body::-webkit-scrollbar {
