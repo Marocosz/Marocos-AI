@@ -1,12 +1,15 @@
 from langchain_core.messages import SystemMessage, HumanMessage
 from langchain_core.prompts import ChatPromptTemplate
-from app.core.llm import llm_creative as llm, llm_precise as router_llm
+from app.core.llm import llm_creative as llm, llm_precise as router_llm, llm_rag
 from app.services.rag_service import RagService
 from app.graph.state import AgentState
 
 # As instâncias de LLM agora vêm centralizadas de app.core.llm
-# llm -> Temperatura 0.6 (Criativo)
-# router_llm -> Temperatura 0 (Preciso)
+# llm -> Temperatura 0.6 (Criativo - Casual)
+# llm_rag -> Temperatura 0.2 (Focado - RAG)
+# router_llm -> Temperatura 0 (Preciso - Router)
+
+from app.core.logger import logger
 
 rag = RagService()
 
@@ -15,7 +18,7 @@ def router_node(state: AgentState):
     """
     Analisa a última mensagem e decide o caminho: 'technical' ou 'casual'.
     """
-    print("--- 🚦 ROUTER (Classificando intenção...) ---")
+    logger.info("--- 🚦 ROUTER (Classificando intenção...) ---")
     messages = state["messages"]
     last_message = messages[-1].content
 
@@ -28,6 +31,7 @@ def router_node(state: AgentState):
     - "technical":
       * Perguntas sobre o Marcos (Carreira, Idade, Localização).
       * Perguntas sobre Habilidades, Projetos, Repositórios ou Contato.
+      * Perguntas sobre o Portfólio, Site, como foi feito, stack utilizada.
       * Perguntas sobre Gosto Pessoal, Hobbies, Games, Animes, Filmes, Música (Isso deve ser buscado no banco!).
       * Perguntas sobre Opiniões ou Visão de Mundo do Marcos.
       * Se a mensagem tiver uma Saudação + Pergunta (ex: "Oi, qual seu github?"), é "technical".
@@ -47,6 +51,7 @@ def router_node(state: AgentState):
     response = chain.invoke({"question": last_message})
     
     decision = response.content.strip().lower()
+    logger.info(f"Router Decision: {decision}")
     
     # Fallback de segurança: se ele alucinar, joga pro technical que é mais seguro
     if "technical" in decision: return {"classification": "technical"}
@@ -56,19 +61,21 @@ def router_node(state: AgentState):
 
 # --- NÓ 2: RETRIEVE (Apenas para rota técnica) ---
 def retrieve(state: AgentState):
-    print("--- 🔍 RETRIEVE (Buscando memórias...) ---")
+    logger.info("--- 🔍 RETRIEVE (Buscando memórias...) ---")
     messages = state["messages"]
     last_message = messages[-1].content
     
-    docs = rag.query(last_message, k=4)
+    docs = rag.query(last_message, k=6)
     context_text = "\n\n".join([doc.page_content for doc in docs])
+    logger.info(f"Retrieved {len(docs)} documents.")
+    logger.info(f"--- RAG FULL CONTEXT ---\n{context_text}\n------------------------")
     
     return {"context": [context_text]}
 
 
 # --- NÓ 3: GENERATE RAG (Responde com dados + ESTILO NOVO) ---
 def generate_rag(state: AgentState):
-    print("--- 🤖 GENERATE RAG (Respondendo com fatos e estilo...) ---")
+    logger.info("--- 🤖 GENERATE RAG (Respondendo com fatos e estilo...) ---")
     messages = state["messages"]
     context = state["context"][0]
     
@@ -105,14 +112,15 @@ def generate_rag(state: AgentState):
     """
     
     prompt = ChatPromptTemplate.from_messages([("system", system_prompt), ("placeholder", "{messages}")])
-    chain = prompt | llm
+    chain = prompt | llm_rag
     response = chain.invoke({"messages": messages, "context": context})
+    logger.info(f"--- RAG GENERATED RESPONSE ---\n{response.content}\n------------------------------")
     return {"messages": [response]}
 
 
 # --- NÓ 4: GENERATE CASUAL (Responde papo furado) ---
 def generate_casual(state: AgentState):
-    print("--- 🗣️ GENERATE CASUAL (Papo livre...) ---")
+    logger.info("--- 🗣️ GENERATE CASUAL (Papo livre...) ---")
     messages = state["messages"]
     
     system_prompt = """
@@ -132,7 +140,7 @@ def generate_casual(state: AgentState):
     - Responda como se estivesse no chat da Twitch ou Discord.
     
     Exemplos:
-    - "Oi" -> "Opa, fala tu! Tudo na paz?"
+    - "Oi" -> "Opa, tudo bem?"
     - "Tudo bem?" -> "Tudo tranquilo por aqui! E contigo, como tão as coisas?"
     - "O que faz?" -> "Tô aqui nos códigos, aquela luta de sempre kkk. E você?"
     - Elogio -> "Pô, valeu demais! Fico feliz que curtiu."
@@ -143,4 +151,5 @@ def generate_casual(state: AgentState):
     prompt = ChatPromptTemplate.from_messages([("system", system_prompt), ("placeholder", "{messages}")])
     chain = prompt | llm
     response = chain.invoke({"messages": messages})
+    logger.info(f"--- CASUAL GENERATED RESPONSE ---\n{response.content}\n---------------------------------")
     return {"messages": [response]}

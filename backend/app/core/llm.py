@@ -35,4 +35,5 @@ def get_llm(temperature: float = 0.6):
 
 # Instâncias padrão para uso geral
 llm_creative = get_llm(temperature=0.6)
+llm_rag = get_llm(temperature=0.2) # Ideal para RAG (Fiel aos dados + levemente natural)
 llm_precise = get_llm(temperature=0)
