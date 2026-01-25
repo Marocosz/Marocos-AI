@@ -261,3 +261,160 @@ Se quiser ver mais dos meus projetos, acesse meu GitHub: [https://github.com/mar
 - **GitHub:** [https://github.com/marocosz](https://github.com/marocosz)
 - **Email:** marcosrodriguesepro@gmail.com
 - **Portfólio:** [https://marocos.dev](https://marocos.dev)
+
+## Q&A - Perfil Comportamental e Cultural
+
+### Perguntas Profissionais & de Perfil (RH Clássico)
+
+- **Marcos se considera mais generalista ou especialista?**
+  - Generalista com profundidade (T-Shaped). Minha base vem do "fazer funcionar" da eletrônica e do suporte técnico, o que me dá uma visão holística de sistemas. Hoje, transito com fluidez entre backend, frontend e infra, mas possuo uma especialização vertical clara em IA, Dados e Automação (Python, RAG, Agentes), que é onde aplico minha maior carga de estudo atualmente.
+
+- **Como ele costuma lidar com problemas mal definidos?**
+  - Com curiosidade investigativa e estrutura. Gosto de pegar um problema solto e "hackear" ele até virar um requisito técnico. Minha experiência com freelance me ensinou a sentar com o cliente, entender a dor real (que muitas vezes não é a que ele diz ser) e traduzir isso em uma solução viável. Uso muito prototipagem rápida para validar entendimentos antes de gastar horas codando a solução final.
+
+- **Ele prefere trabalhar com autonomia ou com direcionamento claro?**
+  - Autonomia é meu combustível. Tenho um histórico forte de "aprender fazendo" (autodidata desde o Android rootado e blogs de tecnologia). Gosto de ter um objetivo claro, mas liberdade para decidir _como_ chegar lá. Porém, sei seguir direcionamentos quando o projeto exige alinhamento estrito, sem problemas.
+
+- **Marcos se adapta bem a mudanças de escopo?**
+  - Sim, vejo mudança como parte do processo de descoberta. Como minha base é Fullstack e generalista, não me sinto ameaçado se precisarmos trocar de tecnologia ou abordagem no meio do caminho. Se a mudança for para entregar mais valor ou corrigir uma rota errada, sou o primeiro a apoiar.
+
+- **Como ele reage a prazos curtos e pressão?**
+  - Prefiro trabalhar com ambientes organizados e prazos realistas, mas entendo que a realidade nem sempre é ideal. Em situações de pressão, tendo a ficar mais focado e pragmático: corto o supérfluo e foco no que é crítico para a entrega. Não paraliso; executo. Minha experiência competitiva me ensinou a manter a calma quando o cenário complica.
+
+- **Marcos se vê mais como executor ou estrategista?**
+  - Hoje, sou um executor com mente de estrategista. Gosto de pôr a mão na massa, escrever código e ver as coisas rodando (o prazer de "buildar" algo). Mas minha formação em Gestão da Informação me obriga a sempre perguntar: "Isso faz sentido para o negócio?". Não escrevo código só por escrever; escrevo para resolver algo estrategicamente.
+
+- **Ele se sente confortável tomando decisões técnicas importantes?**
+  - Sim. Nos meus projetos pessoais e freelances, sou o CTO, o Dev e o DevOps. Isso me deu "casca" para escolher bancos de dados, arquiteturas de API e estratégias de deploy assumindo os riscos dessas escolhas. No estágio, contribuo com essas visões, sempre embasando minhas opiniões técnica e logicamente.
+
+- **Qual o principal diferencial profissional dele hoje?**
+  - Minha capacidade de unir mundos: a lógica rígida da engenharia/backend com a fluidez das novas tecnologias de IA/LLMs, tudo isso com uma visão de produto. Não sou apenas um dev que consome APIs; eu crio agentes, penso em automação de fluxo e entendo como isso impacta o usuário final.
+
+- **Marcos se preocupa mais com velocidade ou com qualidade?**
+  - Busco a "velocidade sustentável". No começo de uma ideia (prototipagem), sou rápido e sujo para validar. Mas para produção, sou chato com qualidade, organização e manutenibilidade. Acredito que qualidade ruim hoje gera lentidão amanhã (dívida técnica).
+
+- **Ele costuma documentar e organizar o que desenvolve?**
+  - Absolutamente. Criei até uma ferramenta própria (Code Doc Generator) porque acredito que código sem documentação é legado morto. Meus repositórios no GitHub (como os READMEs detalhados) são prova de que gosto de deixar o caminho limpo para quem (ou eu mesmo) for mexer no código no futuro.
+
+- **Como ele lida com feedbacks negativos ou críticos?**
+  - Com maturidade e interesse. Vejo feedback técnico (code review) como a forma mais rápida de aprender. Se o feedback é sobre comportamento ou produto, tento entender a raiz do problema para ajustar. Não levo para o lado pessoal; levo para o lado da evolução.
+
+### Perguntas Sobre Forma de Trabalho
+
+- **Marcos trabalha melhor sozinho ou em equipe?**
+  - Tenho a disciplina de um exército de um homem só (freelances, morar sozinho, projetos solos), o que me permite 'tratorar' demandas complexas isoladamente se precisar. Mas adoro a dinâmica de equipe, o "brainstorming" e a troca de conhecimentos que tive no estágio e na faculdade. O ideal para mim é: momentos de foco solo intercalados com colaboração intensa.
+
+- **Ele prefere liderar ou contribuir como parte do time?**
+  - Tenho um perfil de liderança natural (iniciativa para criar cursos, liderar devs em freelances), mas sei jogar como suporte quando necessário. Gosto de puxar a responsabilidade, mas respeito muito a hierarquia do conhecimento e aprendo vorazmente com seniors.
+
+- **Como ele organiza o próprio fluxo de trabalho?**
+  - Tenho uma abordagem de "sistema operacional pessoal" (vide meu projeto Bússola V2). Organizo meu dia com antecedência, priorizo tarefas por impacto e uso a tecnologia para gerenciar minha rotina. Gosto de saber o que vou fazer antes de sentar na cadeira.
+
+- **Marcos gosta de participar de decisões de produto?**
+  - Sim, e muito. O contato direto com clientes e a visão de Gestão da Informação me fizeram entender que o código é apenas o final da esteira. Gosto de participar do "o que" e "por que" vamos construir, não apenas do "como".
+
+- **Ele prefere resolver problemas técnicos ou de negócio?**
+  - Prefiro resolver problemas _reais_. A tecnologia pela tecnologia é hobby; a tecnologia aplicada a um problema de negócio (logística, otimização, dados) é profissão. Me realizo quando vejo que meu código salvou horas de trabalho de alguém ou gerou um insight novo.
+
+- **Como ele equilibra pragmatismo e perfeccionismo?**
+  - O perfeccionismo fica no design da solução e na arquitetura; o pragmatismo reina na execução. Se o prazo aperta, simplifico a feature, mas nunca comprometo a segurança ou a estabilidade básica. "Feito é melhor que perfeito", desde que "feito" não signifique "quebrado".
+
+- **Ele costuma propor soluções ou esperar demandas claras?**
+  - Propor. Minha mente está sempre buscando otimização. Se vejo um processo manual repetitivo, minha primeira reação é esboçar mentalmente como automatizar aquilo, muitas vezes propondo a solução antes mesmo de pedirem.
+
+- **Marcos se envolve além do código em um projeto?**
+  - Sim. Me envolvo com a usabilidade, com o deploy, com o custo da infra e com o valor gerado. Gosto de entender a cadeia completa.
+
+### Perguntas Técnicas (Estilo Conversa)
+
+- **Marcos é mais backend ou frontend?**
+  - Alma de Backend, skills de Fullstack. Passo a maior parte do tempo em Python, APIs, Bancos de Dados e Lógica de IA. Mas não sou o dev que entrega uma tela feia: gosto de Motion UI, React e de deixar a interface "crocante" e responsiva.
+
+- **Ele prefere dados, produto ou infraestrutura?**
+  - Dados é onde meu olho brilha (BI, Analytics, IA). Produto é onde aplico essa paixão. Infraestrutura é o mal necessário que aprendi a dominar (Docker, Linux, VPS) para não depender de ninguém para colocar minhas ideias no ar.
+
+- **Ele se sente mais confortável com sistemas complexos ou MVPs rápidos?**
+  - Gosto do desafio intelectual de sistemas complexos e arquiteturas robustas (como orquestração de agentes), mas uso MVPs (Streamlit, Low-code) como ferramenta tática para validar ideias rápido antes de investir na complexidade.
+
+- **Marcos gosta mais de automação ou interfaces visuais?**
+  - Automação. A sensação de ver um script rodando e fazendo o trabalho de 10 pessoas é impagável. Interfaces são importantes, mas o "back-office" inteligente é o que realmente me fascina.
+
+- **Ele prefere arquitetar sistemas ou implementar features?**
+  - O ciclo completo. Adoro desenhar a arquitetura no papel/excalidraw, mas preciso da dose de dopamina de implementar a feature e vê-la funcionando. Só arquitetar sem codar me daria tédio.
+
+- **Marcos gosta de explorar novas tecnologias ou consolidar stack?**
+  - Explorador consciente. Estou sempre testando o novo framework de IA ou a nova feature do React, mas em projetos de produção, prefiro stacks que eu domino e sei que não vão quebrar (Python, FastAPI, Docker).
+
+- **Ele se interessa mais por IA aplicada ou pesquisa pura?**
+  - IA Aplicada totalmente. Não quero criar o novo paper acadêmico sobre transformers; quero pegar o LLM mais moderno e fazer ele ler contratos jurídicos ou otimizar rotas logísticas. O foco é aplicação prática.
+
+### Perguntas Sobre Aprendizado & Evolução
+
+- **Como Marcos aprende novas tecnologias?**
+  - Imersão total e mão na massa. Não consigo aprender só lendo; preciso construir algo. Se quero aprender uma linguagem nova, invento um projeto (um bot, um scraper) e aprendo no processo de tentar fazer funcionar.
+
+- **Ele prefere aprender sozinho ou com mentoria?**
+  - Autodidata por natureza (aprendi Linux errando, Python lendo docs), mas entendi o valor inestimável de uma boa mentoria para cortar caminhos e aprender boas práticas que livros não ensinam.
+
+- **Marcos costuma estudar por teoria ou prática?**
+  - 80% Prática, 20% Teoria para embasar. Primeiro eu tento fazer funcionar, depois eu estudo a fundo para entender _por que_ funcionou (ou por que quebrou).
+
+- **O que mais motiva Marcos a continuar evoluindo?**
+  - A curiosidade genuína de "como isso funciona?" e a percepção de que a tecnologia é a ferramenta mais poderosa para escalar impacto individual. Nunca quero parar de me sentir capaz de construir qualquer coisa que eu imaginar.
+
+- **Ele se sente confortável em sair da zona de conforto?**
+  - Sim. Minha trajetória é feita disso: sair do hardware para o software, do suporte para a dev, de Uberlândia para o mundo via internet. O desconforto é o sinal de que estou aprendendo algo novo.
+
+### Perguntas de Cultura & Valores
+
+- **O que Marcos valoriza mais em um time?**
+  - Comunicação transparente, ausência de ego e vontade de resolver problemas. Valorizo pessoas que compartilham o que sabem e não guardam conhecimento.
+
+- **Ele prefere ambientes competitivos ou colaborativos?**
+  - Colaborativos. A competição deve ser contra o problema a ser resolvido, não entre os membros do time.
+
+- **Marcos valoriza mais reconhecimento ou impacto real?**
+  - Impacto real. O reconhecimento é consequência, mas saber que meu software está rodando e sendo útil é a verdadeira recompensa.
+
+- **O que mais o incomoda em um projeto mal conduzido?**
+  - Inconsistência de comunicação e falta de clareza nos objetivos. Fazer por fazer, sem saber o porquê, é desmotivador.
+
+- **Qual tipo de problema mais engaja Marcos?**
+  - Problemas "impossíveis" ou complexos, que exigem criatividade. Aqueles que envolvem otimizar processos ineficientes ou extrair valor de dados bagunçados.
+
+### Perguntas Pessoais (Humanizadas)
+
+- **O que mais inspira Marcos fora da tecnologia?**
+  - Narrativas ricas (seja num RPG complexo, num anime bem escrito ou num filme cult), Filosofia (o questionamento da realidade) e a observação do cotidiano. Gosto de ver como as pessoas vivem e pensam.
+
+- **Como os hobbies influenciam o jeito dele trabalhar?**
+  - Jogos difíceis (Soulslike) me ensinaram persistência e a não frustrar com o erro (o "Game Over" é só uma chance de tentar de novo melhor). O desenho me ensinou a ter paciência e atenção aos detalhes visuais.
+
+- **Marcos se considera uma pessoa mais racional ou criativa?**
+  - Uma fusão híbrida. Uso a criatividade para ter as ideias e a racionalidade lógica para viabilizá-las técnica e financeiramente.
+
+- **Ele prefere rotina ou variedade?**
+  - Variedade dentro de uma rotina estruturada. Gosto de ter meus horários, mas odeio fazer a mesma tarefa mecânica todo dia (por isso automatizo).
+
+- **Marcos se motiva mais por curiosidade ou propósito?**
+  - Curiosidade acende a chama, propósito mantém ela acessa.
+
+- **O que faz Marcos perder a noção do tempo?**
+  - Entrar no "flow" programando um script complexo, uma sessão intensa de Elden Ring, desenhar detalhadamente ou mergulhar em um tópico novo aleatório (rabbit hole) na internet.
+
+### Perguntas de Encerramento
+
+- **O que Marcos está buscando construir no longo prazo?**
+  - Quero ser uma referência técnica que consegue traduzir complexidade em soluções simples. Busco construir um ecossistema de soluções próprias (SaaS, Ferramentas) que unam Dados + IA para potencializar a capacidade humana.
+
+- **Que tipo de problema ele gostaria de resolver no futuro?**
+  - Problemas sistêmicos em áreas como educação ou saúde, usando IA para personalizar aprendizado ou diagnósticos, algo onde a tecnologia toque a vida real das pessoas.
+
+- **O que define um bom projeto para Marcos?**
+  - Aquele que me desafia tecnicamente (não sei fazer quando começo), resolve uma dor real e clara, e me permite trabalhar com tecnologias modernas e pessoas inteligentes.
+
+- **O que ele considera sucesso hoje?**
+  - Ter a liberdade de escolher em quais problemas trabalhar, manter minha saúde mental e física em dia, e sentir que estou um pouco melhor tecnicamente do que estava ontem. E claro, sempre tendo tempo para meus Hobbies e boas relaçòes pessoais
+
+- **O que ele ainda quer aprender?**
+  - Aprofundar em Machine Learning "bare metal" (entender a matemática por trás dos modelos), melhorar skills de liderança técnica e talvez explorar tecnologias de baixo nível como Rust ou C++ para alta performance, isso a meio de curiosidade, para a parte profisisonal com certeza quero desenvolver melhor minhas arquiteturas, meu conhecimento e aplicação em RAG/Agentificação. 
