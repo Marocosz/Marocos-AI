@@ -18,7 +18,7 @@ Módulos com quem se comunica:
 - app.graph.state: Para ler e atualizar o estado da conversa.
 """
 
-from langchain_core.messages import SystemMessage, HumanMessage, AIMessage
+from langchain_core.messages import SystemMessage, HumanMessage, AIMessage, RemoveMessage
 from langchain_core.prompts import ChatPromptTemplate
 from app.core.llm import llm_creative as llm, llm_precise as router_llm, llm_rag
 from app.services.rag_service import RagService
@@ -28,6 +28,109 @@ from app.core.logger import logger
 
 # Instância do serviço de RAG (Busca Vetorial)
 rag = RagService()
+
+
+# --- NÓ 0A: DETECT LANGUAGE (Identificação Automática) ---
+def detect_language_node(state: AgentState):
+    """
+    Objetivo: Identificar o idioma da última mensagem do usuário.
+    
+    Por que existe: Para que o bot possa ser usado por estrangeiros sem configuração manual.
+    Ele seta o idioma no estado, e o nó 'translator' no final garante a resposta correta,
+    mantendo o processamento interno (RAG/Generate) em PT-BR para consistência da persona.
+    
+    Entrada: Última mensagem do usuário.
+    Saída: Dicionário com 'language'.
+    """
+    logger.info("--- 🌐 DETECT LANGUAGE (Identificando idioma...) ---")
+    messages = state["messages"]
+    last_message = messages[-1].content
+    
+    system_prompt = """
+    Você é um classificador de idiomas preciso.
+    Sua tarefa é identificar em qual língua o texto abaixo está escrito.
+    
+    Retorne APENAS o código ISO 639-1 (ex: 'pt-br', 'en', 'es', 'fr').
+    
+    Regras:
+    - Se for Português, retorne 'pt-br'.
+    - Se for muito curto ou ambíguo (ex: "ok", "test"), assuma 'pt-br' se não for óbvio.
+    - NÃO responda a mensagem, apenas classifique.
+    - Retorne APENAS o código, sem pontuação ou explicação.
+    
+    Texto: {text}
+    """
+    
+    prompt = ChatPromptTemplate.from_template(system_prompt)
+    chain = prompt | router_llm # Modelo preciso
+    
+    response = chain.invoke({"text": last_message})
+    detected_lang = response.content.strip().lower()
+    
+    logger.info(f"Idioma Detectado: {detected_lang}")
+    return {"language": detected_lang}
+
+
+# --- NÓ 0B: SUMMARIZE MEMORY (Gestão de Contexto) ---
+def summarize_conversation(state: AgentState):
+    """
+    Objetivo: Resumir mensagens antigas para evitar estouro de tokens (Context Window).
+    
+    Lógica: 
+    - Só roda se houver > 10 mensagens.
+    - Mantém as últimas 4 mensagens intactas (contexto imediato).
+    - Resume todas as anteriores em um único SystemMessage.
+    - Remove as mensagens resumidas do estado.
+    
+    Entrada: Histórico completo.
+    Saída: Updates de remoção e adição de resumo.
+    """
+    messages = state["messages"]
+    
+    # Se o histórico for pequeno, não faz nada
+    if len(messages) <= 10:
+        return {}
+    
+    # Define o escopo do resumo: Tudo exceto as últimas 4 mensagens
+    recent_messages = messages[-4:]
+    older_messages = messages[:-4]
+    
+    logger.info(f"--- 🧠 SUMMARIZE (Compactando {len(older_messages)} mensagens antigas...) ---")
+    
+    # Gera o resumo usando o modelo
+    summary_prompt = """
+    Você é um Arquivista de Conversas.
+    Faça um resumo conciso e denso das mensagens anteriores entre um Usuário e o Assistente (Marcos).
+    
+    FOCO:
+    1. O que o usuário já perguntou e quais foram as respostas principais.
+    2. Informações pessoais que o usuário compartilhou (nome, interesses).
+    3. Mantenha o tom direto.
+    
+    Histórico para resumir:
+    {history}
+    """
+    
+    # Formata o histórico antigo para o prompt
+    history_text = "\n".join([f"{msg.type}: {msg.content}" for msg in older_messages])
+    
+    prompt = ChatPromptTemplate.from_template(summary_prompt)
+    chain = prompt | router_llm
+    response = chain.invoke({"history": history_text})
+    summary = response.content
+    
+    # Ações:
+    # 1. Criar lista de Remoção para as mensagens antigas
+    delete_messages = [RemoveMessage(id=m.id) for m in older_messages]
+    
+    # 2. Criar a nova mensagem de sistema com o resumo
+    # Nota: Se já existia um resumo anterior, ele estava em 'older_messages' e foi re-resumido aqui (Rolling Summary).
+    summary_message = SystemMessage(content=f"RESUMO DA CONVERSA ANTERIOR: {summary}")
+    
+    logger.info(f"Resumo gerado: {summary[:100]}...")
+    
+    # Retorna updates: Remove as velhas e adiciona a nova (SystemMessage via de regra entra no início ou topo lógico)
+    return {"messages": delete_messages + [summary_message], "summary": summary}
 
 
 # --- NÓ 0: CONTEXTUALIZE (Entende o contexto) ---

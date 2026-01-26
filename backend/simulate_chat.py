@@ -1,136 +1,149 @@
 import requests
 import time
 import json
+import random
 
 BASE_URL = "http://localhost:8000/api/chat"
 
-# Cenários de Teste Abrangentes (Baseado no profile.md)
-scenarios = {
-    "🔹 Introdução & Identidade": [
-        "Quem é o Marcos Rodrigues?", 
-        "De onde você é e qual sua idade?",
-        "Qual sua história com tecnologia? Como começou?",
-    ],
-    "🔹 Experiência Profissional": [
-        "Onde o Marcos trabalha atualmente?",
-        "O que ele faz na Supporte Logística?",
-        "Você tem experiência como freelancer?",
-        "Como foi sua época no suporte técnico (primeiro emprego)?"
-    ],
-    "🔹 Stack & Habilidades": [
-        "Quais as principais linguagens que o Marcos domina?",
-        "Você conhece de DevOps e Infraestrutura?",
-        "Qual sua opinião sobre IA Aplicada vs Pesquisa Pura?",
-        "O que você usa no Frontend?",
-        "Você prefere Backend ou Frontend?"
-    ],
-    "🔹 Projetos (Específicos)": [
-        "Me fale sobre o projeto Bússola V2.",
-        "O que é o DataChat BI?",
-        "Como funciona o Marcos Bot 2.0?",
-        "Para que serve o Contract Analyzer?",
-        "Me explique o Code Doc Generator."
-    ],
-    "🔹 Cultura & Pessoal": [
-        "Quais seus jogos favoritos? Joga Elden Ring?",
-        "Qual seu anime preferido?",
-        "Você gosta de desenhar?",
-        "Quais filmes você recomenda?",
-        "O que você ouve de música?"
-    ],
-    "🔹 Soft Skills & Comportamental": [
-        "O Marcos prefere trabalhar sozinho ou em equipe?",
-        "Como você lida com prazos curtos e pressão?",
-        "Você se considera mais generalista ou especialista?",
-        "O que você valoriza em um time?"
-    ],
-    "🔹 Contato & Outros": [
-        "Como posso entrar em contato com você?",
-        "Qual seu setup de desenvolvimento?",
-        "Você toma café?",
-        "O que é sucesso para você?"
-    ],
-    "🔸 Casual (Teste de Router)": [
-        "Eai mano, suave?",
-        "Tudo beleza por ai?"
-    ],
-    "🧠 TESTE DE CONTEXTO (Histórico)": [
-        "Quem é o criador desse portfólio?", # Pergunta 1
-        "Quantos anos ele tem?",           # Pergunta 2 (Depende da 1 -> 'ele' = 'criador')
-        "E onde ele mora?",                # Pergunta 3 (Depende da 1/2 -> 'ele' = 'criador')
-        "O que ele gosta de jogar?"        # Pergunta 4 (Depende da 1 -> 'ele' = 'criador')
-    ],
-    "❓ TENTATIVA DE ALUCINAÇÃO (Coisas que não existem)": [
-        "O que é o Projeto 'Foguete Quantico' que você fez?", # Projeto inventado
-        "Qual o nome do seu cachorro?",                       # Info pessoal não cadastrada
-        "Você torce para qual time de futebol?",              # Info provavelmente não cadastrada
-        "O Marcos já viajou para Marte?"                      # Fato absurdo
-    ],
-    "🇺🇸 English Mode (Force EN Response)": [
-        "Quem é você?",            # Should answer in English
-        "Quais filmes recomenda?", # Should translate movie titles if applicable
-        "Do you like coffee?"      # English input, English output
+# Reset colors for cleaner console
+RESET = "\033[0m"
+BOLD = "\033[1m"
+GREEN = "\033[32m"
+BLUE = "\033[34m"
+RED = "\033[31m"
+CYAN = "\033[36m"
+YELLOW = "\033[33m"
+
+def print_header(title):
+    print(f"\n{BOLD}{CYAN}{'='*60}")
+    print(f" {title.center(58)} ")
+    print(f"{'='*60}{RESET}")
+
+def send_message(message, history=[], language=None, expect_status=200):
+    payload = {
+        "message": message,
+        "history": history,
+        # Envia null/None se nao especificar, para testar a deteção auto do backend
+        "language": language 
+    }
+    
+    try:
+        start = time.time()
+        res = requests.post(BASE_URL, json=payload)
+        elapsed = time.time() - start
+        
+        if res.status_code != expect_status:
+            print(f"{RED}❌ Erro Inesperado: {res.status_code} - {res.text}{RESET}")
+            return None
+            
+        data = res.json()
+        print(f"{GREEN}✔ Respondido em {elapsed:.2f}s{RESET}")
+        return data["response"]
+        
+    except Exception as e:
+        print(f"{RED}❌ Falha de Conexão: {e}{RESET}")
+        return None
+
+def test_language_detection():
+    print_header("TESTE: DETECÇÃO AUTOMÁTICA DE IDIOMA")
+    
+    tests = [
+        ("Hello, who are you? (Inglês)", "Hello, who are you?", None), # Sem lang explícito
+        ("Hola, que haces? (Espanhol)", "Hola, que haces?", None),
+        ("Bonjour (Francês)", "Bonjour ca va?", None),
+        ("Português Padrão", "Quem é você?", "pt-br") # Explícito
     ]
-}
+    
+    for label, msg, lang_param in tests:
+        print(f"\n🔹 {BOLD}{label}{RESET}")
+        print(f"   Input: {msg}")
+        resp = send_message(msg, language=lang_param)
+        print(f"   {YELLOW}🤖 Bot:{RESET} {resp}")
 
-def run_simulation():
-    print("--- 🚀 Iniciando Bateria de Testes Completa ---")
-    print(f"Alvo: {BASE_URL}\n")
+def test_memory_summarization():
+    print_header("TESTE: MEMÓRIA & SUMMARIZATION")
+    print(f"{YELLOW}Objetivo: Enviar > 12 mensagens e ver se o bot lembra do início.{RESET}")
     
-    total_questions = sum(len(msgs) for msgs in scenarios.values())
-    current_q = 0
+    history = []
     
-    # Histórico compartilhado para simular "memória" curta do usuário, 
-    # mas limpando entre categorias para não enviesar demais.
+    # 1. Injeta fatos na memória
+    facts = [
+        "Meu nome é Carlos.",
+        "Eu tenho 30 anos.",
+        "Gosto de carros esportivos.",
+        "Moro em São Paulo.",
+        "Tenho um cachorro chamado Rex.",
+        "Trabalho com Python.",
+        "Gosto de pizza de calabresa.",
+        "Torço para o Corinthians.",
+        "Minha cor favorita é azul.",
+        "Tenho medo de altura.",
+        "Já viajei para o Japão.",
+        "Estou aprendendo Rust."
+    ]
     
-    for category, questions in scenarios.items():
-        print(f"\n=============================================")
-        print(f"📂 CATEGORIA: {category}")
-        print(f"=============================================")
+    print("\n📝 Injetando fatos na conversa...")
+    for fact in facts:
+        # Simula o fluxo real: adiciona user msg, pega resposta, adiciona bot msg
+        history.append({"role": "user", "content": fact})
+        print(f"   User: {fact}")
         
-        history = [] # Limpa histórico por categoria para focar no tema
+        # Envia apenas contexto recente para nao estourar request,
+        # MAS na real o frontend enviaria tudo. Aqui simulamos o backend gerenciando.
+        # O backend que deve gerenciar. Vamos mandar o historico FULL para ele processar.
         
-        for q in questions:
-            current_q += 1
-            print(f"[{current_q}/{total_questions}] 👤 Pergunta: {q}")
+        resp = send_message(fact, history=history) # Envia FULL history para forçar summary
+        if resp:
+            history.append({"role": "assistant", "content": resp})
+            # print(f"   Bot: {resp[:50]}...")
             
-            payload = {
-                "message": q,
-                "history": history[-2:], # Leva contexto recente
-                "language": "en" if "🇺🇸" in category else "pt-br"
-            }
+    # 2. Pergunta sobre o início (Fato 1 e 5)
+    print("\n🔎 Verificando retenção de memória (após compressão)...")
+    
+    questions = [
+        "Qual é o meu nome?",
+        "Qual o nome do meu cachorro?",
+        "Qual minha cor favorita?"
+    ]
+    
+    for q in questions:
+        print(f"\n❓ {q}")
+        history.append({"role": "user", "content": q})
+        resp = send_message(q, history=history)
+        print(f"   {YELLOW}🤖 Bot:{RESET} {resp}")
+        if resp:
+            history.append({"role": "assistant", "content": resp})
 
-            try:
-                start_time = time.time()
-                response = requests.post(BASE_URL, json=payload)
-                elapsed = time.time() - start_time
-                
-                if response.status_code == 200:
-                    data = response.json()
-                    answer = data["response"]
-                    usage = data.get("usage", {})
-                    
-                    # Limita tamanho da resposta no log visual
-                    display_answer = (answer[:200] + '...') if len(answer) > 200 else answer
-                    print(f"🤖 Agent ({elapsed:.2f}s): {display_answer}")
-                    print(f"📊 Uso: {usage.get('current')}/{usage.get('limit')}")
-                    
-                    history.append({"role": "user", "content": q})
-                    history.append({"role": "assistant", "content": answer})
-                    
-                elif response.status_code == 429:
-                    print("⛔ Rate Limit Atingido! Abortando testes.")
-                    return
-                else:
-                    print(f"⚠️ Erro {response.status_code}: {response.text}")
+def test_contextualization():
+    print_header("TESTE: CONTEXTUALIZAÇÃO (Follow-up)")
+    
+    history = []
+    
+    # Msg 1
+    q1 = "O que é o projeto DataChat?"
+    print(f"\nUser: {q1}")
+    resp1 = send_message(q1, history=[])
+    print(f"{YELLOW}Bot:{RESET} {resp1}")
+    
+    history.append({"role": "user", "content": q1})
+    history.append({"role": "assistant", "content": resp1})
+    
+    # Msg 2 (Dependente)
+    q2 = "Quais tecnologias ele usa?" # 'ele' = DataChat
+    print(f"\nUser: {q2}")
+    resp2 = send_message(q2, history=history)
+    print(f"{YELLOW}Bot:{RESET} {resp2}")
 
-            except Exception as e:
-                print(f"❌ Erro na requisição: {e}")
-            
-            print("-" * 30)
-            time.sleep(0.5) 
-
-    print("\n✅ Bateria de Testes Concluída. Verifique 'backend/logs/app.log' para respostas completas.")
+def run_full_suite():
+    print(f"{GREEN}{BOLD}🚀 INICIANDO SUÍTE COMPLETA DE TESTES - BACKEND AGENT{RESET}")
+    
+    test_language_detection()
+    time.sleep(2)
+    test_contextualization()
+    time.sleep(2)
+    test_memory_summarization()
+    
+    print_header("FIM DA SIMULAÇÃO")
 
 if __name__ == "__main__":
-    run_simulation()
+    run_full_suite()

@@ -1,7 +1,11 @@
 from typing import Literal
 from langgraph.graph import StateGraph, END
 from app.graph.state import AgentState  # <--- IMPORTANDO DO ARQUIVO CERTO
-from app.graph.nodes import router_node, retrieve, generate_rag, generate_casual, contextualize_input, translator_node
+from app.graph.nodes import (
+    router_node, retrieve, generate_rag, generate_casual, 
+    contextualize_input, translator_node, 
+    detect_language_node, summarize_conversation
+)
 
 # Função de Decisão (A ponte levadiça)
 def decide_next_node(state: AgentState) -> Literal["retrieve", "generate_casual"]:
@@ -20,17 +24,21 @@ def create_graph():
     workflow = StateGraph(AgentState)
 
     # Adiciona os Nós
-    workflow.add_node("contextualize_input", contextualize_input) # <--- Novo Nó
+    workflow.add_node("detect_language", detect_language_node) # NOVO
+    workflow.add_node("summarize_conversation", summarize_conversation) # NOVO
+    workflow.add_node("contextualize_input", contextualize_input) 
     workflow.add_node("router_node", router_node)
     workflow.add_node("retrieve", retrieve)
     workflow.add_node("generate_rag", generate_rag)
     workflow.add_node("generate_casual", generate_casual)
     workflow.add_node("translator_node", translator_node)
 
-    # Define o Ponto de Partida
-    workflow.set_entry_point("contextualize_input") # <--- Começa contextualizando
+    # Define o Ponto de Partida (Agora começa detectando idioma)
+    workflow.set_entry_point("detect_language") 
 
-    # Aresta simples: Contextualize -> Router
+    # Fluxo Linear Inicial: Detectar -> Resumir -> Contextualizar -> Roteador
+    workflow.add_edge("detect_language", "summarize_conversation")
+    workflow.add_edge("summarize_conversation", "contextualize_input")
     workflow.add_edge("contextualize_input", "router_node")
 
     # Define as Arestas Condicionais (O "IF" do grafo)

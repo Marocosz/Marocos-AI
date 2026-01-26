@@ -15,3 +15,4 @@ class AgentState(TypedDict):
     classification: str
     rephrased_query: str
     language: str
+    summary: str
