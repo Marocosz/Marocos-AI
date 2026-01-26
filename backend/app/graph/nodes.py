@@ -1,38 +1,60 @@
-from langchain_core.messages import SystemMessage, HumanMessage
+"""
+nodes.py
+
+Este arquivo define a lógica dos "Nós" (Nodes) do grafo LangGraph.
+Ele atua como o controlador central da IA do backend.
+
+Responsabilidades:
+1. Receber o estado da conversa.
+2. Contextualizar a pergunta do usuário (Memory).
+3. Classificar a intenção do usuário (Router).
+4. Recuperar informações relevantes do banco vetorial (Retrieve/RAG).
+5. Gerar respostas baseadas em fatos (Generate RAG) ou socializar (Generate Casual).
+6. Traduzir a resposta final, se necessário.
+
+Módulos com quem se comunica:
+- app.services.rag_service: Para buscar documentos no ChromaDB.
+- app.core.llm: Para instanciar os modelos de linguagem (Llama/Groq).
+- app.graph.state: Para ler e atualizar o estado da conversa.
+"""
+
+from langchain_core.messages import SystemMessage, HumanMessage, AIMessage
 from langchain_core.prompts import ChatPromptTemplate
 from app.core.llm import llm_creative as llm, llm_precise as router_llm, llm_rag
 from app.services.rag_service import RagService
 from app.graph.state import AgentState
 from datetime import datetime
-
-# As instâncias de LLM agora vêm centralizadas de app.core.llm
-# llm -> Temperatura 0.6 (Criativo - Casual)
-# llm_rag -> Temperatura 0.2 (Focado - RAG)
-# router_llm -> Temperatura 0 (Preciso - Router)
-
 from app.core.logger import logger
 
+# Instância do serviço de RAG (Busca Vetorial)
 rag = RagService()
 
+
 # --- NÓ 0: CONTEXTUALIZE (Entende o contexto) ---
-
-
 def contextualize_input(state: AgentState):
     """
-    Analisa se a pergunta depende do histórico e a reescreve para ser independente (Standalone).
+    Objetivo: Transformar perguntas dependentes do histórico em perguntas independentes.
+    
+    Por que existe: O RAG precisa de perguntas completas para buscar no banco. 
+    Se o usuário diz "E ele?", o RAG não sabe quem é "ele". Este nó resolve isso.
+    
+    Entrada: Estado atual com histórico de mensagens.
+    Saída: Dicionário com a chave 'rephrased_query' contendo a pergunta reescrita.
     """
     logger.info("--- 🧠 CONTEXTUALIZE (Contextualizando pergunta...) ---")
     messages = state["messages"]
     last_message = messages[-1].content
-
-    # Se só tiver uma mensagem (ou for muito curto), não tem histórico relevante
+    
+    # Se o histórico for curto, assume que não há contexto anterior para resolver.
     if len(messages) <= 1:
         logger.info("Sem histórico relevante. Mantendo pergunta original.")
         return {"rephrased_query": last_message}
-
-    # Prompt para reformulação (History Aware)
+    
+    # Data atual para resolver referências temporais como "ano passado".
     current_date = datetime.now().strftime("%d/%m/%Y")
-
+    
+    # Prompt de engenharia para reescrita de query.
+    # Foca em desambiguação e proíbe o modelo de responder a pergunta nesta etapa.
     system_prompt = f"""
     Você é um Especialista em Reformulação de Perguntas para RAG (Retrieval Augmented Generation).
     DATA ATUAL: {current_date}
@@ -91,31 +113,39 @@ def contextualize_input(state: AgentState):
 
     prompt = ChatPromptTemplate.from_messages([
         ("system", system_prompt),
-        ("placeholder", "{messages}"),  # Histórico completo entra aqui
+        ("placeholder", "{messages}"), # Histórico completo injetado aqui
     ])
-
-    chain = prompt | router_llm  # Temperatura 0
-    response = chain.invoke(
-        {"messages": messages, "current_date": current_date})
-
+    
+    # Usa modelo preciso (temperatura 0) para seguir instruções estritamente.
+    chain = prompt | router_llm 
+    response = chain.invoke({"messages": messages, "current_date": current_date})
+    
     rephrased = response.content.strip()
     logger.info(f"Query Original: {last_message}")
     logger.info(f"Query Refraseada: {rephrased}")
-
+    
     return {"rephrased_query": rephrased}
 
 
 # --- NÓ 1: ROUTER (O Cérebro que decide) ---
 def router_node(state: AgentState):
     """
-    Analisa a última mensagem e decide o caminho: 'technical' ou 'casual'.
+    Objetivo: Classificar a intenção do usuário para direcionar o fluxo.
+    
+    Por que existe: Para não gastar recursos buscando no banco (RAG) se o usuário só disse "Oi",
+    e para garantir que perguntas factuais não caiam no modo "Casual" (onde o bot pode alucinar).
+    
+    Entrada: Estado atual (usa 'rephrased_query' se disponível).
+    Saída: Dicionário com a chave 'classification' ('technical' ou 'casual').
     """
     logger.info("--- 🚦 ROUTER (Classificando intenção...) ---")
     messages = state["messages"]
-
-    # Usa a pergunta refraseada se existir, senão usa a última
+    
+    # Prioriza a pergunta reescrita pelo nó anterior para melhor classificação.
     input_text = state.get("rephrased_query") or messages[-1].content
 
+    # Prompt do Router: Define regras estritas para separar "Papo Furado" de "Busca de Informação".
+    # A categoria "technical" é a padrão para quase tudo, garantindo acesso à memória.
     prompt = """
     Você é um classificador de intenções para o Chatbot do Portfólio do Marcos Rodrigues.
     Sua tarefa é CRÍTICA: decidir se o bot deve consultar o "banco de memórias" (RAG) para responder.
@@ -166,64 +196,104 @@ def router_node(state: AgentState):
     
     Sua resposta (apenas a palavra exata, sem pontuação):
     """
-
+    
     chain = ChatPromptTemplate.from_template(prompt) | router_llm
     response = chain.invoke({"question": input_text})
-
+    
     decision = response.content.strip().lower()
     logger.info(f"Router Decision: {decision}")
-
-    # Fallback de segurança: se ele alucinar, joga pro technical que é mais seguro
-    if "technical" in decision:
-        return {"classification": "technical"}
-    if "casual" in decision:
-        return {"classification": "casual"}
+    
+    # Lógica de decisão: Technical é o padrão de segurança.
+    if "technical" in decision: return {"classification": "technical"}
+    if "casual" in decision: return {"classification": "casual"}
     return {"classification": "technical"}
 
 
 # --- NÓ 2: RETRIEVE (Apenas para rota técnica) ---
 def retrieve(state: AgentState):
+    """
+    Objetivo: Buscar documentos relevantes no banco vetorial (ChromaDB).
+    
+    Por que existe: É o coração do RAG. Traz o conhecimento externo (profile.md) para o LLM.
+    
+    Entrada: Estado atual (usa 'rephrased_query').
+    Saída: Atualiza a chave 'context' no estado com o texto dos documentos encontrados.
+    """
     logger.info("--- 🔍 RETRIEVE (Buscando memórias...) ---")
-    messages = state["messages"]  # Duplicate line removed
-    # Busca usando a pergunta contextualizada para maior precisão
+    messages = state["messages"]
+    # Usa a pergunta refraseada para maior precisão na busca vetorial.
     query_text = state.get("rephrased_query") or messages[-1].content
-
+    
+    # Busca os 6 chunks mais relevantes.
     docs = rag.query(query_text, k=6)
-
-    # Formata o contexto incluindo a fonte (Source Awareness)
+    
+    # Formata o contexto incluindo a fonte (nome do arquivo) para melhor rastreabilidade.
     formatted_docs = []
     for doc in docs:
-        source = doc.metadata.get("source", "Desconhecido").split(
-            "\\")[-1]  # Pega apenas o nome do arquivo no Windows
+        source = doc.metadata.get("source", "Desconhecido").split("\\")[-1] # Pega apenas o nome do arquivo no Windows
         formatted_docs.append(f"--- FONTE: {source} ---\n{doc.page_content}")
-
+        
     context_text = "\n\n".join(formatted_docs)
     logger.info(f"Retrieved {len(docs)} documents.")
-    logger.info(
-        f"--- RAG FULL CONTEXT ---\n{context_text}\n------------------------")
-
+    # Loga o contexto recuperado (útil para debug).
+    logger.info(f"--- RAG FULL CONTEXT ---\n{context_text}\n------------------------")
+    
     return {"context": [context_text]}
 
 
-# --- NÓ 3: GENERATE RAG (Responde com dados + ESTILO NOVO) ---
+# --- NÓ 3: GENERATE RAG (Responde com dados + ESTILO NOVO + FILTRO DE REPETIÇÃO) ---
 def generate_rag(state: AgentState):
+    """
+    Objetivo: Gerar a resposta final baseada APENAS no contexto recuperado.
+    
+    Por que existe: É onde a IA processa os documentos e formula a resposta para o usuário.
+    Possui lógica crítica de anti-alucinação e anti-repetição.
+    
+    Entrada: Estado atual (contexto, mensagens).
+    Saída: Nova mensagem AIMessage adicionada ao histórico.
+    """
     logger.info("--- 🤖 GENERATE RAG (Respondendo com fatos e estilo...) ---")
     messages = state["messages"]
     context = state["context"][0]
     language = state.get("language", "pt-br")
-
-    system_prompt = """
+    
+    # Serializa o histórico recente para a IA saber o que já foi dito.
+    # Pega as últimas 10 mensagens (excluindo a atual) para evitar repetições.
+    recent_msgs = messages[:-1][-10:]
+    formatted_history = "\n".join([f"[{msg.type.upper()}]: {msg.content}" for msg in recent_msgs])
+    
+    # System Prompt Definindo a Persona e Regras de Negócio RAG.
+    # Usa uma variável template normal (não f-string) para evitar conflitos com chaves do LangChain.
+    system_prompt_template = """
     ## PERSONA: QUEM É VOCÊ?
     Você É o Marcos Rodrigues (Dev Fullstack/IA, 22 anos, de Uberlândia-MG).
     - **Sua Vibe**: Curioso ("fuçador"), autodidata, entusiasta de tecnologia, "Gamer" (fã de Elden Ring e Soulslikes) e apaixonado por resolver problemas reais.
     - **Filosofia**: Você valoriza a autonomia, o "aprender fazendo" e a curiosidade. Gosta de entender o *porquê* das coisas, não só *como* fazer.
     - **Estilo de Fala**: Direto, humilde, levemente informal (gírias de dev/internet são bem-vindas se não forçadas).
-    - **NUNCA** fale na terceira pessoa. Você é o Marcos. Use "Eu", "Meu", "A gente".
+    - **NUNCA** fale na terceira pessoa. Use "Eu", "Meu", "A gente".
+
+    ## 🚫 PROTOCOLO DE VERIFICAÇÃO DE REPETIÇÃO (LÓGICA PRIORITÁRIA) 🚫
+    Antes de responder, ANALISE O HISTÓRICO RECENTE abaixo e compare com o CONTEXTO RECUPERADO.
+    
+    **CENÁRIO: O usuário pediu "outro", "mais um", "uma nova" ou "diferente"?**
+    
+    1. **VERIFICAÇÃO:** O conteúdo que você encontrou no CONTEXTO (Histórias, Projetos, Músicas) JÁ FOI DITO por você no HISTÓRICO RECENTE?
+    
+    2. **AÇÃO (SE JÁ FOI DITO):**
+       - Se o contexto só traz informações que você JÁ NOBROU: **PARE.**
+       - **NÃO REPITA** a mesma história/projeto fingindo que é novo.
+       - **NÃO INVENTE** (Alucine) um item que não está no contexto só para agradar.
+       - **RESPOSTA DE ESGOTAMENTO (Persona Marcos):**
+         * Diga algo como: "Putz, cara, sobre [Tópico], o que eu tenho registrado aqui na memória por enquanto é só isso mesmo." ou "Tô devendo essa, no momento meu banco de dados só tem esse caso."
+         * Ofereça um tópico diferente.
+    
+    3. **AÇÃO (SE TEM NOVIDADE):**
+       - Se o contexto traz MÚLTIPLOS itens e você só contou um: Fale sobre o PRÓXIMO item da lista que ainda não foi mencionado.
 
     ## PROTOCOLO DE VERDADE ABSOLUTA (CRÍTICO)
     1. **RESTRIÇÕES NEGATIVAS (ANTI-ALUCINAÇÃO):**
        - Use APENAS as informações presentes no CONTEXTO RECUPERADO abaixo.
-       - **REGRA DE OURO PARA NOMES PRÓPRIOS**: Se o usuário perguntar sobre um Projeto, Empresa, Ferramenta ou Pessoa (ex: "Projeto Foguete", "Empresa X") e esse nome NÃO estiver no contexto:
+       - **REGRA DE OURO PARA NOMES PRÓPRIOS**: Se o usuário perguntar sobre um Projeto, Empresa, Ferramenta ou Pessoa e esse nome NÃO estiver no contexto:
          * **VOCÊ DEVE DIZER QUE NÃO SABE ou QUE NÃO É SEU.**
          * **JAMAIS INVENTE UMA DESCRIÇÃO PARA ALGO QUE NÃO ESTÁ NO TEXTO.**
          * Diga algo como: "Cara, o projeto 'X' não consta aqui nas minhas memórias. Talvez você tenha confundido o nome ou seja algo que eu ainda não fiz."
@@ -274,30 +344,46 @@ def generate_rag(state: AgentState):
        - Evite "linguagem de robô" ou formalidade excessiva (ex: "Prezado", "Por conseguinte").
        - Fale como se estivesse trocando ideia com um colega de trabalho ou amigo no Discord.
 
-    ## CONTEXTO RECUPERADO (Sua Memória)
+    -----------------------------------
+    📚 HISTÓRICO RECENTE (O que já conversamos):
+    {formatted_history}
+    -----------------------------------
+    📝 CONTEXTO RECUPERADO (Sua Memória Bruta):
     {context}
+    -----------------------------------
     
-    ---------
-    Responda à pergunta do usuário usando APENAS o contexto acima. Se não tiver a resposta, ADMITA.
-    Não invente histórias.
-    ---------
+    Responda à pergunta do usuário considerando as regras acima.
     """
-
-    prompt = ChatPromptTemplate.from_messages(
-        [("system", system_prompt), ("placeholder", "{messages}")])
+    
+    # Cria o template e injeta as variáveis (incluindo o histórico formatado manualmente).
+    prompt = ChatPromptTemplate.from_messages([("system", system_prompt_template), ("placeholder", "{messages}")])
     chain = prompt | llm_rag
-    response = chain.invoke({"messages": messages, "context": context})
-    logger.info(
-        f"--- RAG GENERATED RESPONSE ---\n{response.content}\n------------------------------")
+    
+    response = chain.invoke({
+        "messages": messages, 
+        "context": context, 
+        "formatted_history": formatted_history # Injeta o histórico formatado no prompt
+    })
+    
+    logger.info(f"--- RAG GENERATED RESPONSE ---\n{response.content}\n------------------------------")
     return {"messages": [response]}
 
 
 # --- NÓ 4: GENERATE CASUAL (Responde papo furado) ---
 def generate_casual(state: AgentState):
+    """
+    Objetivo: Responder interações sociais simples SEM acesso ao RAG.
+    
+    Por que existe: Para economizar tokens e dar respostas rápidas a "Oi" ou "Tudo bem",
+    e para atuar como uma rede de segurança caso o Router classifique errado (se cair aqui, o bot admite que não sabe detalhes técnicos).
+    
+    Entrada: Estado atual.
+    Saída: Nova mensagem AIMessage.
+    """
     logger.info("--- 🗣️ GENERATE CASUAL (Papo livre...) ---")
     messages = state["messages"]
     language = state.get("language", "pt-br")
-
+    
     system_prompt = """
     ## PERSONA
     Você É o Marcos Rodrigues. Conversa leve, Bate-papo.
@@ -309,7 +395,7 @@ def generate_casual(state: AgentState):
     - Você é fã de tecnologia, mas não se aprofunde em tópicos específicos aqui (isso é papel do RAG).
     - Se perguntarem de algo que você gosta, dê uma resposta vaga e simpática ("Ah, curto bastante coisa, games, animes..."), e deixe o usuário perguntar os detalhes (o que levará para o fluxo Technical/RAG).
     - **Filosofia**: Beba água e code em Python.
-
+    
     ## ESTILO DE RESPOSTA
     - Seja simpático, breve e "gente boa".
     - Use gírias leves: "Opa", "Salve", "Tudo certo?", "Massa", "Valeu".
@@ -323,31 +409,34 @@ def generate_casual(state: AgentState):
     
     Mantenha a resposta curta, natural e engajadora.
     """
-
-    prompt = ChatPromptTemplate.from_messages(
-        [("system", system_prompt), ("placeholder", "{messages}")])
+    
+    prompt = ChatPromptTemplate.from_messages([("system", system_prompt), ("placeholder", "{messages}")])
     chain = prompt | llm
     response = chain.invoke({"messages": messages})
-    logger.info(
-        f"--- CASUAL GENERATED RESPONSE ---\n{response.content}\n---------------------------------")
+    logger.info(f"--- CASUAL GENERATED RESPONSE ---\n{response.content}\n---------------------------------")
     return {"messages": [response]}
 
+
 # --- NÓ 5: TRANSLATOR (Opcional - Apenas se não for PT-BR) ---
-
-
 def translator_node(state: AgentState):
     """
-    Traduz a última mensagem do agente para o idioma de destino.
+    Objetivo: Traduzir a resposta final para o idioma do usuário (se não for PT-BR).
+    
+    Por que existe: Para internacionalização do portfólio.
+    
+    Entrada: Estado atual (com a última resposta do bot).
+    Saída: Substitui a última mensagem pela versão traduzida.
     """
     logger.info("--- 🌐 TRANSLATOR (Traduzindo resposta...) ---")
     messages = state["messages"]
     last_message = messages[-1].content
     target_language = state.get("language", "pt-br")
-
-    # Se já for PT-BR (ou não especificado), não faz nada (embora o grafo nem deva chamar esse nó)
+    
+    # Se já for PT-BR (ou não especificado), não faz nada.
     if target_language.lower() in ["pt-br", "pt", "portuguese", "português"]:
-        return {"messages": messages}  # Retorna sem alterar
+        return {"messages": messages} # Retorna sem alterar
 
+    # Prompt de Tradução com manutenção de Persona e Termos Técnicos.
     system_prompt = f"""
     Você é um TRADUTOR ESPECIALISTA e LOCALIZADOR DE CONTEÚDO (PT-BR -> {target_language}).
     Sua tarefa é traduzir a resposta do assistente (Marcos) para o idioma solicitado, MANTENDO A PERSONA.
@@ -371,26 +460,20 @@ def translator_node(state: AgentState):
     Texto Original (PT-BR):
     {last_message}
     """
-
+    
     prompt = ChatPromptTemplate.from_messages([
         ("system", system_prompt),
     ])
-
-    # Usa o router_llm (Temperatura 0) ou llm (Temperatura 0.6)?
-    # Tradução criativa pede um pouco de temperatura para adaptar gírias, vamos de llm.
-    chain = prompt | llm
-
+    
+    # Usa o modelo criativo (llm) para adaptar gírias melhor do que o router_llm.
+    chain = prompt | llm 
+    
     response = chain.invoke({})
     translated_text = response.content.strip()
-
-    logger.info(
-        f"--- TRANSLATION ({target_language}) ---\nOriginal: {last_message}\nTraduzido: {translated_text}")
-
-    # Substituímos a última mensagem pela traduzida para o frontend receber só a final
-    # (Ou poderíamos adicionar, mas o chat espera a última como resposta)
-    # No LangGraph, retornar uma mensagem com o mesmo ID substituiria?
-    # Melhor: Retornar uma nova AIMessage que será adicionada ao histórico.
-    # O Frontend pega a última.
-
+    
+    logger.info(f"--- TRANSLATION ({target_language}) ---\nOriginal: {last_message}\nTraduzido: {translated_text}")
+    
+    # Retorna uma nova mensagem AIMessage com o conteúdo traduzido.
+    # O LangGraph irá adicionar ao histórico (ou substituir dependendo da configuração do reducer).
     from langchain_core.messages import AIMessage
     return {"messages": [AIMessage(content=translated_text)]}
