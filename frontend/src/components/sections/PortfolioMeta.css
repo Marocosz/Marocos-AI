@@ -1,0 +1,104 @@
+.portfolio-meta-section {
+    position: relative;
+    width: 100%;
+    /* Aumenta a largura máxima para ficar mais wide/retangular */
+    max-width: 1200px; 
+    margin: 0 auto;
+    padding: 2rem 2rem; /* Reduz padding vertical da section */
+    display: flex;
+    justify-content: center;
+}
+
+.meta-card {
+    background: rgba(255, 255, 255, 0.03);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    border-radius: 20px; /* Bordas um pouco menos arredondadas para reforçar o retângulo */
+    padding: 2.5rem; /* Menos padding interno */
+    position: relative;
+    overflow: hidden;
+    width: 100%; /* Ocupa largura disponível */
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+    transition: all 0.3s ease;
+}
+
+.theme-light .meta-card {
+    background: rgba(255, 255, 255, 0.6);
+    border: 1px solid rgba(0, 0, 0, 0.05);
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.05);
+}
+
+.meta-content {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+}
+
+.meta-text-col {
+    width: 100%;
+}
+
+.meta-label {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 1.1rem; 
+    color: var(--accent-color);
+    text-transform: uppercase;
+    letter-spacing: 0.15em;
+    margin-bottom: 1rem; /* Aumentei margem pq não tem mais título */
+    display: inline-block;
+    font-weight: 700;
+}
+
+.meta-title {
+    font-family: 'Outfit', sans-serif;
+    font-size: 1.5rem;
+    color: var(--text-primary);
+    margin-bottom: 1rem;
+    font-weight: 600;
+}
+
+.meta-description {
+    font-family: 'Inter', sans-serif;
+    font-size: 0.95rem; /* Texto um pouco menor */
+    line-height: 1.6;
+    color: var(--text-secondary);
+}
+
+.meta-description p {
+    margin-bottom: 0.5rem;
+}
+
+.meta-description p:last-child {
+    margin-bottom: 0;
+}
+
+/* Decoration mais sutil */
+.meta-decoration {
+    position: absolute;
+    top: -50%;
+    right: -10%;
+    width: 400px; /* Reduz tamanho da decoração */
+    height: 400px;
+    background: radial-gradient(circle, var(--accent-color) 0%, transparent 70%);
+    opacity: 0.03; /* BEM sutil */
+    pointer-events: none;
+    z-index: 0;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .meta-content {
+        flex-direction: column;
+        gap: 1.5rem;
+        align-items: flex-start;
+    }
+
+    .meta-card {
+        padding: 1.5rem;
+    }
+
+    .meta-title {
+        font-size: 1.25rem;
+    }
+}

@@ -8,6 +8,7 @@ import Journey from '../components/sections/Journey';
 import TechStack from '../components/sections/TechStack';
 import Contact from '../components/sections/Contact';
 import Navbar from '../components/ui/Navbar';
+import PortfolioMeta from '../components/sections/PortfolioMeta';
 
 const HomePage = () => {
   // Inicializa estado lendo do LocalStorage (Persistência)
@@ -123,8 +124,8 @@ const HomePage = () => {
       <div style={{ position: 'relative', zIndex: 5 }}>
         <div id="profile"><Profile /></div>
         <div id="projects"><Projects /></div>
+        <div id="meta-project"><PortfolioMeta /></div>
         
-
 
         <div id="journey"><Journey /></div>
         <div id="tech"><TechStack /></div>

@@ -35,11 +35,13 @@ app = FastAPI(
 # Necessário porque o Frontend (Porta 5173) e Backend (Porta 8000) 
 # rodam em origens diferentes durante o desenvolvimento.
 origins = [
+    # --- Desenvolvimento (Local) ---
     "http://localhost:5173", # Vite Local
-    "http://localhost:3000", # Next.js Local (se houver)
-    "https://marocos.dev",   # Produção
+    "http://localhost:3000", # Next.js (se houver)
+    
+    # --- Produção (Live) ---
+    "https://marocos.dev",
     "https://www.marocos.dev",
-    "*" # Permite tudo (Cuidado em produção real, mas útil para testes)
 ]
 
 app.add_middleware(

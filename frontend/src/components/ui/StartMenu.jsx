@@ -9,7 +9,7 @@ import './StartMenu.css';
 // Determine API URL based on environment
 // Dev: http://localhost:8000/api
 // Prod: /api (Assumes Nginx/Reverse Proxy handles the route)
-const API_BASE = import.meta.env.DEV ? 'http://localhost:8000/api' : '/api';
+const API_BASE = import.meta.env.DEV ? 'http://localhost:8000/api' : 'https://api.marocos.dev/api';
 
 const StartMenu = ({ isOpen, onClose, isDarkMode }) => {
   const { language } = useLanguage();
