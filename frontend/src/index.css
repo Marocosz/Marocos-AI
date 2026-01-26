@@ -74,6 +74,9 @@ html {
   scroll-behavior: auto !important;
   scrollbar-width: none; /* Firefox - Hide Scrollbar */
   -ms-overflow-style: none; /* IE/Edge */
+  background-color: var(--bg-color); /* FIX: Sync background to prevent black flash in F11 */
+  transition: background-color 1.5s ease;
+  min-height: 100vh;
 }
 
 /* Remove Webkit Scrollbar (Chrome/Safari/Edge) */
@@ -115,6 +118,7 @@ body {
   color: var(--text-primary);
   overflow-x: hidden; /* Evita scroll horizontal indesejado */
   transition: background-color 1.5s ease, color 1.5s ease;
+  min-height: 100vh;
 }
 
 * {

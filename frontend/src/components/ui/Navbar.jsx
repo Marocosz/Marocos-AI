@@ -21,7 +21,7 @@ import { useLanguage } from '../../contexts/LanguageContext';
 
 const Navbar = ({ isDarkMode, toggleTheme, isAnimationEnabled, toggleAnimation }) => {
   const { language, toggleLanguage } = useLanguage();
-  const navItems = getNavItems(language); // Get translated items
+  const navItems = React.useMemo(() => getNavItems(language), [language]); // Get translated items (Memoized)
   const [activeId, setActiveId] = useState('hero');
   const [isStartMenuOpen, setIsStartMenuOpen] = useState(false);
   const [isTrayMenuOpen, setIsTrayMenuOpen] = useState(false); // Mobile Tray Menu
@@ -79,6 +79,9 @@ const Navbar = ({ isDarkMode, toggleTheme, isAnimationEnabled, toggleAnimation }
   };
 
   useEffect(() => {
+    // Stop updating active indicator if StartMenu is open (prevents weird jumping)
+    if (isStartMenuOpen) return;
+
     const observerOptions = {
       root: null,
       rootMargin: '-10% 0px -40% 0px', 
@@ -115,7 +118,7 @@ const Navbar = ({ isDarkMode, toggleTheme, isAnimationEnabled, toggleAnimation }
     });
 
     return () => observer.disconnect();
-  }, [activeId]);
+  }, [activeId, isStartMenuOpen, navItems]);
 
   return (
     <>
