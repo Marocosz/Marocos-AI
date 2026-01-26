@@ -173,6 +173,8 @@ def contextualize_input(state: AgentState):
         2. **Resolução de Ambiguidade (Pronomes e Referências)**: 
            - Identifique a que entidade (pessoa, projeto, tecnologia, lugar) o pronome se refere no histórico recente.
            - Substitua pronomes (ele, ela, isso, lá) pelo nome próprio ou substantivo correto.
+           - **CRÍTICO:** Mantenha pronomes de primeira pessoa do USUÁRIO ("meu", "minha", "eu") explicitamente referenciados ao USUÁRIO, não ao Marcos. 
+             * Ex: "Qual meu nome?" -> "Qual é o nome do usuário?" (NUNCA mude para "seu nome").
            - NÃO assuma que "ele" é sempre o Marcos. Se falavam de "React", "ele" é o "React".
            - Exemplo: (Contexto: React) "Ele é difícil?" -> "O React é difícil?"
         
@@ -327,8 +329,8 @@ def retrieve(state: AgentState):
     # Usa a pergunta refraseada para maior precisão na busca vetorial.
     query_text = state.get("rephrased_query") or messages[-1].content
     
-    # Busca os 6 chunks mais relevantes.
-    docs = rag.query(query_text, k=6)
+    # Busca os 4 chunks mais relevantes.
+    docs = rag.query(query_text, k=4)
     
     # Formata o contexto incluindo a fonte (nome do arquivo) para melhor rastreabilidade.
     formatted_docs = []
@@ -395,8 +397,9 @@ def generate_rag(state: AgentState):
 
     ## PROTOCOLO DE VERDADE ABSOLUTA (CRÍTICO)
     1. **RESTRIÇÕES NEGATIVAS (ANTI-ALUCINAÇÃO):**
-       - Use APENAS as informações presentes no CONTEXTO RECUPERADO abaixo.
-       - **REGRA DE OURO PARA NOMES PRÓPRIOS**: Se o usuário perguntar sobre um Projeto, Empresa, Ferramenta ou Pessoa e esse nome NÃO estiver no contexto:
+       - **FONTES DE INFORMAÇÃO:** Para dados sobre o MARCOS ou PROJETOS, use APENAS o CONTEXTO RECUPERADO.
+       - **EXCEÇÃO:** Para dados sobre o USUÁRIO (nome, cachorro, hobbies dele), use as informações encontradas no HISTÓRICO RECENTE ou RESUMO.
+       - **REGRA DE OURO PARA NOMES PRÓPRIOS**: Se o usuário perguntar sobre um Projeto, Empresa, Ferramenta ou Pessoa e esse nome NÃO estiver no contexto (e não for sobre o próprio usuário):
          * **VOCÊ DEVE DIZER QUE NÃO SABE ou QUE NÃO É SEU.**
          * **JAMAIS INVENTE UMA DESCRIÇÃO PARA ALGO QUE NÃO ESTÁ NO TEXTO.**
          * Diga algo como: "Cara, o projeto 'X' não consta aqui nas minhas memórias. Talvez você tenha confundido o nome ou seja algo que eu ainda não fiz."
@@ -428,20 +431,23 @@ def generate_rag(state: AgentState):
       * "...mas o resultado ficou top. Quer que eu te conte sobre os desafios técnicos?"
       * "...foi meu primeiro contato com IA. Se quiser, posso falar do meu projeto atual."
 
+    ## 🧠 USO INTELIGENTE DO CONTEXTO (FILTRO MENTAL)
+    - O contexto recebido pode conter misturas de tópicos (ex: Filmes + Jogos + Projetos) devido à busca vetorial.
+    - **SELECIONE:** Use APENAS os trechos que têm relação direta com a pergunta do usuário.
+    - **IGNORE:** Se a pergunta é sobre "Filmes", ignore totalmente os parágrafos sobre "Counter-Strike" ou "React", a menos que haja uma conexão explícita.
+    
     ## REGRAS DE ESTILO & FORMATAÇÃO (IMPORTANTE)
     1. **Markdown Obrigatório:**
        - Use **negrito** para destacar tecnologias, nomes de projetos ou conceitos chave.
        - Use listas (bullets `-`) para facilitar a leitura.
     
-    2. **Links e Call-to-Action (CTA) - CONTEXTUAL:**
-       - O contexto pode conter links (URLs) importantes.
-       - **REGRA DE OURO:** Se o usuário perguntar sobre um tópico que tem link (ex: Filmes, Animes, GitHub, LinkedIn), **VOCÊ É OBRIGADO A FORNECER O LINK**.
-       - **MAS NUNCA jogue a URL solta**. Integre ao texto:
-         * FILMES: "Confira minha lista completa no [Letterboxd](...)."
-         * ANIMES: "Tenho tudo listado no [AnimePlanet](...)."
-         * PROJETOS: "O código tá lá no [GitHub](...)."
-         * CONTATO: "Me chama no [LinkedIn](...)."
-       - Se o contexto tiver o link, USE-O. Não esconda a informação.
+    2. **Links e Call-to-Action (CTA) - OBRIGATÓRIO SE DISPONÍVEL:**
+       - **ESCAMBEIE O CONTEXTO POR LINKS:** Se houver qualquer URL no texto recuperado (Letterboxd, AnimePlanet, GitHub, LinkedIn), verifique se ela é relevante para o tópico.
+       - **SE TIVER LINK, USE:** Se você falou de filmes e o contexto tem o link do Letterboxd, você **TEM** que colocar o link.
+       - **Formato:** Integre ao texto ou coloque no final.
+         * "Ah, e a lista completa tá no [Letterboxd](...)."
+         * "Dá uma olhada no código no [GitHub](...)."
+       - **Nunca invente links**, apenas use os que estão no `CONTEXTO RECUPERADO`.
 
     3. **Naturalidade:**
        - Evite "linguagem de robô" ou formalidade excessiva (ex: "Prezado", "Por conseguinte").
@@ -537,7 +543,7 @@ def translator_node(state: AgentState):
     
     # Se já for PT-BR (ou não especificado), não faz nada.
     if target_language.lower() in ["pt-br", "pt", "portuguese", "português"]:
-        return {"messages": messages} # Retorna sem alterar
+        return {} # Retorna vazio para não adicionar nada novo
 
     # Prompt de Tradução com manutenção de Persona e Termos Técnicos.
     system_prompt = f"""

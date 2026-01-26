@@ -6,6 +6,11 @@ import { useLanguage } from '../../contexts/LanguageContext';
 import { getStartMenuData } from '../../data/startMenu';
 import './StartMenu.css';
 
+// Determine API URL based on environment
+// Dev: http://localhost:8000/api
+// Prod: /api (Assumes Nginx/Reverse Proxy handles the route)
+const API_BASE = import.meta.env.DEV ? 'http://localhost:8000/api' : '/api';
+
 const StartMenu = ({ isOpen, onClose, isDarkMode }) => {
   const { language } = useLanguage();
   const content = getStartMenuData(language);
@@ -27,16 +32,11 @@ const StartMenu = ({ isOpen, onClose, isDarkMode }) => {
     ]
   };
 
-  // Determine API URL based on environment
-  // Dev: http://localhost:8000/api
-  // Prod: /api (Assumes Nginx/Reverse Proxy handles the route)
-  const API_BASE = import.meta.env.DEV ? 'http://localhost:8000/api' : '/api';
-
-
   // States
   const [messages, setMessages] = useState([]);
   const [input, setInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+  const [loadingStatus, setLoadingStatus] = useState(''); // New State for Status Text
   const [usage, setUsage] = useState(null);
 
   // Scroll to bottom effect
@@ -44,7 +44,7 @@ const StartMenu = ({ isOpen, onClose, isDarkMode }) => {
     if (chatEndRef.current) {
       chatEndRef.current.scrollIntoView({ behavior: 'smooth' });
     }
-  }, [messages, isLoading]);
+  }, [messages, isLoading, loadingStatus]);
 
   // Disable scroll when open (Robust Strategy: Fixed Body + Lenis Stop)
   useEffect(() => {
@@ -86,15 +86,15 @@ const StartMenu = ({ isOpen, onClose, isDarkMode }) => {
     setMessages(prev => [...prev, userMsg]);
     setInput('');
     setIsLoading(true);
+    setLoadingStatus(language === 'pt' ? 'Iniciando...' : 'Starting...');
 
     try {
-      // Send message to Backend
       const response = await fetch(`${API_BASE}/chat`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           message: text,
-          history: messages, // Send previous context
+          history: messages,
           language: language
         })
       });
@@ -105,17 +105,59 @@ const StartMenu = ({ isOpen, onClose, isDarkMode }) => {
             role: 'assistant', 
             content: `⚠️ ${errorData.detail}`
          }]);
+         setIsLoading(false);
          return;
       }
 
       if (!response.ok) throw new Error('Network response was not ok');
-      
-      const data = await response.json();
-      const botMsg = { role: 'assistant', content: data.response };
-      
-      if (data.usage) setUsage(data.usage);
-      
-      setMessages(prev => [...prev, botMsg]);
+
+      // READ STREAM
+      const reader = response.body.getReader();
+      const decoder = new TextDecoder();
+      let buffer = '';
+
+      while (true) {
+        const { done, value } = await reader.read();
+        if (done) break;
+        
+        buffer += decoder.decode(value, { stream: true });
+        
+        // Process buffer for events (event: ... \n data: ... \n\n)
+        const parts = buffer.split('\n\n');
+        buffer = parts.pop(); // Keep incomplete part in buffer
+
+        for (const part of parts) {
+            const lines = part.split('\n');
+            let eventType = null;
+            let eventData = null;
+
+            for (const line of lines) {
+                if (line.startsWith('event: ')) {
+                    eventType = line.substring(7).trim();
+                } else if (line.startsWith('data: ')) {
+                    try {
+                        eventData = JSON.parse(line.substring(6));
+                    } catch (e) {
+                        console.error('JSON Parse Error', e);
+                    }
+                }
+            }
+
+            if (eventType && eventData) {
+                if (eventType === 'status') {
+                    setLoadingStatus(eventData.message);
+                } else if (eventType === 'result') {
+                    const botMsg = { role: 'assistant', content: eventData.response };
+                    setMessages(prev => [...prev, botMsg]);
+                    if (eventData.usage) setUsage(eventData.usage);
+                } else if (eventType === 'error') {
+                    const errorMsg = { role: 'assistant', content: `⚠️ Error: ${eventData.detail}` };
+                    setMessages(prev => [...prev, errorMsg]);
+                }
+            }
+        }
+      }
+
     } catch (error) {
       console.error('Chat Error:', error);
       setMessages(prev => [...prev, { 
@@ -124,6 +166,7 @@ const StartMenu = ({ isOpen, onClose, isDarkMode }) => {
       }]);
     } finally {
       setIsLoading(false);
+      setLoadingStatus('');
     }
   };
 
@@ -229,8 +272,8 @@ const StartMenu = ({ isOpen, onClose, isDarkMode }) => {
               {isLoading && (
                   <div className="message-row assistant">
                       <div className="message-avatar bot"><Bot size={16} /></div>
-                      <div className="message-bubble loading">
-                        <span className="dot">.</span><span className="dot">.</span><span className="dot">.</span>
+                      <div className="message-bubble loading-status">
+                        <span className="status-text">{loadingStatus || (language === 'pt' ? 'Processando...' : 'Processing...')}</span>
                       </div>
                   </div>
               )}
