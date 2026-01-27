@@ -292,11 +292,11 @@ O "cérebro" do sistema opera como um **Grafo de Estados (StateGraph)**. Cada me
 
 O objetivo foi demonstrar domínio sobre **Engenharia de IA** e **Sistemas Complexos**. Em vez de apenas exibir textos estáticos, o portfólio demonstra as habilidades do Marcos em tempo real, servindo como uma prova de conceito viva de suas capacidades em **Fullstack + AI**.
 
-6. **Noise Portfolio (Este Projeto):**
+6. **Meu Portfolio (Este Projeto):**
    - Categoria: Fullstack & IA Agentica
    - Descrição: Portfólio interativo baseado em IA Generativa que simula minha própria persona (Marcos). Diferente de sites estáticos, ele utiliza uma arquitetura de Agentes (LangGraph) para "conversar" com visitantes em tempo real. O sistema possui RAG (Retrieval-Augmented Generation) para acessar minha base de conhecimentos, Router Semântico para classificar intenções e Guardrails para segurança. É uma prova de conceito viva das minhas capacidades em criar sistemas complexos e modernos.
    - Tecnologias: React (Vite+Tailwind), Python (FastAPI), LangGraph, LangChain, ChromaDB (Vector Store), Google Gemini 1.5 Flash.
-   - Link: [GitHub](https://github.com/Marocosz/noiseportfolio)
+   - Link: [GitHub](https://github.com/Marocosz/Marocos-AI)
 
 Se quiser ver mais dos meus projetos, acesse meu GitHub: [https://github.com/marocosz](https://github.com/marocosz)
 

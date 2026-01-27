@@ -133,7 +133,7 @@ llm_fast = get_llm(provider=default_provider, tier=ModelTier.FAST, temperature=0
 # Foco: Capacidade de contexto e raciocínio moderado.
 # Temperatura baixa (0.2) para evitar alucinações no RAG, mas permitir fluidez.
 # Uso: GenerateRAGNode.
-llm_medium = get_llm(provider=default_provider, tier=ModelTier.MEDIUM, temperature=0.2)
+llm_medium = get_llm(provider=default_provider, tier=ModelTier.MEDIUM, temperature=0.1)
 llm_medium_no_temp = get_llm(provider=default_provider, tier=ModelTier.MEDIUM, temperature=0.0)
 
 # 3. Modelo Strong (Complexidade/Criatividade Controlada)

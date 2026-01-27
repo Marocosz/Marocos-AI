@@ -270,7 +270,7 @@ def fallback_responder(state: AgentState):
     
     # Utiliza modelo 'medium' (com temperatura padrão) para permitir
     # fluidez e naturalidade na conversa, já que não precisamos de output estruturado aqui.
-    chain = prompt | llm_medium_no_temp
+    chain = prompt | llm_medium
     
     response = chain.invoke({
         "messages": state["messages"],
