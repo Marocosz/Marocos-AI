@@ -239,6 +239,65 @@ Todos esses interesses funcionam como fontes constantes de inspiração e reflex
    - Tecnologias: Python, Discord.py, Riot API, Algoritmos, AsyncIO.
    - Link: [GitHub](https://github.com/Marocosz/Marocos-BOT-2)
 
+# Arquitetura do Sistema: Portfolio (Este Projeto)
+
+## Visão Geral
+
+O **Noise Portfolio** é uma aplicação **Agentica** moderna que serve como o portfólio interativo do Marcos Rodrigues. Diferente de sites estáticos tradicionais (SPA), este projeto utiliza uma arquitetura complexa baseada em **Inteligência Artificial Generativa** para conversar com os visitantes, simulando a persona do próprio desenvolvedor.
+
+## Stack Tecnológica
+
+### Backend (Core)
+
+- **Linguagem:** Python 3.12+
+- **Framework Web:** FastAPI (Alta performance, Assíncrono)
+- **Orquestração de Agentes:** LangGraph (StateGraph)
+  - Controla o fluxo lógico: Router -> Retrieval -> Guard -> Generation
+- **Framework de IA:** LangChain
+- **Banco Vetorial:** ChromaDB (Persistência local em `./backend/chroma_db`)
+- **LLMs (Modelos de Linguagem):**
+  - **Google Gemini 1.5 Flash:** Modelo principal para raciocínio rápido (Router, Guard).
+  - **OpenAI GPT-4o-mini:** Utilizado como alternativa/backup em alguns fluxos.
+
+### Frontend (Interface)
+
+- **Framework:** React (Vite)
+- **Estilização:** TailwindCSS (Utility-first)
+- **Animações:** Framer Motion
+- **Comunicação:** API REST customizada (`/api/chat`)
+
+### Infraestrutura & DevOps
+
+- **Containerização:** Docker & Docker Compose (Backend isolado).
+- **Deploy:** Gerenciado via Coolify em VPS Linux.
+- **Monitoramento:** Módulo próprio de Observabilidade (`observability.py`) para tracing de Agentes.
+
+## Arquitetura de Software (Pipeline LangGraph)
+
+O "cérebro" do sistema opera como um **Grafo de Estados (StateGraph)**. Cada mensagem enviada pelo usuário viaja pelo seguinte pipeline:
+
+1.  **Entrada:** A API recebe a mensagem e inicia o estado do agente.
+2.  **Análise (Nodes):**
+    - `detect_language`: Identifica o idioma (PT-BR, EN, ES, etc).
+    - `contextualize_input`: Reescreve perguntas ambíguas (Ex: "E ele?" -> "E o Marcos?") usando histórico de conversas.
+    - `router_node`: Classifica a intenção. Se for sobre código/carreira -> **RAG**. Se for "Oi/Tudo bem" -> **Casual**.
+3.  **Recuperação (RAG Branch):**
+    - `retrieve`: Busca vetores semânticos no ChromaDB.
+    - `answerability_guard`: Um "Guarda" de IA avalia se os documentos encontrados realmente respondem à pergunta. Se não, ativa o fallback.
+4.  **Geração:**
+    - `generate_rag`: Responde fatos técnicos com base no conteúdo recuperado.
+    - `generate_casual`: Mantém a conversa informal.
+
+## Por que essa arquitetura?
+
+O objetivo foi demonstrar domínio sobre **Engenharia de IA** e **Sistemas Complexos**. Em vez de apenas exibir textos estáticos, o portfólio demonstra as habilidades do Marcos em tempo real, servindo como uma prova de conceito viva de suas capacidades em **Fullstack + AI**.
+
+6. **Noise Portfolio (Este Projeto):**
+   - Categoria: Fullstack & IA Agentica
+   - Descrição: Portfólio interativo baseado em IA Generativa que simula minha própria persona (Marcos). Diferente de sites estáticos, ele utiliza uma arquitetura de Agentes (LangGraph) para "conversar" com visitantes em tempo real. O sistema possui RAG (Retrieval-Augmented Generation) para acessar minha base de conhecimentos, Router Semântico para classificar intenções e Guardrails para segurança. É uma prova de conceito viva das minhas capacidades em criar sistemas complexos e modernos.
+   - Tecnologias: React (Vite+Tailwind), Python (FastAPI), LangGraph, LangChain, ChromaDB (Vector Store), Google Gemini 1.5 Flash.
+   - Link: [GitHub](https://github.com/Marocosz/noiseportfolio)
+
 Se quiser ver mais dos meus projetos, acesse meu GitHub: [https://github.com/marocosz](https://github.com/marocosz)
 
 ## Status Profissional e Disponibilidade

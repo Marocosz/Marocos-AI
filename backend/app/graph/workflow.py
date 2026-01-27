@@ -27,9 +27,11 @@ from app.graph.state import AgentState  # <--- IMPORTANDO DO ARQUIVO CERTO
 from app.graph.nodes import (
     router_node, retrieve, generate_rag, generate_casual, 
     contextualize_input, translator_node, 
-    detect_language_node, summarize_conversation
+    contextualize_input, translator_node, 
+    detect_language_node, summarize_conversation,
+    answerability_guard, fallback_responder # Novos nós do Guard
 )
-from app.graph.nodes_guard import answerability_guard, fallback_responder
+# from app.graph.nodes_guard import answerability_guard, fallback_responder # <-- REMOVIDO (agora incluído acima)
 
 # --------------------------------------------------
 # Lógica de Decisão Condicional (Roteamento)
@@ -45,12 +47,14 @@ def decide_next_node(state: AgentState) -> Literal["retrieve", "generate_casual"
     Entrada: State gerado pelo router_node.
     Saída: String com o nome do próximo nó ("retrieve" ou "generate_casual").
     """
+    # Acessa a classificação definida pelo Router (technical/casual)
     user_intent = state["classification"]
     
     if user_intent == "casual":
         return "generate_casual"
     else:
         # Padrão de segurança: Se technical ou qualquer erro, tenta buscar no RAG.
+        # Isso garante que dúvidas reais nunca sejam descartadas.
         return "retrieve" 
 
 # --------------------------------------------------
@@ -59,12 +63,20 @@ def decide_next_node(state: AgentState) -> Literal["retrieve", "generate_casual"
 def decide_after_guard(state: AgentState) -> Literal["generate_rag", "fallback_responder"]:
     """
     Decide se segue para geração de resposta (RAG) ou fallback.
-    Baseado na decisão do AnswerabilityGuard.
+    
+    Lógica:
+        - Verifica o resultado do `answerability_guard`.
+        - Se is_answerable == True: Segue para gerar a resposta com os dados.
+        - Se is_answerable == False: Desvia para o FallbackResponder para negar educadamente.
     """
     result = state.get("answerability_result", {})
-    # Default True para não quebrar em caso de erro
+    
+    # Default True (Fail Open para geração) para evitar travar em caso de erro de parsing no Guard,
+    # embora o Guard tenha fail-safe interno.
     if result.get("is_answerable", True):
         return "generate_rag"
+        
+    # Caminho de negação/explicação
     return "fallback_responder" 
 
 # --------------------------------------------------

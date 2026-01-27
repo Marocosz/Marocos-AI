@@ -11,7 +11,7 @@ Atuação no Sistema:
       
 Responsabilidades:
     1. AnswerabilityGuard: Julgar, via LLM estrito, se o contexto recuperado é SUFICIENTE
-       e SEGURO para responder à pergunta, evitando alucinações e respostas vazias.
+       e SEGURO para responder à pergunta, evitando alucinações.
     2. FallbackResponder: Gerar a resposta explicativa para o usuário quando o Guard
        bloqueia a geração, mantendo a persona do sistema.
 
@@ -38,11 +38,10 @@ def answerability_guard(state: AgentState):
     Objetivo:
         Avaliar tecnicamente se é possível responder à pergunta do usuário usando APENAS
         os fatos recuperados (RAG) e o histórico recente, sem invenção.
-        Ele atua como um 'Firewall Semântico'.
-
+        
     Regras de Negócio (Hardening):
         - Fail Closed: Em caso de erro técnico, assume que NÃO é respondível.
-        - Consolidação de Contexto: Analisa TODOS os chunks recuperados, não apenas o primeiro.
+        - Consolidação de Contexto: Analisa TODOS os chunks recuperados.
         - Detecção de Exaustão: Verifica se o tópico já foi esgotado em mensagens anteriores.
 
     Entrada (State):
@@ -53,7 +52,7 @@ def answerability_guard(state: AgentState):
     Saída (State Update):
         - answerability_result: Dict contendo a decisão (is_answerable), motivo e confiança.
     """
-    logger.info("--- 🛡️ ANSWERABILITY GUARD (Julgando viabilidade da resposta...) ---")
+    logger.info("--- ANSWERABILITY GUARD (Julgando viabilidade da resposta...) ---")
     
     messages = state["messages"]
     context = state.get("context", [])
@@ -168,7 +167,10 @@ def answerability_guard(state: AgentState):
         
         decision_json = json.loads(content)
         
-        logger.info(f"Guard Decision: {decision_json}")
+        # --- OBSERVABILITY UPDATE ---
+        from app.core.observability import observer
+        observer.log_section("ANSWERABILITY GUARD", data=decision_json)
+        
         return {"answerability_result": decision_json}
         
     except Exception as e:
@@ -194,27 +196,26 @@ def answerability_guard(state: AgentState):
 # ============================================================================
 def fallback_responder(state: AgentState):
     """
-    Nó de Comunicação (Persona).
+    Nó de Comunicação e Resposta Negativa.
     
     Objetivo:
-        Traduzir a decisão técnica do Guard (motivo do bloqueio) em uma explicação
-        humana, amigável e alinhada à persona "Marcos".
+        Traduzir a negativa técnica do Guard em uma resposta humana e amigável,
+        mantendo a persona do sistema.
         
     Por que existe:
-        Separação de Preocupações. O nó de geração principal (RAG) não precisa
-        aprender a dar desculpas, focando apenas em conteúdo positivo. Este nó
-        especializa-se na "arte de dizer não".
+        Isola a responsabilidade de "dar más notícias". O nó de RAG foca em sucesso,
+        enquanto este nó gerencia frustrações e limites de conhecimento.
 
-    Lógica de Resposta Diferenciada:
-        Adapta a mensagem baseada no 'reason' recebido (falta de dados, ambiguidade, erro).
+    Lógica:
+        Adapta o pedido de desculpas baseado no motivo ('reason') do bloqueio.
 
     Entrada (State):
-        - answerability_result: O veredito do Guard.
+        - answerability_result: O veredito do Guard (reason, exhausted).
     
     Saída (State Update):
         - messages: Adiciona a resposta final (AIMessage) ao histórico.
     """
-    logger.info("--- 🛑 FALLBACK RESPONDER (Gerando negativa elegante...) ---")
+    logger.info("--- FALLBACK RESPONDER (Gerando negativa elegante...) ---")
     
     result = state.get("answerability_result", {})
     reason = result.get("reason", "unknown_reason")
@@ -223,6 +224,12 @@ def fallback_responder(state: AgentState):
     system_prompt = """
     Você é o Marcos Rodrigues (Assistant).
     Sua tarefa é explicar ao usuário que você NÃO consegue responder à pergunta dele agora.
+
+    ## POSTURA DE ANFITRIÃO
+    - O usuário está no SEU site/portfólio.
+    - **NUNCA** mande o usuário "procurar no site" ou "ver o link".
+    - Se não sabe, diga que *sua memória* falhou agora, mas não mande ele se virar.
+    - **PROIBIDO**: "Vou te mandar meu portfólio" (Já estamos nele).
     
     MOTIVO TÉCNICO: {reason}
     ESGOTAMENTO DE CONTEÚDO: {exhausted}
@@ -240,6 +247,7 @@ def fallback_responder(state: AgentState):
        - Diga que não tem essa informação no seu "banco de dados" (RAG).
        - Sugira olhar o LinkedIn ou GitHub se fizer sentido.
        - "Putz, essa informação específica eu não tenho aqui agora."
+       - **PROIBIDO OPINAR**: Se você não sabe se o Marcos gosta de X, NÃO DIGA que ele gosta ou acha "clássico". Diga APENAS que não tem a info.
        
     4. **Se ambiguous_intent (Não entendeu):**
        - Diga que não entendeu se é sobre X ou Y. Peça para o usuário reformular.
@@ -262,12 +270,17 @@ def fallback_responder(state: AgentState):
     
     # Utiliza modelo 'medium' (com temperatura padrão) para permitir
     # fluidez e naturalidade na conversa, já que não precisamos de output estruturado aqui.
-    chain = prompt | llm_medium
+    chain = prompt | llm_medium_no_temp
     
     response = chain.invoke({
         "messages": state["messages"],
         "reason": reason,
         "exhausted": str(exhausted)
     })
+    
+    # --- OBSERVABILITY UPDATE ---
+    from app.core.observability import observer
+    # Fallback não passa por tradutor necessariamente, mas vamos assumir o padrão
+    observer.log_end_interaction("FALLBACK RESPONDER", response.content)
     
     return {"messages": [response]}

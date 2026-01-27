@@ -147,6 +147,10 @@ async def chat_endpoint(request: ChatRequest, fast_api_request: Request):
                         status_msg = "Pensando..." if is_pt else "Thinking..."
                 elif node_name == "retrieve":
                     status_msg = "Estudando informações..." if is_pt else "Reading data..."
+                elif node_name == "answerability_guard":
+                    status_msg = "Validando resposta..." if is_pt else "Validating answer..."
+                elif node_name == "fallback_responder":
+                    status_msg = "Formulando explicação..." if is_pt else "Formulating explanation..."
                 elif node_name == "generate_rag" or node_name == "generate_casual":
                      status_msg = "Finalizando..." if is_pt else "Finalizing..."
                 elif node_name == "translator_node":
