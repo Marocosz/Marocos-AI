@@ -29,18 +29,39 @@ from datetime import date
 
 # Implementação manual de Lock se não quiser adicionar dependência externa
 class SimpleFileLock:
-    def __init__(self, lock_file):
+    def __init__(self, lock_file, timeout=5.0):
         self.lock_file = lock_file
+        self.timeout = timeout  # Tempo máximo de vida do lock (segundos)
         
     def __enter__(self):
+        start_time = time.time()
         while True:
             try:
                 # Tenta criar arquivo de lock (atomic operation no OS)
                 fd = os.open(self.lock_file, os.O_CREAT | os.O_EXCL | os.O_RDWR)
                 os.close(fd)
-                break
+                return
             except FileExistsError:
-                # Lock existe, espera um pouco
+                # Verifica se o arquivo de lock é velho (stale check)
+                try:
+                    if os.path.exists(self.lock_file):
+                        # Se o lock tem mais de X segundos, assumimos que o processo morreu
+                        if time.time() - os.path.getmtime(self.lock_file) > self.timeout:
+                            os.remove(self.lock_file)
+                            continue # Tenta adquirir novamente
+                except OSError:
+                    # Concorrência: alguém já removeu
+                    pass
+
+                # Verifica Timeout de espera (loop infinito prevention)
+                if time.time() - start_time > self.timeout:
+                    # Em caso de timeout extremo, limpamos o lock para recuperar o sistema
+                    try:
+                        os.remove(self.lock_file)
+                    except OSError:
+                        pass
+                    # Na próxima iteração tentará pegar
+                
                 time.sleep(0.05)
                 
     def __exit__(self, exc_type, exc_val, exc_tb):
