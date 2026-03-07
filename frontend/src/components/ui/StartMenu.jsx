@@ -89,6 +89,9 @@ const StartMenu = ({ isOpen, onClose, isDarkMode }) => {
     setIsLoading(true);
     setLoadingStatus(language === 'pt' ? 'Iniciando...' : 'Starting...');
 
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 60000); // 60s timeout
+
     try {
       const response = await fetch(`${API_BASE}/chat`, {
         method: 'POST',
@@ -97,7 +100,8 @@ const StartMenu = ({ isOpen, onClose, isDarkMode }) => {
           message: text,
           history: messages,
           language: language
-        })
+        }),
+        signal: controller.signal
       });
 
       if (response.status === 429) {
@@ -161,11 +165,15 @@ const StartMenu = ({ isOpen, onClose, isDarkMode }) => {
 
     } catch (error) {
       console.error('Chat Error:', error);
-      setMessages(prev => [...prev, { 
-        role: 'assistant', 
-        content: language === 'pt' ? '⚠️ Erro ao conectar com o servidor. Tente novamente mais tarde.' : '⚠️ Error connecting to server. Please try again later.'
+      const isTimeout = error.name === 'AbortError';
+      setMessages(prev => [...prev, {
+        role: 'assistant',
+        content: isTimeout
+          ? (language === 'pt' ? '⚠️ O servidor demorou muito para responder. Tente novamente.' : '⚠️ The server took too long to respond. Please try again.')
+          : (language === 'pt' ? '⚠️ Erro ao conectar com o servidor. Tente novamente mais tarde.' : '⚠️ Error connecting to server. Please try again later.')
       }]);
     } finally {
+      clearTimeout(timeoutId);
       setIsLoading(false);
       setLoadingStatus('');
     }

@@ -66,12 +66,14 @@ def main():
     print("🚀  Iniciando Servidor Uvicorn...")
     
     # Inicia o servidor Uvicorn
+    # IMPORTANTE: 1 worker apenas. FastAPI é async e lida com concorrência internamente.
+    # Múltiplos workers causam race conditions no ChromaDB (SQLite) e no file-based rate limiter.
     subprocess.run([
-        sys.executable, "-m", "uvicorn", 
-        "main:app", 
-        "--host", "0.0.0.0", 
+        sys.executable, "-m", "uvicorn",
+        "main:app",
+        "--host", "0.0.0.0",
         "--port", "8000",
-        "--workers", "4",
+        "--workers", "1",
     ])
 
 if __name__ == "__main__":
