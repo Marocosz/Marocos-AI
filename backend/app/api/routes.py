@@ -76,7 +76,10 @@ async def chat_endpoint(request: ChatRequest, fast_api_request: Request):
     4. Intercepta cada passo do grafo para enviar feedbacks de progresso ao usuário.
     5. Envia a resposta final.
     """
-    client_ip = fast_api_request.client.host
+    client_ip = (
+        fast_api_request.headers.get("X-Forwarded-For", "").split(",")[0].strip()
+        or fast_api_request.client.host
+    )
     logger.info(f"Incoming chat request from IP: {client_ip}\nMessage: {request.message}")
     
     # 1. Validação de Rate Limit (Segurança)
