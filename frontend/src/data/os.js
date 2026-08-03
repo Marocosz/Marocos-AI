@@ -1,13 +1,13 @@
 const osContentEn = {
   windows: {
-    readme: 'leia-me.txt',
-    projects: 'Meus Projetos',
+    readme: 'readme.txt',
+    projects: 'My Projects',
   },
   controls: {
-    minimize: 'Minimizar',
-    maximize: 'Maximizar',
-    restore: 'Restaurar',
-    close: 'Fechar',
+    minimize: 'Minimize',
+    maximize: 'Maximize',
+    restore: 'Restore',
+    close: 'Close',
   },
   taskbar: {
     start: 'Start',
