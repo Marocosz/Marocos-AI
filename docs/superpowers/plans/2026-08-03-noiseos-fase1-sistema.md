@@ -1445,6 +1445,10 @@ git commit -m "feat: WindowManagerContext com sincronia bidirecional de URL"
    Framer não recebe mais os valores e a janela salta para o canto superior esquerdo em vez de
    voltar ao `prevPos`. A posição tem que ser `useMotionValue` em `style`, sincronizada do estado
    por efeito — assim o drag é dono dos valores durante o gesto e o estado é dono fora dele.
+3. **`inert` é booleano no React 19** (o projeto está em `react@^19.1.1`). Escreva
+   `inert={win.minimized}` — a forma antiga `inert=""` do React 18 gera warning. Note que a
+   janela minimizada já sai da árvore de acessibilidade pelo `display: none`; o `inert` é a
+   garantia adicional que o spec pede para janela escondida.
 
 - [ ] **Step 1: Implementar o componente**
 
@@ -1508,7 +1512,7 @@ const Window = ({ win }) => {
       role="dialog"
       aria-labelledby={`win-title-${win.key}`}
       tabIndex={-1}
-      inert={win.minimized ? '' : undefined}
+      inert={win.minimized}
       onKeyDown={onKeyDown}
       onPointerDownCapture={() => !isFocused && focus(win.key)}
       style={{
