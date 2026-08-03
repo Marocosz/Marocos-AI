@@ -13,9 +13,14 @@ import { useState, useEffect } from 'react'
 
 export const DESKTOP_BREAKPOINT = 1024
 
+// A media query é a única forma de ler o breakpoint, tanto no valor inicial
+// quanto no listener. Ler innerWidth aqui e matchMedia lá divergiria pela
+// largura da barra de rolagem em navegadores que a contam na viewport.
+const DESKTOP_QUERY = `(min-width: ${DESKTOP_BREAKPOINT}px)`
+
 function currentMode() {
   if (typeof window === 'undefined') return 'desktop'
-  return window.innerWidth >= DESKTOP_BREAKPOINT ? 'desktop' : 'mobile'
+  return window.matchMedia(DESKTOP_QUERY).matches ? 'desktop' : 'mobile'
 }
 
 export function useDeviceMode() {
@@ -24,9 +29,12 @@ export function useDeviceMode() {
   useEffect(() => {
     // matchMedia em vez de listener de resize: dispara só na travessia do
     // breakpoint, não a cada pixel arrastado na borda da janela.
-    const mq = window.matchMedia(`(min-width: ${DESKTOP_BREAKPOINT}px)`)
+    const mq = window.matchMedia(DESKTOP_QUERY)
     const onChange = (e) => setMode(e.matches ? 'desktop' : 'mobile')
 
+    // Sincronia defensiva: cobre a travessia que aconteça entre o primeiro
+    // render e o anexo do listener. Sem custo de render quando o valor não
+    // muda, porque o React descarta setState com valor idêntico.
     setMode(mq.matches ? 'desktop' : 'mobile')
     mq.addEventListener('change', onChange)
     return () => mq.removeEventListener('change', onChange)
