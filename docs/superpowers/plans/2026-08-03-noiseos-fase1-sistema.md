@@ -23,17 +23,39 @@
 
 ## Ordem de execução e paralelismo
 
+A Task 1 instala e configura o Vitest, então tudo que roda teste depende dela. Fora isso, o
+paralelismo real é este:
+
+| Onda | Tasks | Paralelas? | Por quê |
+|---|---|---|---|
+| 1 | 1 | não | instala o Vitest — bloqueia toda task que roda teste |
+| 2 | **2, 4, 5, 6** | **sim, 4 trilhas** | arquivos disjuntos; nenhuma lê o resultado da outra |
+| 3 | 3 | não | continua `windowManager.js`, que a Task 2 está editando |
+| 4 | 7 | não | precisa do reducer completo (3) e do registry (4) |
+| 5 | 8 | não | precisa do context (7) |
+| 6 | **9, 10** | **sim, 2 trilhas** | ambas consomem 7 e 8; nenhuma depende da outra |
+| 7 | 11 | não | monta tudo e mexe em CSS global |
+
 ```
-Task 1 ─ Task 2 ─ Task 3 ─┐
-                          ├─ Task 7 ─ Task 8 ─┬─ Task 9 ─┐
-Task 4 ───────────────────┘                   └─ Task 10 ─┤
-                                                          ├─ Task 11
-Task 5  (independente) ───────────────────────────────────┤
-Task 6  (independente) ───────────────────────────────────┘
+Onda 1    Onda 2                Onda 3   Onda 4   Onda 5   Onda 6      Onda 7
+Task 1 ─┬─ Task 2 ──────────────  Task 3 ─┐
+        ├─ Task 4 ───────────────────────┴─ Task 7 ─ Task 8 ─┬─ Task 9 ─┐
+        ├─ Task 5 (hook) ─────────────────────────────────────┤          ├─ Task 11
+        └─ Task 6 (wallpaper) ───────────────────────────────┴─ Task 10 ─┘
 ```
 
-- **Tasks 5 e 6 são independentes de tudo** — podem rodar em paralelo com a trilha 1→2→3.
-- **Tasks 9 e 10 são paralelas entre si** (ambas dependem de 7 e 8, nenhuma depende da outra).
+Mapa de arquivos da Onda 2, confirmando que não há colisão:
+
+| Task | Arquivos que escreve |
+|---|---|
+| 2 | `os/windowManager.js`, `os/windowManager.test.js` |
+| 4 | `os/registry.js`, `os/routes.js`, `os/routes.test.js`, `data/os.js`, `apps/ReadmeApp.jsx` |
+| 5 | `os/useDeviceMode.js` |
+| 6 | `wallpapers/Hills.jsx`, `os/tokens.css` |
+
+**Commits em execução paralela:** agentes concorrentes no mesmo working tree disputam o
+`index.lock` do git. Em paralelo, os agentes **implementam e testam sem commitar**, e quem
+orquestra faz um commit por onda. Os passos de commit de cada task valem para execução serial.
 - Todo o resto é serial.
 - **Nenhuma task fora da 6 e da 11 toca CSS global**, e só a Task 4 toca `registry.js` — sem
   colisão de arquivos entre trilhas paralelas. As Tasks 6 e 11 nunca rodam juntas (11 é a última).
@@ -324,8 +346,11 @@ export function windowReducer(state, action) {
 
 - [ ] **Step 7: Rodar os testes e confirmar que passam**
 
-Run: `cd frontend && npm test`
+Run: `cd frontend && npx vitest run src/os/windowManager.test.js`
 Expected: PASS — 12 testes
+
+> Rodar o arquivo específico, não `npm test`. Tasks paralelas adicionam testes em outros
+> arquivos, e uma contagem global tornaria esta verificação dependente da ordem de execução.
 
 - [ ] **Step 8: Commit**
 
@@ -489,7 +514,7 @@ Em `frontend/src/os/windowManager.js`, inserir os casos abaixo dentro do `switch
 
 - [ ] **Step 4: Rodar e confirmar que passam**
 
-Run: `cd frontend && npm test`
+Run: `cd frontend && npx vitest run src/os/windowManager.test.js`
 Expected: PASS — 20 testes
 
 - [ ] **Step 5: Commit**
@@ -622,7 +647,7 @@ No mesmo `switch`, inserir antes de `default`:
 
 - [ ] **Step 5: Rodar e confirmar que passam**
 
-Run: `cd frontend && npm test`
+Run: `cd frontend && npx vitest run src/os/windowManager.test.js`
 Expected: PASS — 24 testes
 
 - [ ] **Step 6: Commit**
@@ -989,8 +1014,8 @@ export function buildRoute(appId, params) {
 
 - [ ] **Step 7: Rodar e confirmar que passam**
 
-Run: `cd frontend && npm test`
-Expected: PASS — 36 testes
+Run: `cd frontend && npx vitest run src/os/routes.test.js`
+Expected: PASS — 12 testes
 
 - [ ] **Step 8: Commit**
 
