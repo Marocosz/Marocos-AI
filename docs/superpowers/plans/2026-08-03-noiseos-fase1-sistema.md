@@ -20,6 +20,14 @@
 - `MOVE` do reducer é despachado **somente** em `onDragEnd`, nunca durante o arrasto.
 - Todo teste roda em `environment: 'node'` — Fase 1 não testa DOM.
 - Commits em PT-BR, prefixo `feat:` / `test:` / `chore:` / `style:`.
+- **O lint já falha no baseline.** Medido no commit `07681b3`: `npm run lint` sai com código 1 por
+  **9 erros pré-existentes** em arquivos legados (`DecryptedText.jsx`, `Contact.jsx`,
+  `Journey.jsx`, `PortfolioMeta.jsx`, `Profile.jsx`, `Projects.jsx`, `TechStack.jsx`,
+  `Navbar.jsx`, `LanguageContext.jsx` — oito `no-unused-vars` e um
+  `react-refresh/only-export-components`). Nenhuma task da Fase 1 deve corrigi-los: eles somem na
+  Fase 4, quando esses arquivos forem deletados. Por isso **cada task roda o lint apenas nos
+  próprios arquivos**, com `npx eslint <caminhos que a task criou ou alterou>`, e não `npm run
+  lint`. Corrigir arquivo legado é scope creep e será marcado no review.
 
 ## Ordem de execução e paralelismo
 
@@ -1082,8 +1090,9 @@ export function useDeviceMode() {
 
 - [ ] **Step 2: Verificar que o lint passa**
 
-Run: `cd frontend && npm run lint`
-Expected: sem erros
+Run: `cd frontend && npx eslint <os arquivos que esta task criou/alterou>`
+Expected: sem erros **nos arquivos desta task**. Não rode `npm run lint`: o baseline já tem 9
+erros em arquivos legados (ver Global Constraints) e eles não são para consertar aqui.
 
 - [ ] **Step 3: Commit**
 
@@ -1296,8 +1305,9 @@ Adicionar ao final de `frontend/src/os/tokens.css`:
 
 - [ ] **Step 4: Verificar que o lint passa**
 
-Run: `cd frontend && npm run lint`
-Expected: sem erros
+Run: `cd frontend && npx eslint <os arquivos que esta task criou/alterou>`
+Expected: sem erros **nos arquivos desta task**. Não rode `npm run lint`: o baseline já tem 9
+erros em arquivos legados (ver Global Constraints) e eles não são para consertar aqui.
 
 - [ ] **Step 5: Commit**
 
@@ -1399,8 +1409,9 @@ export function useWindows() {
 
 - [ ] **Step 2: Verificar que o lint passa**
 
-Run: `cd frontend && npm run lint`
-Expected: sem erros
+Run: `cd frontend && npx eslint <os arquivos que esta task criou/alterou>`
+Expected: sem erros **nos arquivos desta task**. Não rode `npm run lint`: o baseline já tem 9
+erros em arquivos legados (ver Global Constraints) e eles não são para consertar aqui.
 
 - [ ] **Step 3: Confirmar que os testes puros continuam verdes**
 
@@ -1676,8 +1687,9 @@ Criar `frontend/src/os/desktop/Window.css`:
 
 - [ ] **Step 3: Verificar que o lint passa**
 
-Run: `cd frontend && npm run lint`
-Expected: sem erros
+Run: `cd frontend && npx eslint <os arquivos que esta task criou/alterou>`
+Expected: sem erros **nos arquivos desta task**. Não rode `npm run lint`: o baseline já tem 9
+erros em arquivos legados (ver Global Constraints) e eles não são para consertar aqui.
 
 - [ ] **Step 4: Commit**
 
@@ -1888,8 +1900,9 @@ Criar `frontend/src/os/desktop/Desktop.css`:
 
 - [ ] **Step 3: Verificar que o lint passa**
 
-Run: `cd frontend && npm run lint`
-Expected: sem erros
+Run: `cd frontend && npx eslint <os arquivos que esta task criou/alterou>`
+Expected: sem erros **nos arquivos desta task**. Não rode `npm run lint`: o baseline já tem 9
+erros em arquivos legados (ver Global Constraints) e eles não são para consertar aqui.
 
 - [ ] **Step 4: Commit**
 
@@ -2117,8 +2130,9 @@ Criar `frontend/src/os/desktop/Taskbar.css`:
 
 - [ ] **Step 3: Verificar que o lint passa**
 
-Run: `cd frontend && npm run lint`
-Expected: sem erros
+Run: `cd frontend && npx eslint <os arquivos que esta task criou/alterou>`
+Expected: sem erros **nos arquivos desta task**. Não rode `npm run lint`: o baseline já tem 9
+erros em arquivos legados (ver Global Constraints) e eles não são para consertar aqui.
 
 - [ ] **Step 4: Commit**
 
@@ -2276,10 +2290,14 @@ cd frontend && npm uninstall lenis
 
 - [ ] **Step 5: Verificar que lint e testes passam**
 
-Run: `cd frontend && npm run lint && npm test`
-Expected: lint sem erros; 36 testes PASS
+Run: `cd frontend && npx eslint src/App.jsx src/contexts/ThemeContext.jsx && npm test`
+Expected: eslint sem erros nesses dois arquivos; 36 testes PASS
 
-**Nota:** o lint vai acusar imports não usados em `pages/HomePage.jsx` se ele ainda referenciar `Silk`/`Iridescence`. Isso é esperado — `HomePage.jsx` deixou de ser renderizado mas ainda existe como referência para a Fase 2. Se o lint falhar por causa dele, adicionar `pages/HomePage.jsx` ao `globalIgnores` de `eslint.config.js` com o comentário `// removido na Fase 2`.
+**Sobre o lint global:** ele continua saindo com código 1 por causa dos 9 erros de baseline em
+arquivos legados (ver Global Constraints), e `pages/HomePage.jsx` some da árvore de render nesta
+task mas continua existindo como referência para a Fase 2. Nada disso é para consertar agora — a
+Fase 4 deleta esses arquivos e o lint global fica verde sozinho. **Não** adicione exceções ao
+`eslint.config.js` para escondê-los.
 
 - [ ] **Step 6: Verificação manual**
 
