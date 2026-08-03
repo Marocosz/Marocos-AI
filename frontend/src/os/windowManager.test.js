@@ -103,3 +103,83 @@ describe('CLOSE', () => {
     expect(s).toEqual(initialState)
   })
 })
+
+describe('FOCUS', () => {
+  it('traz a janela para o topo do z', () => {
+    let s = windowReducer(initialState, { type: 'OPEN', appId: 'readme' })
+    s = windowReducer(s, { type: 'OPEN', appId: 'about' })
+    s = windowReducer(s, { type: 'FOCUS', key: 'readme' })
+
+    expect(s.focusedKey).toBe('readme')
+    expect(s.windows.find((w) => w.key === 'readme').z).toBeGreaterThan(
+      s.windows.find((w) => w.key === 'about').z,
+    )
+  })
+
+  it('restaura janela minimizada', () => {
+    let s = windowReducer(initialState, { type: 'OPEN', appId: 'readme' })
+    s = windowReducer(s, { type: 'MINIMIZE', key: 'readme' })
+    s = windowReducer(s, { type: 'FOCUS', key: 'readme' })
+
+    expect(s.windows[0].minimized).toBe(false)
+    expect(s.focusedKey).toBe('readme')
+  })
+})
+
+describe('MINIMIZE', () => {
+  it('marca como minimizada e passa o foco adiante', () => {
+    let s = windowReducer(initialState, { type: 'OPEN', appId: 'readme' })
+    s = windowReducer(s, { type: 'OPEN', appId: 'about' })
+    s = windowReducer(s, { type: 'MINIMIZE', key: 'about' })
+
+    expect(s.windows.find((w) => w.key === 'about').minimized).toBe(true)
+    expect(s.focusedKey).toBe('readme')
+  })
+
+  it('deixa focusedKey nulo quando não há mais janela visível', () => {
+    let s = windowReducer(initialState, { type: 'OPEN', appId: 'readme' })
+    s = windowReducer(s, { type: 'MINIMIZE', key: 'readme' })
+
+    expect(s.focusedKey).toBe(null)
+  })
+})
+
+describe('TOGGLE_MAXIMIZE', () => {
+  it('guarda a posição anterior ao maximizar', () => {
+    let s = windowReducer(initialState, { type: 'OPEN', appId: 'readme' })
+    s = windowReducer(s, { type: 'MOVE', key: 'readme', x: 300, y: 200 })
+    s = windowReducer(s, { type: 'TOGGLE_MAXIMIZE', key: 'readme' })
+
+    const w = s.windows[0]
+    expect(w.maximized).toBe(true)
+    expect(w.prevPos).toEqual({ x: 300, y: 200 })
+  })
+
+  it('devolve a posição guardada ao restaurar', () => {
+    let s = windowReducer(initialState, { type: 'OPEN', appId: 'readme' })
+    s = windowReducer(s, { type: 'MOVE', key: 'readme', x: 300, y: 200 })
+    s = windowReducer(s, { type: 'TOGGLE_MAXIMIZE', key: 'readme' })
+    s = windowReducer(s, { type: 'TOGGLE_MAXIMIZE', key: 'readme' })
+
+    expect(s.windows[0]).toMatchObject({
+      maximized: false, x: 300, y: 200, prevPos: null,
+    })
+  })
+})
+
+describe('MOVE', () => {
+  it('atualiza a posição', () => {
+    let s = windowReducer(initialState, { type: 'OPEN', appId: 'readme' })
+    s = windowReducer(s, { type: 'MOVE', key: 'readme', x: 42, y: 43 })
+
+    expect(s.windows[0]).toMatchObject({ x: 42, y: 43 })
+  })
+
+  it('não move janela maximizada', () => {
+    let s = windowReducer(initialState, { type: 'OPEN', appId: 'readme' })
+    s = windowReducer(s, { type: 'TOGGLE_MAXIMIZE', key: 'readme' })
+    s = windowReducer(s, { type: 'MOVE', key: 'readme', x: 500, y: 500 })
+
+    expect(s.windows[0]).toMatchObject({ x: 96, y: 64 })
+  })
+})

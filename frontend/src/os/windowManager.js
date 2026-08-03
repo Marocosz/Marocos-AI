@@ -91,6 +91,50 @@ export function windowReducer(state, action) {
       return { ...state, windows, focusedKey }
     }
 
+    case 'FOCUS': {
+      if (!state.windows.some((w) => w.key === action.key)) return state
+      return raise(state, action.key)
+    }
+
+    case 'MINIMIZE': {
+      if (!state.windows.some((w) => w.key === action.key)) return state
+
+      const windows = state.windows.map((w) =>
+        w.key === action.key ? { ...w, minimized: true } : w,
+      )
+      const focusedKey =
+        state.focusedKey === action.key ? topmostVisible(windows) : state.focusedKey
+
+      return { ...state, windows, focusedKey }
+    }
+
+    case 'TOGGLE_MAXIMIZE': {
+      return {
+        ...state,
+        windows: state.windows.map((w) => {
+          if (w.key !== action.key) return w
+          // Guarda x/y ao maximizar porque o CSS passa a mandar via inset:0,
+          // e sem isso a janela restaurada volta na posição errada.
+          if (w.maximized) {
+            const { x, y } = w.prevPos || { x: w.x, y: w.y }
+            return { ...w, maximized: false, x, y, prevPos: null }
+          }
+          return { ...w, maximized: true, prevPos: { x: w.x, y: w.y } }
+        }),
+      }
+    }
+
+    case 'MOVE': {
+      return {
+        ...state,
+        windows: state.windows.map((w) =>
+          // Maximizada não tem posição própria; ignora para não guardar
+          // coordenada suja que reapareceria ao restaurar.
+          w.key === action.key && !w.maximized ? { ...w, x: action.x, y: action.y } : w,
+        ),
+      }
+    }
+
     default:
       return state
   }
