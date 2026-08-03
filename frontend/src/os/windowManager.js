@@ -61,19 +61,26 @@ function raise(state, key) {
 export function windowReducer(state, action) {
   switch (action.type) {
     case 'OPEN': {
-      const { appId, params = null } = action
+      const { appId, params = null, parent = null } = action
       const key = makeKey(appId, params)
 
       // Já aberto: foca em vez de duplicar.
       if (state.windows.some((w) => w.key === key)) return raise(state, key)
 
-      const z = state.zTop + 1
-      const { x, y } = cascadePosition(state.windows.length)
+      // Deep link para janela filha precisa do pai atrás dela. Recursão de
+      // um nível só — o registry não define netos.
+      let base = state
+      if (parent && !state.windows.some((w) => w.key === parent)) {
+        base = windowReducer(state, { type: 'OPEN', appId: parent })
+      }
+
+      const z = base.zTop + 1
+      const { x, y } = cascadePosition(base.windows.length)
 
       return {
-        ...state,
+        ...base,
         windows: [
-          ...state.windows,
+          ...base.windows,
           { key, appId, params, x, y, z, minimized: false, maximized: false, prevPos: null },
         ],
         zTop: z,
@@ -133,6 +140,18 @@ export function windowReducer(state, action) {
           w.key === action.key && !w.maximized ? { ...w, x: action.x, y: action.y } : w,
         ),
       }
+    }
+
+    case 'MINIMIZE_ALL': {
+      return {
+        ...state,
+        windows: state.windows.map((w) => ({ ...w, minimized: true })),
+        focusedKey: null,
+      }
+    }
+
+    case 'CLOSE_ALL': {
+      return { ...state, windows: [], focusedKey: null }
     }
 
     default:

@@ -183,3 +183,49 @@ describe('MOVE', () => {
     expect(s.windows[0]).toMatchObject({ x: 96, y: 64 })
   })
 })
+
+describe('OPEN com pai', () => {
+  it('abre o pai antes do filho e mantém o foco no filho', () => {
+    const s = windowReducer(initialState, {
+      type: 'OPEN', appId: 'project', params: { slug: 'bussola-v2' }, parent: 'projects',
+    })
+
+    expect(s.windows.map((w) => w.key)).toEqual(['projects', 'project:bussola-v2'])
+    expect(s.focusedKey).toBe('project:bussola-v2')
+    expect(s.windows.find((w) => w.key === 'project:bussola-v2').z).toBeGreaterThan(
+      s.windows.find((w) => w.key === 'projects').z,
+    )
+  })
+
+  it('não reabre o pai se ele já estiver aberto', () => {
+    let s = windowReducer(initialState, { type: 'OPEN', appId: 'projects' })
+    s = windowReducer(s, {
+      type: 'OPEN', appId: 'project', params: { slug: 'bussola-v2' }, parent: 'projects',
+    })
+
+    expect(s.windows.filter((w) => w.key === 'projects')).toHaveLength(1)
+    expect(s.windows).toHaveLength(2)
+  })
+})
+
+describe('MINIMIZE_ALL', () => {
+  it('minimiza todas e zera o foco', () => {
+    let s = windowReducer(initialState, { type: 'OPEN', appId: 'readme' })
+    s = windowReducer(s, { type: 'OPEN', appId: 'about' })
+    s = windowReducer(s, { type: 'MINIMIZE_ALL' })
+
+    expect(s.windows.every((w) => w.minimized)).toBe(true)
+    expect(s.focusedKey).toBe(null)
+  })
+})
+
+describe('CLOSE_ALL', () => {
+  it('volta ao estado inicial preservando o zTop', () => {
+    let s = windowReducer(initialState, { type: 'OPEN', appId: 'readme' })
+    s = windowReducer(s, { type: 'CLOSE_ALL' })
+
+    expect(s.windows).toEqual([])
+    expect(s.focusedKey).toBe(null)
+    expect(s.zTop).toBe(101)
+  })
+})
