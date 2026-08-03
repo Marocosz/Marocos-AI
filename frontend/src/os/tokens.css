@@ -1,0 +1,85 @@
+/* --------------------------------------------------
+   TOKENS DO NOISEOS
+   Chrome de janela, escala de z-index e paleta do wallpaper.
+   Convive com index.css, que segue dono das variáveis de conteúdo.
+   -------------------------------------------------- */
+
+:root {
+  /* Chrome de janela */
+  --win-glass-blur: blur(20px) saturate(140%);
+  --win-border: 1px solid rgba(255, 255, 255, 0.18);
+  --win-highlight: inset 0 1px 0 rgba(255, 255, 255, 0.25);
+  --win-shadow: 0 16px 48px rgba(0, 0, 0, 0.45);
+  --win-radius: 10px;
+  --win-control-radius: 8px;
+  --win-titlebar-h: 40px;
+  --win-titlebar-bg: rgba(88, 28, 135, 0.55);
+  --win-body-bg: rgba(20, 12, 32, 0.72);
+
+  /* Legibilidade de label sobre wallpaper */
+  --icon-label-shadow: 0 1px 3px rgba(0, 0, 0, 0.8);
+
+  /* Escala de z-index — única fonte de verdade */
+  --z-wallpaper: 0;
+  --z-icons: 10;
+  --z-windows: 100;
+  --z-taskbar: 1000;
+  --z-startmenu: 1100;
+  --z-boot: 2000;
+
+  /* Wallpaper — dia */
+  --hill-sky-top: #6d28d9;
+  --hill-sky-mid: #a78bfa;
+  --hill-sky-low: #ddd6fe;
+  --hill-front: #7c3aed;
+  --hill-mid: #6b21a8;
+  --hill-back: #581c87;
+  --hill-cloud: #ffffff;
+  --hill-cloud-opacity: 0.5;
+}
+
+/* Wallpaper — noite */
+.theme-dark {
+  --hill-sky-top: #1e1b4b;
+  --hill-sky-mid: #2e1065;
+  --hill-sky-low: #4c1d95;
+  --hill-front: #2e1065;
+  --hill-mid: #1e1b4b;
+  --hill-back: #0f0a1f;
+  --hill-cloud: #c4b5fd;
+  --hill-cloud-opacity: 0.18;
+
+  --win-titlebar-bg: rgba(76, 29, 149, 0.5);
+  --win-body-bg: rgba(12, 8, 20, 0.78);
+}
+
+.theme-light {
+  --win-titlebar-bg: rgba(168, 85, 247, 0.28);
+  --win-body-bg: rgba(255, 255, 255, 0.7);
+  --win-border: 1px solid rgba(255, 255, 255, 0.6);
+  --win-shadow: 0 16px 48px rgba(88, 28, 135, 0.2);
+}
+
+/* Deriva das nuvens — desligada por preferência do sistema */
+@keyframes noiseos-cloud-drift {
+  from { transform: translateX(0); }
+  to   { transform: translateX(60px); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .noiseos-cloud { animation: none !important; }
+}
+
+.noiseos-wallpaper {
+  position: fixed;
+  inset: 0;
+  z-index: var(--z-wallpaper);
+  pointer-events: none;
+  overflow: hidden;
+}
+
+.noiseos-wallpaper-svg {
+  width: 100%;
+  height: 100%;
+  display: block;
+}
