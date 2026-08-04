@@ -1,0 +1,112 @@
+.noiseos-desktop {
+  position: fixed;
+  inset: 0;
+  overflow: hidden;
+}
+
+.noiseos-icons {
+  position: absolute;
+  top: 20px;
+  left: 20px;
+  z-index: var(--z-icons);
+  display: flex;
+  flex-direction: column;
+  flex-wrap: wrap;
+  align-content: flex-start;
+  gap: 4px;
+  max-height: calc(100vh - 120px);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.noiseos-icons button {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  width: 88px;
+  padding: 8px 4px;
+  border: 1px solid transparent;
+  border-radius: var(--win-control-radius);
+  background: transparent;
+  cursor: pointer;
+}
+
+.noiseos-icons button:hover { background: rgba(255, 255, 255, 0.12); }
+.noiseos-icons button:focus-visible { outline: 2px solid var(--accent-color); }
+
+.noiseos-icon-tile {
+  display: grid;
+  place-items: center;
+  width: 56px;
+  height: 56px;
+  border: var(--win-border);
+  border-radius: 14px;
+  background: linear-gradient(160deg, rgba(168, 85, 247, 0.5), rgba(88, 28, 135, 0.6));
+  box-shadow: var(--win-highlight);
+  color: #fff;
+}
+
+.noiseos-icon-label {
+  font-family: system-ui, sans-serif;
+  font-size: 0.72rem;
+  line-height: 1.25;
+  text-align: center;
+  color: #fff;
+  text-shadow: var(--icon-label-shadow);
+}
+
+/* Assinatura tratada como marca d'água: integrada ao wallpaper, sem card.
+   Baixo contraste no tratamento, mas o h1 continua grande de propósito. */
+.noiseos-signature {
+  position: absolute;
+  top: 50%;
+  left: 148px;
+  z-index: var(--z-icons);
+  transform: translateY(-50%);
+  max-width: 460px;
+  pointer-events: none;
+}
+
+.noiseos-signature h1 {
+  margin: 0;
+  font-family: 'Poppins', sans-serif;
+  font-size: clamp(2.4rem, 4vw, 3.6rem);
+  font-weight: 900;
+  line-height: 1;
+  letter-spacing: -1px;
+  color: #fff;
+  text-shadow: 0 2px 20px rgba(0, 0, 0, 0.4);
+  opacity: 0.92;
+}
+
+.noiseos-signature p {
+  margin: 10px 0 0;
+  font-family: system-ui, sans-serif;
+  font-size: 0.95rem;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  color: #fff;
+  opacity: 0.7;
+}
+
+.noiseos-signature-bio {
+  display: block;
+  margin-top: 14px;
+  font-size: 0.86rem;
+  line-height: 1.6;
+  color: #fff;
+  opacity: 0.52;
+}
+
+.theme-light .noiseos-signature h1,
+.theme-light .noiseos-signature p,
+.theme-light .noiseos-signature-bio {
+  color: #2e1065;
+  text-shadow: none;
+}
+
+@media (max-width: 1200px) {
+  .noiseos-signature { display: none; }
+}
