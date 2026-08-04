@@ -1,5 +1,6 @@
 import React from 'react'
 import Silk from '../components/backgrounds/Silk'
+import Iridescence from '../components/backgrounds/Iridescence'
 import { useDeviceMode } from '../os/useDeviceMode'
 import { useTheme } from '../contexts/ThemeContext'
 
@@ -18,9 +19,10 @@ import { useTheme } from '../contexts/ThemeContext'
  * de tela cheia não vale o custo de bateria num celular.
  */
 
-// Silk pinta o céu; a cor troca com o tema para o horizonte não sumir.
+// Cor do Silk no tema escuro. O tema claro usa o Iridescence, que era o
+// shader que o projeto já aplicava no modo claro — manter esse par preserva a
+// identidade dos dois temas em vez de forçar o mesmo shader nos dois.
 const SILK_DARK = '#4c1d95'
-const SILK_LIGHT = '#a78bfa'
 
 const Hills = ({ isAnimated = true }) => {
   const isMobile = useDeviceMode() === 'mobile'
@@ -31,14 +33,23 @@ const Hills = ({ isAnimated = true }) => {
       {/* --- CAMADA 1: CÉU --- */}
       <div className="noiseos-sky">
         {isMobile ? (
+          // Celular não paga o custo de WebGL de tela cheia: só o gradiente.
           <div className="noiseos-sky-fallback" />
-        ) : (
+        ) : isDark ? (
           <Silk
-            color={isDark ? SILK_DARK : SILK_LIGHT}
+            color={SILK_DARK}
             speed={12}
             scale={1.4}
             rotation={2.6}
             noiseIntensity={1.2}
+            isAnimated={isAnimated}
+          />
+        ) : (
+          <Iridescence
+            color={[0.9, 0.9, 0.95]}
+            mouseReact={false}
+            amplitude={0.1}
+            speed={1}
             isAnimated={isAnimated}
           />
         )}
@@ -46,19 +57,11 @@ const Hills = ({ isAnimated = true }) => {
 
       {/* --- CAMADA 2: COLINAS --- */}
       <div className="noiseos-hills">
-        {/* Brilho de horizonte: separa céu de terra sem linha dura. */}
-        <div className="noiseos-horizon" />
-
+        {/* Sem <rect> de grão aqui: ele cobria a caixa inteira desta camada,
+            inclusive a parte transparente acima das colinas, e desenhava uma
+            borda tênue atravessando a tela na altura em que a camada começa.
+            O ruído do sistema já vem do noiseIntensity do próprio shader. */}
         <svg viewBox="0 0 1440 400" preserveAspectRatio="none" className="noiseos-hills-svg">
-          <defs>
-            {/* Grão de filme — o projeto se chama noiseportfolio, então o ruído
-                na textura do sistema é literal, não decorativo. */}
-            <filter id="noiseos-grain">
-              <feTurbulence type="fractalNoise" baseFrequency="0.85" numOctaves="3" />
-              <feColorMatrix type="saturate" values="0" />
-            </filter>
-          </defs>
-
           <path
             d="M0,260 C260,190 420,242 700,160 C980,78 1180,126 1440,60 L1440,400 L0,400 Z"
             fill="var(--hill-back)"
@@ -73,8 +76,6 @@ const Hills = ({ isAnimated = true }) => {
             d="M0,400 C240,320 480,362 780,284 C1060,212 1260,248 1440,214 L1440,400 Z"
             fill="var(--hill-front)"
           />
-
-          <rect width="1440" height="400" filter="url(#noiseos-grain)" opacity="0.06" />
         </svg>
       </div>
     </div>

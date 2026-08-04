@@ -64,17 +64,18 @@
   text-shadow: 0 1px 2px rgba(255, 255, 255, 0.85);
 }
 
-/* Assinatura tratada como marca d'água: integrada ao wallpaper, sem card.
-   Baixo contraste no tratamento, mas o h1 continua grande de propósito.
-   ANCORADA EMBAIXO À ESQUERDA de propósito: as janelas nascem no canto
-   superior esquerdo e descem em cascata, então centralizar na vertical fazia
-   a primeira janela cobrir exatamente o <h1> logo na primeira visita. */
+/* Assinatura tratada como marca d'agua: integrada ao wallpaper, sem card.
+   Baixo contraste no tratamento, mas o h1 continua grande de proposito.
+   ANCORADA NO CANTO SUPERIOR DIREITO: as janelas nascem em (96,64) no canto
+   superior esquerdo e descem em cascata para a direita e para baixo, entao
+   este e o canto que a cascata leva mais tempo para cobrir. */
 .noiseos-signature {
   position: absolute;
-  bottom: 84px; /* acima da taskbar de 52px, com folga */
-  left: 28px;
+  top: 40px;
+  right: 40px;
   z-index: var(--z-icons);
-  max-width: 520px;
+  max-width: 460px;
+  text-align: right;
   pointer-events: none;
 }
 
@@ -120,8 +121,9 @@
    página, e display:none aqui seria regressão de SEO em todo mobile. */
 @media (max-width: 1200px) {
   .noiseos-signature {
-    bottom: 72px;
-    max-width: 60vw;
+    top: 24px;
+    right: 24px;
+    max-width: 52vw;
   }
 
   .noiseos-signature h1 {

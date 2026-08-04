@@ -103,19 +103,9 @@
   min-height: 260px;
 }
 
-/* Brilho onde a terra encontra o céu, para não virar linha dura. */
-.noiseos-horizon {
-  position: absolute;
-  top: -14vh;
-  left: 0;
-  right: 0;
-  height: 22vh;
-  background: radial-gradient(
-    120% 100% at 50% 100%,
-    var(--hill-glow) 0%,
-    transparent 70%
-  );
-}
+/* Sem brilho de horizonte: a tentativa anterior virou uma faixa clara visível
+   atravessando a tela no meio, em vez de suavizar o encontro céu/terra. As
+   próprias camadas de colina com opacidade escalonada já dão a profundidade. */
 
 .noiseos-hills-svg {
   position: absolute;
