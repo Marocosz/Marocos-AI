@@ -1,0 +1,259 @@
+/* --------------------------------------------------
+   CERIMÔNIA DE SISTEMA DO NOISEOS
+   Boot, desligamento e protetor de tela. As três telas são overlays de tela
+   cheia na mesma camada (--z-boot, definido em os/tokens.css) — quem decide
+   qual delas está montada é o dono do estado (fora daqui).
+   -------------------------------------------------- */
+
+.boot-screen,
+.shutdown-screen,
+.screensaver {
+  position: fixed;
+  inset: 0;
+  z-index: var(--z-boot);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  gap: 24px;
+  text-align: center;
+  /* Full-bleed: nenhum toque deve "vazar" para o que está por baixo. */
+  overflow: hidden;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .boot-screen,
+  .shutdown-screen,
+  .screensaver {
+    animation: noiseos-fade-in 0.35s ease-out;
+  }
+}
+
+@keyframes noiseos-fade-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+/* --------------------------------------------------
+   CRYSTAL MARK — cristal em CSS/SVG (sem WebGL)
+   -------------------------------------------------- */
+
+.crystal-mark {
+  position: relative;
+  margin: 0 auto;
+  filter: drop-shadow(0 0 24px rgba(168, 85, 247, 0.55));
+}
+
+.crystal-mark-svg {
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+
+.crystal-mark-pulse {
+  animation: crystal-mark-pulse 3.2s ease-in-out infinite;
+}
+
+@keyframes crystal-mark-pulse {
+  0%,
+  100% {
+    filter: drop-shadow(0 0 18px rgba(168, 85, 247, 0.45));
+    transform: scale(1);
+  }
+  50% {
+    filter: drop-shadow(0 0 34px rgba(216, 180, 254, 0.7));
+    transform: scale(1.035);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .crystal-mark-pulse {
+    animation: none;
+  }
+}
+
+/* --------------------------------------------------
+   BOOT SCREEN
+   -------------------------------------------------- */
+
+.boot-screen {
+  background: radial-gradient(circle at 50% 38%, #2e1065 0%, #120820 55%, #05030a 100%);
+  color: #f5f3ff;
+}
+
+.boot-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 22px;
+  padding: 0 24px;
+}
+
+.boot-title {
+  margin: 0;
+  font-size: clamp(1.8rem, 5vw, 2.6rem);
+  font-weight: 600;
+  letter-spacing: 0.08em;
+}
+
+.boot-title-inner {
+  display: inline-block;
+}
+
+.boot-title-char {
+  color: #f5f3ff;
+}
+
+.boot-title-char-encrypted {
+  color: #a78bfa;
+  opacity: 0.7;
+}
+
+.boot-tagline {
+  margin: -8px 0 0;
+  font-size: 0.9rem;
+  color: rgba(245, 243, 255, 0.6);
+  letter-spacing: 0.03em;
+}
+
+.boot-progress {
+  width: min(220px, 60vw);
+  height: 4px;
+  border-radius: 999px;
+  background: rgba(168, 85, 247, 0.18);
+  overflow: hidden;
+}
+
+.boot-progress-fill {
+  height: 100%;
+  width: 0%;
+  border-radius: 999px;
+  background: linear-gradient(90deg, #a855f7, #d8b4fe);
+  animation-name: boot-progress-fill;
+  animation-timing-function: linear;
+  animation-fill-mode: forwards;
+}
+
+@keyframes boot-progress-fill {
+  from {
+    width: 0%;
+  }
+  to {
+    width: 100%;
+  }
+}
+
+.boot-skip-hint {
+  margin: 0;
+  font-size: 0.75rem;
+  color: rgba(245, 243, 255, 0.4);
+  letter-spacing: 0.02em;
+}
+
+/* --------------------------------------------------
+   SHUTDOWN SCREEN
+   Homenagem direta à tela "It's now safe to turn off your computer" do
+   Windows 9x: preto, âmbar, monoespaçado.
+   -------------------------------------------------- */
+
+.shutdown-screen {
+  background: #000000;
+  color: #ffb000;
+  font-family: ui-monospace, SFMono-Regular, 'Cascadia Mono', Menlo, Consolas, monospace;
+}
+
+.shutdown-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 28px;
+  padding: 0 24px;
+  max-width: 560px;
+}
+
+.shutdown-message {
+  margin: 0;
+  font-size: clamp(1.1rem, 3.4vw, 1.6rem);
+  line-height: 1.6;
+}
+
+.shutdown-submessage {
+  margin: -16px 0 0;
+  font-size: 0.95rem;
+  opacity: 0.75;
+}
+
+.shutdown-power-btn {
+  padding: 10px 28px;
+  font-family: inherit;
+  font-size: 0.95rem;
+  color: #ffb000;
+  background: transparent;
+  border: 1px solid #ffb000;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background 0.15s ease, color 0.15s ease;
+}
+
+.shutdown-power-btn:hover,
+.shutdown-power-btn:focus-visible {
+  background: #ffb000;
+  color: #000000;
+  outline: none;
+}
+
+/* --------------------------------------------------
+   SCREENSAVER
+   Desktop escurecido: gradiente na paleta noturna do wallpaper (ver
+   .theme-dark em os/tokens.css), cristal centralizado e relógio grande.
+   -------------------------------------------------- */
+
+.screensaver {
+  background: radial-gradient(circle at 50% 34%, #1e1b4b 0%, #100a18 55%, #000000 100%);
+  color: #e9e4ff;
+  cursor: none;
+}
+
+.screensaver-crystal {
+  position: relative;
+  width: 260px;
+  height: 260px;
+  overflow: hidden;
+}
+
+.screensaver-clock {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+}
+
+.screensaver-time {
+  font-size: clamp(3rem, 10vw, 6rem);
+  font-weight: 300;
+  letter-spacing: 0.02em;
+  line-height: 1;
+}
+
+.screensaver-date {
+  font-size: 1rem;
+  color: rgba(233, 228, 255, 0.65);
+  text-transform: capitalize;
+}
+
+.screensaver-hint {
+  margin: 0;
+  font-size: 0.8rem;
+  color: rgba(233, 228, 255, 0.4);
+}
+
+@media (max-width: 480px) {
+  .screensaver-crystal {
+    width: 180px;
+    height: 180px;
+  }
+}

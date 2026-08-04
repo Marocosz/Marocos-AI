@@ -16,12 +16,13 @@ const API_BASE = import.meta.env.DEV ? 'http://localhost:8000/api' : 'https://ap
 /**
  * Marcos Virtual — chat com o agente RAG, dentro de uma janela do NoiseOS.
  *
- * Toda a lógica de rede (status de cota, streaming SSE manual, timeout de
- * 60s, tratamento de 429) veio de StartMenu.jsx sem alteração de
- * comportamento. O que mudou foi só o invólucro: sem backdrop, sem
- * isOpen/onClose, sem travar o scroll do body — quem monta e desmonta o
+ * A lógica de rede (status de cota, streaming SSE manual, timeout de 60s,
+ * tratamento de 429) veio de StartMenu.jsx. O invólucro mudou: sem backdrop,
+ * sem isOpen/onClose, sem travar o scroll do body — quem monta e desmonta o
  * componente agora é o gerenciador de janelas, e o Lenis não existe mais
- * no projeto.
+ * no projeto. Além disso, dois bugs herdados do componente antigo (histórico
+ * lido de uma closure velha e uma string de erro cravada em inglês) foram
+ * corrigidos nesta migração — ver comentários em `sendMessage`.
  *
  * O app não sabe que janelas existem: não importa nada de `os/`.
  */
@@ -60,7 +61,24 @@ const AssistantApp = () => {
     if (!text.trim() || isLoading) return
 
     const userMsg = { role: 'user', content: text }
-    setMessages((prev) => [...prev, userMsg])
+
+    // Bug herdado do porte original: o corpo da requisição usava `messages`
+    // lido direto do escopo do render em que esta função foi criada. Se o
+    // envio ocorresse rápido (ou logo após outro setMessages ainda não
+    // "commitado"), esse `messages` podia estar defasado e o backend recebia
+    // um histórico sem a troca mais recente. Correção: usar a forma
+    // funcional de setMessages para capturar o array mais atual garantido
+    // pelo React (que aplica updates em fila, sempre a partir do estado
+    // pendente mais recente) — sem depender de quando o render acontece.
+    // `historyForRequest` fica com o histórico ANTES desta mensagem, que é
+    // exatamente o que o backend espera em `history` (a mensagem atual vai
+    // separada, no campo `message`).
+    let historyForRequest = []
+    setMessages((prev) => {
+      historyForRequest = prev
+      return [...prev, userMsg]
+    })
+
     setInput('')
     setIsLoading(true)
     setLoadingStatus(content.startingStatus)
@@ -74,11 +92,8 @@ const AssistantApp = () => {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           message: text,
-          // Nota: `messages` aqui é o valor da closure ANTES do setMessages
-          // acima (state assíncrono), ou seja, o histórico enviado exclui a
-          // mensagem que acabou de ser digitada — ela já vai separada em
-          // `message`. Comportamento idêntico ao original; não alterado.
-          history: messages,
+          // `historyForRequest` (não `messages`) — ver comentário acima.
+          history: historyForRequest,
           language: language,
         }),
         signal: controller.signal,
@@ -136,7 +151,13 @@ const AssistantApp = () => {
               setMessages((prev) => [...prev, botMsg])
               if (eventData.usage) setUsage(eventData.usage)
             } else if (eventType === 'error') {
-              const errorMsg = { role: 'assistant', content: `⚠️ Error: ${eventData.detail}` }
+              // Bug herdado do porte original: "Error:" ficava cravado em
+              // inglês aqui, aparecendo mesmo com a interface em português.
+              // Agora vem de os.assistant.errorPrefix, traduzido por idioma.
+              const errorMsg = {
+                role: 'assistant',
+                content: `⚠️ ${content.errorPrefix} ${eventData.detail}`,
+              }
               setMessages((prev) => [...prev, errorMsg])
             }
           }

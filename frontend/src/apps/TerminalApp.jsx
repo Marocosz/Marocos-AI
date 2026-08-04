@@ -1,5 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react'
 import { useLanguage } from '../contexts/LanguageContext'
+import { useWindows } from '../os/WindowManagerContext'
 import { getContactData } from '../data/contact'
 import { getProfileData } from '../data/content'
 import { getOsData } from '../data/os'
@@ -14,9 +15,9 @@ import './TerminalApp.css'
  * "digitar" de um comando fixo). Aqui o mesmo visual vira de verdade
  * interativo: quem abre a janela digita os comandos.
  *
- * Não importa nada de `os/` — não sabe que janelas existem, não sabe abrir
- * outras janelas. `projetos` e `stack` (que abririam outras janelas) ficam
- * de fora desta fase; ver o TODO no mapa de comandos abaixo.
+ * A única dependência de `os/` é `useWindows`, usada só por dois comandos
+ * (`projetos` e `stack`) para abrir outras janelas — o resto do app continua
+ * cego a janelas.
  */
 
 // Contador simples para chaves React estáveis das linhas de saída. Vive no
@@ -87,6 +88,19 @@ const buildVpsEntries = ({ content }) => {
   ]
 }
 
+// Os dois únicos comandos que saem do terminal: abrem outra janela do
+// NoiseOS via `open` (vindo de useWindows, injetado no ctx pelo componente)
+// e imprimem uma linha de confirmação na própria transcrição.
+const buildProjetosEntries = ({ strings, open }) => {
+  open('projects')
+  return [{ id: uid(), kind: 'line', text: strings.openingProjects }]
+}
+
+const buildStackEntries = ({ strings, open }) => {
+  open('devices')
+  return [{ id: uid(), kind: 'line', text: strings.openingStack }]
+}
+
 // Sentinela devolvida pelo handler de `clear`: o comando não produz linhas
 // de saída, ele apaga o histórico inteiro — tratado à parte de `push`.
 const CLEAR_SIGNAL = Symbol('terminal-clear')
@@ -103,16 +117,17 @@ const COMMANDS = {
   contato: buildContatoEntries,
   vps: buildVpsEntries,
   clear: () => CLEAR_SIGNAL,
-  // TODO(fase-2): 'projetos' e 'stack' entram aqui. Os dois abrem outras
-  // janelas (useWindows / WindowManagerContext), e este app é propositalmente
-  // cego a janelas — a ligação é feita por quem tiver acesso ao contexto.
+  projetos: buildProjetosEntries,
+  stack: buildStackEntries,
 }
 
 // Aliases em inglês, só reconhecidos quando a UI está em 'en' — o app é
 // bilíngue, mas os nomes de comando "reais" (contato, vps) são fixos como
 // qualquer nome de comando de shell; o alias é só uma conveniência para
 // quem está lendo a interface em inglês.
-const EN_ALIASES = { contact: 'contato', who: 'whoami' }
+const EN_ALIASES = {
+  contact: 'contato', who: 'whoami', projects: 'projetos', devices: 'stack',
+}
 
 const resolveCommandName = (typed, language) => {
   const name = typed.toLowerCase()
@@ -219,6 +234,7 @@ const renderEntry = (entry) => {
 
 const TerminalApp = () => {
   const { language } = useLanguage()
+  const { open } = useWindows()
   const content = getContactData(language)
   const profile = getProfileData(language)
   const os = getOsData(language)
@@ -264,7 +280,7 @@ const TerminalApp = () => {
       return
     }
 
-    const result = COMMANDS[name]({ content, profile, strings })
+    const result = COMMANDS[name]({ content, profile, strings, open })
     if (result === CLEAR_SIGNAL) {
       setOutput([])
       return

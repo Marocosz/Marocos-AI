@@ -1,7 +1,8 @@
-import React, { useEffect } from 'react'
+import React, { useEffect, useRef, useMemo } from 'react'
 import { motion } from 'motion/react'
 import Hills from '../../wallpapers/Hills'
 import Window from './Window'
+import ContextMenu from './ContextMenu'
 import { APPS } from '../registry'
 import { useWindows } from '../WindowManagerContext'
 import { useDeviceMode } from '../useDeviceMode'
@@ -11,7 +12,7 @@ import { getProfileData } from '../../data/content'
 import './Desktop.css'
 
 const Desktop = ({ isAnimated = true }) => {
-  const { windows, open } = useWindows()
+  const { windows, open, minimizeAll } = useWindows()
   const { language } = useLanguage()
   const isDesktop = useDeviceMode() === 'desktop'
   const os = getOsData(language)
@@ -35,6 +36,20 @@ const Desktop = ({ isAnimated = true }) => {
   const temJanelaVisivel = windows.some((w) => !w.minimized)
   const wallpaperAnimado = isAnimated && !temJanelaVisivel
 
+  // O menu de contexto escuta no proprio desktop; ele so intercepta o clique
+  // quando o alvo nao e janela, link nem campo de texto, para o menu nativo
+  // continuar disponivel sobre conteudo (copiar e-mail, por exemplo).
+  const desktopRef = useRef(null)
+
+  const itensDoMenu = useMemo(
+    () => [
+      { id: 'refresh', label: os.contextMenu.refresh, onSelect: () => window.location.reload() },
+      { id: 'wallpaper', label: os.contextMenu.wallpaper, onSelect: () => open('settings') },
+      { id: 'arrange', label: os.contextMenu.arrange, onSelect: () => minimizeAll() },
+    ],
+    [os.contextMenu, open, minimizeAll],
+  )
+
   /**
    * PERFORMANCE: pré-carrega o chunk 3D quando a máquina estiver ociosa.
    *
@@ -51,7 +66,7 @@ const Desktop = ({ isAnimated = true }) => {
 
     let cancelado = false
     const buscar = () => {
-      if (!cancelado) import('../../components/sections/CrystalScene')
+      if (!cancelado) import('../../components/CrystalScene')
     }
 
     if ('requestIdleCallback' in window) {
@@ -70,7 +85,8 @@ const Desktop = ({ isAnimated = true }) => {
   }, [isDesktop])
 
   return (
-    <div className="noiseos-desktop">
+    <div className="noiseos-desktop" ref={desktopRef}>
+      <ContextMenu targetRef={desktopRef} items={itensDoMenu} />
       <Hills isAnimated={wallpaperAnimado} />
 
       {/* Assinatura: é aqui que vive o <h1> da página. A Hero deixou de

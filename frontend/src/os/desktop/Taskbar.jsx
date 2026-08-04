@@ -11,6 +11,7 @@ import { useDeviceMode } from '../useDeviceMode'
 import { useLanguage } from '../../contexts/LanguageContext'
 import { useTheme } from '../../contexts/ThemeContext'
 import { getOsData } from '../../data/os'
+import StartMenu from './StartMenu'
 import './Taskbar.css'
 
 /**
@@ -27,14 +28,21 @@ import './Taskbar.css'
  *   2. Os ícones de seção deram lugar a botões de janela aberta, já que a
  *      navegação passou a ser por janela e não por scroll de seção.
  */
-const Taskbar = () => {
-  const { windows, focusedKey, focus, minimize, minimizeAll } = useWindows()
+const Taskbar = ({ onShutdown }) => {
+  const { windows, focusedKey, focus, minimize, minimizeAll, open } = useWindows()
   const { language, toggleLanguage } = useLanguage()
   const { isDark, isAnimated, toggleTheme, toggleAnimation } = useTheme()
   const isCompact = useDeviceMode() === 'mobile'
   const os = getOsData(language)
 
   const [isTrayMenuOpen, setIsTrayMenuOpen] = useState(false)
+  const [isStartOpen, setIsStartOpen] = useState(false)
+
+  // Iniciar e bandeja sao mutuamente exclusivos: abrir um fecha o outro.
+  const alternarIniciar = () => {
+    setIsStartOpen((v) => !v)
+    setIsTrayMenuOpen(false)
+  }
 
   // Fecha o popup se a tela virar desktop com ele aberto.
   useEffect(() => {
@@ -43,6 +51,14 @@ const Taskbar = () => {
 
   return (
     <>
+      <StartMenu
+        isOpen={isStartOpen}
+        onClose={() => setIsStartOpen(false)}
+        onLaunch={(appId) => open(appId)}
+        onSubmitSearch={() => open('assistant')}
+        onShutdown={onShutdown}
+      />
+
       {/* Popup do tray (mobile/tablet): os três toggles que não caberiam na barra */}
       <AnimatePresence>
         {isTrayMenuOpen && isCompact && (
@@ -84,8 +100,13 @@ const Taskbar = () => {
         <div className="taskbar-center">
           <div className="taskbar-icon-wrapper">
             <div className="taskbar-tooltip">{os.taskbar.start}</div>
-            <button className="taskbar-btn" aria-label={os.taskbar.start}>
-              <LayoutGrid size={22} strokeWidth={2} />
+            <button
+              className={`taskbar-btn${isStartOpen ? ' active' : ''}`}
+              aria-label={os.taskbar.start}
+              aria-expanded={isStartOpen}
+              onClick={alternarIniciar}
+            >
+              <LayoutGrid size={22} strokeWidth={isStartOpen ? 2.5 : 2} />
             </button>
           </div>
 

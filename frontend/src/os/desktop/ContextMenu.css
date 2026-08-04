@@ -1,0 +1,78 @@
+/* src/os/desktop/ContextMenu.css
+ *
+ * Mesma linguagem visual da Taskbar/StartMenu: material mica, raio de
+ * janela pequena, transição dupla e os mesmos overrides de tema claro.
+ * Aqui o backdrop-filter grande é aceitável — o menu é pequeno.
+ */
+
+.noiseos-context-menu {
+  position: fixed;
+  margin: 0;
+  padding: 4px;
+  list-style: none;
+  min-width: 180px;
+
+  background: rgba(30, 30, 30, 0.92);
+  backdrop-filter: blur(16px) saturate(150%);
+  -webkit-backdrop-filter: blur(16px) saturate(150%);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: var(--win-control-radius, 8px);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+
+  z-index: var(--z-startmenu);
+  transition: background 1.5s ease, border-color 1.5s ease;
+}
+
+.noiseos-context-menu li {
+  margin: 0;
+}
+
+.noiseos-context-menu-item {
+  width: 100%;
+  display: block;
+  text-align: left;
+  padding: 8px 12px;
+  background: transparent;
+  border: none;
+  border-radius: 5px;
+  color: #ddd;
+  font-family: inherit;
+  font-size: 0.85rem;
+  cursor: pointer;
+  transition: background 0.1s ease, color 0.1s ease;
+}
+
+.noiseos-context-menu-item:hover,
+.noiseos-context-menu-item:focus-visible {
+  background: rgba(255, 255, 255, 0.1);
+  color: #fff;
+  outline: none;
+}
+
+.noiseos-context-menu-item:active {
+  background: rgba(255, 255, 255, 0.06);
+}
+
+/* ========================================
+   THEME LIGHT OVERRIDES
+   ======================================== */
+
+.theme-light .noiseos-context-menu {
+  background: rgba(255, 255, 255, 0.92);
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+}
+
+.theme-light .noiseos-context-menu-item {
+  color: #333;
+}
+
+.theme-light .noiseos-context-menu-item:hover,
+.theme-light .noiseos-context-menu-item:focus-visible {
+  background: rgba(0, 0, 0, 0.06);
+  color: #000;
+}
+
+.theme-light .noiseos-context-menu-item:active {
+  background: rgba(0, 0, 0, 0.04);
+}

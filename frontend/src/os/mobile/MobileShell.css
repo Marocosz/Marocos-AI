@@ -1,0 +1,366 @@
+/* --------------------------------------------------
+   SHELL MOBILE DO NOISEOS
+   CSS de MobileShell, HomeScreen, MobileApp, Dock e QuickSettings — tudo num
+   arquivo só por simplicidade, já que os cinco componentes formam uma
+   unidade fechada (nenhum é reutilizado fora deste shell).
+
+   Reaproveita as variáveis de tokens.css (--win-*, --text-*, --accent-color,
+   --z-*) em vez de duplicar cores: o tema claro/escuro já é resolvido por
+   elas, então este arquivo só define geometria e algumas variáveis locais de
+   dimensão que não interessam ao desktop.
+   -------------------------------------------------- */
+
+.noiseos-mobile-shell {
+  position: fixed;
+  inset: 0;
+  overflow: hidden;
+  /* Dimensões locais do shell mobile — não vão para tokens.css porque o
+     desktop não usa nenhuma delas. */
+  --mobile-statusbar-h: 44px;
+  --mobile-header-h: 52px;
+  --mobile-dock-h: 68px;
+}
+
+/* --------------------------------------------------
+   HOME SCREEN
+   -------------------------------------------------- */
+
+.noiseos-mobile-home {
+  position: absolute;
+  inset: 0;
+  z-index: var(--z-icons);
+  display: flex;
+  flex-direction: column;
+  /* Home screen tem scroll próprio se a grade não couber (mais apps do que
+     a tela aguenta em 3 colunas), mas nunca rola por trás do dock/status. */
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+/* --- Barra de status --- */
+.noiseos-mobile-statusbar {
+  flex: 0 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: var(--mobile-statusbar-h);
+  padding: 0 18px;
+  padding-top: env(safe-area-inset-top, 0px);
+  /* Sem backdrop-filter: é decoração fina sobre o wallpaper, e sombra de
+     texto já garante legibilidade sem custo de blur (ver instrução de não
+     usar backdrop-filter em área grande — aqui nem precisa em área pequena). */
+  cursor: pointer;
+  touch-action: none;
+  user-select: none;
+}
+
+.noiseos-mobile-clock {
+  font-family: system-ui, sans-serif;
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: #fff;
+  text-shadow: var(--icon-label-shadow);
+}
+
+.noiseos-mobile-statusicons {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  color: #fff;
+  filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.6));
+}
+
+.theme-light .noiseos-mobile-clock,
+.theme-light .noiseos-mobile-statusicons {
+  color: #2e1065;
+  text-shadow: 0 1px 2px rgba(255, 255, 255, 0.7);
+  filter: drop-shadow(0 1px 1px rgba(255, 255, 255, 0.7));
+}
+
+/* --- Grade de apps --- */
+.noiseos-mobile-grid {
+  flex: 1 1 auto;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  align-content: start;
+  gap: 22px 0;
+  margin: 0;
+  padding: 20px 12px calc(var(--mobile-dock-h) + 20px);
+  list-style: none;
+}
+
+.noiseos-mobile-grid button {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  width: 100%;
+  /* Botão inteiro (tile + label) folga bem acima dos 44px mínimos de alvo de
+     toque; só o tile já tem 60px. */
+  padding: 4px 0 8px;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+}
+
+.noiseos-mobile-tile {
+  display: grid;
+  place-items: center;
+  width: 60px;
+  height: 60px;
+  border: var(--win-border);
+  border-radius: 16px;
+  background: linear-gradient(160deg, rgba(168, 85, 247, 0.5), rgba(88, 28, 135, 0.6));
+  box-shadow: var(--win-highlight);
+  color: #fff;
+  transition: transform 0.1s ease;
+}
+
+.noiseos-mobile-grid button:active .noiseos-mobile-tile {
+  transform: scale(0.94);
+}
+
+.noiseos-mobile-label {
+  font-family: system-ui, sans-serif;
+  font-size: 0.72rem;
+  line-height: 1.25;
+  text-align: center;
+  color: #fff;
+  text-shadow: var(--icon-label-shadow);
+}
+
+/* Wallpaper claro é lilás pálido: texto branco desapareceria. */
+.theme-light .noiseos-mobile-label {
+  color: #2e1065;
+  text-shadow: 0 1px 2px rgba(255, 255, 255, 0.85);
+}
+
+/* --------------------------------------------------
+   APP EM TELA CHEIA
+   -------------------------------------------------- */
+
+.noiseos-mobile-app {
+  position: absolute;
+  inset: 0;
+  z-index: var(--z-windows);
+  display: flex;
+  flex-direction: column;
+  background: var(--win-body-solid);
+}
+
+.noiseos-mobile-app-header {
+  flex: 0 0 auto;
+  display: flex;
+  align-items: center;
+  height: var(--mobile-header-h);
+  padding: env(safe-area-inset-top, 0px) 8px 0;
+  background: var(--win-titlebar-bg);
+  box-shadow: var(--win-highlight);
+  /* Header é barra fina: aqui o blur é seguro (mesmo raciocínio do
+     titlebar de janela do desktop). */
+  -webkit-backdrop-filter: var(--win-glass-blur);
+  backdrop-filter: var(--win-glass-blur);
+}
+
+.noiseos-mobile-back {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  min-height: 44px;
+  padding: 0 8px 0 4px;
+  border: none;
+  border-radius: var(--win-control-radius);
+  background: transparent;
+  color: var(--text-primary);
+  font-family: system-ui, sans-serif;
+  font-size: 0.92rem;
+  cursor: pointer;
+}
+
+.noiseos-mobile-back:active {
+  background: rgba(255, 255, 255, 0.12);
+}
+
+.noiseos-mobile-app-title {
+  flex: 1 1 auto;
+  overflow: hidden;
+  text-align: center;
+  font-family: system-ui, sans-serif;
+  font-size: 0.94rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+/* Mesma largura do botão Voltar, para o título ficar centralizado de
+   verdade em vez de puxado para a direita. */
+.noiseos-mobile-app-spacer {
+  min-width: 44px;
+}
+
+.noiseos-mobile-app-body {
+  flex: 1 1 auto;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  padding: 20px 22px;
+  color: var(--text-primary);
+}
+
+/* --------------------------------------------------
+   DOCK
+   -------------------------------------------------- */
+
+.noiseos-mobile-dock {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: var(--z-taskbar);
+  display: flex;
+  align-items: center;
+  justify-content: space-evenly;
+  height: var(--mobile-dock-h);
+  padding-bottom: env(safe-area-inset-bottom, 0px);
+  background: rgba(20, 20, 20, 0.8);
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+  /* Barra fina no rodapé: mesmo custo de blur que a taskbar do desktop já
+     paga, então é seguro repetir aqui. */
+  -webkit-backdrop-filter: blur(12px);
+  backdrop-filter: blur(12px);
+}
+
+.noiseos-mobile-dock-btn {
+  display: grid;
+  place-items: center;
+  width: 48px;
+  height: 48px;
+  border: none;
+  border-radius: 12px;
+  background: transparent;
+  color: #ddd;
+  cursor: pointer;
+  transition: background 0.15s ease, color 0.15s ease;
+}
+
+.noiseos-mobile-dock-btn:active {
+  background: rgba(255, 255, 255, 0.1);
+  color: #fff;
+}
+
+.theme-light .noiseos-mobile-dock {
+  background: rgba(245, 245, 245, 0.85);
+  border-top: 1px solid rgba(0, 0, 0, 0.08);
+}
+
+.theme-light .noiseos-mobile-dock-btn {
+  color: #555;
+}
+
+.theme-light .noiseos-mobile-dock-btn:active {
+  background: rgba(0, 0, 0, 0.06);
+  color: #000;
+}
+
+/* --------------------------------------------------
+   QUICK SETTINGS
+   -------------------------------------------------- */
+
+.noiseos-mobile-qs-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: var(--z-startmenu);
+  background: rgba(0, 0, 0, 0.35);
+}
+
+.noiseos-mobile-qs-panel {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: var(--z-startmenu);
+  padding: calc(env(safe-area-inset-top, 0px) + 16px) 16px 20px;
+  border-radius: 0 0 20px 20px;
+  border-bottom: var(--win-border);
+  box-shadow: var(--win-shadow);
+  /* Painel grande: SEM backdrop-filter de propósito (ver instrução de não
+     usar blur em área extensa). Fundo sólido do mesmo tom que a janela
+     maximizada do desktop usa pelo mesmo motivo. */
+  background: var(--win-body-solid);
+  touch-action: none;
+}
+
+.noiseos-mobile-qs-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 12px;
+}
+
+.noiseos-mobile-qs-title {
+  font-family: system-ui, sans-serif;
+  font-size: 0.98rem;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.noiseos-mobile-qs-close {
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  border: none;
+  border-radius: var(--win-control-radius);
+  background: transparent;
+  color: var(--text-primary);
+  cursor: pointer;
+}
+
+.noiseos-mobile-qs-close:active {
+  background: rgba(255, 255, 255, 0.12);
+}
+
+.noiseos-mobile-qs-list {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.noiseos-mobile-qs-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  min-height: 48px;
+  padding: 8px 10px;
+  border: none;
+  border-radius: 10px;
+  background: transparent;
+  color: var(--text-primary);
+  cursor: pointer;
+  text-align: left;
+}
+
+.noiseos-mobile-qs-row:active {
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.theme-light .noiseos-mobile-qs-row:active {
+  background: rgba(0, 0, 0, 0.05);
+}
+
+.noiseos-mobile-qs-label {
+  flex: 1 1 auto;
+  font-family: system-ui, sans-serif;
+  font-size: 0.88rem;
+}
+
+.noiseos-mobile-qs-value {
+  font-family: system-ui, sans-serif;
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--accent-color);
+}
