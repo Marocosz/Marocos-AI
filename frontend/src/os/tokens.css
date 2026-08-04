@@ -6,15 +6,15 @@
 
 :root {
   /* Chrome de janela */
-  --win-glass-blur: blur(20px) saturate(140%);
+  --win-glass-blur: blur(6px) saturate(125%);
   --win-border: 1px solid rgba(255, 255, 255, 0.18);
   --win-highlight: inset 0 1px 0 rgba(255, 255, 255, 0.25);
-  --win-shadow: 0 16px 48px rgba(0, 0, 0, 0.45);
+  --win-shadow: 0 10px 24px rgba(0, 0, 0, 0.5);
   --win-radius: 10px;
   --win-control-radius: 8px;
   --win-titlebar-h: 40px;
-  --win-titlebar-bg: rgba(88, 28, 135, 0.55);
-  --win-body-bg: rgba(20, 12, 32, 0.72);
+  --win-titlebar-bg: rgba(88, 28, 135, 0.42);
+  --win-body-bg: rgba(22, 14, 34, 0.62);
 
   /* Legibilidade de label sobre wallpaper */
   --icon-label-shadow: 0 1px 3px rgba(0, 0, 0, 0.8);
@@ -31,11 +31,14 @@
   --hill-sky-top: #6d28d9;
   --hill-sky-mid: #a78bfa;
   --hill-sky-low: #ddd6fe;
-  --hill-front: #7c3aed;
-  --hill-mid: #6b21a8;
-  --hill-back: #581c87;
-  /* Brilho de horizonte (dia): luz quente encostando na crista. */
-  --hill-glow: rgba(255, 236, 200, 0.5);
+  /* Ondas (dia). Um gradiente vertical serve as cinco cristas; a opacidade
+     de cada uma faz o resto. A vinheta e escura para separar a onda da frente
+     do ceu pastel do Iridescence. */
+  --wave-top: #c4b5fd;
+  --wave-mid: #8b5cf6;
+  --wave-bottom: #5b21b6;
+  --wave-crest: #f5f3ff;
+  --wave-vignette: rgba(46, 16, 101, 0.55);
 }
 
 /* Wallpaper — noite */
@@ -43,21 +46,23 @@
   --hill-sky-top: #1e1b4b;
   --hill-sky-mid: #2e1065;
   --hill-sky-low: #4c1d95;
-  --hill-front: #2e1065;
-  --hill-mid: #1e1b4b;
-  --hill-back: #0f0a1f;
-  /* Brilho de horizonte (noite): halo violeta frio, bem mais discreto. */
-  --hill-glow: rgba(167, 139, 250, 0.28);
+  /* Ondas (noite): mesma ideia, valores muito mais baixos. A crista recebe um
+     violeta apenas visivel, como luar, e a vinheta e quase preta. */
+  --wave-top: #6d28d9;
+  --wave-mid: #2e1065;
+  --wave-bottom: #120820;
+  --wave-crest: #c4b5fd;
+  --wave-vignette: rgba(4, 2, 10, 0.8);
 
-  --win-titlebar-bg: rgba(76, 29, 149, 0.5);
-  --win-body-bg: rgba(12, 8, 20, 0.78);
+  --win-titlebar-bg: rgba(76, 29, 149, 0.4);
+  --win-body-bg: rgba(14, 9, 22, 0.6);
 }
 
 .theme-light {
-  --win-titlebar-bg: rgba(168, 85, 247, 0.28);
-  --win-body-bg: rgba(255, 255, 255, 0.7);
+  --win-titlebar-bg: rgba(168, 85, 247, 0.22);
+  --win-body-bg: rgba(255, 255, 255, 0.55);
   --win-border: 1px solid rgba(255, 255, 255, 0.6);
-  --win-shadow: 0 16px 48px rgba(88, 28, 135, 0.2);
+  --win-shadow: 0 10px 24px rgba(88, 28, 135, 0.22);
 }
 
 /* --------------------------------------------------
@@ -113,4 +118,68 @@
   width: 100%;
   height: 100%;
   display: block;
+}
+
+/* --------------------------------------------------
+   BARRAS DE ROLAGEM
+   O scroll de página foi eliminado, mas todo conteúdo de janela rola por
+   dentro — e a barra nativa do Windows/Chrome é cinza e destoa do chrome roxo
+   translúcido. Estilizada aqui, num só lugar, para valer em qualquer app.
+   -------------------------------------------------- */
+
+:root {
+  --scroll-thumb: rgba(168, 85, 247, 0.55);
+  --scroll-thumb-hover: rgba(168, 85, 247, 0.85);
+  --scroll-track: rgba(255, 255, 255, 0.06);
+}
+
+.theme-light {
+  --scroll-thumb: rgba(124, 58, 237, 0.45);
+  --scroll-thumb-hover: rgba(109, 40, 217, 0.75);
+  --scroll-track: rgba(88, 28, 135, 0.08);
+}
+
+/* Firefox */
+.noiseos-window-body,
+.noiseos-window-body *,
+.noiseos-desktop [class*='-scroll'],
+.tray-menu-popup {
+  scrollbar-width: thin;
+  scrollbar-color: var(--scroll-thumb) transparent;
+}
+
+/* WebKit / Blink */
+.noiseos-window-body ::-webkit-scrollbar,
+.noiseos-window-body::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+
+.noiseos-window-body ::-webkit-scrollbar-track,
+.noiseos-window-body::-webkit-scrollbar-track {
+  background: var(--scroll-track);
+  /* Acompanha o arredondamento da janela em vez de encostar quadrado nela. */
+  border-radius: 0 var(--win-radius) var(--win-radius) 0;
+}
+
+.noiseos-window-body ::-webkit-scrollbar-thumb,
+.noiseos-window-body::-webkit-scrollbar-thumb {
+  background: var(--scroll-thumb);
+  border-radius: 6px;
+  /* A borda transparente afina o polegar sem mexer na área de clique. */
+  border: 2px solid transparent;
+  background-clip: content-box;
+  transition: background 0.15s ease;
+}
+
+.noiseos-window-body ::-webkit-scrollbar-thumb:hover,
+.noiseos-window-body::-webkit-scrollbar-thumb:hover {
+  background: var(--scroll-thumb-hover);
+  background-clip: content-box;
+}
+
+/* Cantinho onde as duas barras se encontram: sem quadrado cinza. */
+.noiseos-window-body ::-webkit-scrollbar-corner,
+.noiseos-window-body::-webkit-scrollbar-corner {
+  background: transparent;
 }

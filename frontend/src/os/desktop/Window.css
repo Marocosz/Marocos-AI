@@ -1,3 +1,14 @@
+/* PERFORMANCE do vidro — o que custava e o que não custava:
+ *
+ * O corpo da janela é grande e fica sobre um shader WebGL que anima, então cada
+ * frame do shader obriga o navegador a refazer o blur da área da janela. O que
+ * pesa nessa conta é o RAIO do blur, não a transparência da cor: alpha é de
+ * graça. Por isso o raio caiu de 20px para 6px em vez de o blur ser removido —
+ * assim a janela continua deixando o fundo aparecer.
+ *
+ * A abertura também deixou de animar `scale`, que forçava recomposição (e
+ * re-blur) a cada passo. Agora é só fade.
+ */
 .noiseos-window {
   position: fixed;
   top: 0;
@@ -12,6 +23,10 @@
   backdrop-filter: var(--win-glass-blur);
   overflow: hidden;
   outline: none;
+  /* Promove a janela a camada própria de composição: mover e focar deixam de
+     repintar o wallpaper atrás. */
+  will-change: transform;
+  contain: paint;
 }
 
 .noiseos-window.focused {
@@ -26,6 +41,8 @@
 }
 
 .noiseos-titlebar {
+  -webkit-backdrop-filter: var(--win-glass-blur);
+  backdrop-filter: var(--win-glass-blur);
   display: flex;
   align-items: center;
   justify-content: space-between;

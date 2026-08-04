@@ -5,24 +5,43 @@ import { useDeviceMode } from '../os/useDeviceMode'
 import { useTheme } from '../contexts/ThemeContext'
 
 /**
- * WALLPAPER "COLINAS"
+ * WALLPAPER "ONDAS"
  * --------------------------------------------------
- * Composição em duas camadas:
- *   1. CÉU — o shader Silk que o projeto já usava, animado. O movimento vem de
- *      arte já validada, em vez de nuvens SVG que na prática renderizavam como
- *      manchas cinzas borradas.
- *   2. COLINAS — três paths SVG opacos ancorados embaixo, dando a forma de
- *      paisagem que o shader sozinho não tem. Homenagem original ao Bliss do
- *      Windows XP, repintada na paleta roxa (a foto original é licenciada).
+ * Duas camadas:
+ *   1. CÉU — o shader que o projeto já usava, animado: Silk no tema escuro,
+ *      Iridescence no claro. Movimento vindo de arte já validada.
+ *   2. ONDAS — três cristas SVG empilhadas, todas semitransparentes com
+ *      opacidade crescente da mais distante para a mais próxima. Como são
+ *      translúcidas, o shader continua visível através delas e as
+ *      sobreposições criam tons intermediários de graça.
  *
- * No mobile o Silk cede lugar a gradiente CSS, como o projeto já fazia: WebGL
- * de tela cheia não vale o custo de bateria num celular.
+ * A onda da frente recebe um halo escuro largo e difuso — vinheta por fora, não
+ * por dentro — que a separa do céu. Sem ele, roxo translúcido sobre roxo
+ * animado se dissolvia e a silhueta desaparecia.
+ *
+ * No mobile o shader cede lugar a gradiente CSS, como o projeto já fazia:
+ * WebGL de tela cheia não vale o custo de bateria num celular.
  */
 
-// Cor do Silk no tema escuro. O tema claro usa o Iridescence, que era o
-// shader que o projeto já aplicava no modo claro — manter esse par preserva a
+// Cor do Silk no tema escuro. O tema claro usa o Iridescence, que era o shader
+// que o projeto já aplicava no modo claro — manter esse par preserva a
 // identidade dos dois temas em vez de forçar o mesmo shader nos dois.
 const SILK_DARK = '#4c1d95'
+
+/**
+ * As tres cristas, da mais distante para a mais próxima.
+ *
+ * `op` cresce em direção ao observador: a de trás quase se dissolve no céu, a
+ * da frente é quase sólida — mas nenhuma chega a ser opaca, para o shader
+ * continuar aparecendo atraves delas.
+ */
+const ONDAS = [
+  { d: 'M0,260 C260,190 420,242 700,160 C980,78 1180,126 1440,60 L1440,400 L0,400 Z', op: 0.45 },
+  { d: 'M0,320 C300,242 520,290 820,206 C1080,134 1260,176 1440,140 L1440,400 L0,400 Z', op: 0.68 },
+  { d: 'M0,400 C240,320 480,362 780,284 C1060,212 1260,248 1440,214 L1440,400 Z', op: 0.88 },
+]
+
+const FRENTE = ONDAS[ONDAS.length - 1].d
 
 const Hills = ({ isAnimated = true }) => {
   const isMobile = useDeviceMode() === 'mobile'
@@ -55,26 +74,55 @@ const Hills = ({ isAnimated = true }) => {
         )}
       </div>
 
-      {/* --- CAMADA 2: COLINAS --- */}
+      {/* --- CAMADA 2: AS ONDAS --- */}
       <div className="noiseos-hills">
-        {/* Sem <rect> de grão aqui: ele cobria a caixa inteira desta camada,
-            inclusive a parte transparente acima das colinas, e desenhava uma
-            borda tênue atravessando a tela na altura em que a camada começa.
-            O ruído do sistema já vem do noiseIntensity do próprio shader. */}
         <svg viewBox="0 0 1440 400" preserveAspectRatio="none" className="noiseos-hills-svg">
+          <defs>
+            {/* Gradiente vertical compartilhado: cada crista pega luz no alto e
+                afunda embaixo, então empilhá-las gera bandas de tom sem eu ter
+                de pintar cada uma à mão. */}
+            <linearGradient id="noiseos-wave" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0%" stopColor="var(--wave-top)" />
+              <stop offset="55%" stopColor="var(--wave-mid)" />
+              <stop offset="100%" stopColor="var(--wave-bottom)" />
+            </linearGradient>
+
+            {/* Vinheta externa: traço grosso e escuro na crista da frente,
+                fortemente desfocado, desenhado ATRÁS do preenchimento. O
+                resultado vaza para cima e escurece o céu junto à silhueta. */}
+            <filter
+              id="noiseos-outer-vignette"
+              x="-10%"
+              y="-60%"
+              width="120%"
+              height="220%"
+            >
+              <feGaussianBlur stdDeviation="16" />
+            </filter>
+          </defs>
+
+          {/* Halo escuro da onda mais externa, antes de tudo. */}
           <path
-            d="M0,260 C260,190 420,242 700,160 C980,78 1180,126 1440,60 L1440,400 L0,400 Z"
-            fill="var(--hill-back)"
-            opacity="0.65"
+            d={FRENTE}
+            fill="none"
+            stroke="var(--wave-vignette)"
+            strokeWidth="30"
+            filter="url(#noiseos-outer-vignette)"
+            opacity="0.9"
           />
+
+          {ONDAS.map((onda, i) => (
+            <path key={i} d={onda.d} fill="url(#noiseos-wave)" opacity={onda.op} />
+          ))}
+
+          {/* Fio de luz na crista da frente, para a borda não ficar mole. */}
           <path
-            d="M0,320 C300,242 520,290 820,206 C1080,134 1260,176 1440,140 L1440,400 L0,400 Z"
-            fill="var(--hill-mid)"
-            opacity="0.85"
-          />
-          <path
-            d="M0,400 C240,320 480,362 780,284 C1060,212 1260,248 1440,214 L1440,400 Z"
-            fill="var(--hill-front)"
+            d={FRENTE}
+            fill="none"
+            stroke="var(--wave-crest)"
+            strokeWidth="1.25"
+            vectorEffect="non-scaling-stroke"
+            opacity="0.5"
           />
         </svg>
       </div>

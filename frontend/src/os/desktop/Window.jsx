@@ -66,9 +66,12 @@ const Window = ({ win }) => {
         height: win.maximized ? undefined : app?.defaultSize.h,
         display: win.minimized ? 'none' : undefined,
       }}
-      initial={{ opacity: 0, scale: 0.96 }}
-      animate={{ opacity: 1, scale: 1 }}
-      transition={{ duration: 0.18, ease: 'easeOut' }}
+      /* Só opacidade na abertura. Animar `scale` numa janela grande obrigava o
+         navegador a recompor a cada passo (e, quando havia backdrop-filter,
+         refazer o blur inteiro), o que travava a abertura. Fade é barato. */
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      transition={{ duration: 0.12, ease: 'linear' }}
       drag={!win.maximized}
       dragListener={false}
       dragControls={dragControls}

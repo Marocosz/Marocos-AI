@@ -1,4 +1,4 @@
-import React, { Suspense, lazy } from 'react'
+import React, { Suspense, lazy, useState, useEffect } from 'react'
 import { useLanguage } from '../contexts/LanguageContext'
 import { getProfileData } from '../data/content'
 import { getOsData } from '../data/os'
@@ -25,6 +25,25 @@ const AboutApp = () => {
   const profile = getProfileData(language)
   const os = getOsData(language)
 
+  /**
+   * PERFORMANCE: o cristal só monta depois que a janela pintou.
+   *
+   * Criar o contexto WebGL e montar o ambiente do material custa centenas de
+   * milissegundos, e fazer isso no mesmo frame da abertura travava a janela
+   * inteira. Adiando, a janela aparece na hora e o cristal preenche em seguida.
+   *
+   * É a mesma solução que o Profile.jsx da página clássica já usava, com o
+   * comentário "Delay 3D Scene load to prevent startup freeze" — só que aqui o
+   * gatilho é a abertura da janela, não a carga da página.
+   */
+  const [montarCristal, setMontarCristal] = useState(false)
+
+  useEffect(() => {
+    if (deviceMode !== 'desktop') return
+    const id = setTimeout(() => setMontarCristal(true), 450)
+    return () => clearTimeout(id)
+  }, [deviceMode])
+
   // Igual ao Profile.jsx: tripliquei a lista pra garantir que o marquee de
   // 50% de translação nunca mostre buraco, mesmo se o container for mais
   // largo que uma cópia só da lista de skills.
@@ -38,7 +57,7 @@ const AboutApp = () => {
     <div className="about-app">
       {/* --- IDENTIDADE: cristal (logo do sistema) + destaque --- */}
       <div className="about-identity">
-        {deviceMode === 'desktop' && (
+        {deviceMode === 'desktop' && montarCristal && (
           <div className="about-crystal" role="img" aria-label={os.about.crystalAlt}>
             <Suspense fallback={<div className="about-crystal-fallback" aria-hidden="true" />}>
               <CrystalScene />
