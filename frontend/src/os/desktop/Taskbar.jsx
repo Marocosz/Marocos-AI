@@ -1,81 +1,197 @@
 import React, { useState, useEffect } from 'react'
-import { LayoutGrid, Wifi, Volume2, BatteryMedium } from 'lucide-react'
+import { motion, AnimatePresence } from 'motion/react'
+import {
+  LayoutGrid, MoreVertical,
+  Wifi, Volume2, BatteryMedium,
+  Sun, Moon, Play, Pause,
+} from 'lucide-react'
 import { useWindows } from '../WindowManagerContext'
 import { getApp } from '../registry'
+import { useDeviceMode } from '../useDeviceMode'
 import { useLanguage } from '../../contexts/LanguageContext'
+import { useTheme } from '../../contexts/ThemeContext'
 import { getOsData } from '../../data/os'
 import './Taskbar.css'
 
+/**
+ * TASKBAR DO NOISEOS
+ * --------------------------------------------------
+ * Continuação direta da Navbar que o projeto já tinha: mesma altura de 52px,
+ * mesmo material mica, mesmos tooltips com delay, mesmo system tray à direita
+ * e os mesmos overrides de tema claro. O CSS é o Navbar.css preservado.
+ *
+ * O que muda em relação à versão anterior:
+ *   1. Ancorada à esquerda (era centralizada), porque agora existem botões de
+ *      janela que entram e saem — num grupo centralizado cada janela nova
+ *      empurraria todos os outros alvos de navegação de lugar.
+ *   2. Os ícones de seção deram lugar a botões de janela aberta, já que a
+ *      navegação passou a ser por janela e não por scroll de seção.
+ */
 const Taskbar = () => {
   const { windows, focusedKey, focus, minimize, minimizeAll } = useWindows()
-  const { language } = useLanguage()
+  const { language, toggleLanguage } = useLanguage()
+  const { isDark, isAnimated, toggleTheme, toggleAnimation } = useTheme()
+  const isCompact = useDeviceMode() === 'mobile'
   const os = getOsData(language)
 
+  const [isTrayMenuOpen, setIsTrayMenuOpen] = useState(false)
+
+  // Fecha o popup se a tela virar desktop com ele aberto.
+  useEffect(() => {
+    if (!isCompact) setIsTrayMenuOpen(false)
+  }, [isCompact])
+
   return (
-    <div className="noiseos-taskbar">
-      <button type="button" className="noiseos-start" aria-label={os.taskbar.start}>
-        <LayoutGrid size={20} />
-      </button>
+    <>
+      {/* Popup do tray (mobile/tablet): os três toggles que não caberiam na barra */}
+      <AnimatePresence>
+        {isTrayMenuOpen && isCompact && (
+          <>
+            <div className="tray-backdrop" onClick={() => setIsTrayMenuOpen(false)} />
+            <motion.div
+              className="tray-menu-popup"
+              initial={{ opacity: 0, y: 10, scale: 0.95 }}
+              animate={{ opacity: 1, y: 0, scale: 1 }}
+              exit={{ opacity: 0, y: 10, scale: 0.95 }}
+              transition={{ duration: 0.2 }}
+            >
+              <div className="tray-menu-item" onClick={toggleTheme}>
+                <span className="tray-menu-label">{os.tray.theme}</span>
+                {isDark ? <Moon size={18} /> : <Sun size={18} />}
+              </div>
+              <div className="tray-menu-item" onClick={toggleLanguage}>
+                <span className="tray-menu-label">{os.tray.language}</span>
+                <span style={{ fontSize: '0.8rem', fontWeight: 'bold' }}>
+                  {language === 'en' ? 'EN' : 'PT'}
+                </span>
+              </div>
+              <div className="tray-menu-item" onClick={toggleAnimation}>
+                <span className="tray-menu-label">{os.tray.animation}</span>
+                {isAnimated ? <Pause size={18} /> : <Play size={18} />}
+              </div>
+            </motion.div>
+          </>
+        )}
+      </AnimatePresence>
 
-      <div className="noiseos-taskbar-divider" />
+      <motion.div
+        className="taskbar-container"
+        initial={{ y: 100 }}
+        animate={{ y: 0 }}
+        transition={{ delay: 0.4, duration: 0.5 }}
+      >
+        {/* --- ESQUERDA: Iniciar + janelas abertas --- */}
+        <div className="taskbar-center">
+          <div className="taskbar-icon-wrapper">
+            <div className="taskbar-tooltip">{os.taskbar.start}</div>
+            <button className="taskbar-btn" aria-label={os.taskbar.start}>
+              <LayoutGrid size={22} strokeWidth={2} />
+            </button>
+          </div>
 
-      <ul className="noiseos-taskbar-windows">
-        {windows.map((win) => {
-          const app = getApp(win.appId)
-          const Icon = app?.icon
-          const title = app?.titleKey ? os.windows[app.titleKey] : win.params?.slug || ''
-          const isFocused = focusedKey === win.key
+          <div className="tray-divider" />
 
-          return (
-            <li key={win.key}>
-              {/* Clicar no botão da janela em foco minimiza — comportamento
-                  Windows, e é o que faz a barra parecer viva. */}
-              <button
-                type="button"
-                className={`${isFocused ? 'focused' : ''}${win.minimized ? ' minimized' : ''}`}
-                onClick={() => (isFocused ? minimize(win.key) : focus(win.key))}
-                title={title}
-              >
-                {Icon ? <Icon size={16} /> : null}
-                <span>{title}</span>
-              </button>
-            </li>
-          )
-        })}
-      </ul>
+          <ul className="taskbar-windows">
+            {windows.map((win) => {
+              const app = getApp(win.appId)
+              const Icon = app?.icon
+              const title = app?.titleKey ? os.windows[app.titleKey] : win.params?.slug || ''
+              const isFocused = focusedKey === win.key
 
-      <div className="noiseos-taskbar-right">
-        <div className="noiseos-tray" aria-hidden="true">
-          <Wifi size={15} />
-          <Volume2 size={15} />
-          <BatteryMedium size={15} />
+              return (
+                <li key={win.key}>
+                  {/* Clicar no botão da janela em foco minimiza — comportamento Windows. */}
+                  <button
+                    className={`taskbar-btn taskbar-window-btn${isFocused ? ' active' : ''}${win.minimized ? ' minimized' : ''}`}
+                    onClick={() => (isFocused ? minimize(win.key) : focus(win.key))}
+                    title={title}
+                  >
+                    {Icon ? <Icon size={18} strokeWidth={isFocused ? 2.5 : 2} /> : null}
+                    <span className="taskbar-window-label">{title}</span>
+
+                    {isFocused && (
+                      <motion.div
+                        layoutId="taskbar-indicator"
+                        className="app-indicator"
+                        transition={{ type: 'spring', stiffness: 300, damping: 30 }}
+                      />
+                    )}
+                  </button>
+                </li>
+              )
+            })}
+          </ul>
         </div>
-        <Clock />
-        <button
-          type="button"
-          className="noiseos-show-desktop"
-          aria-label={os.taskbar.showDesktop}
-          onClick={minimizeAll}
-        />
-      </div>
-    </div>
+
+        {/* --- DIREITA: System Tray (preservado do design original) --- */}
+        <div className="taskbar-right">
+          {isCompact ? (
+            <button
+              onClick={() => setIsTrayMenuOpen(!isTrayMenuOpen)}
+              className={`taskbar-btn${isTrayMenuOpen ? ' active' : ''}`}
+              aria-label={os.tray.more}
+            >
+              <MoreVertical size={20} />
+            </button>
+          ) : (
+            <>
+              <button onClick={toggleTheme} className="theme-toggle-btn" aria-label={os.tray.theme}>
+                {isDark ? <Moon size={18} /> : <Sun size={18} />}
+              </button>
+
+              <button onClick={toggleAnimation} className="theme-toggle-btn" aria-label={os.tray.animation}>
+                {isAnimated ? <Pause size={18} /> : <Play size={18} />}
+              </button>
+
+              <button onClick={toggleLanguage} className="theme-toggle-btn" aria-label={os.tray.language}>
+                <span style={{ fontSize: '0.8rem', fontWeight: 'bold' }}>
+                  {language === 'en' ? 'BR' : 'EN'}
+                </span>
+              </button>
+
+              <div className="tray-divider" />
+
+              <div className="tray-icons">
+                <div className="tray-icon-hover"><Wifi size={16} /></div>
+                <div className="tray-icon-hover"><Volume2 size={16} /></div>
+                <div className="tray-icon-hover"><BatteryMedium size={16} /></div>
+              </div>
+
+              <div className="tray-clock">
+                <Clock />
+              </div>
+
+              <div
+                className="show-desktop-line"
+                onClick={minimizeAll}
+                title={os.taskbar.showDesktop}
+              />
+            </>
+          )}
+        </div>
+      </motion.div>
+    </>
   )
 }
 
-/** Isolado em memo para o tick de 1s não re-renderizar a taskbar toda. */
+/** Isolado em memo para o tick de 1s não re-renderizar a taskbar inteira. */
 const Clock = React.memo(function Clock() {
-  const [now, setNow] = useState(() => new Date())
+  const [time, setTime] = useState(() => new Date())
 
   useEffect(() => {
-    const t = setInterval(() => setNow(new Date()), 1000)
-    return () => clearInterval(t)
+    const timer = setInterval(() => setTime(new Date()), 1000)
+    return () => clearInterval(timer)
   }, [])
 
   return (
-    <div className="noiseos-clock">
-      <span>{now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>
-      <span>{now.toLocaleDateString([], { day: '2-digit', month: '2-digit', year: 'numeric' })}</span>
-    </div>
+    <>
+      <div className="time">
+        {time.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+      </div>
+      <div className="date">
+        {time.toLocaleDateString([], { day: '2-digit', month: '2-digit', year: 'numeric' })}
+      </div>
+    </>
   )
 })
 

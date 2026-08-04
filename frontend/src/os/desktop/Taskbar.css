@@ -1,107 +1,467 @@
-.noiseos-taskbar {
+/* src/os/desktop/Taskbar.css
+ *
+ * Herdado do Navbar.css original do projeto, preservado quase inteiro: mesma
+ * altura de 52px, mesmo material mica, mesmas transições de velocidade dupla
+ * (1.5s para troca de tema, 0.1s para hover), mesmo tooltip com delay, mesmo
+ * system tray e os mesmos overrides de tema claro.
+ *
+ * Só duas mudanças em relação ao original:
+ *   1. `.taskbar-container` alinha à esquerda em vez de centralizar.
+ *   2. `.taskbar-windows` / `.taskbar-window-btn` são novos, para os botões de
+ *      janela aberta que substituíram os ícones de seção.
+ */
+
+/* --- CONTAINER DA BARRA DE TAREFAS --- */
+.taskbar-container {
   position: fixed;
   bottom: 0;
   left: 0;
-  right: 0;
-  z-index: var(--z-taskbar);
+  width: 100%;
+  height: 52px; /* Altura padrão Windows 11 */
+
+  /* Material Mica / Glass Dark */
+  background: rgba(20, 20, 20, 0.8);
+  /* PERFORMANCE FIX: Blur moderado */
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+
   display: flex;
   align-items: center;
-  gap: 8px;
-  height: var(--win-titlebar-h);
-  padding: 0 0 0 8px;
-  border-top: var(--win-border);
-  background: var(--win-titlebar-bg);
-  -webkit-backdrop-filter: var(--win-glass-blur);
-  backdrop-filter: var(--win-glass-blur);
-  font-family: system-ui, sans-serif;
+  /* MUDANÇA: ancorada à esquerda. Botões de janela entram e saem, e num grupo
+     centralizado cada janela nova empurraria os outros alvos de lugar. */
+  justify-content: flex-start;
+  padding-left: 8px;
+
+  /* Sync Theme Transition */
+  transition: background 1.5s ease, border-color 1.5s ease;
+  z-index: var(--z-taskbar, 1000);
+
+  box-shadow: 0 -5px 20px rgba(0, 0, 0, 0.3);
 }
 
-.noiseos-start {
-  display: grid;
-  place-items: center;
-  width: 40px;
-  height: 30px;
-  border: none;
-  border-radius: var(--win-control-radius);
-  background: transparent;
-  color: var(--text-primary);
-  cursor: pointer;
-}
-
-.noiseos-start:hover { background: rgba(255, 255, 255, 0.16); }
-
-.noiseos-taskbar-divider {
-  width: 1px;
-  height: 20px;
-  background: rgba(255, 255, 255, 0.22);
-}
-
-/* Ancorada à esquerda: botões de janela entram e saem, e num grupo
-   centralizado cada janela nova empurraria os alvos de lugar. */
-.noiseos-taskbar-windows {
+/* --- ESQUERDA: INICIAR + JANELAS --- */
+.taskbar-center {
   display: flex;
+  align-items: center;
+  gap: 6px;
+  height: 100%;
+  min-width: 0; /* permite o ellipsis dos labels funcionar */
+}
+
+.taskbar-icon-wrapper {
+  position: relative;
+  height: 40px;
+  width: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.taskbar-btn {
+  background: transparent;
+  border: none;
+  width: 40px;
+  height: 40px;
+  border-radius: 6px; /* Quadrado arredondado */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #bbb;
+  cursor: pointer;
+  position: relative;
+  /* Dual Speed Transition: lenta para tema, rápida no hover */
+  transition: background 1.5s ease, color 1.5s ease, transform 0.1s ease, box-shadow 0.1s ease;
+}
+
+/* Hover estilo Windows: Fundo claro sutil */
+.taskbar-btn:hover {
+  background: rgba(255, 255, 255, 0.08);
+  color: #fff;
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.05);
+  transition: all 0.1s ease;
+}
+
+/* Active: Fundo um pouco mais claro e ícone colorido */
+.taskbar-btn.active {
+  background: rgba(255, 255, 255, 0.05);
+  color: #a855f7; /* Roxo do tema */
+}
+
+.taskbar-btn:active {
+  transform: scale(0.95);
+  background: rgba(255, 255, 255, 0.04);
+}
+
+/* --- NOVO: BOTÕES DE JANELA ABERTA --- */
+.taskbar-windows {
+  display: flex;
+  align-items: center;
   gap: 4px;
-  flex: 1 1 auto;
-  min-width: 0;
+  height: 100%;
   margin: 0;
   padding: 0;
   list-style: none;
+  min-width: 0;
   overflow: hidden;
 }
 
-.noiseos-taskbar-windows button {
-  display: flex;
-  align-items: center;
-  gap: 7px;
-  max-width: 180px;
-  height: 30px;
-  padding: 0 10px;
-  border: 1px solid transparent;
-  border-radius: var(--win-control-radius);
-  background: rgba(255, 255, 255, 0.08);
-  color: var(--text-primary);
+/* Herda tudo de .taskbar-btn e só cresce para caber o label. */
+.taskbar-window-btn {
+  width: auto;
+  max-width: 190px;
+  gap: 8px;
+  padding: 0 12px;
+  justify-content: flex-start;
+  font-family: inherit;
   font-size: 0.78rem;
-  cursor: pointer;
 }
 
-.noiseos-taskbar-windows button span {
+.taskbar-window-label {
   overflow: hidden;
   white-space: nowrap;
   text-overflow: ellipsis;
 }
 
-.noiseos-taskbar-windows button:hover { background: rgba(255, 255, 255, 0.18); }
-.noiseos-taskbar-windows button.minimized { opacity: 0.55; }
-.noiseos-taskbar-windows button.focused {
-  background: rgba(255, 255, 255, 0.22);
-  border-color: var(--accent-color);
+/* Minimizada continua listada, mas apagada. */
+.taskbar-window-btn.minimized {
+  opacity: 0.55;
 }
 
-.noiseos-taskbar-right {
+/* Indicador (Tracinho em baixo) */
+.app-indicator {
+  position: absolute;
+  bottom: 2px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 16px;
+  height: 3px;
+  background: #a855f7;
+  border-radius: 2px;
+}
+
+/* Tooltip Windows Style */
+.taskbar-tooltip {
+  position: absolute;
+  bottom: 100%;
+  left: 50%;
+  transform: translateX(-50%) translateY(-15px);
+  background: rgba(30, 30, 30, 0.95);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  color: #fff;
+  font-size: 0.75rem;
+  padding: 4px 8px;
+  border-radius: 4px;
+  white-space: nowrap;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.2s ease;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5);
+  z-index: 1001;
+}
+
+.taskbar-icon-wrapper:hover .taskbar-tooltip {
+  opacity: 1;
+  transition-delay: 0.4s; /* Windows tem um delayzinho */
+}
+
+/* --- DIREITA: SYSTEM TRAY --- */
+.taskbar-right {
+  position: absolute;
+  right: 0;
+  height: 100%;
   display: flex;
   align-items: center;
-  gap: 10px;
-  flex: 0 0 auto;
+  padding-right: 12px;
+  gap: 4px;
 }
 
-.noiseos-tray { display: flex; gap: 10px; color: var(--text-secondary); }
+/* Tray Icons (Wifi, Som, Bat) */
+.tray-icons {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  padding: 4px;
+  border-radius: 6px;
+  transition: background 0.2s;
+  cursor: default;
+}
 
-.noiseos-clock {
+.tray-icons:hover {
+  transition: background 0.2s ease;
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.tray-icon-hover {
+  color: #fff;
+  width: 28px;
+  height: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 4px;
+}
+
+/* Relógio */
+.tray-clock {
   display: flex;
   flex-direction: column;
   align-items: flex-end;
-  line-height: 1.15;
-  font-size: 0.72rem;
-  color: var(--text-primary);
+  justify-content: center;
+  padding: 0 8px;
+  height: 40px;
+  border-radius: 6px;
+  cursor: default;
+  transition: background 1.5s ease;
+  margin-left: 4px;
 }
 
-.noiseos-show-desktop {
-  width: 8px;
+.tray-clock:hover {
+  transition: background 0.2s ease;
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.time {
+  font-size: 0.75rem;
+  color: #fff;
+  line-height: 1.1;
+}
+
+.date {
+  font-size: 0.75rem;
+  color: #fff;
+  line-height: 1.1;
+}
+
+/* Show Desktop Line (Cantinho) */
+.show-desktop-line {
+  width: 6px;
   height: 100%;
-  border: none;
-  border-left: 1px solid rgba(255, 255, 255, 0.22);
-  background: transparent;
+  border-left: 1px solid rgba(255, 255, 255, 0.1);
+  margin-left: 8px;
   cursor: pointer;
 }
 
-.noiseos-show-desktop:hover { background: rgba(255, 255, 255, 0.14); }
+.show-desktop-line:hover {
+  background: rgba(255, 255, 255, 0.1);
+}
+
+/* --- TRAY POPUP (MOBILE/TABLET) --- */
+.tray-backdrop {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  z-index: 1005;
+  background: transparent;
+}
+
+.tray-menu-popup {
+  position: fixed;
+  bottom: 60px;
+  right: 12px;
+  width: 200px;
+  background: rgba(20, 20, 20, 0.95);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: 12px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  padding: 8px;
+  z-index: 1010;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.tray-menu-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 12px;
+  border-radius: 8px;
+  color: #ddd;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.tray-menu-item:hover {
+  background: rgba(255, 255, 255, 0.1);
+  color: #fff;
+}
+
+.tray-menu-label {
+  font-size: 0.9rem;
+  font-weight: 500;
+}
+
+.theme-toggle-btn {
+  background: transparent;
+  border: none;
+  color: #fff;
+  cursor: pointer;
+  padding: 6px;
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 1.5s ease, color 1.5s ease;
+}
+
+.theme-toggle-btn:hover {
+  transition: all 0.2s ease;
+  background: rgba(255, 255, 255, 0.1);
+  color: #a855f7;
+}
+
+.tray-divider {
+  width: 1px;
+  height: 20px;
+  background: rgba(255, 255, 255, 0.1);
+  margin: 0 8px;
+  flex: 0 0 auto;
+}
+
+/* --- RESPONSIVIDADE --- */
+
+/* Tablet (600px - 1024px) */
+@media (max-width: 1024px) and (min-width: 601px) {
+  .taskbar-center {
+    gap: 4px;
+  }
+
+  .taskbar-btn {
+    width: 38px;
+    height: 38px;
+  }
+
+  .taskbar-window-btn {
+    width: auto;
+    max-width: 150px;
+  }
+
+  .taskbar-icon-wrapper {
+    width: 38px;
+    height: 38px;
+  }
+}
+
+/* Mobile (< 600px) */
+@media (max-width: 600px) {
+  .taskbar-center {
+    gap: 2px;
+    margin-right: 48px; /* Espaço para o botão More */
+  }
+
+  .taskbar-btn {
+    width: 36px;
+    height: 36px;
+  }
+
+  /* Sem espaço para label no celular: só o ícone. */
+  .taskbar-window-btn {
+    width: 36px;
+    padding: 0;
+    justify-content: center;
+  }
+
+  .taskbar-window-label {
+    display: none;
+  }
+
+  .taskbar-icon-wrapper {
+    width: 36px;
+    height: 36px;
+  }
+
+  .taskbar-right {
+    position: absolute;
+    right: 0;
+    width: 48px;
+    justify-content: center;
+    background: transparent;
+  }
+}
+
+/* ========================================
+   THEME LIGHT OVERRIDES
+   ======================================== */
+
+.theme-light .taskbar-container {
+  background: rgba(245, 245, 245, 0.7); /* Vidro claro tipo Windows 11 Light */
+  border-top: 1px solid rgba(0, 0, 0, 0.08);
+  box-shadow: 0 -5px 20px rgba(0, 0, 0, 0.05);
+}
+
+.theme-light .taskbar-btn {
+  color: #555;
+}
+
+.theme-light .taskbar-btn:hover {
+  background: rgba(0, 0, 0, 0.05);
+  color: #000;
+  box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.05);
+}
+
+.theme-light .taskbar-btn.active {
+  background: rgba(0, 0, 0, 0.04);
+  color: #a855f7;
+}
+
+.theme-light .taskbar-btn:active {
+  background: rgba(0, 0, 0, 0.08);
+}
+
+.theme-light .taskbar-tooltip {
+  background: rgba(255, 255, 255, 0.95);
+  border: 1px solid rgba(0, 0, 0, 0.1);
+  color: #333;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+}
+
+/* Tray Popover Light */
+.theme-light .tray-menu-popup {
+  background: rgba(255, 255, 255, 0.95);
+  border: 1px solid rgba(0, 0, 0, 0.1);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.15);
+}
+
+.theme-light .tray-menu-item {
+  color: #333;
+}
+
+.theme-light .tray-menu-item:hover {
+  background: rgba(0, 0, 0, 0.05);
+  color: #000;
+}
+
+/* Tray Area Light */
+.theme-light .tray-icon-hover {
+  color: #333;
+}
+
+.theme-light .tray-icons:hover,
+.theme-light .tray-clock:hover,
+.theme-light .theme-toggle-btn:hover {
+  background: rgba(0, 0, 0, 0.05);
+}
+
+.theme-light .time,
+.theme-light .date,
+.theme-light .theme-toggle-btn {
+  color: var(--text-primary);
+}
+
+.theme-light .tray-divider {
+  background: rgba(0, 0, 0, 0.1);
+}
+
+.theme-light .show-desktop-line {
+  border-left: 1px solid rgba(0, 0, 0, 0.1);
+}
+
+.theme-light .show-desktop-line:hover {
+  background: rgba(0, 0, 0, 0.05);
+}
