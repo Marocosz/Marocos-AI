@@ -23,9 +23,11 @@
   backdrop-filter: var(--win-glass-blur);
   overflow: hidden;
   outline: none;
-  /* Promove a janela a camada própria de composição: mover e focar deixam de
-     repintar o wallpaper atrás. */
-  will-change: transform;
+  /* Isola a repintura da janela do resto da tela.
+     Sem `will-change: transform` aqui: o Framer Motion já escreve um
+     `transform` em x/y, o que promove a camada de qualquer forma. Declarar
+     will-change em cima disso só reservava uma textura de GPU do tamanho da
+     janela sem ganho — e numa janela maximizada isso é a tela inteira. */
   contain: paint;
 }
 
@@ -33,11 +35,26 @@
   box-shadow: var(--win-shadow), 0 0 0 1px var(--accent-color);
 }
 
+/* MAXIMIZADA — sem vidro, de propósito.
+ *
+ * A janela cobre a viewport inteira, então não há nada visível atrás para o
+ * blur revelar: o efeito é invisível e ainda cobra um passe de filtro em tela
+ * cheia a cada repintura (o relógio da taskbar, por exemplo, repinta a cada
+ * segundo). Fundo opaco aqui é mais rápido E mais legível.
+ *
+ * O `bottom` usa --taskbar-h (52px) e não --win-titlebar-h (40px): com o valor
+ * errado a janela terminava 12px por baixo da barra de tarefas.
+ */
 .noiseos-window.maximized {
-  inset: 0 0 var(--win-titlebar-h) 0;
+  inset: 0 0 var(--taskbar-h) 0;
   width: 100vw !important;
   height: auto !important;
+  border: none;
   border-radius: 0;
+  box-shadow: none;
+  background: var(--win-body-solid);
+  -webkit-backdrop-filter: none;
+  backdrop-filter: none;
 }
 
 .noiseos-titlebar {

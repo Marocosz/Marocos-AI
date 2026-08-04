@@ -13,8 +13,13 @@
   --win-radius: 10px;
   --win-control-radius: 8px;
   --win-titlebar-h: 40px;
+  /* Altura da barra de tarefas. A janela maximizada precisa deste valor, nao
+     do da barra de titulo, para nao terminar por baixo dela. */
+  --taskbar-h: 52px;
   --win-titlebar-bg: rgba(88, 28, 135, 0.42);
   --win-body-bg: rgba(22, 14, 34, 0.62);
+  /* Sem transparencia: usada pela janela maximizada, que nao tem fundo visivel. */
+  --win-body-solid: #17101f;
 
   /* Legibilidade de label sobre wallpaper */
   --icon-label-shadow: 0 1px 3px rgba(0, 0, 0, 0.8);
@@ -56,11 +61,13 @@
 
   --win-titlebar-bg: rgba(76, 29, 149, 0.4);
   --win-body-bg: rgba(14, 9, 22, 0.6);
+  --win-body-solid: #100a18;
 }
 
 .theme-light {
   --win-titlebar-bg: rgba(168, 85, 247, 0.22);
   --win-body-bg: rgba(255, 255, 255, 0.55);
+  --win-body-solid: #faf8ff;
   --win-border: 1px solid rgba(255, 255, 255, 0.6);
   --win-shadow: 0 10px 24px rgba(88, 28, 135, 0.22);
 }
