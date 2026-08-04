@@ -20,7 +20,7 @@
 - `MOVE` do reducer é despachado **somente** em `onDragEnd`, nunca durante o arrasto.
 - Todo teste roda em `environment: 'node'` — Fase 1 não testa DOM.
 - Commits em PT-BR, prefixo `feat:` / `test:` / `chore:` / `style:`.
-- **O lint já falha no baseline.** Medido no commit `07681b3`: `npm run lint` sai com código 1 por
+- **O lint já falha no baseline.** Medido no commit `07681b3`: `npm run lint` saía com código 1 por
   **9 erros pré-existentes** em arquivos legados (`DecryptedText.jsx`, `Contact.jsx`,
   `Journey.jsx`, `PortfolioMeta.jsx`, `Profile.jsx`, `Projects.jsx`, `TechStack.jsx`,
   `Navbar.jsx`, `LanguageContext.jsx` — oito `no-unused-vars` e um
@@ -28,6 +28,12 @@
   Fase 4, quando esses arquivos forem deletados. Por isso **cada task roda o lint apenas nos
   próprios arquivos**, com `npx eslint <caminhos que a task criou ou alterou>`, e não `npm run
   lint`. Corrigir arquivo legado é scope creep e será marcado no review.
+  **Atualização (commit `8643d2e`):** o baseline caiu para **8 erros**, todos `no-unused-vars`. A
+  regra `react-refresh/only-export-components` foi desligada em `**/*Context.jsx` porque arquivo
+  de contexto exportar Provider + hook junto é padrão intencional e permanente do projeto (já
+  existia no `LanguageContext`, e o NoiseOS repete no `WindowManagerContext` e no `ThemeContext`).
+  O custo é só de fast-refresh, não de correção. Essa é a **única** exceção de config autorizada
+  na Fase 1 — não adicione outras para esconder os 8 restantes.
 
 ## Ordem de execução e paralelismo
 
@@ -1341,19 +1347,58 @@ git commit -m "feat: wallpaper Colinas em SVG e tokens do NoiseOS"
 
 Criar `frontend/src/os/WindowManagerContext.jsx`:
 
+**Armadilha que esta task tem que evitar** (descoberta na review da primeira tentativa):
+
+**A URL inicial precisa ser resolvida de forma síncrona, não dentro de um efeito.** Os dois
+efeitos deste provider rodam no mesmo commit, ambos fechando sobre o `state` do primeiro render.
+Se o efeito URL→estado apenas despachasse `OPEN`, o efeito estado→URL rodaria em seguida ainda
+vendo `windows: []`, calcularia `/` e daria `pushState('/')` por cima de uma URL que já estava
+correta — e no render seguinte empurraria a rota certa. Resultado: **duas entradas espúrias no
+histórico** sempre que a página carrega em qualquer rota diferente de `/`, com o botão voltar
+exigindo três cliques para sair do site. Por isso o estado inicial nasce de `deriveInitial()`, e o
+efeito URL→estado passa a servir **somente** ao `popstate`.
+
 ```jsx
-import React, { createContext, useContext, useReducer, useCallback, useEffect, useRef } from 'react'
+import React, {
+  createContext, useContext, useReducer, useCallback, useEffect, useRef, useMemo,
+} from 'react'
 import { windowReducer, initialState } from './windowManager'
 import { getApp } from './registry'
 import { resolveRoute, buildRoute } from './routes'
 
 const WindowContext = createContext(null)
 
-export const WindowManagerProvider = ({ children }) => {
-  const [state, dispatch] = useReducer(windowReducer, initialState)
+/**
+ * Deriva estado inicial E rota canônica a partir da URL, sincronamente.
+ * Ver a armadilha documentada acima: aplicar a URL por efeito polui o histórico.
+ */
+function deriveInitial() {
+  if (typeof window === 'undefined') return { state: initialState, path: '/' }
 
-  // Evita empurrar no histórico a mesma URL que acabamos de ler dele.
-  const lastPath = useRef(null)
+  const match = resolveRoute(window.location.pathname)
+  if (!match) return { state: initialState, path: '/' }
+
+  const app = getApp(match.appId)
+  return {
+    state: windowReducer(initialState, {
+      type: 'OPEN',
+      appId: match.appId,
+      params: match.params,
+      parent: app?.parent,
+    }),
+    // Forma canônica, não a string crua: '/leia-me/' e '/leia-me' resolvem para
+    // o mesmo app, e é a canônica que o efeito estado->URL vai calcular.
+    path: buildRoute(match.appId, match.params),
+  }
+}
+
+export const WindowManagerProvider = ({ children }) => {
+  const initial = useMemo(deriveInitial, [])
+  const [state, dispatch] = useReducer(windowReducer, initial.state)
+
+  // Última rota conhecida, para não empurrar no histórico a mesma URL que
+  // acabamos de ler dele. Nasce coerente com o estado inicial.
+  const lastPath = useRef(initial.path)
 
   const open = useCallback((appId, params = null) => {
     const app = getApp(appId)
@@ -2328,6 +2373,10 @@ Confirmar no navegador:
 10. `Esc` fecha a janela focada
 11. Abrir `/projetos/bussola-v2` direto abre duas janelas, com a do projeto na frente
 12. O relógio da taskbar avança
+13. **Histórico não poluído** (regressão que a review da Task 7 pegou): abrir `/leia-me`
+    diretamente numa aba nova, conferir que a barra de endereço **não pisca** para `/`, e então
+    apertar voltar **uma única vez** — deve sair do site, não cair numa entrada intermediária.
+    Antes da correção isso exigia três cliques.
 
 - [ ] **Step 7: Commit**
 
