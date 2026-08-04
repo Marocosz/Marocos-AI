@@ -1,5 +1,6 @@
 import js from '@eslint/js'
 import globals from 'globals'
+import react from 'eslint-plugin-react'
 import reactHooks from 'eslint-plugin-react-hooks'
 import reactRefresh from 'eslint-plugin-react-refresh'
 import { defineConfig, globalIgnores } from 'eslint/config'
@@ -24,6 +25,19 @@ export default defineConfig([
     },
     rules: {
       'no-unused-vars': ['error', { varsIgnorePattern: '^[A-Z_]' }],
+    },
+  },
+  {
+    // Sem jsx-uses-vars, o no-unused-vars do ESLint core não entende JSX: um
+    // import minúsculo usado apenas como <motion.div> é reportado como não
+    // usado. Era a causa de TODOS os 8 erros de baseline do projeto — todos em
+    // arquivos que importam `motion` de 'motion/react'.
+    // Habilitada só essa regra, não o preset recomendado do plugin, que
+    // acrescentaria uma leva de erros novos em código legado.
+    files: ['**/*.jsx'],
+    plugins: { react },
+    rules: {
+      'react/jsx-uses-vars': 'error',
     },
   },
   {
