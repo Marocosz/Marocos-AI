@@ -1,0 +1,85 @@
+/* src/apps/ProjectsApp.css */
+
+/* A pasta "Projetos": lista em estilo explorador de arquivos. O container
+   da janela já dá padding e overflow-y auto — aqui só cuida das linhas. */
+
+.projects-app-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.projects-app-row {
+  display: block;
+}
+
+.projects-app-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  padding: 10px 12px;
+  background: transparent;
+  border: 1px solid transparent;
+  border-radius: 8px;
+  color: inherit;
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+  transition: background-color 0.15s ease, border-color 0.15s ease;
+}
+
+.projects-app-item:hover,
+.projects-app-item:focus-visible {
+  background: var(--card-bg);
+  border-color: var(--card-border);
+}
+
+.projects-app-item:focus-visible {
+  outline: 2px solid var(--accent-color);
+  outline-offset: -2px;
+}
+
+.projects-app-item-icon {
+  display: grid;
+  place-items: center;
+  flex-shrink: 0;
+  width: 36px;
+  height: 36px;
+  border-radius: 8px;
+  background: var(--card-bg);
+  border: 1px solid var(--card-border);
+  color: var(--accent-color);
+}
+
+.projects-app-item-info {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.projects-app-item-title {
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.projects-app-item-category {
+  font-size: 0.72rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 1.2px;
+  color: var(--accent-color);
+}
+
+/* Contraste maior no tema claro, mesmo tratamento do carrossel antigo. */
+.theme-light .projects-app-item-category {
+  color: #9333ea;
+}

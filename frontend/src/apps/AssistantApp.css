@@ -1,0 +1,490 @@
+/* src/apps/AssistantApp.css
+   Linguagem visual reaproveitada de components/ui/StartMenu.css: bolhas de
+   mensagem, scroll do chat, input, indicador de status e banner de beta são
+   os mesmos, só renomeados para não colidir com o arquivo de referência.
+
+   O que NÃO veio: moldura de menu Iniciar (backdrop, container flutuante,
+   animação de slide, media query de largura) e o rodapé decorativo de
+   Start Menu (perfil "Visitante", engrenagem de settings, botão de power) —
+   esse rodapé virou só o contador de uso, que é a única peça dele exigida
+   pelo spec.
+
+   Sem backdrop-filter aqui dentro: o blur já é do chrome da janela
+   (noiseos-window), e empilhar blur quebra o Safari do iOS.
+
+   As variáveis de tema (--text-primary, --text-secondary, --accent-color)
+   já trocam sozinhas via .theme-dark/.theme-light no elemento raiz do Shell
+   (src/App.jsx) — por isso os overrides "tema claro" abaixo continuam
+   funcionando mesmo sem a prop isDarkMode que o StartMenu.jsx recebia. */
+
+.assistant-app {
+  height: 100%;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+/* --- BANNER DE BETA (aviso de IA generativa) --- */
+.assistant-beta-banner {
+  margin: 0 0 10px 0;
+  padding: 8px 12px;
+  background: rgba(99, 102, 241, 0.1);
+  border: 1px solid rgba(99, 102, 241, 0.2);
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 0.78rem;
+  color: #c7d2fe;
+  flex-shrink: 0;
+  animation: assistantFadeIn 0.5s ease;
+}
+
+.assistant-beta-icon {
+  color: #818cf8;
+  flex-shrink: 0;
+}
+
+.assistant-beta-close {
+  background: transparent;
+  border: none;
+  color: #818cf8;
+  opacity: 0.6;
+  cursor: pointer;
+  padding: 4px;
+  border-radius: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s;
+  margin-left: auto;
+}
+
+.assistant-beta-close:hover {
+  background: rgba(255, 255, 255, 0.1);
+  opacity: 1;
+}
+
+.theme-light .assistant-beta-banner {
+  background: rgba(79, 70, 229, 0.06);
+  border-color: rgba(79, 70, 229, 0.15);
+  color: #4338ca;
+}
+
+.theme-light .assistant-beta-icon {
+  color: #4f46e5;
+}
+
+.theme-light .assistant-beta-close {
+  color: #4f46e5;
+}
+
+.theme-light .assistant-beta-close:hover {
+  background: rgba(0, 0, 0, 0.05);
+}
+
+/* --- ÁREA DE MENSAGENS (a que rola) --- */
+.assistant-chat-scroll {
+  flex: 1 1 auto;
+  min-height: 0; /* crucial para o scroll funcionar dentro do flex column */
+  overflow-y: auto;
+  padding: 4px 0 8px;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(255, 255, 255, 0.1) transparent;
+  overscroll-behavior: contain;
+}
+
+.theme-light .assistant-chat-scroll {
+  scrollbar-color: rgba(0, 0, 0, 0.1) transparent;
+}
+
+/* Estado vazio */
+.assistant-empty-state {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  color: var(--text-secondary);
+  padding: 0 8px;
+}
+
+.assistant-empty-icon {
+  margin-bottom: 16px;
+  opacity: 0.5;
+  color: var(--accent-color);
+}
+
+.assistant-empty-title {
+  font-size: 1.1rem;
+  font-weight: 500;
+  margin-bottom: 8px;
+  color: var(--text-primary);
+}
+
+.assistant-empty-subtitle {
+  font-size: 0.9rem;
+  max-width: 300px;
+  opacity: 0.7;
+  margin-bottom: 24px;
+}
+
+/* Sugestões de pergunta */
+.assistant-suggestions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  justify-content: center;
+  max-width: 400px;
+}
+
+.assistant-suggestion-chip {
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  color: var(--text-primary);
+  padding: 8px 16px;
+  border-radius: 20px;
+  font-size: 0.85rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s cubic-bezier(0.2, 0, 0, 1);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.assistant-suggestion-chip:hover {
+  background: rgba(255, 255, 255, 0.12);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  border-color: rgba(255, 255, 255, 0.2);
+}
+
+.theme-light .assistant-suggestion-chip {
+  background: rgba(255, 255, 255, 0.8);
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  color: #444;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+}
+
+.theme-light .assistant-suggestion-chip:hover {
+  background: white;
+  color: #000;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.08);
+}
+
+/* Mensagens */
+.assistant-messages {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding-bottom: 4px;
+}
+
+.assistant-message-row {
+  display: flex;
+  gap: 12px;
+  align-items: flex-start;
+  animation: assistantFadeIn 0.3s ease;
+}
+
+.assistant-message-row.user {
+  flex-direction: row-reverse;
+}
+
+.assistant-avatar {
+  width: 28px;
+  height: 28px;
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.8rem;
+  font-weight: bold;
+  flex-shrink: 0;
+}
+
+.assistant-avatar.bot {
+  background: linear-gradient(135deg, #6366f1 0%, #a855f7 100%);
+  color: white;
+}
+
+/* Avatar do usuário escondido — igual ao original (a letra "M" nunca chega
+   a aparecer, mas o elemento é mantido por fidelidade à estrutura). */
+.assistant-avatar.user {
+  display: none;
+}
+
+.assistant-bubble {
+  background: rgba(30, 30, 30, 0.4);
+  padding: 10px 14px;
+  border-radius: 12px;
+  font-size: 0.92rem;
+  line-height: 1.5;
+  color: var(--text-primary);
+  max-width: 85%;
+  border: 1px solid rgba(255, 255, 255, 0.03);
+  word-break: break-word;
+}
+
+/* Markdown dentro da bolha */
+.assistant-bubble p {
+  margin: 0 0 8px 0;
+}
+.assistant-bubble p:last-child {
+  margin: 0;
+}
+.assistant-bubble ul {
+  margin: 4px 0 8px 18px;
+  padding: 0;
+}
+.assistant-bubble li {
+  margin-bottom: 4px;
+}
+.assistant-bubble strong {
+  font-weight: 600;
+  color: var(--accent-color);
+}
+.assistant-bubble a {
+  color: #60a5fa;
+  text-decoration: none;
+  border-bottom: 1px dotted rgba(96, 165, 250, 0.4);
+}
+.assistant-bubble a:hover {
+  border-bottom-style: solid;
+}
+
+.assistant-message-row.user .assistant-bubble {
+  background: rgba(255, 255, 255, 0.08);
+  color: var(--text-primary);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.theme-light .assistant-bubble {
+  background: rgba(255, 255, 255, 0.85);
+  color: #1a1a1a;
+  border: 1px solid rgba(0, 0, 0, 0.06);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.03);
+}
+
+.theme-light .assistant-message-row.user .assistant-bubble {
+  background: #ffffff !important;
+  border: 1px solid rgba(0, 0, 0, 0.1) !important;
+  color: #333 !important;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+/* Bolha de status ("Pensando...", "Pesquisando nas memórias...") */
+.assistant-loading-bubble {
+  background: rgba(30, 30, 30, 0.4);
+  padding: 10px 14px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  border: 1px solid rgba(255, 255, 255, 0.03);
+  min-width: 150px;
+}
+
+.assistant-status-text {
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  font-style: italic;
+  animation: assistantTextPulse 1.5s infinite ease-in-out;
+}
+
+.theme-light .assistant-loading-bubble {
+  background: rgba(255, 255, 255, 0.85);
+  border: 1px solid rgba(0, 0, 0, 0.06);
+  color: #555;
+}
+
+.theme-light .assistant-status-text {
+  color: #666;
+}
+
+/* --- CONTADOR DE USO --- */
+.assistant-footer {
+  display: flex;
+  justify-content: flex-end;
+  flex-shrink: 0;
+  padding: 6px 2px 0;
+}
+
+.assistant-usage {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.8rem;
+  color: var(--text-secondary);
+  background: rgba(255, 255, 255, 0.05);
+  padding: 4px 10px;
+  border-radius: 4px;
+  position: relative;
+  cursor: help;
+  transition: all 0.2s ease;
+}
+
+.assistant-usage:hover {
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.theme-light .assistant-usage {
+  background: rgba(0, 0, 0, 0.05);
+  color: #555;
+}
+
+.theme-light .assistant-usage:hover {
+  background: rgba(0, 0, 0, 0.1);
+}
+
+.assistant-usage-tooltip {
+  position: absolute;
+  bottom: 110%;
+  right: 0;
+  width: 200px;
+  background: rgba(20, 20, 20, 0.95);
+  color: #fff;
+  padding: 8px 12px;
+  border-radius: 6px;
+  font-size: 0.75rem;
+  line-height: 1.4;
+  text-align: center;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+  pointer-events: none;
+  opacity: 0;
+  transform: translateY(5px);
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  z-index: 10;
+}
+
+.assistant-usage:hover .assistant-usage-tooltip {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.theme-light .assistant-usage-tooltip {
+  background: #fff;
+  color: #333;
+  border: 1px solid rgba(0, 0, 0, 0.1);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+/* --- INPUT (fixo embaixo) --- */
+.assistant-input-bar {
+  flex-shrink: 0;
+  padding-top: 10px;
+  margin-top: 8px;
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.theme-light .assistant-input-bar {
+  border-top-color: rgba(0, 0, 0, 0.08);
+}
+
+.assistant-search-bar {
+  display: flex;
+  align-items: center;
+  background: rgba(30, 30, 30, 0.6);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 24px;
+  padding: 10px 16px;
+  gap: 10px;
+  color: #fff;
+  transition: all 0.2s;
+  box-shadow: inset 0 -1px 1px rgba(0, 0, 0, 0.2);
+}
+
+.assistant-search-bar:focus-within {
+  background: rgba(40, 40, 40, 0.9);
+  border-color: rgba(255, 255, 255, 0.2);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+}
+
+.theme-light .assistant-search-bar {
+  background: rgba(255, 255, 255, 0.6);
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  color: #333;
+  box-shadow: inset 0 -1px 1px rgba(0, 0, 0, 0.05);
+}
+
+.theme-light .assistant-search-bar:focus-within {
+  background: #fff;
+  border-color: rgba(0, 0, 0, 0.2);
+}
+
+.assistant-input {
+  background: transparent;
+  border: none;
+  outline: none;
+  width: 100%;
+  color: inherit;
+  font-family: inherit;
+  font-size: 0.95rem;
+}
+
+.assistant-search-icon {
+  opacity: 0.6;
+  flex-shrink: 0;
+}
+
+.assistant-send-btn {
+  background: transparent;
+  border: none;
+  color: inherit;
+  opacity: 0.6;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 4px;
+  border-radius: 50%;
+  transition: all 0.2s;
+  flex-shrink: 0;
+}
+
+.assistant-send-btn:hover:not(:disabled) {
+  opacity: 1;
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.theme-light .assistant-send-btn:hover:not(:disabled) {
+  background: rgba(0, 0, 0, 0.05);
+}
+
+.assistant-spin {
+  animation: assistantSpin 1s linear infinite;
+}
+
+/* --- KEYFRAMES --- */
+@keyframes assistantFadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(5px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes assistantSpin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes assistantTextPulse {
+  0% {
+    opacity: 0.5;
+  }
+  50% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0.5;
+  }
+}

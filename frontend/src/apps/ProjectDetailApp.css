@@ -1,0 +1,118 @@
+/* src/apps/ProjectDetailApp.css */
+
+/* Detalhe de um projeto. Reaproveita o tratamento visual do carrossel antigo
+   (header em "vidro", label de categoria, lista de techs, botão do GitHub),
+   sem backdrop-filter — o chrome da janela já borra, empilhar derruba o
+   Safari do iOS. O container da janela já dá padding e overflow-y auto. */
+
+.project-detail-app {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.project-detail-header {
+  padding: 14px 16px;
+  background: var(--card-bg);
+  border: 1px solid var(--card-border);
+  border-radius: 10px;
+}
+
+.project-detail-category {
+  display: block;
+  font-size: 0.72rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 1.5px;
+  color: var(--accent-color);
+  margin-bottom: 6px;
+}
+
+.theme-light .project-detail-category {
+  color: #9333ea;
+}
+
+.project-detail-title {
+  margin: 0;
+  font-size: 1.35rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  letter-spacing: -0.3px;
+}
+
+.project-detail-section {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.project-detail-label {
+  font-size: 0.7rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 1.5px;
+  color: var(--text-secondary);
+}
+
+.project-detail-description {
+  margin: 0;
+  font-size: 0.9rem;
+  line-height: 1.7;
+  color: var(--text-primary);
+}
+
+.project-detail-techs {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.project-detail-tech-item {
+  font-size: 0.8rem;
+  color: var(--text-secondary);
+  background: var(--card-bg);
+  border: 1px solid var(--card-border);
+  border-radius: 8px;
+  padding: 5px 10px;
+}
+
+.project-detail-github-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  align-self: flex-start;
+  padding: 10px 18px;
+  background: #fff;
+  color: #000;
+  font-weight: 600;
+  font-size: 0.9rem;
+  border-radius: 8px;
+  text-decoration: none;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.project-detail-github-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 5px 15px rgba(255, 255, 255, 0.15);
+}
+
+.theme-light .project-detail-github-btn {
+  background: #111;
+  color: #fff;
+}
+
+.theme-light .project-detail-github-btn:hover {
+  background: #333;
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.15);
+}
+
+.project-detail-empty {
+  align-items: center;
+  justify-content: center;
+  min-height: 100%;
+  text-align: center;
+  color: var(--text-secondary);
+}

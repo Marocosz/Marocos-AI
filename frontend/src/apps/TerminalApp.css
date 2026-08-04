@@ -1,0 +1,246 @@
+/* src/apps/TerminalApp.css
+ *
+ * Reaproveita a linguagem visual do terminal falso de Contact.jsx (prompt
+ * roxo, logs com status colorido, tabela de canais em grid) — mas com
+ * classes próprias (`terminal-*`). O projeto não usa CSS Modules e
+ * Contact.css continua carregado ao mesmo tempo (a página clássica em
+ * HomePage.jsx ainda monta <Contact />): reusar os nomes de lá (`.cmd-line`,
+ * `.log-line`, `.terminal-row`...) faria os dois estilos vazarem um no
+ * outro.
+ *
+ * Fonte monoespaçada só de pilha de sistema (o projeto carrega só Poppins) —
+ * zero requisição de rede, e é o que um terminal de verdade usaria.
+ */
+
+.terminal-app {
+  /* O corpo da janela (.noiseos-window-body) já dá padding 20px/22px e
+     overflow-y:auto. Um terminal precisa do prompt fixo embaixo e só o
+     histórico rolando por cima — então a gente recupera esse espaço com
+     margem negativa e devolve o respiro por dentro, nas subáreas. */
+  margin: -20px -22px;
+  height: calc(100% + 40px);
+  display: flex;
+  flex-direction: column;
+  font-family: ui-monospace, SFMono-Regular, 'Cascadia Mono', Menlo, Consolas, monospace;
+  font-size: 0.85rem;
+  line-height: 1.5;
+  color: #ddd;
+  cursor: text;
+}
+
+/* --- HISTÓRICO / SAÍDA (rola sozinho) --- */
+.terminal-output {
+  flex: 1 1 auto;
+  overflow-y: auto;
+  overflow-x: hidden;
+  padding: 14px 18px 6px;
+}
+
+.terminal-output::-webkit-scrollbar { width: 8px; }
+.terminal-output::-webkit-scrollbar-track { background: transparent; }
+.terminal-output::-webkit-scrollbar-thumb {
+  background: var(--scrollbar-thumb);
+  border-radius: 4px;
+}
+.terminal-output::-webkit-scrollbar-thumb:hover { background: var(--scrollbar-thumb-hover); }
+
+/* Linha de texto simples. <pre> (não <p>/<div>/<span>) de propósito: o
+   index.css força `color: var(--text-primary) !important` em h1-4/p/span/li/
+   div no tema claro, o que apagaria as cores de destaque (prompt, status,
+   erro) bem no meio da janela. <pre> escapa dessa regra e ainda é a tag
+   semanticamente certa para saída de terminal — só ajustado para quebrar
+   linha em vez do `white-space: pre` padrão. */
+.terminal-line {
+  margin: 0 0 0.35rem;
+  font-family: inherit;
+  font-size: inherit;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+
+.terminal-dim { opacity: 0.6; font-size: 0.8rem; }
+.terminal-accent { color: var(--accent-color); font-weight: 700; margin-top: 0.5rem; }
+.terminal-strong { color: #fff; font-weight: 700; }
+.terminal-error { color: #ff5f56; }
+
+.terminal-rule {
+  border: none;
+  border-top: 1px dashed rgba(255, 255, 255, 0.2);
+  margin: 0.2rem 0 0.6rem;
+}
+
+/* Linha ecoada: prompt + o que foi digitado, congelados no histórico assim
+   que o Enter é apertado. */
+.terminal-echo {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 0.5rem;
+  margin-bottom: 0.35rem;
+}
+
+.terminal-prompt { color: var(--accent-color); font-weight: 700; white-space: nowrap; }
+.terminal-command { color: #fff; word-break: break-all; }
+
+/* --- LOGS DE BOOT --- */
+.terminal-log {
+  display: flex;
+  align-items: baseline;
+  gap: 0.5rem;
+  margin-bottom: 0.3rem;
+  font-size: 0.82rem;
+}
+
+.terminal-log-text { color: #ccc; white-space: nowrap; }
+
+.terminal-log-fill {
+  flex: 1 1 auto;
+  align-self: center;
+  height: 0;
+  border-bottom: 1px dotted #444;
+}
+
+.terminal-log-status { white-space: nowrap; }
+
+/* --- LISTAS CHAVE/VALOR (neofetch, help) --- */
+.terminal-kv { margin: 0.2rem 0 0.6rem; }
+
+.terminal-kv-row {
+  display: flex;
+  gap: 0.6rem;
+  margin-bottom: 0.25rem;
+}
+
+.terminal-kv-label {
+  color: var(--accent-color);
+  min-width: 110px;
+  flex: 0 0 auto;
+}
+
+.terminal-kv-value { color: #ddd; }
+
+/* --- TAGS (features do vps) --- */
+.terminal-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin: 0.4rem 0 0.6rem;
+}
+
+.terminal-tag {
+  font-size: 0.78rem;
+  color: #ddd;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  padding: 0.3rem 0.6rem;
+  border-radius: 5px;
+}
+
+/* --- TABELA DE CANAIS (contato) --- */
+.terminal-table { margin: 0.3rem 0 0.6rem; }
+
+.terminal-table-header {
+  display: grid;
+  grid-template-columns: 100px 1fr 64px;
+  gap: 0.5rem;
+  padding: 0.3rem 0;
+  border-bottom: 1px dashed rgba(255, 255, 255, 0.2);
+  color: var(--accent-color);
+  font-weight: 700;
+  font-size: 0.7rem;
+  letter-spacing: 1px;
+  margin-bottom: 0.2rem;
+}
+
+.terminal-row {
+  display: grid;
+  grid-template-columns: 100px 1fr 64px;
+  gap: 0.5rem;
+  align-items: center;
+  padding: 0.35rem 0;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+}
+
+.terminal-col-type {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  color: #fff;
+  font-weight: 600;
+  font-size: 0.8rem;
+}
+
+.terminal-row-icon { flex: 0 0 auto; }
+
+.terminal-col-dest {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.terminal-link {
+  color: var(--text-secondary);
+  text-decoration: none;
+  transition: color 0.2s ease;
+}
+
+.terminal-link:hover { color: var(--accent-color); }
+
+.terminal-col-status {
+  color: #27c93f;
+  font-size: 0.76rem;
+  text-align: right;
+}
+
+/* --- PROMPT ATIVO (input de verdade) --- */
+.terminal-input-line {
+  flex: 0 0 auto;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 8px 18px 14px;
+  border-top: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.terminal-input {
+  flex: 1 1 auto;
+  min-width: 0;
+  background: transparent;
+  border: none;
+  outline: none;
+  color: #fff;
+  font: inherit;
+  caret-color: var(--accent-color);
+}
+
+/* ========================================
+   TEMA CLARO
+   ======================================== */
+
+.theme-light .terminal-app { color: #333; }
+.theme-light .terminal-strong { color: #1a1a1a; }
+.theme-light .terminal-log-text { color: #444; }
+.theme-light .terminal-log-fill { border-bottom-color: #bbb; }
+.theme-light .terminal-kv-value { color: #333; }
+.theme-light .terminal-col-type { color: #333; }
+.theme-light .terminal-link { color: #555; }
+.theme-light .terminal-link:hover { color: #9333ea; }
+.theme-light .terminal-tag {
+  background: rgba(0, 0, 0, 0.03);
+  border-color: rgba(0, 0, 0, 0.08);
+  color: #555;
+}
+.theme-light .terminal-input { color: #111; }
+.theme-light .terminal-input-line { border-top-color: rgba(0, 0, 0, 0.08); }
+.theme-light .terminal-row { border-bottom-color: rgba(0, 0, 0, 0.05); }
+.theme-light .terminal-table-header {
+  border-bottom-color: rgba(0, 0, 0, 0.2);
+  color: #9333ea;
+}
+.theme-light .terminal-rule { border-top-color: rgba(0, 0, 0, 0.15); }
+
+/* .terminal-prompt, .terminal-accent, .terminal-kv-label e .terminal-col-status
+   usam <b>/<pre> (não <span>/<p>/<div>) de propósito — por isso continuam
+   roxo/verde mesmo no tema claro, sem precisar de override aqui: só o
+   seletor `.theme-light span/p/div {color: var(--text-primary) !important}`
+   de index.css é que os ignoraria. */

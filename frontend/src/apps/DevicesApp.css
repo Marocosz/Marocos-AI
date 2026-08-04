@@ -1,0 +1,259 @@
+/* src/apps/DevicesApp.css */
+
+/*
+ * Usa as variáveis de tema já globais (--text-primary, --text-secondary,
+ * --accent-color, --card-bg, --card-border), as mesmas que
+ * TechStack.css escreve como valores fixos por tema (dark/light). Como
+ * aqui viram var(), o componente ganha os dois temas de graça, sem
+ * reescrever um bloco .theme-light — o container da janela (Window.css)
+ * já prova que essas variáveis chegam até o conteúdo.
+ *
+ * Sem backdrop-filter aqui dentro: o chrome da janela já borra atrás, e
+ * empilhar blur derruba o Safari do iOS.
+ */
+
+.devices-app {
+  display: flex;
+  flex-direction: column;
+  gap: 1.1rem;
+  font-size: 0.9rem;
+}
+
+/* --- HEADER --- */
+.devices-header {
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+}
+
+.devices-eyebrow {
+  font-family: 'Courier New', monospace;
+  color: var(--accent-color);
+  font-size: 0.68rem;
+  font-weight: 600;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+}
+
+.devices-title {
+  font-size: 1.3rem;
+  font-weight: 800;
+  color: var(--text-primary);
+  margin: 0;
+  letter-spacing: -0.5px;
+}
+
+.devices-subtitle {
+  font-size: 0.82rem;
+  color: var(--text-secondary);
+  line-height: 1.5;
+  margin: 0;
+  font-weight: 300;
+}
+
+/* --- ÁRVORE DE CATEGORIAS --- */
+.devices-tree {
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+}
+
+.devices-category {
+  background: var(--card-bg);
+  border: 1px solid var(--card-border);
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+/* Nó de categoria — botão real, não div, pra expandir/recolher por teclado. */
+.devices-category-toggle {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+  padding: 0.65rem 0.8rem;
+  background: transparent;
+  border: none;
+  color: var(--text-primary);
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+  transition: background 0.15s ease;
+}
+
+.devices-category-toggle:hover {
+  background: var(--card-border);
+}
+
+.devices-category-toggle:focus-visible {
+  outline: 2px solid var(--accent-color);
+  outline-offset: -2px;
+}
+
+.devices-chevron {
+  flex: 0 0 auto;
+  color: var(--text-secondary);
+  transition: transform 0.2s ease, color 0.2s ease;
+}
+
+.devices-chevron.is-open {
+  transform: rotate(90deg);
+  color: var(--accent-color);
+}
+
+.devices-icon-wrapper {
+  flex: 0 0 auto;
+  width: 30px;
+  height: 30px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--card-bg);
+  border: 1px solid var(--card-border);
+  border-radius: 8px;
+  color: var(--accent-color);
+}
+
+.devices-category-title {
+  font-size: 0.92rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.devices-category-body {
+  overflow: hidden;
+  padding: 0 0.8rem 0.8rem;
+}
+
+.devices-category-desc {
+  font-size: 0.78rem;
+  color: var(--text-secondary);
+  line-height: 1.5;
+  margin: 0 0 0.7rem;
+}
+
+/* Cabeçalho de coluna, ao estilo "Detalhes" do Explorer. */
+.devices-list-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  padding: 0 0.6rem 0.35rem;
+  border-bottom: 1px solid var(--card-border);
+  margin-bottom: 0.3rem;
+  font-size: 0.66rem;
+  font-weight: 600;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: var(--text-secondary);
+}
+
+/* --- LISTA DE DISPOSITIVOS (TECNOLOGIAS) --- */
+.devices-item-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.devices-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  padding: 0.55rem 0.6rem;
+  border-radius: 8px;
+  transition: background 0.15s ease;
+}
+
+.devices-item + .devices-item {
+  border-top: 1px solid var(--card-border);
+}
+
+.devices-item:hover {
+  background: var(--card-border);
+}
+
+.devices-item-main {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+  min-width: 0;
+  flex: 1 1 auto;
+}
+
+/* Ponto de status colorido com glow — igual ao .tech-dot do TechStack. */
+.devices-dot {
+  flex: 0 0 auto;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  box-shadow: 0 0 8px currentColor;
+}
+
+.devices-item-text {
+  display: flex;
+  flex-direction: column;
+  gap: 0.1rem;
+  min-width: 0;
+}
+
+.devices-item-name {
+  font-size: 0.86rem;
+  font-weight: 500;
+  color: var(--text-primary);
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+/* Descrição da tecnologia (era tooltip no hover em TechStack) como texto
+   secundário sempre visível — ver justificativa no relatório: hover não
+   funciona por teclado nem em toque, e a árvore já rola verticalmente. */
+.devices-item-desc {
+  font-size: 0.72rem;
+  color: var(--text-secondary);
+  line-height: 1.4;
+}
+
+.devices-item-level {
+  flex: 0 0 auto;
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+  padding: 0.2rem 0.6rem;
+  border-radius: 999px;
+  white-space: nowrap;
+}
+
+.devices-item-level.level-expert {
+  color: var(--accent-color);
+  background: rgba(168, 85, 247, 0.14);
+  border: 1px solid rgba(168, 85, 247, 0.32);
+}
+
+.devices-item-level.level-advanced {
+  color: #38bdf8;
+  background: rgba(56, 189, 248, 0.14);
+  border: 1px solid rgba(56, 189, 248, 0.32);
+}
+
+.devices-item-level.level-intermediate {
+  color: var(--text-secondary);
+  background: var(--card-bg);
+  border: 1px solid var(--card-border);
+}
+
+/* --- RESPONSIVIDADE (janela estreitada) --- */
+@media (max-width: 420px) {
+  .devices-item {
+    flex-wrap: wrap;
+  }
+
+  .devices-item-level {
+    margin-left: calc(8px + 0.65rem);
+  }
+}

@@ -1,0 +1,103 @@
+/* src/apps/SettingsApp.css
+ *
+ * Classes prefixadas com `settings-` de propósito: o CSS do projeto é global,
+ * sem módulos, então nome genérico vazaria estilo entre apps.
+ * Sem backdrop-filter aqui — o chrome da janela já tem blur, e empilhar
+ * derruba o Safari do iOS.
+ */
+
+.settings-app {
+  font-family: system-ui, sans-serif;
+}
+
+.settings-intro {
+  margin: 0 0 18px;
+  font-size: 0.85rem;
+  line-height: 1.6;
+  color: var(--text-secondary);
+}
+
+.settings-list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.settings-row {
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  align-items: center;
+  gap: 14px;
+  padding: 12px 14px;
+  border: var(--win-border);
+  border-radius: var(--win-control-radius);
+  background: var(--card-bg);
+}
+
+.settings-icon {
+  display: grid;
+  place-items: center;
+  width: 34px;
+  height: 34px;
+  border-radius: 9px;
+  background: linear-gradient(160deg, rgba(168, 85, 247, 0.42), rgba(88, 28, 135, 0.5));
+  color: #fff;
+  flex: 0 0 auto;
+}
+
+.settings-text {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  min-width: 0;
+}
+
+.settings-label {
+  font-size: 0.88rem;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.settings-hint {
+  font-size: 0.76rem;
+  line-height: 1.45;
+  color: var(--text-secondary);
+}
+
+.settings-value {
+  padding: 7px 13px;
+  border: var(--win-border);
+  border-radius: var(--win-control-radius);
+  background: rgba(168, 85, 247, 0.16);
+  color: var(--text-primary);
+  font-family: inherit;
+  font-size: 0.78rem;
+  font-weight: 600;
+  white-space: nowrap;
+  cursor: pointer;
+  transition: background 0.15s ease, border-color 0.15s ease;
+}
+
+.settings-value:hover {
+  background: rgba(168, 85, 247, 0.3);
+  border-color: var(--accent-color);
+}
+
+.settings-value:focus-visible {
+  outline: 2px solid var(--accent-color);
+  outline-offset: 2px;
+}
+
+.settings-footer {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  margin: 20px 0 0;
+  font-size: 0.74rem;
+  line-height: 1.5;
+  color: var(--text-secondary);
+  opacity: 0.85;
+}

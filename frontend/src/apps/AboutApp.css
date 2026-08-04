@@ -1,0 +1,199 @@
+/* src/apps/AboutApp.css
+   "Sobre este PC" — reaproveita a linguagem visual do Profile.jsx (faixa de
+   identidade, cards de stat, marquee de skills) dentro de uma janela pequena.
+   Sem backdrop-filter: o chrome da janela já borra o que está atrás; repetir
+   o blur aqui dentro é o que derruba o Safari do iOS (ver Window.css). No
+   lugar do "vidro" com blur, uso os tokens --card-bg/--card-border, que já
+   são theme-aware sozinhos — sem precisar de overrides .theme-light manuais. */
+
+.about-app {
+  display: flex;
+  flex-direction: column;
+  gap: 22px;
+}
+
+/* --- IDENTIDADE (cristal + destaque) --- */
+.about-identity {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  flex-wrap: wrap;
+}
+
+/* Recorte do CrystalScene: o componente vem com width/height: 700px e
+   position: absolute chumbados nele mesmo. Este wrapper é o ancestral
+   posicionado mais próximo, então o canvas gigante é centrado em
+   (50%, 40%) DESTE container e tudo que sobra é cortado pelo overflow.
+   O resultado é um "chip" com o facetado do cristal, não a peça inteira —
+   é o comportamento esperado ao aceitar o recorte em vez de editar o 3D. */
+.about-crystal {
+  position: relative;
+  overflow: hidden;
+  flex: 0 0 auto;
+  width: 150px;
+  height: 190px;
+  border-radius: 22px;
+  background: radial-gradient(
+    circle at 50% 42%,
+    rgba(88, 28, 135, 0.35),
+    rgba(10, 6, 18, 0.5) 70%
+  );
+  border: 1px solid rgba(168, 85, 247, 0.3);
+  box-shadow: 0 0 30px rgba(168, 85, 247, 0.18);
+}
+
+.about-crystal-fallback {
+  width: 100%;
+  height: 100%;
+  background: radial-gradient(circle at 50% 42%, rgba(168, 85, 247, 0.25), transparent 70%);
+  animation: aboutCrystalPulse 1.6s ease-in-out infinite;
+}
+
+@keyframes aboutCrystalPulse {
+  0%, 100% { opacity: 0.4; }
+  50% { opacity: 0.9; }
+}
+
+.about-identity-text {
+  flex: 1 1 220px;
+  min-width: 180px;
+}
+
+.about-kicker {
+  font-family: 'Courier New', monospace;
+  font-size: 0.85rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  color: var(--accent-color);
+  margin: 0 0 8px;
+}
+
+.about-highlight {
+  margin: 0;
+  font-size: 1.1rem;
+  line-height: 1.35;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+/* --- BIOGRAFIA COMPLETA --- */
+.about-bio {
+  margin: 0;
+  font-size: 0.85rem;
+  line-height: 1.6;
+  color: var(--text-secondary);
+  border-left: 2px solid rgba(168, 85, 247, 0.25);
+  padding-left: 14px;
+}
+
+/* --- SEÇÕES (specs / features) --- */
+.about-section-title {
+  margin: 0 0 10px;
+  font-family: 'Courier New', monospace;
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--text-secondary);
+}
+
+.about-section-title::before {
+  content: '// ';
+  color: var(--accent-color);
+}
+
+/* --- ESPECIFICAÇÕES (stats como hardware) --- */
+.about-specs {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px;
+}
+
+.about-spec-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  text-align: center;
+  padding: 12px 8px;
+  border-radius: 14px;
+  background: var(--card-bg);
+  border: 1px solid var(--card-border);
+}
+
+.about-spec-number {
+  font-size: 1.6rem;
+  font-weight: 800;
+  line-height: 1.1;
+  background: linear-gradient(135deg, var(--text-primary) 30%, var(--accent-color) 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.about-spec-label {
+  font-family: 'Courier New', monospace;
+  font-size: 0.65rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--text-primary);
+}
+
+.about-spec-sublabel {
+  font-size: 0.65rem;
+  font-weight: 300;
+  color: var(--text-secondary);
+}
+
+/* --- RECURSOS INSTALADOS (skills como marquee infinito) --- */
+.about-features-wrapper {
+  overflow: hidden;
+  position: relative;
+  mask-image: linear-gradient(to right, transparent, black 8%, black 92%, transparent);
+  -webkit-mask-image: linear-gradient(to right, transparent, black 8%, black 92%, transparent);
+}
+
+.about-features-track {
+  display: flex;
+  width: max-content;
+  gap: 8px;
+  animation: aboutFeaturesScroll 18s linear infinite;
+  will-change: transform;
+}
+
+.about-feature-chip {
+  white-space: nowrap;
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+  color: var(--text-primary);
+  background: var(--card-bg);
+  border: 1px solid var(--card-border);
+  border-radius: 8px;
+  padding: 6px 12px;
+}
+
+@keyframes aboutFeaturesScroll {
+  from { transform: translateX(0); }
+  /* Lista triplicada acima: anda só metade, o resto é a folga que evita
+     buraco no ponto do reset. */
+  to { transform: translateX(-50%); }
+}
+
+/* --- RESPONSIVIDADE --- */
+@media (max-width: 480px) {
+  .about-specs {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* Respeita quem pede menos movimento: sem isso o marquee e o pulso do
+   fallback do cristal rodam sempre, mesmo com prefers-reduced-motion. */
+@media (prefers-reduced-motion: reduce) {
+  .about-features-track,
+  .about-crystal-fallback {
+    animation: none;
+  }
+}
