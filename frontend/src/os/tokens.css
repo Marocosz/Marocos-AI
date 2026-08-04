@@ -34,8 +34,8 @@
   --hill-front: #7c3aed;
   --hill-mid: #6b21a8;
   --hill-back: #581c87;
-  --hill-cloud: #ffffff;
-  --hill-cloud-opacity: 0.5;
+  /* Brilho de horizonte (dia): luz quente encostando na crista. */
+  --hill-glow: rgba(255, 236, 200, 0.5);
 }
 
 /* Wallpaper — noite */
@@ -46,8 +46,8 @@
   --hill-front: #2e1065;
   --hill-mid: #1e1b4b;
   --hill-back: #0f0a1f;
-  --hill-cloud: #c4b5fd;
-  --hill-cloud-opacity: 0.18;
+  /* Brilho de horizonte (noite): halo violeta frio, bem mais discreto. */
+  --hill-glow: rgba(167, 139, 250, 0.28);
 
   --win-titlebar-bg: rgba(76, 29, 149, 0.5);
   --win-body-bg: rgba(12, 8, 20, 0.78);
@@ -60,15 +60,11 @@
   --win-shadow: 0 16px 48px rgba(88, 28, 135, 0.2);
 }
 
-/* Deriva das nuvens — desligada por preferência do sistema */
-@keyframes noiseos-cloud-drift {
-  from { transform: translateX(0); }
-  to   { transform: translateX(60px); }
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .noiseos-cloud { animation: none !important; }
-}
+/* --------------------------------------------------
+   WALLPAPER EM DUAS CAMADAS
+   Céu = shader Silk animado (ou gradiente CSS no mobile).
+   Colinas = SVG opaco ancorado embaixo.
+   -------------------------------------------------- */
 
 .noiseos-wallpaper {
   position: fixed;
@@ -76,9 +72,54 @@
   z-index: var(--z-wallpaper);
   pointer-events: none;
   overflow: hidden;
+  /* Cor de base atrás do shader, para não haver flash preto antes do WebGL
+     inicializar nem faixa vazia se ele falhar. */
+  background: linear-gradient(
+    to bottom,
+    var(--hill-sky-top) 0%,
+    var(--hill-sky-mid) 55%,
+    var(--hill-sky-low) 100%
+  );
 }
 
-.noiseos-wallpaper-svg {
+.noiseos-sky {
+  position: absolute;
+  inset: 0;
+}
+
+/* Mobile e fallback: sem WebGL, só o gradiente do container aparece. */
+.noiseos-sky-fallback {
+  width: 100%;
+  height: 100%;
+}
+
+.noiseos-hills {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  /* Altura da faixa de terra. Ancorada embaixo, o céu fica com o resto. */
+  height: 46vh;
+  min-height: 260px;
+}
+
+/* Brilho onde a terra encontra o céu, para não virar linha dura. */
+.noiseos-horizon {
+  position: absolute;
+  top: -14vh;
+  left: 0;
+  right: 0;
+  height: 22vh;
+  background: radial-gradient(
+    120% 100% at 50% 100%,
+    var(--hill-glow) 0%,
+    transparent 70%
+  );
+}
+
+.noiseos-hills-svg {
+  position: absolute;
+  inset: 0;
   width: 100%;
   height: 100%;
   display: block;

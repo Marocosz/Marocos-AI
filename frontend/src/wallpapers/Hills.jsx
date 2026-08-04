@@ -1,81 +1,84 @@
 import React from 'react'
+import Silk from '../components/backgrounds/Silk'
+import { useDeviceMode } from '../os/useDeviceMode'
+import { useTheme } from '../contexts/ThemeContext'
 
 /**
  * WALLPAPER "COLINAS"
  * --------------------------------------------------
- * Homenagem original ao Bliss do Windows XP, repintada na paleta roxa.
- * SVG em vez de shader por três motivos: nítido em qualquer resolução,
- * ~2KB, e deixa o orçamento de GPU livre para o cristal 3D.
+ * Composição em duas camadas:
+ *   1. CÉU — o shader Silk que o projeto já usava, animado. O movimento vem de
+ *      arte já validada, em vez de nuvens SVG que na prática renderizavam como
+ *      manchas cinzas borradas.
+ *   2. COLINAS — três paths SVG opacos ancorados embaixo, dando a forma de
+ *      paisagem que o shader sozinho não tem. Homenagem original ao Bliss do
+ *      Windows XP, repintada na paleta roxa (a foto original é licenciada).
  *
- * Dia e noite compartilham a geometria e trocam só os tokens de cor.
+ * No mobile o Silk cede lugar a gradiente CSS, como o projeto já fazia: WebGL
+ * de tela cheia não vale o custo de bateria num celular.
  */
 
-const Hills = ({ isAnimated = true }) => (
-  <div className="noiseos-wallpaper" aria-hidden="true">
-    <svg
-      viewBox="0 0 1440 900"
-      preserveAspectRatio="xMidYMid slice"
-      className="noiseos-wallpaper-svg"
-    >
-      <defs>
-        <linearGradient id="noiseos-sky" x1="0" y1="0" x2="0" y2="1">
-          <stop offset="0%" stopColor="var(--hill-sky-top)" />
-          <stop offset="55%" stopColor="var(--hill-sky-mid)" />
-          <stop offset="100%" stopColor="var(--hill-sky-low)" />
-        </linearGradient>
+// Silk pinta o céu; a cor troca com o tema para o horizonte não sumir.
+const SILK_DARK = '#4c1d95'
+const SILK_LIGHT = '#a78bfa'
 
-        <filter id="noiseos-cloud-blur">
-          <feGaussianBlur stdDeviation="18" />
-        </filter>
+const Hills = ({ isAnimated = true }) => {
+  const isMobile = useDeviceMode() === 'mobile'
+  const { isDark } = useTheme()
 
-        {/* Grão de filme: o projeto se chama noiseportfolio, então o ruído
-            na textura do sistema é literal, não decorativo. */}
-        <filter id="noiseos-grain">
-          <feTurbulence type="fractalNoise" baseFrequency="0.8" numOctaves="3" />
-          <feColorMatrix type="saturate" values="0" />
-        </filter>
-      </defs>
-
-      <rect width="1440" height="900" fill="url(#noiseos-sky)" />
-
-      <g filter="url(#noiseos-cloud-blur)" opacity="var(--hill-cloud-opacity)">
-        {[
-          { cx: 240, cy: 150, rx: 120, ry: 34, dur: 90 },
-          { cx: 700, cy: 100, rx: 90, ry: 26, dur: 120 },
-          { cx: 1130, cy: 190, rx: 150, ry: 40, dur: 105 },
-          { cx: 950, cy: 300, rx: 70, ry: 20, dur: 140 },
-        ].map((c, i) => (
-          <ellipse
-            key={i}
-            className="noiseos-cloud"
-            cx={c.cx}
-            cy={c.cy}
-            rx={c.rx}
-            ry={c.ry}
-            fill="var(--hill-cloud)"
-            style={
-              isAnimated
-                ? {
-                    animation: `noiseos-cloud-drift ${c.dur}s ease-in-out ${i * -20}s infinite alternate`,
-                  }
-                : undefined
-            }
+  return (
+    <div className="noiseos-wallpaper" aria-hidden="true">
+      {/* --- CAMADA 1: CÉU --- */}
+      <div className="noiseos-sky">
+        {isMobile ? (
+          <div className="noiseos-sky-fallback" />
+        ) : (
+          <Silk
+            color={isDark ? SILK_DARK : SILK_LIGHT}
+            speed={12}
+            scale={1.4}
+            rotation={2.6}
+            noiseIntensity={1.2}
+            isAnimated={isAnimated}
           />
-        ))}
-      </g>
+        )}
+      </div>
 
-      {/* Três camadas de colina — a da frente é a crista do Bliss,
-          subindo suave da esquerda para a direita. */}
-      <path d="M0,760 C260,690 420,742 700,660 C980,578 1180,626 1440,560 L1440,900 L0,900 Z"
-            fill="var(--hill-back)" opacity="0.55" />
-      <path d="M0,820 C300,742 520,790 820,706 C1080,634 1260,676 1440,640 L1440,900 L0,900 Z"
-            fill="var(--hill-mid)" opacity="0.8" />
-      <path d="M0,900 C240,820 480,862 780,784 C1060,712 1260,748 1440,714 L1440,900 Z"
-            fill="var(--hill-front)" />
+      {/* --- CAMADA 2: COLINAS --- */}
+      <div className="noiseos-hills">
+        {/* Brilho de horizonte: separa céu de terra sem linha dura. */}
+        <div className="noiseos-horizon" />
 
-      <rect width="1440" height="900" filter="url(#noiseos-grain)" opacity="0.05" />
-    </svg>
-  </div>
-)
+        <svg viewBox="0 0 1440 400" preserveAspectRatio="none" className="noiseos-hills-svg">
+          <defs>
+            {/* Grão de filme — o projeto se chama noiseportfolio, então o ruído
+                na textura do sistema é literal, não decorativo. */}
+            <filter id="noiseos-grain">
+              <feTurbulence type="fractalNoise" baseFrequency="0.85" numOctaves="3" />
+              <feColorMatrix type="saturate" values="0" />
+            </filter>
+          </defs>
+
+          <path
+            d="M0,260 C260,190 420,242 700,160 C980,78 1180,126 1440,60 L1440,400 L0,400 Z"
+            fill="var(--hill-back)"
+            opacity="0.65"
+          />
+          <path
+            d="M0,320 C300,242 520,290 820,206 C1080,134 1260,176 1440,140 L1440,400 L0,400 Z"
+            fill="var(--hill-mid)"
+            opacity="0.85"
+          />
+          <path
+            d="M0,400 C240,320 480,362 780,284 C1060,212 1260,248 1440,214 L1440,400 Z"
+            fill="var(--hill-front)"
+          />
+
+          <rect width="1440" height="400" filter="url(#noiseos-grain)" opacity="0.06" />
+        </svg>
+      </div>
+    </div>
+  )
+}
 
 export default Hills
