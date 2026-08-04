@@ -1,0 +1,107 @@
+.noiseos-taskbar {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  z-index: var(--z-taskbar);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  height: var(--win-titlebar-h);
+  padding: 0 0 0 8px;
+  border-top: var(--win-border);
+  background: var(--win-titlebar-bg);
+  -webkit-backdrop-filter: var(--win-glass-blur);
+  backdrop-filter: var(--win-glass-blur);
+  font-family: system-ui, sans-serif;
+}
+
+.noiseos-start {
+  display: grid;
+  place-items: center;
+  width: 40px;
+  height: 30px;
+  border: none;
+  border-radius: var(--win-control-radius);
+  background: transparent;
+  color: var(--text-primary);
+  cursor: pointer;
+}
+
+.noiseos-start:hover { background: rgba(255, 255, 255, 0.16); }
+
+.noiseos-taskbar-divider {
+  width: 1px;
+  height: 20px;
+  background: rgba(255, 255, 255, 0.22);
+}
+
+/* Ancorada à esquerda: botões de janela entram e saem, e num grupo
+   centralizado cada janela nova empurraria os alvos de lugar. */
+.noiseos-taskbar-windows {
+  display: flex;
+  gap: 4px;
+  flex: 1 1 auto;
+  min-width: 0;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  overflow: hidden;
+}
+
+.noiseos-taskbar-windows button {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  max-width: 180px;
+  height: 30px;
+  padding: 0 10px;
+  border: 1px solid transparent;
+  border-radius: var(--win-control-radius);
+  background: rgba(255, 255, 255, 0.08);
+  color: var(--text-primary);
+  font-size: 0.78rem;
+  cursor: pointer;
+}
+
+.noiseos-taskbar-windows button span {
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.noiseos-taskbar-windows button:hover { background: rgba(255, 255, 255, 0.18); }
+.noiseos-taskbar-windows button.minimized { opacity: 0.55; }
+.noiseos-taskbar-windows button.focused {
+  background: rgba(255, 255, 255, 0.22);
+  border-color: var(--accent-color);
+}
+
+.noiseos-taskbar-right {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex: 0 0 auto;
+}
+
+.noiseos-tray { display: flex; gap: 10px; color: var(--text-secondary); }
+
+.noiseos-clock {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  line-height: 1.15;
+  font-size: 0.72rem;
+  color: var(--text-primary);
+}
+
+.noiseos-show-desktop {
+  width: 8px;
+  height: 100%;
+  border: none;
+  border-left: 1px solid rgba(255, 255, 255, 0.22);
+  background: transparent;
+  cursor: pointer;
+}
+
+.noiseos-show-desktop:hover { background: rgba(255, 255, 255, 0.14); }
