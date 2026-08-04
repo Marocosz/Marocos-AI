@@ -70,8 +70,6 @@
 /* --- ESTILOS GLOBAIS DE SCROLL --- */
 /* --- ESTILOS GLOBAIS DE SCROLL (LENIS / NATIVE) --- */
 html {
-  /* Lenis requer scroll-behavior: auto para funcionar corretamente */
-  scroll-behavior: auto !important;
   scrollbar-width: none; /* Firefox - Hide Scrollbar */
   -ms-overflow-style: none; /* IE/Edge */
   background-color: var(--bg-color); /* FIX: Sync background to prevent black flash in F11 */
@@ -88,27 +86,6 @@ body::-webkit-scrollbar {
   display: none;
 }
 
-/* LENIS RECOMMENDED STYLES */
-html.lenis, html.lenis body {
-  height: auto;
-}
-
-.lenis.lenis-smooth {
-  scroll-behavior: auto !important;
-}
-
-.lenis.lenis-smooth [data-lenis-prevent] {
-  overscroll-behavior: contain;
-}
-
-.lenis.lenis-stopped {
-  overflow: hidden;
-}
-
-.lenis.lenis-scrolling iframe {
-  pointer-events: none;
-}
-
 /* --- ESTILOS GERAIS --- */
 body {
   margin: 0;
@@ -123,20 +100,6 @@ body {
 
 * {
   box-sizing: border-box;
-}
-
-/* --- ESTILOS DA LUZ DO MOUSE --- */
-.mouse-light-overlay {
-  position: fixed;
-  inset: 0;
-  z-index: 1;
-  pointer-events: none;
-  background: radial-gradient(300px circle at var(--mouse-x, 50%) var(--mouse-y, 50%),
-      rgba(255, 255, 255, 0.6) 0%,
-      rgba(255, 255, 255, 0.1) 35%,
-      transparent 70%);
-  /* No modo claro, a luz pode atrapalhar ou ser invisível, ajustamos se necessário */
-  mix-blend-mode: overlay; 
 }
 
 .main-content {
@@ -452,11 +415,6 @@ body {
 
 /* --- MOBILE (< 768px) --- */
 @media (max-width: 768px) {
-  
-  /* Desabilita efeito de luz do mouse em mobile (performance) */
-  .mouse-light-overlay {
-    display: none;
-  }
 
   /* Hero Section */
   .hero-section {
@@ -573,4 +531,10 @@ body {
 html.stop-scrolling,
 body.stop-scrolling {
   overflow: hidden !important;
+}
+
+/* Desktop-SO não rola: todo scroll acontece dentro de janelas. */
+html, body {
+  height: 100%;
+  overflow: hidden;
 }
