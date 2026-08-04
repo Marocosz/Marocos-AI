@@ -1,0 +1,87 @@
+.noiseos-window {
+  position: fixed;
+  top: 0;
+  left: 0;
+  display: flex;
+  flex-direction: column;
+  border: var(--win-border);
+  border-radius: var(--win-radius);
+  box-shadow: var(--win-shadow);
+  background: var(--win-body-bg);
+  -webkit-backdrop-filter: var(--win-glass-blur);
+  backdrop-filter: var(--win-glass-blur);
+  overflow: hidden;
+  outline: none;
+}
+
+.noiseos-window.focused {
+  box-shadow: var(--win-shadow), 0 0 0 1px var(--accent-color);
+}
+
+.noiseos-window.maximized {
+  inset: 0 0 var(--win-titlebar-h) 0;
+  width: 100vw !important;
+  height: auto !important;
+  border-radius: 0;
+}
+
+.noiseos-titlebar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: var(--win-titlebar-h);
+  padding: 0 6px 0 12px;
+  background: var(--win-titlebar-bg);
+  box-shadow: var(--win-highlight);
+  cursor: grab;
+  user-select: none;
+  touch-action: none;
+  flex: 0 0 auto;
+}
+
+.noiseos-titlebar:active { cursor: grabbing; }
+
+.noiseos-titlebar-label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-family: system-ui, sans-serif;
+  font-size: 0.82rem;
+  font-weight: 500;
+  color: var(--text-primary);
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.noiseos-titlebar-controls { display: flex; gap: 2px; }
+
+.noiseos-titlebar-controls button {
+  display: grid;
+  place-items: center;
+  width: 32px;
+  height: 26px;
+  border: none;
+  border-radius: var(--win-control-radius);
+  background: transparent;
+  color: var(--text-primary);
+  cursor: pointer;
+  transition: background 0.15s;
+}
+
+.noiseos-titlebar-controls button:hover { background: rgba(255, 255, 255, 0.16); }
+.noiseos-titlebar-controls button.close:hover { background: #e81123; color: #fff; }
+.noiseos-titlebar-controls button:focus-visible { outline: 2px solid var(--accent-color); }
+
+/* Blur fica só no chrome. Repetir backdrop-filter aqui dentro derruba
+   o Safari do iOS — ver riscos do spec. */
+.noiseos-window-body {
+  flex: 1 1 auto;
+  overflow-y: auto;
+  padding: 20px 22px;
+  color: var(--text-primary);
+}
+
+.app-prose { font-size: 0.92rem; line-height: 1.7; }
+.app-prose p { margin: 0 0 1rem; }
+.app-prose a { color: var(--accent-color); }
