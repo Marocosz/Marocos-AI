@@ -1,24 +1,117 @@
-# Logs
-logs
+# ==================================================
+# SEGREDOS E AMBIENTE
+# Primeiro de tudo, de propósito: o .gitignore do backend só vale dentro de
+# backend/, então um frontend/.env com chave de API ficava desprotegido.
+# ==================================================
+.env
+.env.*
+.env.local
+.env.*.local
+!.env.example
+!.env.template
+
+# Chaves e certificados soltos
+*.pem
+*.key
+*.p12
+*.pfx
+
+# ==================================================
+# DEPENDÊNCIAS E BUILD
+# ==================================================
+node_modules/
+dist/
+dist-ssr/
+build/
+*.local
+
+# Cache do Vite e do bundler
+.vite/
+.cache/
+.parcel-cache/
+.rollup.cache/
+
+# Gerenciadores de pacote
+.npm/
+.yarn/
+.pnpm-store/
+.pnp.*
+
+# ==================================================
+# LOGS
+# ==================================================
+logs/
 *.log
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
 pnpm-debug.log*
 lerna-debug.log*
+.node_repl_history
 
-node_modules
-dist
-dist-ssr
-*.local
+# ==================================================
+# TESTES E QUALIDADE
+# ==================================================
+coverage/
+.nyc_output/
+.eslintcache
+test-results/
+playwright-report/
+blob-report/
+.playwright/
 
-# Editor directories and files
+# ==================================================
+# WINDOWS E ONEDRIVE
+# O repositório vive dentro de uma pasta sincronizada do OneDrive, que cria
+# desktop.ini em cada diretório e arquivos temporários durante a sincronia.
+# Sem estas regras eles entram no commit sem ninguém perceber.
+# ==================================================
+desktop.ini
+Thumbs.db
+ehthumbs.db
+ehthumbs_vista.db
+$RECYCLE.BIN/
+*.stackdump
+[Dd]esktop.ini
+
+# Arquivos de bloqueio do Office (abrem com ~$ quando um doc está em uso)
+~$*
+*.tmp
+*.temp
+
+# ==================================================
+# macOS E LINUX
+# ==================================================
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+*~
+.fuse_hidden*
+.nfs*
+
+# ==================================================
+# EDITORES E IDEs
+# ==================================================
 .vscode/*
 !.vscode/extensions.json
-.idea
-.DS_Store
+!.vscode/settings.json.example
+.idea/
 *.suo
 *.ntvs*
 *.njsproj
 *.sln
 *.sw?
+*.swp
+*.swo
+
+# ==================================================
+# FERRAMENTAS DE AGENTE
+# O workspace do subagent-driven-development guarda ledger, briefs e diffs de
+# review. É rascunho de processo: o registro que importa está no histórico do
+# git. Havia um .gitignore aninhado cobrindo só .superpowers/sdd/ — esta regra
+# fecha o diretório inteiro.
+# ==================================================
+.superpowers/
+.claude/settings.local.json
