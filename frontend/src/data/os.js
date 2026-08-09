@@ -37,6 +37,15 @@ const osContentEn = {
   boot: {
     systemName: 'MAROCOS OS',
     tagline: 'Marocos Systems',
+    // Etapas reais do que acontece atrás desta tela, na ordem em que acontece:
+    // o shell monta por baixo do boot e o assistente é um app de verdade. São o
+    // que dá assunto à segunda metade da cerimônia.
+    stages: [
+      'loading system modules',
+      'mounting the desktop',
+      'starting Virtual Marcos',
+      'ready',
+    ],
     skipHint: 'click to skip',
     ariaLabel: 'Starting the system',
   },
@@ -44,7 +53,7 @@ const osContentEn = {
     systemName: 'MAROCOS OS',
     enter: 'Enter',
     enterAria: 'Enter the desktop',
-    hint: 'click anywhere to enter',
+    hint: 'click MAROCOS OS to enter',
     ariaLabel: 'Lock screen',
   },
   shutdown: {
@@ -190,6 +199,15 @@ const osContentPt = {
   boot: {
     systemName: 'MAROCOS SO',
     tagline: 'Marocos Systems',
+    // Etapas reais do que acontece atrás desta tela, na ordem em que acontece:
+    // o shell monta por baixo do boot e o assistente é um app de verdade. São o
+    // que dá assunto à segunda metade da cerimônia.
+    stages: [
+      'carregando módulos do sistema',
+      'montando a área de trabalho',
+      'iniciando o Marcos Virtual',
+      'pronto',
+    ],
     skipHint: 'clique para pular',
     ariaLabel: 'Iniciando o sistema',
   },
@@ -197,7 +215,7 @@ const osContentPt = {
     systemName: 'MAROCOS SO',
     enter: 'Entrar',
     enterAria: 'Entrar na área de trabalho',
-    hint: 'clique em qualquer lugar para entrar',
+    hint: 'clique em MAROCOS SO para entrar',
     ariaLabel: 'Tela de bloqueio',
   },
   shutdown: {

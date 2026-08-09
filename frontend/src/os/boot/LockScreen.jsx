@@ -16,7 +16,13 @@ const Crystal = lazy(() => import('../../components/Crystal'))
  *
  * O CRISTAL É O BOTÃO. A alternativa óbvia — cristal decorativo com um botão
  * "Entrar" ao lado — poria dois elementos disputando o mesmo trabalho. Aqui a
- * marca é a porta. Clicar em qualquer outro lugar também entra.
+ * marca é a porta.
+ *
+ * E SÓ A PORTA ABRE. Antes qualquer clique e qualquer tecla destrancavam, o que
+ * transformava a porta em decoração: ninguém chegava a usá-la, e o hover que
+ * ela oferece não queria dizer nada. Uma tela de bloqueio que abre sozinha ao
+ * primeiro toque não é uma porta, é uma cortina. Agora o gesto é um só, e é o
+ * que a tela mostra.
  *
  * ── DUAS DECISÕES DE PERFORMANCE QUE VALEM O COMENTÁRIO ──
  *
@@ -39,10 +45,15 @@ const LockScreen = ({ onUnlock, onUnlockStart }) => {
 
   const [saindo, setSaindo] = useState(false)
   const jaDestrancou = useRef(false)
+  const portaRef = useRef(null)
 
-  // Sem foco programático na porta: como o listener abaixo entra com qualquer
-  // tecla, focar na montagem só acenderia o anel de foco em todo visitante de
-  // mouse. Quem usa teclado entra com Enter, ou tabula e vê o anel na hora.
+  // A porta recebe o foco na montagem. É o comportamento correto para um
+  // diálogo modal, e como ela virou o único caminho para entrar, quem navega
+  // por teclado passa a ter Enter disponível de imediato em vez de precisar
+  // descobrir que existe um Tab a dar.
+  useEffect(() => {
+    portaRef.current?.focus({ preventScroll: true })
+  }, [])
 
   const destrancar = () => {
     if (jaDestrancou.current) return
@@ -54,17 +65,6 @@ const LockScreen = ({ onUnlock, onUnlockStart }) => {
     // cortina revela e um papel de parede vivo em vez de um congelado.
     onUnlockStart?.()
   }
-
-  // Qualquer tecla também entra — é o gesto que a metáfora ensina.
-  useEffect(() => {
-    const aoTeclar = (e) => {
-      if (e.key === 'Tab') return // deixa a navegação por teclado funcionar
-      destrancar()
-    }
-    window.addEventListener('keydown', aoTeclar)
-    return () => window.removeEventListener('keydown', aoTeclar)
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [])
 
   // Rede de segurança: se `animationend` não disparar (aba em segundo plano,
   // movimento reduzido, animação cancelada), o desmonte ainda acontece.
@@ -87,7 +87,6 @@ const LockScreen = ({ onUnlock, onUnlockStart }) => {
       role="dialog"
       aria-modal="true"
       aria-label={t.ariaLabel}
-      onPointerDown={destrancar}
       onAnimationEnd={aoTerminarAnimacao}
     >
       {/* Relógio no canto: é informação real, e é onde todo sistema o coloca. */}
@@ -98,13 +97,14 @@ const LockScreen = ({ onUnlock, onUnlockStart }) => {
 
         <button
           type="button"
+          ref={portaRef}
           className="lock-door"
           aria-label={t.enterAria}
           onClick={destrancar}
         >
           <Suspense fallback={<div className="crystal-loading lock-crystal" aria-hidden="true" />}>
             {/* `animated={!saindo}`: ver a decisão 1 no topo do arquivo. */}
-            <Crystal size={340} animated={!saindo} className="lock-crystal" />
+            <Crystal size={340} animated={!saindo} spin={1.6} className="lock-crystal" />
           </Suspense>
 
           <span className="lock-wordmark">{t.systemName}</span>

@@ -17,6 +17,8 @@
 .crystal-loading {
   width: 100%;
   height: 100%;
+  min-width: 180px;
+  min-height: 180px;
   border-radius: 50%;
   background: radial-gradient(
     circle at 50% 50%,
@@ -85,16 +87,41 @@
   to   { opacity: 1; }
 }
 
-/* Barra de progresso: torna os 4,2s legiveis como inicializacao em vez de
+/* Barra de progresso: torna a duracao legivel como inicializacao em vez de
    travamento. Anima a largura por transform, que e composicao pura. */
 .boot-progress {
-  width: 190px;
-  height: 2px;
-  border-radius: 2px;
-  background: rgba(196, 181, 253, 0.16);
+  position: relative;
+  width: 260px;
+  height: 3px;
+  border-radius: 3px;
+  background: rgba(196, 181, 253, 0.14);
+  box-shadow: 0 0 18px rgba(124, 58, 237, 0.25);
   overflow: hidden;
   opacity: 0;
-  animation: boot-rise 600ms ease-out 900ms forwards;
+  animation: boot-rise 500ms ease-out 420ms forwards;
+}
+
+/* Varredura continua sobre o trilho. Existe para que a barra nunca fique
+   totalmente imovel: entre uma etapa e outra o avanco de 3px por segundo e
+   pequeno demais para o olho registrar, e um trilho parado desmente a ideia de
+   que ha trabalho acontecendo. Vive no trilho, e nao no preenchimento, porque
+   o preenchimento esta sob scaleX — um filho dele sairia esmagado. */
+.boot-progress::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    rgba(245, 243, 255, 0.55) 50%,
+    transparent 100%
+  );
+  transform: translateX(-100%);
+  animation: boot-sweep 1.5s linear infinite;
+}
+
+@keyframes boot-sweep {
+  to { transform: translateX(100%); }
 }
 
 .boot-progress-fill {
@@ -102,17 +129,45 @@
   width: 100%;
   height: 100%;
   border-radius: inherit;
-  background: linear-gradient(90deg, #7c3aed, #c4b5fd);
+  background: linear-gradient(90deg, #7c3aed, #c4b5fd 70%, #f5f3ff);
+  box-shadow: 0 0 12px rgba(196, 181, 253, 0.55);
   transform-origin: left center;
   transform: scaleX(0);
   animation-name: boot-progress-grow;
-  animation-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+  /* LINEAR de proposito. Com cubic-bezier(0.4, 0, 0.2, 1) a barra chegava a
+     ~94% no primeiro terco da cerimonia e passava o resto do tempo rastejando:
+     media, mas nao parecia mediar nada. Progresso e informacao, e informacao
+     nao tem easing. */
+  animation-timing-function: linear;
   animation-fill-mode: forwards;
   /* animation-duration vem inline, do BOOT_DURATION_MS */
 }
 
 @keyframes boot-progress-grow {
   to { transform: scaleX(1); }
+}
+
+/* Etapa corrente. Ocupa a segunda metade da cerimonia, que antes era so espera:
+   a altura fixa evita que a troca de texto empurre o layout. */
+.boot-stage {
+  margin: -6px 0 0;
+  height: 1.1em;
+  font-family: system-ui, sans-serif;
+  font-size: 0.72rem;
+  letter-spacing: 0.14em;
+  color: #a78bfa;
+  opacity: 0;
+  animation: boot-rise 600ms ease-out 700ms forwards;
+}
+
+.boot-stage-text {
+  display: inline-block;
+  animation: boot-stage-in 420ms cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+@keyframes boot-stage-in {
+  from { opacity: 0; transform: translateY(5px); }
+  to   { opacity: 0.85; transform: translateY(0); }
 }
 
 .boot-title {
@@ -126,7 +181,7 @@
   padding-left: 0.34em;
   color: #f5f3ff;
   opacity: 0;
-  animation: boot-rise 800ms cubic-bezier(0.22, 1, 0.36, 1) 1300ms forwards;
+  animation: boot-rise 800ms cubic-bezier(0.22, 1, 0.36, 1) 900ms forwards;
 }
 
 .boot-tagline {
@@ -137,7 +192,7 @@
   text-transform: uppercase;
   color: #a78bfa;
   opacity: 0;
-  animation: boot-rise 800ms cubic-bezier(0.22, 1, 0.36, 1) 1750ms forwards;
+  animation: boot-rise 800ms cubic-bezier(0.22, 1, 0.36, 1) 1300ms forwards;
 }
 
 @keyframes boot-rise {
@@ -160,7 +215,7 @@
   letter-spacing: 0.12em;
   color: #6d5b8c;
   opacity: 0;
-  animation: boot-rise 800ms ease-out 2600ms forwards;
+  animation: boot-rise 800ms ease-out 2000ms forwards;
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -168,6 +223,8 @@
   .boot-title,
   .boot-tagline,
   .boot-progress,
+  .boot-stage,
+  .boot-stage-text,
   .boot-skip-hint {
     animation: none;
     opacity: 1;
@@ -175,6 +232,7 @@
   }
 
   .boot-progress-fill { transform: scaleX(1); }
+  .boot-progress::after { animation: none; opacity: 0; }
 }
 
 /* ==================================================

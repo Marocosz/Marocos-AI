@@ -41,13 +41,14 @@ const POSE_PARADA = [0.14, 0.6, 0.05]
  */
 const DISTANCIA_CAMERA = 5.6
 
-const CrystalMesh = ({ animated }) => {
+const CrystalMesh = ({ animated, spin }) => {
   const meshRef = useRef()
 
   useFrame((state) => {
     if (!animated || !meshRef.current) return
-    // Rotação orgânica e contínua — os mesmos coeficientes da produção.
-    const t = state.clock.getElapsedTime()
+    // Rotação orgânica e contínua — os mesmos coeficientes da produção,
+    // multiplicados por `spin`. Em spin=1 o comportamento é idêntico ao de lá.
+    const t = state.clock.getElapsedTime() * spin
     meshRef.current.rotation.y = t * 0.2
     meshRef.current.rotation.x = Math.cos(t * 0.3) * 0.1
     meshRef.current.rotation.z = Math.sin(t * 0.2) * 0.05
@@ -81,6 +82,13 @@ const CrystalMesh = ({ animated }) => {
 const Crystal = ({
   size = 260,
   animated = false,
+  /**
+   * Multiplicador da rotação. Em 1 o giro é o da produção: 0.2 rad/s, ou seja
+   * 48 graus em quatro segundos — organico para um objeto em repouso numa
+   * pagina, mas perto de imperceptivel numa tela de boot, onde o movimento
+   * PRECISA comunicar que o sistema esta trabalhando.
+   */
+  spin = 1,
   sparkles = true,
   className = '',
 }) => {
@@ -144,7 +152,7 @@ const Crystal = ({
           rotationIntensity={0}
           floatIntensity={animated ? 1 : 0}
         >
-          <CrystalMesh animated={animated} />
+          <CrystalMesh animated={animated} spin={spin} />
         </Float>
 
         {sparkles && (

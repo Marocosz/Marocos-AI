@@ -49,16 +49,27 @@ const TituloDaPagina = () => {
  * da transição, esse custo caía exatamente sobre o momento em que o desktop
  * aparecia. Atrás da cortina, ele não é visto por ninguém, e o que a cortina
  * revela é uma janela já pintada.
+ *
+ * A TRAVA É NA DECISÃO, NÃO NA ABERTURA. Antes o `return` do deep link vinha
+ * ANTES de marcar a flag: quem entrava por uma rota (`/sobre`, `/projetos`)
+ * saía deste efeito sem nada registrado. Bastava fechar aquela janela no X para
+ * `windows.length` voltar a 0, o efeito rodar de novo e as boas-vindas
+ * dispararem — a janela "reabria sozinha". E isso valia para todo mundo a
+ * partir do segundo carregamento, porque a janela aberta aqui empurra a própria
+ * rota para a URL: o F5 seguinte já chega em /sobre.
+ *
+ * Agora a primeira execução válida decide de uma vez: ou abre, ou respeita o
+ * que a URL trouxe. Nos dois casos o assunto está encerrado.
  */
 const BoasVindas = ({ ativa }) => {
   const { open, windows } = useWindows()
-  const jaAbriu = useRef(false)
+  const jaDecidiu = useRef(false)
 
   useEffect(() => {
-    // Se a URL já trouxe uma janela (deep link), respeita o deep link.
-    if (!ativa || jaAbriu.current || windows.length > 0) return
-    jaAbriu.current = true
-    open('about')
+    if (!ativa || jaDecidiu.current) return
+    jaDecidiu.current = true
+    // Só recebe as boas-vindas quem chegou sem rota; deep link manda.
+    if (windows.length === 0) open('about')
   }, [ativa, open, windows.length])
 
   return null

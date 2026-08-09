@@ -14,8 +14,15 @@ const Crystal = lazy(() => import('../../components/Crystal'))
  * isso acontecer. Abaixo de ~3s a sequência vira um flash e o visitante só
  * registra que "piscou alguma coisa". Pulável a qualquer momento, então quem
  * tem pressa não paga o preço.
+ *
+ * Só que duração não é o mesmo que movimento percebido: a versão anterior
+ * durava 4,2s e mesmo assim lia como "não aconteceu animação nenhuma", porque
+ * a última entrada era aos 2,6s e a barra usava uma curva ease-out que chegava
+ * a ~94% no primeiro terço. Sobravam quase dois segundos de tela parada, e tela
+ * parada durante um boot lê como travamento. O que consertou foi ocupar esse
+ * tempo (etapas + barra linear), não esticá-lo.
  */
-const BOOT_DURATION_MS = 4200
+const BOOT_DURATION_MS = 4800
 
 /**
  * BootScreen — inicialização do Marocos OS.
@@ -42,6 +49,22 @@ const BootScreen = ({ onDone }) => {
       typeof window !== 'undefined' &&
       window.matchMedia('(prefers-reduced-motion: reduce)').matches,
   )
+
+  // Etapa atual. É o que carrega a segunda metade da cerimônia: a barra sozinha
+  // é uma medida sem assunto, e o texto dá ao tempo um porquê.
+  const etapas = strings.stages || []
+  const [etapa, setEtapa] = useState(0)
+
+  useEffect(() => {
+    if (reduceMotion || etapas.length < 2) return
+    const passo = BOOT_DURATION_MS / etapas.length
+    const id = setInterval(() => {
+      // Trava na última: o intervalo é limpo no desmonte, mas a fase pode ser
+      // encurtada por quem pula o boot.
+      setEtapa((n) => (n + 1 < etapas.length ? n + 1 : n))
+    }, passo)
+    return () => clearInterval(id)
+  }, [reduceMotion, etapas.length])
 
   useEffect(() => {
     if (reduceMotion) {
@@ -74,7 +97,10 @@ const BootScreen = ({ onDone }) => {
       <div className="boot-content">
         <div className="boot-crystal">
           <Suspense fallback={<div className="crystal-loading" aria-hidden="true" />}>
-            <Crystal size={300} animated />
+            {/* spin alto: no boot o movimento precisa comunicar que o sistema
+                está trabalhando. Em spin=1 o cristal gira 48° em quatro
+                segundos, o que lê como parado. */}
+            <Crystal size={300} animated spin={3.2} />
           </Suspense>
         </div>
 
@@ -82,13 +108,28 @@ const BootScreen = ({ onDone }) => {
         {strings.tagline && <p className="boot-tagline">{strings.tagline}</p>}
 
         {/* A barra torna a duração legível: sem ela, quatro segundos de tela
-            quieta leem como travamento em vez de inicialização. */}
+            quieta leem como travamento em vez de inicialização.
+
+            LINEAR, e não uma curva de easing. Barra de progresso é medida, não
+            gesto: com ease-out ela dispara e depois rasteja, e o olho lê o
+            rastejo como travamento — exatamente o sintoma que essa barra
+            deveria evitar. */}
         <div className="boot-progress" aria-hidden="true">
           <span
             className="boot-progress-fill"
             style={{ animationDuration: `${BOOT_DURATION_MS}ms` }}
           />
         </div>
+
+        {/* `key` no texto: a troca de etapa remonta o span e a entrada roda de
+            novo, então cada passo se anuncia em vez de trocar seco. */}
+        {etapas.length > 0 && (
+          <p className="boot-stage" aria-hidden="true">
+            <span key={etapa} className="boot-stage-text">
+              {etapas[etapa]}
+            </span>
+          </p>
+        )}
       </div>
 
       <p className="boot-skip-hint">{strings.skipHint}</p>
