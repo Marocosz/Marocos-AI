@@ -57,14 +57,25 @@
      o olho reconhece coluna e arco muito antes de reparar na diferença de
      luminosidade. */
   --cer-base: #120a20;
+  /* TEMPERATURA — o terceiro eixo de separação, depois de forma e de textura.
+     A inicialização puxa para o índigo: é a máquina antes de o roxo dela
+     acender, e frio lê como "ainda não". O bloqueio puxa para o violeta quente,
+     que é a cor da identidade tendo chegado. Os dois continuam sendo roxo, então
+     nada foge do padrão — mas lado a lado a diferença é imediata. */
   --cer-ceu-boot:
-    radial-gradient(36% 74% at 50% 28%, rgba(139, 92, 246, 0.24) 0%, rgba(109, 40, 217, 0.09) 48%, transparent 74%),
-    radial-gradient(120% 100% at 50% 42%, #1d1033 0%, #160d28 58%, #11081c 100%);
-  /* O céu do bloqueio é um campo profundo com estrelas. As posições são em
-     porcentagem, e não um ladrilho repetido: assim elas acompanham o formato da
-     janela sem denunciar a emenda. Evitam o miolo de propósito — é onde o
-     cristal vive, e estrela em cima dele vira sujeira. */
-  --cer-ceu-lock:
+    radial-gradient(36% 74% at 50% 28%, rgba(129, 130, 240, 0.22) 0%, rgba(79, 70, 200, 0.08) 48%, transparent 74%),
+    radial-gradient(120% 100% at 50% 42%, #191536 0%, #14112b 58%, #100d20 100%);
+  /* O campo do bloqueio é mais QUENTE que o da inicialização — ver a nota de
+     temperatura em --cer-ceu-boot. */
+  --cer-campo-lock: linear-gradient(180deg, #1a0d2e 0%, #160a26 58%, #120821 100%);
+
+  /* As estrelas moram numa camada própria (o ::before do céu) para poderem
+     cintilar sem brigar com o crossfade de entrada, que anima a opacidade do
+     elemento pai. As posições são em porcentagem, e não um ladrilho repetido:
+     assim elas acompanham o formato da janela sem denunciar a emenda. Evitam o
+     miolo de propósito — é onde o cristal vive, e estrela em cima dele vira
+     sujeira. */
+  --cer-estrelas:
     radial-gradient(1.6px 1.6px at 11% 17%, rgba(245, 243, 255, 0.95), transparent),
     radial-gradient(1.2px 1.2px at 23% 34%, rgba(221, 214, 254, 0.7), transparent),
     radial-gradient(1.8px 1.8px at 8% 62%, rgba(245, 243, 255, 0.8), transparent),
@@ -82,19 +93,30 @@
     radial-gradient(1.1px 1.1px at 88% 85%, rgba(221, 214, 254, 0.5), transparent),
     radial-gradient(1.3px 1.3px at 96% 22%, rgba(245, 243, 255, 0.6), transparent),
     radial-gradient(1px 1px at 4% 40%, rgba(196, 181, 253, 0.5), transparent),
-    radial-gradient(1.4px 1.4px at 66% 82%, rgba(245, 243, 255, 0.55), transparent),
-    linear-gradient(180deg, #160d2b 0%, #130a24 58%, #100820 100%);
+    radial-gradient(1.4px 1.4px at 66% 82%, rgba(245, 243, 255, 0.55), transparent);
 
-  /* A NEBULOSA: núcleo quente no meio e dois braços afilando para os lados.
-     São quatro elipses concêntricas, da mais larga e difusa até o ponto quente —
-     é o empilhamento que faz a luz parecer ter volume em vez de ser um degradê.
-     Os centros estão deslocados em frações de por cento entre si: a assimetria é
-     o que impede que aquilo leia como forma desenhada. */
+  /* A NEBULOSA — um fuso, não uma linha.
+   *
+   * COMO SE CONSEGUE O AFILAMENTO. Uma elipse sozinha decai igual em toda a
+   * extensão: por mais achatada que seja, ela lê como um traço reto de pontas
+   * macias. Para a espessura ser função da distância horizontal é preciso
+   * empilhar elipses CADA VEZ MAIS LARGAS E MAIS FINAS — a união delas é que
+   * desenha o fuso. A versão anterior fazia o contrário (a camada mais larga era
+   * também a mais alta) e por isso a banda tinha quase a mesma grossura do meio
+   * até as bordas.
+   *
+   * Da mais estreita e alta para a mais larga e rasteira: bojo 9vh, meio 4.5vh,
+   * distância 2.2vh, pontas 0.9vh. O núcleo quente vem por cima de tudo, e a
+   * bruma ambiente por baixo. Os centros estão deslocados em frações de por
+   * cento entre si: a assimetria é o que impede que aquilo leia como forma
+   * desenhada em vez de luz. */
   --cer-nebulosa:
-    radial-gradient(11vh 11vh at 50% 46%, rgba(250, 249, 255, 0.42) 0%, rgba(214, 203, 253, 0.2) 40%, transparent 72%),
-    radial-gradient(56vw 3vh at 49.2% 45.6%, rgba(233, 226, 255, 0.34) 0%, rgba(167, 139, 250, 0.13) 40%, transparent 78%),
-    radial-gradient(74vw 15vh at 51% 46.5%, rgba(139, 92, 246, 0.26) 0%, rgba(109, 40, 217, 0.11) 46%, transparent 82%),
-    radial-gradient(48vh 42vh at 50% 46%, rgba(124, 58, 237, 0.22) 0%, transparent 74%);
+    radial-gradient(10vh 10vh at 50% 46%, rgba(250, 249, 255, 0.46) 0%, rgba(214, 203, 253, 0.2) 40%, transparent 72%),
+    radial-gradient(15vw 9vh at 50% 46%, rgba(236, 230, 255, 0.22) 0%, rgba(178, 152, 250, 0.1) 46%, transparent 78%),
+    radial-gradient(33vw 4.5vh at 49.5% 45.9%, rgba(224, 214, 255, 0.22) 0%, rgba(158, 120, 247, 0.09) 46%, transparent 80%),
+    radial-gradient(58vw 2.2vh at 50.5% 46.1%, rgba(205, 192, 255, 0.19) 0%, rgba(139, 92, 246, 0.07) 46%, transparent 82%),
+    radial-gradient(84vw 0.9vh at 50% 46%, rgba(196, 181, 253, 0.14) 0%, transparent 80%),
+    radial-gradient(46vh 38vh at 50% 46%, rgba(124, 58, 237, 0.2) 0%, transparent 74%);
 
   --cer-texto: #f5f3ff;
   --cer-texto-suave: #c4b5fd;
@@ -136,24 +158,33 @@
   /* Mesma leitura de dia — coluna na inicialização, arco no bloqueio —, e a
      mesma suavidade: aqui a luz é o branco e o que recua é a lavanda. */
   --cer-base: #f7f4fd;
+  /* A mesma separação de temperatura, traduzida para o dia: a inicialização é um
+     branco frio, levemente azulado; o bloqueio é um branco quente, puxado para o
+     violeta. */
   --cer-ceu-boot:
-    radial-gradient(36% 74% at 50% 28%, #ffffff 0%, rgba(244, 241, 253, 0.6) 48%, transparent 74%),
-    radial-gradient(120% 100% at 50% 42%, #fbf9ff 0%, #f4f1fb 58%, #ebe6f7 100%);
+    radial-gradient(36% 74% at 50% 28%, #ffffff 0%, rgba(238, 240, 252, 0.65) 48%, transparent 74%),
+    radial-gradient(120% 100% at 50% 42%, #fafbff 0%, #eff1fa 58%, #e4e7f4 100%);
   /* De dia não há estrelas — céu claro não tem. O que sobrevive da ideia é a
      luz: o mesmo núcleo com dois braços, só que agora ele é o ponto MAIS CLARO
      de um campo pálido, em vez do mais brilhante de um campo escuro. A leitura
      vira alvorada em vez de cosmos, e é a tradução honesta do motivo. */
-  --cer-ceu-lock: linear-gradient(180deg, #f2eefc 0%, #f8f5ff 58%, #fdfcff 100%);
+  --cer-campo-lock: linear-gradient(180deg, #f6effd 0%, #fbf6ff 58%, #fefcff 100%);
+  /* Não há estrelas de dia — céu claro não tem. É de propósito que a textura
+     seja mais uma diferença entre as duas telas, e não só a cor. */
+  --cer-estrelas: none;
   /* A ORDEM SE INVERTE DE DIA. À noite os braços são claros sobre o escuro; de
      dia branco sobre branco não é luz nenhuma, e a primeira versão virou uma
      nuvem roxa sem estrutura. Aqui os braços são VIOLETA SATURADO sobre o campo
      pálido — o brilho lê por saturação, não por luminância — e o núcleo branco
-     vem por cima deles, quente e apertado, como o centro de um clarão. */
+     vem por cima deles, quente e apertado, como o centro de um clarão. O
+     afilamento é o mesmo da noite: cada camada mais larga é mais fina. */
   --cer-nebulosa:
-    radial-gradient(11vh 11vh at 50% 46%, rgba(255, 255, 255, 1) 0%, rgba(255, 255, 255, 0.62) 40%, transparent 72%),
-    radial-gradient(54vw 2.6vh at 49.2% 45.8%, rgba(167, 139, 250, 0.55) 0%, rgba(139, 92, 246, 0.26) 38%, transparent 80%),
-    radial-gradient(70vw 9vh at 51% 46.4%, rgba(167, 139, 250, 0.26) 0%, rgba(139, 92, 246, 0.1) 45%, transparent 82%),
-    radial-gradient(40vh 34vh at 50% 46%, rgba(196, 181, 253, 0.22) 0%, transparent 72%);
+    radial-gradient(10vh 10vh at 50% 46%, rgba(255, 255, 255, 1) 0%, rgba(255, 255, 255, 0.6) 40%, transparent 72%),
+    radial-gradient(15vw 8vh at 50% 46%, rgba(167, 139, 250, 0.4) 0%, rgba(139, 92, 246, 0.18) 46%, transparent 78%),
+    radial-gradient(33vw 4vh at 49.5% 45.9%, rgba(160, 130, 249, 0.46) 0%, rgba(139, 92, 246, 0.2) 46%, transparent 80%),
+    radial-gradient(58vw 2vh at 50.5% 46.1%, rgba(154, 122, 248, 0.44) 0%, rgba(139, 92, 246, 0.16) 46%, transparent 82%),
+    radial-gradient(84vw 0.8vh at 50% 46%, rgba(167, 139, 250, 0.3) 0%, transparent 80%),
+    radial-gradient(40vh 34vh at 50% 46%, rgba(196, 181, 253, 0.2) 0%, transparent 72%);
 
   --cer-texto: #2e1065;
   --cer-texto-suave: #6d28d9;

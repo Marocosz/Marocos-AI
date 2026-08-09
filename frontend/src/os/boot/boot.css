@@ -80,9 +80,40 @@
 
 /* Roxo do sistema já aceso, mas ainda fechado. */
 .cerimonia-ceu--lock {
-  background: var(--cer-ceu-lock);
+  background: var(--cer-campo-lock);
   opacity: 0;
   transition: opacity 1150ms ease-out;
+}
+
+/* MOVIMENTO — o quarto eixo de separação, e o mais forte de todos.
+ *
+ * O fundo da inicialização é absolutamente imóvel: o que se mexe lá é só o que
+ * mede o tempo (a barra, as etapas). O fundo do bloqueio respira — as estrelas
+ * cintilam e a nebulosa pulsa, em ciclos longos e primos entre si (7s e 11s)
+ * para nunca voltarem juntas ao mesmo ponto e denunciarem o laço. Máquina
+ * parada contra céu vivo: o olho separa as duas telas antes mesmo de reparar na
+ * cor.
+ *
+ * As duas animações moram em pseudo-elementos, e não nas camadas em si, porque
+ * a entrada anima a opacidade DAS CAMADAS — uma animação infinita de opacidade
+ * no mesmo elemento sobrescreveria o crossfade. Em camadas separadas as duas
+ * opacidades se multiplicam, e cada uma cuida do seu trabalho. */
+.cerimonia-ceu--lock::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background-image: var(--cer-estrelas);
+  animation: estrelas-cintilam 7s ease-in-out infinite;
+}
+
+@keyframes estrelas-cintilam {
+  0%,
+  100% {
+    opacity: 0.7;
+  }
+  50% {
+    opacity: 1;
+  }
 }
 
 /* A NEBULOSA — o que faz a tela de bloqueio não ser a inicialização com outra
@@ -106,11 +137,29 @@
 .cerimonia-nebulosa {
   position: absolute;
   inset: 0;
-  background: var(--cer-nebulosa);
   opacity: 0;
   transform: scale(0.9);
   transform-origin: 50% 46%;
   transition: opacity 1250ms ease-out, transform 1750ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+/* O brilho em si, numa camada própria — ver a nota sobre movimento acima. */
+.cerimonia-nebulosa::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: var(--cer-nebulosa);
+  animation: nebulosa-pulsa 11s ease-in-out infinite;
+}
+
+@keyframes nebulosa-pulsa {
+  0%,
+  100% {
+    opacity: 0.8;
+  }
+  50% {
+    opacity: 1;
+  }
 }
 
 .cerimonia:not([data-fase='boot']) .cerimonia-ceu--boot {
@@ -706,10 +755,17 @@
     transform: none;
   }
 
-  /* A nebulosa ainda acende — cor não é movimento —, só não se aproxima. */
+  /* A nebulosa ainda acende — cor não é movimento —, só não se aproxima. E o
+     céu do bloqueio para de respirar: cintilar e pulsar é gesto puro. */
   .cerimonia-nebulosa,
   .cerimonia:not([data-fase='boot']) .cerimonia-nebulosa {
     transform: none;
+  }
+
+  .cerimonia-ceu--lock::before,
+  .cerimonia-nebulosa::before {
+    animation: none;
+    opacity: 1;
   }
 
   /* A saída da cena do boot vira um esmaecer no lugar: sem deslocamento, mas
