@@ -156,7 +156,9 @@ const Ceremony = ({ fase, onBootDone, onUnlock, onUnlockStart }) => {
 
   return (
     <div
-      className={`cerimonia${saindo ? ' cerimonia-saindo' : ''}`}
+      className={`cerimonia${comecouNoBoot ? ' cerimonia-com-boot' : ''}${
+        saindo ? ' cerimonia-saindo' : ''
+      }`}
       data-fase={fase}
       data-foco={tecladoEmUso ? 'visivel' : 'mudo'}
       style={{ '--cristal': `${tamanhoCristal}px` }}

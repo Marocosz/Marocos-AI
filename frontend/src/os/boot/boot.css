@@ -75,14 +75,14 @@
 .cerimonia-ceu--boot {
   background: var(--cer-ceu-boot);
   opacity: 1;
-  transition: opacity 720ms ease-out;
+  transition: opacity 1150ms ease-out;
 }
 
 /* Roxo do sistema já aceso, mas ainda fechado. */
 .cerimonia-ceu--lock {
   background: var(--cer-ceu-lock);
   opacity: 0;
-  transition: opacity 720ms ease-out;
+  transition: opacity 1150ms ease-out;
 }
 
 /* A CÚPULA — o que faz a tela de bloqueio não ser a inicialização com outra cor.
@@ -113,7 +113,7 @@
   background: var(--cer-domo);
   opacity: 0;
   transform: translate(-50%, -7vh);
-  transition: opacity 820ms ease-out, transform 1100ms cubic-bezier(0.22, 1, 0.36, 1);
+  transition: opacity 1250ms ease-out, transform 1750ms cubic-bezier(0.22, 1, 0.36, 1);
 }
 
 .cerimonia:not([data-fase='boot']) .cerimonia-ceu--boot {
@@ -179,15 +179,58 @@
   width: var(--cristal, 300px);
   height: var(--cristal, 300px);
   opacity: 0;
-  /* Só opacidade. Escalar o container obriga o compositor a reamostrar a textura
-     do canvas WebGL a cada passo, e o cristal já entra em movimento por conta
-     própria. */
+  /* A ENTRADA é só opacidade: aqui o cristal ainda não está desenhando (o chunk
+     3D pode nem ter chegado), e escalar um canvas parado obrigaria o compositor
+     a reamostrar a textura a cada passo sem nada em troca. */
   animation: cerimonia-acende 1100ms cubic-bezier(0.22, 1, 0.36, 1) 250ms forwards;
 }
 
 @keyframes cerimonia-acende {
   to {
     opacity: 1;
+  }
+}
+
+/* A RESPIRADA DA PASSAGEM.
+ *
+ * O cristal não sai do lugar entre as cenas — é o ponto fixo em volta do qual
+ * tudo gira —, mas ficar absolutamente inerte enquanto o mundo inteiro troca faz
+ * ele parecer alheio à cena, e não o centro dela. Um crescer e voltar no meio da
+ * travessia o inclui no movimento sem deslocá-lo: é o sistema respirando fundo
+ * ao abrir a porta.
+ *
+ * O pico cai por volta dos 840ms, e a volta dura mais que a ida: o movimento
+ * cresce com intenção e assenta devagar, em vez de quicar. Toda a travessia ao
+ * redor foi alargada junto — uma respirada longa dentro de uma troca curta
+ * pareceria dois eventos, e não um.
+ *
+ * O CUSTO AQUI É OUTRO. Diferente da entrada acima, neste momento o cristal já
+ * está girando, então a textura do canvas sobe para a GPU a cada frame de
+ * qualquer jeito; a escala é composição pura por cima disso. A ressalva honesta
+ * é a nitidez: com `dpr` limitado a 1.5, uma tela de densidade 1 amplia a
+ * textura em 26% no pico. Num objeto translúcido, difuso e sem detalhe fino
+ * isso não se lê — mas é a razão de o pico não passar daqui.
+ *
+ * Só quando houve inicialização de verdade: religar a máquina monta a cerimônia
+ * já no bloqueio, e ali não existe travessia para acompanhar. */
+.cerimonia-com-boot:not([data-fase='boot']) .cerimonia-cristal {
+  animation: cristal-respira 1900ms both;
+}
+
+@keyframes cristal-respira {
+  0% {
+    opacity: 1;
+    transform: scale(1);
+    animation-timing-function: cubic-bezier(0.45, 0, 0.35, 1);
+  }
+  44% {
+    opacity: 1;
+    transform: scale(1.26);
+    animation-timing-function: cubic-bezier(0.32, 0, 0.24, 1);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1);
   }
 }
 
@@ -261,7 +304,7 @@
 .porta-entrar {
   font-family: system-ui, sans-serif;
   opacity: 0;
-  transition: opacity 520ms ease-out, transform 520ms cubic-bezier(0.22, 1, 0.36, 1);
+  transition: opacity 780ms ease-out, transform 780ms cubic-bezier(0.22, 1, 0.36, 1);
 }
 
 .lock-user {
@@ -288,13 +331,13 @@
 .cerimonia:not([data-fase='boot']) .lock-user {
   opacity: 0.7;
   transform: translateY(0);
-  transition-delay: 320ms;
+  transition-delay: 620ms;
 }
 
 .cerimonia:not([data-fase='boot']) .porta-entrar {
   opacity: 1;
   transform: translateY(0);
-  transition-delay: 400ms;
+  transition-delay: 780ms;
 }
 
 /* Sublinhado que cresce do centro no hover: confirma que aquilo é um destino,
@@ -486,16 +529,16 @@
  * opacidade 0 e deslocamento final já no instante zero da troca. Substituindo a
  * animação de entrada pela de saída, a continuidade é exata. */
 .cerimonia:not([data-fase='boot']) .boot-tagline {
-  animation: cena-sai-perto 420ms ease-in both;
+  animation: cena-sai-perto 620ms ease-in both;
 }
 .cerimonia:not([data-fase='boot']) .boot-progress {
-  animation: cena-sai-medio 480ms ease-in 40ms both;
+  animation: cena-sai-medio 700ms ease-in 60ms both;
 }
 .cerimonia:not([data-fase='boot']) .boot-stage {
-  animation: cena-sai-longe 520ms ease-in 80ms both;
+  animation: cena-sai-longe 760ms ease-in 120ms both;
 }
 .cerimonia:not([data-fase='boot']) .boot-skip-hint {
-  animation: cena-sai-borda 560ms ease-in both;
+  animation: cena-sai-borda 820ms ease-in both;
 }
 
 @keyframes cena-sai-perto {
@@ -529,8 +572,8 @@
   /* Entra de cima, e de mais longe que o resto: é o elemento mais periférico da
      cena, o que mais se move num parallax. */
   transform: translateY(-26px);
-  transition: opacity 620ms ease-out 240ms,
-    transform 760ms cubic-bezier(0.22, 1, 0.36, 1) 240ms;
+  transition: opacity 900ms ease-out 380ms,
+    transform 1150ms cubic-bezier(0.22, 1, 0.36, 1) 380ms;
 }
 
 .lock-time {
@@ -565,8 +608,8 @@
   color: var(--cer-texto-suave);
   opacity: 0;
   transform: translateY(30px);
-  transition: opacity 620ms ease-out 480ms,
-    transform 760ms cubic-bezier(0.22, 1, 0.36, 1) 480ms;
+  transition: opacity 900ms ease-out 900ms,
+    transform 1150ms cubic-bezier(0.22, 1, 0.36, 1) 900ms;
 }
 
 .cerimonia:not([data-fase='boot']) .lock-clock,
@@ -639,6 +682,9 @@
      Nada sobe, nada desliza, o cristal não gira (o próprio componente o põe na
      pose parada) e a varredura some. A passagem entre as cenas vira um
      crossfade limpo: os céus ainda trocam, porque cor não é movimento. */
+  /* Sem respirada: crescer e voltar é gesto puro, e é justamente o que esta
+     preferência pede para não acontecer. */
+  .cerimonia-com-boot:not([data-fase='boot']) .cerimonia-cristal,
   .cerimonia-cristal,
   .cerimonia-marca,
   .boot-tagline,
