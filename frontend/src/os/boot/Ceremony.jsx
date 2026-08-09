@@ -171,10 +171,11 @@ const Ceremony = ({ fase, onBootDone, onUnlock, onUnlockStart }) => {
           leitura de parallax, o fundo é o que menos se mexe. */}
       <div className="cerimonia-ceu cerimonia-ceu--boot" aria-hidden="true" />
       <div className="cerimonia-ceu cerimonia-ceu--lock" aria-hidden="true" />
-      {/* A cúpula do bloqueio: um arco de círculo descendo do topo, com espaço
-          livre embaixo. É o que separa esta cena da inicialização — lá a luz é
-          atmosfera sem contorno, aqui é forma com borda. Ver boot.css. */}
-      <div className="cerimonia-domo" aria-hidden="true" />
+      {/* A nebulosa do bloqueio: núcleo quente com dois braços afilando para os
+          lados, sobre o campo de estrelas do céu. É o que separa esta cena da
+          inicialização — lá a luz é uma coluna vertical, aqui é uma banda
+          horizontal. Ver boot.css. */}
+      <div className="cerimonia-nebulosa" aria-hidden="true" />
 
       {/* ---- NÚCLEO PERSISTENTE ----
           Nada aqui dentro se move entre as cenas. Os espaços do rótulo de
