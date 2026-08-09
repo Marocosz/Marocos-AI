@@ -62,9 +62,24 @@
      acender, e frio lê como "ainda não". O bloqueio puxa para o violeta quente,
      que é a cor da identidade tendo chegado. Os dois continuam sendo roxo, então
      nada foge do padrão — mas lado a lado a diferença é imediata. */
+  /* VINHETA FORTE — o quinto eixo, e o que fecha o enquadramento.
+   *
+   * Ela é o que faz um facho ler como facho: sem escuro nas bordas, luz no meio
+   * é só um degradê. E dá à inicialização uma leitura oposta à do bloqueio, que
+   * é aberto e vai até as quatro pontas — aqui a cena é FECHADA, contida; lá é
+   * infinita.
+   *
+   * A VINHETA ASSENTA EM VIOLETA, NÃO EM PRETO. Uma versão anterior morria em
+   * #030106 e a tela inteira ficou dura; o problema nunca foi a vinheta, foi o
+   * destino dela. Aqui os cantos param por volta de #0d0b22 — bem escuro, e
+   * ainda assim visivelmente uma cor.
+   *
+   * O campo por baixo subiu de brilho junto: com as bordas puxadas para baixo, o
+   * miolo lê mais aceso sem precisar de mais luz de verdade. É de graça. */
   --cer-ceu-boot:
-    radial-gradient(36% 74% at 50% 28%, rgba(129, 130, 240, 0.22) 0%, rgba(79, 70, 200, 0.08) 48%, transparent 74%),
-    radial-gradient(120% 100% at 50% 42%, #191536 0%, #14112b 58%, #100d20 100%);
+    radial-gradient(112% 86% at 50% 44%, transparent 30%, rgba(12, 10, 30, 0.4) 68%, rgba(11, 9, 26, 0.78) 100%),
+    radial-gradient(36% 74% at 50% 28%, rgba(133, 134, 242, 0.26) 0%, rgba(79, 70, 200, 0.09) 48%, transparent 74%),
+    radial-gradient(120% 100% at 50% 42%, #1d1843 0%, #171331 58%, #131024 100%);
   /* O campo do bloqueio é mais QUENTE que o da inicialização — ver a nota de
      temperatura em --cer-ceu-boot. */
   --cer-campo-lock: linear-gradient(180deg, #1a0d2e 0%, #160a26 58%, #120821 100%);
@@ -161,9 +176,14 @@
   /* A mesma separação de temperatura, traduzida para o dia: a inicialização é um
      branco frio, levemente azulado; o bloqueio é um branco quente, puxado para o
      violeta. */
+  /* A mesma vinheta, contida. De dia ela não pode ser forte como à noite: cantos
+     escuros sobre campo claro leem como sujeira, não como enquadramento. O que
+     sobrevive é a direção — os cantos recuam para um cinza-lavanda enquanto o
+     miolo vai a branco puro. */
   --cer-ceu-boot:
-    radial-gradient(36% 74% at 50% 28%, #ffffff 0%, rgba(238, 240, 252, 0.65) 48%, transparent 74%),
-    radial-gradient(120% 100% at 50% 42%, #fafbff 0%, #eff1fa 58%, #e4e7f4 100%);
+    radial-gradient(112% 86% at 50% 44%, transparent 32%, rgba(176, 178, 208, 0.2) 70%, rgba(158, 160, 194, 0.38) 100%),
+    radial-gradient(36% 74% at 50% 28%, #ffffff 0%, rgba(240, 242, 253, 0.7) 48%, transparent 74%),
+    radial-gradient(120% 100% at 50% 42%, #fdfeff 0%, #f3f5fd 58%, #e9ecf7 100%);
   /* De dia não há estrelas — céu claro não tem. O que sobrevive da ideia é a
      luz: o mesmo núcleo com dois braços, só que agora ele é o ponto MAIS CLARO
      de um campo pálido, em vez do mais brilhante de um campo escuro. A leitura

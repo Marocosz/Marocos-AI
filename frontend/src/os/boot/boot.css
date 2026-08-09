@@ -149,6 +149,8 @@
   position: absolute;
   inset: 0;
   background: var(--cer-nebulosa);
+  transform-origin: 50% 46%;
+  transition: transform 760ms cubic-bezier(0.22, 1, 0.36, 1);
   animation: nebulosa-pulsa 11s ease-in-out infinite;
 }
 
@@ -280,54 +282,60 @@
   }
 }
 
-/* O REALCE DA PORTA É REDONDO.
+/* O REALCE DA PORTA É O PRÓPRIO UNIVERSO.
  *
- * Antes era um retângulo arredondado envolvendo o cristal, a marca e o "Entrar":
- * emoldurava três coisas de naturezas diferentes e desenhava um contorno de
- * campo de formulário em volta da peça mais bonita da tela. O anel emoldura só o
- * cristal, e a curva conversa com o arco da cúpula em vez de brigar com ele.
+ * Antes era um anel desenhado em volta do cristal. Funcionava, mas era um
+ * objeto novo aparecendo na tela só para dizer "isto é clicável" — e numa cena
+ * que já tem uma fonte de luz no centro, a resposta natural é a luz reagir, não
+ * uma moldura nascer. Passar o mouse na porta faz a nebulosa CRESCER e ACENDER;
+ * a cena inteira responde ao gesto.
  *
- * `inset` negativo em vez de tamanho fixo: o anel fica centrado no cristal
- * sozinho, qualquer que seja o `--cristal` ou o padding da porta. E `z-index:-1`
- * o joga atrás do canvas — o véu de dentro do anel cobriria o cristal, já que
- * pseudo-elemento posicionado pinta acima de conteúdo estático. O contexto de
- * empilhamento vem da própria opacidade animada do bloco, então o -1 não escapa
- * para trás da cena. */
-.cerimonia-cristal::before {
+ * `:has()` porque a nebulosa é irmã do núcleo, e não descendente da porta: é a
+ * única forma de um estado do botão alcançar uma camada de fundo sem subir isso
+ * para o React. Onde `:has()` não existir, a regra inteira é descartada e sobra
+ * o sublinhado do "Entrar" — degradação silenciosa, não quebra.
+ *
+ * O foco só acende junto DEPOIS que o teclado entrou em uso (data-foco), pelo
+ * mesmo motivo de sempre: a porta é focada na montagem, e sem essa guarda a tela
+ * de bloqueio abriria com o universo já aceso. */
+.cerimonia:has(.porta:not(:disabled):hover) .cerimonia-nebulosa::before,
+.cerimonia[data-foco='visivel']:has(.porta:not(:disabled):focus-visible)
+  .cerimonia-nebulosa::before {
+  transform: scale(1.07);
+}
+
+/* A SEGUNDA CÓPIA DO BRILHO.
+ *
+ * Aumentar a luz pedia animar a opacidade — mas a opacidade do ::before já é da
+ * pulsação ambiente, e a do elemento é da entrada. Em vez de um `filter:
+ * brightness()`, que custaria um passe de shader de tela cheia a cada frame,
+ * aqui entra uma segunda camada com o mesmo brilho: empilhada sobre a primeira
+ * ela soma luz de verdade, e sendo maior ela expande. Duas transições de
+ * composição, zero shader. */
+.cerimonia-nebulosa::after {
   content: '';
   position: absolute;
-  inset: -18px;
-  z-index: -1;
-  border-radius: 50%;
-  border: 1px solid transparent;
-  background: transparent;
-  transition: border-color 0.28s ease, background 0.28s ease, box-shadow 0.28s ease;
+  inset: 0;
+  background: var(--cer-nebulosa);
+  transform-origin: 50% 46%;
+  transform: scale(1);
+  opacity: 0;
+  transition: opacity 620ms ease-out, transform 760ms cubic-bezier(0.22, 1, 0.36, 1);
 }
 
-.porta:not(:disabled):hover .cerimonia-cristal::before,
-.porta:not(:disabled):focus-visible .cerimonia-cristal::before {
-  border-color: var(--cer-borda);
-  background: var(--cer-veu);
+.cerimonia:has(.porta:not(:disabled):hover) .cerimonia-nebulosa::after,
+.cerimonia[data-foco='visivel']:has(.porta:not(:disabled):focus-visible)
+  .cerimonia-nebulosa::after {
+  opacity: 1;
+  transform: scale(1.2);
 }
 
-.porta:not(:disabled):focus-visible .cerimonia-cristal::before {
-  border-color: var(--cer-borda-forte);
-  box-shadow: 0 0 42px var(--cer-brilho);
-}
-
-/* O anel não aparece antes de o teclado entrar em uso. A porta é focada na
-   montagem (ver Ceremony.jsx), e foco programático em página recém carregada
-   casa com `:focus-visible` no Chrome — a tela abria com o cristal já circulado,
-   como se estivesse pré-selecionado. O `:not(:hover)` deixa o mouse continuar
-   destacando normalmente. */
-.cerimonia[data-foco='mudo'] .porta:focus-visible:not(:hover) .cerimonia-cristal::before {
-  border-color: transparent;
-  background: transparent;
-  box-shadow: none;
-}
-
-.cerimonia[data-foco='mudo'] .porta:focus-visible:not(:hover) .porta-entrar::after {
-  width: 0;
+/* A marca acende junto. É o que mantém a resposta ancorada NO controle: sem
+   isso, o feedback do hover aconteceria só no fundo, longe de onde o cursor
+   está. */
+.porta:not(:disabled):hover .cerimonia-marca,
+.porta:not(:disabled):focus-visible .cerimonia-marca {
+  text-shadow: 0 0 24px var(--cer-brilho-forte);
 }
 
 .cerimonia-marca {
@@ -340,6 +348,8 @@
   padding-left: 0.32em;
   color: var(--cer-texto);
   opacity: 0;
+  text-shadow: 0 0 0 transparent;
+  transition: text-shadow 500ms ease-out;
   animation: cerimonia-sobe 800ms cubic-bezier(0.22, 1, 0.36, 1) 900ms forwards;
 }
 
@@ -766,6 +776,14 @@
   .cerimonia-nebulosa::before {
     animation: none;
     opacity: 1;
+  }
+
+  /* No hover a luz ainda aumenta — brilho é cor —, mas não se expande. */
+  .cerimonia-nebulosa::before,
+  .cerimonia-nebulosa::after,
+  .cerimonia:has(.porta:not(:disabled):hover) .cerimonia-nebulosa::before,
+  .cerimonia:has(.porta:not(:disabled):hover) .cerimonia-nebulosa::after {
+    transform: none;
   }
 
   /* A saída da cena do boot vira um esmaecer no lugar: sem deslocamento, mas
