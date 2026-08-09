@@ -37,13 +37,6 @@
      que a animação começa causa um engasgo no primeiro frame. A cerimônia vive
      poucos segundos, então o custo de memória é limitado. */
   will-change: transform;
-
-  /* Meia altura do núcleo, usada para pendurar as cenas acima e abaixo dele sem
-     que elas participem do seu fluxo. Some com o tamanho do cristal, que vem
-     inline do componente para não haver duas fontes de verdade.
-     73px = metade do que o núcleo tem além do cristal (rótulo, marca, "Entrar"
-     e os paddings da porta). */
-  --nucleo-meio: calc(var(--cristal, 300px) / 2 + 73px);
 }
 
 /* A cortina sobe e revela a área de trabalho, que já está montada por baixo.
@@ -359,6 +352,18 @@
   text-shadow: 0 0 24px var(--cer-brilho-forte);
 }
 
+/* A MARCA É DA TELA DE BLOQUEIO, MAS O ESPAÇO DELA É DAS DUAS.
+ *
+ * Ela não aparece mais na inicialização — lá ficam só o cristal, a barra e as
+ * legendas. Mas o bloco continua ocupando a mesma altura desde o primeiro frame,
+ * com opacidade zero, pela mesma razão do rótulo de visitante e do "Entrar": se
+ * a marca nascesse do nada no bloqueio, a coluna cresceria e empurraria o
+ * cristal. O cristal continua sendo o único elemento que atravessa as duas
+ * cenas, e continua imóvel.
+ *
+ * Os atrasos da transição são declarados por propriedade, e não num
+ * `transition-delay` geral, porque o `text-shadow` é do hover: com atraso
+ * global, acender a marca ao passar o mouse levaria meio segundo. */
 .cerimonia-marca {
   font-family: 'Poppins', system-ui, sans-serif;
   font-size: clamp(1.3rem, 2.5vw, 1.8rem);
@@ -369,9 +374,17 @@
   padding-left: 0.32em;
   color: var(--cer-texto);
   opacity: 0;
+  transform: translateY(9px);
   text-shadow: 0 0 0 transparent;
-  transition: text-shadow 500ms ease-out;
-  animation: cerimonia-sobe 800ms cubic-bezier(0.22, 1, 0.36, 1) 900ms forwards;
+  transition: opacity 780ms ease-out, transform 780ms cubic-bezier(0.22, 1, 0.36, 1),
+    text-shadow 500ms ease-out;
+}
+
+.cerimonia:not([data-fase='boot']) .cerimonia-marca {
+  opacity: 1;
+  transform: translateY(0);
+  transition: opacity 780ms ease-out 500ms,
+    transform 780ms cubic-bezier(0.22, 1, 0.36, 1) 500ms, text-shadow 500ms ease-out;
 }
 
 /* Rótulos que só valem no bloqueio, mas cujo ESPAÇO existe desde o boot. Se
@@ -441,6 +454,27 @@
   width: 100%;
 }
 
+/* NADA DE FOCO APARECE ANTES DE O TECLADO ENTRAR EM USO.
+ *
+ * A porta é focada na montagem (é um diálogo modal), e foco programático em
+ * página recém carregada casa com `:focus-visible` no Chrome. Sem esta guarda a
+ * tela de bloqueio abre com a marca acesa e o "Entrar" sublinhado, como se
+ * alguém já a tivesse selecionado — que é exatamente a queixa que originou o
+ * `data-foco`.
+ *
+ * Estas duas regras já existiram e foram perdidas: a do sublinhado sumiu junto
+ * com o anel do cristal quando o realce virou a nebulosa, e a da marca nasceu
+ * depois, sem a guarda. Ficam agora lado a lado, e junto do lugar onde o realce
+ * é definido, para não se separarem de novo. O `:not(:hover)` deixa o mouse
+ * continuar destacando normalmente. */
+.cerimonia[data-foco='mudo'] .porta:focus-visible:not(:hover) .cerimonia-marca {
+  text-shadow: 0 0 0 transparent;
+}
+
+.cerimonia[data-foco='mudo'] .porta:focus-visible:not(:hover) .porta-entrar::after {
+  width: 0;
+}
+
 /* ==================================================
    CENAS — o que troca ao redor do núcleo
    ================================================== */
@@ -460,11 +494,12 @@
   position: absolute;
   left: 0;
   right: 0;
-  /* Logo abaixo do rodapé do núcleo — incluindo a faixa reservada do "Entrar",
-     que está invisível durante a inicialização. Assim a legenda cai enquanto o
-     "Entrar" sobe para o espaço logo acima dela, em vez de os dois disputarem o
-     mesmo lugar na troca de cena. */
-  top: calc(50% + var(--nucleo-meio) + 6px);
+  /* Pendurada a partir do rodapé do CRISTAL, não do núcleo inteiro: com a marca
+     invisível na inicialização, esperar o núcleo acabar deixaria um vão morto de
+     mais de cem pixels sob o cristal. O valor ainda cai abaixo da faixa que a
+     marca vai ocupar, então as duas nunca dividem o mesmo lugar no meio da troca
+     de cena — a legenda desce enquanto a marca sobe, lado a lado. */
+  top: calc(50% + var(--cristal, 300px) / 2 + 44px);
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -637,12 +672,17 @@
 
 /* --- Cena do bloqueio --- */
 
+/* Relógio centralizado e discreto. Ancorado no canto ele competia com a marca
+   pela atenção e desequilibrava a cena, que é simétrica em torno do cristal;
+   no eixo central ele vira o topo da mesma coluna. */
 .lock-clock {
   position: absolute;
-  top: 46px;
-  left: 48px;
+  top: 40px;
+  left: 0;
+  right: 0;
   display: flex;
   flex-direction: column;
+  align-items: center;
   gap: 2px;
   color: var(--cer-texto);
   opacity: 0;
@@ -655,7 +695,7 @@
 
 .lock-time {
   font-family: system-ui, sans-serif;
-  font-size: clamp(2.6rem, 6vw, 4.6rem);
+  font-size: clamp(1.6rem, 3vw, 2.3rem);
   font-weight: 200;
   line-height: 1;
   letter-spacing: -0.02em;
@@ -664,7 +704,7 @@
 
 .lock-date {
   font-family: system-ui, sans-serif;
-  font-size: 0.92rem;
+  font-size: 0.76rem;
   font-weight: 400;
   color: var(--cer-texto-suave);
   opacity: 0.75;
@@ -763,7 +803,6 @@
      preferência pede para não acontecer. */
   .cerimonia-com-boot:not([data-fase='boot']) .cerimonia-cristal,
   .cerimonia-cristal,
-  .cerimonia-marca,
   .boot-tagline,
   .boot-progress,
   .boot-stage,
@@ -782,7 +821,8 @@
   .lock-user,
   .porta-entrar,
   .lock-clock,
-  .lock-hint {
+  .lock-hint,
+  .cerimonia-marca {
     transform: none;
   }
 
@@ -851,7 +891,6 @@
   }
 
   .lock-clock {
-    top: 34px;
-    left: 26px;
+    top: 30px;
   }
 }

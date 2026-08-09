@@ -22,15 +22,17 @@ const Crystal = lazy(() => import('../../components/Crystal'))
  *      solavanco justamente onde deveria haver continuidade;
  *   3. as duas telas dividiam o mesmo z-index, e a de baixo cobria a de cima.
  *
- * Aqui existe UM palco. O cristal e a marca são os elementos que atravessam:
- * ficam parados, no mesmo pixel, do primeiro frame do boot até a cortina subir.
- * O que muda é a cena ao redor deles — o céu faz crossfade, a cena do boot se
- * afasta e a do bloqueio se aproxima, cada camada com uma distância diferente.
- * É a mesma leitura de um parallax: o que está longe quase não anda, o que está
- * perto anda bastante, e o que está no centro da atenção não anda nada.
+ * Aqui existe UM palco. O CRISTAL é o elemento que atravessa: fica parado, no
+ * mesmo pixel, do primeiro frame do boot até a cortina subir. O que muda é a
+ * cena ao redor dele — o céu faz crossfade, a cena do boot se afasta e a do
+ * bloqueio se aproxima, cada camada com uma distância diferente. É a mesma
+ * leitura de um parallax: o que está longe quase não anda, o que está perto anda
+ * bastante, e o que está no centro da atenção não anda nada.
  *
- * De quebra, o nome do sistema é literalmente o mesmo texto nas duas telas
- * ("MAROCOS SO"), então ele não precisa ser recriado — só ficar onde está.
+ * A marca e os rótulos do bloqueio pertencem só à segunda cena, mas o ESPAÇO
+ * deles existe desde o primeiro frame, com opacidade zero. Se aparecessem do
+ * nada, a coluna cresceria e empurraria o cristal — que é exatamente o
+ * deslocamento que este arranjo inteiro existe para evitar.
  */
 
 /**
@@ -235,8 +237,8 @@ const Ceremony = ({ fase, onBootDone, onUnlock, onUnlockStart }) => {
             </Suspense>
           </span>
 
-          {/* A marca é o outro elemento que atravessa: o texto é o mesmo nas duas
-              telas, então não há por que recriá-lo. */}
+          {/* Só aparece no bloqueio, mas ocupa a altura dela desde já — ver a
+              nota sobre espaço reservado no cabeçalho. */}
           <span className="cerimonia-marca">{boot.systemName}</span>
           <span className="porta-entrar">{bloqueio.enter}</span>
         </button>
