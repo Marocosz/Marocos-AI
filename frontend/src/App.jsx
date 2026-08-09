@@ -42,12 +42,20 @@ const TituloDaPagina = () => {
  * Abre "Sobre este PC" para ninguém cair num desktop vazio sem saber o que
  * clicar.
  *
- * Dispara quando a CORTINA COMEÇA a subir, não quando ela termina. Montar a
- * janela custa a árvore inteira do app mais, 450ms depois, um segundo contexto
- * WebGL para o cristal dele — medi ~560ms de main thread travada. Feito no fim
- * da transição, esse custo caía exatamente sobre o momento em que o desktop
- * aparecia. Atrás da cortina, ele não é visto por ninguém, e o que a cortina
- * revela é uma janela já pintada.
+ * QUANDO. Montar esta janela custa a árvore inteira do app mais um segundo
+ * contexto WebGL para o cristal dela. O custo saiu do fim da transição (onde
+ * caía bem no instante em que o desktop aparecia) para o começo dela, e daí
+ * para cá: a TELA DE BLOQUEIO PARADA.
+ *
+ * Medi o pior frame do destravamento no Edge com e sem esta janela montada:
+ * 85ms contra 42ms. Ou seja, montá-la durante a cortina custava metade da
+ * suavidade da transição — "escondido atrás da cortina" nunca quis dizer
+ * "de graça", porque a main thread é a mesma.
+ *
+ * A tela de bloqueio, ao contrário, é tempo ocioso de verdade: ela fica ali
+ * esperando um clique que pode demorar segundos, com uma cerimônia já pronta e
+ * nada disputando a CPU. A janela monta ali, em `requestIdleCallback`, e quando
+ * o clique vem não sobra trabalho nenhum para a transição.
  *
  * A TRAVA É NA DECISÃO, NÃO NA ABERTURA. Antes o `return` do deep link vinha
  * ANTES de marcar a flag: quem entrava por uma rota (`/sobre`, `/projetos`)
@@ -68,7 +76,17 @@ const BoasVindas = ({ ativa }) => {
     if (!ativa || jaDecidiu.current) return
     jaDecidiu.current = true
     // Só recebe as boas-vindas quem chegou sem rota; deep link manda.
-    if (windows.length === 0) open('about')
+    if (windows.length > 0) return
+
+    // Na primeira folga: a tela de bloqueio acabou de entrar e ainda está
+    // animando os próprios elementos, então montar a janela no mesmo frame só
+    // trocaria um engasgo de lugar.
+    const agendar =
+      typeof window.requestIdleCallback === 'function'
+        ? (fn) => window.requestIdleCallback(fn, { timeout: 1500 })
+        : (fn) => setTimeout(fn, 400)
+
+    agendar(() => open('about'))
   }, [ativa, open, windows.length])
 
   return null
@@ -175,7 +193,8 @@ const Shell = () => {
         )}
         {desligado && <ShutdownScreen onPowerOn={ligar} />}
 
-        <BoasVindas ativa={modo === 'desktop' && (revelando || fase === 'pronto')} />
+        {/* A partir da tela de bloqueio — ver o porquê no cabeçalho de BoasVindas. */}
+        <BoasVindas ativa={modo === 'desktop' && !desligado && fase !== 'boot'} />
       </WindowManagerProvider>
     </div>
   )

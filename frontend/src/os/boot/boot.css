@@ -55,6 +55,20 @@
   pointer-events: none;
 }
 
+/* A VIDA AMBIENTE PARA ENQUANTO A CORTINA SOBE.
+ *
+ * Cintilar e pulsar sao animacoes de opacidade, e opacidade animada promove cada
+ * camada a uma superficie propria do compositor. Durante a saida havia tres
+ * camadas de tela cheia sendo recompostas a cada frame — duas piscando e uma
+ * deslizando — no exato momento em que o wallpaper volta a desenhar por baixo.
+ * Medido no Edge, congelar as duas tirou ~14% do pior frame.
+ *
+ * Ninguem repara: sao ciclos de 7s e 11s, e a cortina dura 620ms. */
+.cerimonia-saindo .cerimonia-ceu--lock::before,
+.cerimonia-saindo .cerimonia-nebulosa::before {
+  animation-play-state: paused;
+}
+
 @keyframes cerimonia-sai {
   to {
     transform: translateY(-100%);

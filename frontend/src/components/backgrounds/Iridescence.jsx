@@ -51,6 +51,26 @@ export default function Iridescence({ color = [1, 1, 1], speed = 1.0, amplitude 
   const mousePos = useRef({ x: 0.5, y: 0.5 });
   const lastTime = useRef(0);
 
+  /**
+   * O ESTADO DE ANIMACAO VIVE NUMA REF, E NAO NAS DEPENDENCIAS DO EFEITO.
+   *
+   * `isAnimated` estava no array de dependencias la embaixo. Como a limpeza do
+   * efeito chama `loseContext()` e remove o canvas, alternar a animacao DESTRUIA
+   * E RECONSTRUIA O WEBGL INTEIRO: novo renderer, novo programa, recompilacao de
+   * shader. E isso acontecia exatamente no instante em que a cortina da tela de
+   * bloqueio comeca a subir, que e quando o wallpaper volta a animar — o pior
+   * momento possivel para um engasgo.
+   *
+   * O corpo do efeito ja tratava a pausa em tempo de execucao (o `return` dentro
+   * de `update`), entao a dependencia nao servia para nada alem de causar isso.
+   * Lendo de uma ref, ligar e desligar a animacao passa a ser o que sempre
+   * deveria ter sido: um `if`.
+   */
+  const animandoRef = useRef(isAnimated);
+  useEffect(() => {
+    animandoRef.current = isAnimated;
+  }, [isAnimated]);
+
   useEffect(() => {
     if (!ctnDom.current) return;
     const ctn = ctnDom.current;
@@ -124,7 +144,7 @@ export default function Iridescence({ color = [1, 1, 1], speed = 1.0, amplitude 
 
     function update(t) {
       animateId = requestAnimationFrame(update);
-      if (!isAnimated) return; // Pausado: nao desenha nada, 0% de GPU
+      if (!animandoRef.current) return; // Pausado: nao desenha nada, 0% de GPU
 
       if (t - ultimoDesenho < INTERVALO_MS) return;
       ultimoDesenho = t;
@@ -160,7 +180,7 @@ export default function Iridescence({ color = [1, 1, 1], speed = 1.0, amplitude 
       }
       gl.getExtension('WEBGL_lose_context')?.loseContext();
     };
-  }, [color, speed, amplitude, mouseReact, isAnimated]);
+  }, [color, speed, amplitude, mouseReact]);
 
   return <div ref={ctnDom} className="iridescence-container" {...rest} />;
 }

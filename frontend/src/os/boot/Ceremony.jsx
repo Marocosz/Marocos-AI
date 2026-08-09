@@ -110,6 +110,34 @@ const Ceremony = ({ fase, onBootDone, onUnlock, onUnlockStart }) => {
   }, [noBoot])
 
   /**
+   * GUARDA DE FOCO — o que torna esta tela realmente modal.
+   *
+   * A janela de boas-vindas monta ATRÁS da cortina enquanto esta tela está no
+   * ar, e abrir uma janela move o foco para ela. Resultado: o Enter parava de
+   * destrancar, porque não havia mais nada focado aqui. O mesmo valeria para
+   * quem apertasse Tab e caísse nos ícones da área de trabalho — invisíveis,
+   * atrás de uma camada opaca.
+   *
+   * Enquanto a cerimônia é a tela, o foco pertence à porta. Devolver no próximo
+   * frame, e não na hora, evita brigar com o elemento que ainda está no meio do
+   * próprio processo de receber o foco.
+   */
+  useEffect(() => {
+    if (noBoot || saindo) return
+
+    const devolverFoco = (e) => {
+      const porta = portaRef.current
+      if (!porta || e.target === porta) return
+      requestAnimationFrame(() => {
+        if (!jaDestrancou.current) porta.focus({ preventScroll: true })
+      })
+    }
+
+    document.addEventListener('focusin', devolverFoco)
+    return () => document.removeEventListener('focusin', devolverFoco)
+  }, [noBoot, saindo])
+
+  /**
    * O FOCO FICA MUDO ATÉ ALGUÉM TOCAR NO TECLADO.
    *
    * Foco programático numa página recém-carregada casa com `:focus-visible` no
