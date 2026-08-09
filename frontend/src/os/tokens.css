@@ -30,7 +30,14 @@
   --z-windows: 100;
   --z-taskbar: 1000;
   --z-startmenu: 1100;
-  --z-boot: 2000;
+  /* Cerimônia. A tela de bloqueio já está montada DURANTE o boot, de propósito:
+     o cristal dela precisa desse tempo para aquecer o contexto WebGL, senão o
+     custo cai no instante em que o boot sai. Só que as duas dividiam o mesmo
+     valor, e empate de z-index é resolvido pela ordem do DOM — o bloqueio vem
+     depois, é opaco, e cobria o boot inteiro. A inicialização rodava certinho e
+     ninguém nunca viu. Dois degraus, e a ordem fica explícita. */
+  --z-lock: 2000;
+  --z-boot: 2010;
 
   /* Wallpaper — dia */
   --sky-top: #6d28d9;
