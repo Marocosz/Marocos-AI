@@ -315,7 +315,7 @@
 .cerimonia:has(.porta:not(:disabled):hover) .cerimonia-nebulosa::before,
 .cerimonia[data-foco='visivel']:has(.porta:not(:disabled):focus-visible)
   .cerimonia-nebulosa::before {
-  transform: scale(1.07);
+  transform: scale(1.12);
 }
 
 /* A SEGUNDA CÓPIA DO BRILHO.
@@ -330,7 +330,10 @@
   content: '';
   position: absolute;
   inset: 0;
-  background: var(--cer-nebulosa);
+  /* A variante ACESA, não uma cópia da mesma. Repetir o brilho normal só
+     dobrava a cobertura; com a versão forte cada camada sobe de cor também, e é
+     isso que faz o hover ler como a luz aumentando em vez de engrossando. */
+  background: var(--cer-nebulosa-forte);
   transform-origin: 50% 46%;
   transform: scale(1);
   opacity: 0;
@@ -341,7 +344,7 @@
 .cerimonia[data-foco='visivel']:has(.porta:not(:disabled):focus-visible)
   .cerimonia-nebulosa::after {
   opacity: 1;
-  transform: scale(1.2);
+  transform: scale(1.28);
 }
 
 /* A marca acende junto. É o que mantém a resposta ancorada NO controle: sem

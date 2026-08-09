@@ -48,14 +48,16 @@
      porque o tema escuro é o padrão do sistema. `.theme-light` logo abaixo
      troca a paleta inteira; o boot.css não conhece cor nenhuma, só estes nomes.
      -------------------------------------------------- */
-  /* O QUE SEPARA AS DUAS CENAS É A FORMA DA LUZ, NÃO A FORÇA DELA.
-     A inicialização é um facho vertical, alto e sem contorno — atmosfera. O
-     bloqueio é um arco de círculo descendo do topo, com borda — geometria. Uma
-     versão anterior tentou separá-las por contraste, com vinheta quase preta e
-     um degrau duro no arco; ficou pesado e as duas telas ganharam uma dureza que
-     o resto do sistema não tem. A distinção sobrevive inteira em tons próximos:
-     o olho reconhece coluna e arco muito antes de reparar na diferença de
-     luminosidade. */
+  /* OS SEIS EIXOS QUE SEPARAM AS DUAS CENAS, para quem for mexer aqui:
+       forma       coluna vertical de luz   x  fuso horizontal
+       textura     lisa                     x  campo de estrelas
+       temperatura índigo frio              x  violeta quente
+       movimento   imóvel                   x  cintila e pulsa
+       valor       quase preto              x  campo violeta
+       moldura     vinheta forte, fechada   x  aberta até as bordas
+     Mexer num deles sozinho é seguro; esvaziar vários ao mesmo tempo faz as duas
+     telas voltarem a parecer a mesma coisa, que foi o ponto de partida. */
+
   /* O sólido do palco acompanha a inicialização, que é quem ele fica atrás. */
   --cer-base: #04020c;
 
@@ -131,6 +133,19 @@
     radial-gradient(84vw 0.9vh at 50% 46%, rgba(196, 181, 253, 0.14) 0%, transparent 80%),
     radial-gradient(46vh 38vh at 50% 46%, rgba(124, 58, 237, 0.2) 0%, transparent 74%);
 
+  /* A MESMA NEBULOSA, ACESA. Usada só pela segunda cópia, que aparece no hover
+     da porta e é empilhada sobre a primeira. Repetir a forma com alphas altos e
+     o núcleo quase branco soma luz de verdade — muito mais do que aumentar a
+     opacidade de uma cópia igual conseguiria, porque a cor de cada camada
+     também sobe, não só a cobertura. Mesmos degraus do fuso. */
+  --cer-nebulosa-forte:
+    radial-gradient(11vh 11vh at 50% 46%, rgba(255, 255, 255, 0.75) 0%, rgba(228, 220, 255, 0.36) 40%, transparent 72%),
+    radial-gradient(17vw 10vh at 50% 46%, rgba(242, 237, 255, 0.36) 0%, rgba(192, 170, 252, 0.17) 46%, transparent 78%),
+    radial-gradient(36vw 5vh at 49.5% 45.9%, rgba(234, 226, 255, 0.36) 0%, rgba(174, 142, 250, 0.15) 46%, transparent 80%),
+    radial-gradient(62vw 2.4vh at 50.5% 46.1%, rgba(217, 206, 255, 0.31) 0%, rgba(152, 107, 248, 0.12) 46%, transparent 82%),
+    radial-gradient(90vw 1vh at 50% 46%, rgba(208, 196, 255, 0.23) 0%, transparent 80%),
+    radial-gradient(52vh 42vh at 50% 46%, rgba(139, 92, 246, 0.3) 0%, transparent 74%);
+
   --cer-texto: #f5f3ff;
   --cer-texto-suave: #c4b5fd;
   /* Subiu junto com o escurecimento do fundo. Em #6d5b8c a dica de pular ficava
@@ -205,6 +220,17 @@
     radial-gradient(58vw 2vh at 50.5% 46.1%, rgba(154, 122, 248, 0.44) 0%, rgba(139, 92, 246, 0.16) 46%, transparent 82%),
     radial-gradient(84vw 0.8vh at 50% 46%, rgba(167, 139, 250, 0.3) 0%, transparent 80%),
     radial-gradient(40vh 34vh at 50% 46%, rgba(196, 181, 253, 0.2) 0%, transparent 72%);
+
+  /* A versão acesa, de dia. Aqui subir para o branco não acende nada — o campo
+     já é branco. O que sobe é a SATURAÇÃO dos braços, e só o núcleo vai a branco
+     pleno. Mesma regra da versão normal, levada mais longe. */
+  --cer-nebulosa-forte:
+    radial-gradient(11vh 11vh at 50% 46%, rgba(255, 255, 255, 1) 0%, rgba(255, 255, 255, 0.85) 40%, transparent 72%),
+    radial-gradient(17vw 9vh at 50% 46%, rgba(139, 92, 246, 0.5) 0%, rgba(124, 58, 237, 0.24) 46%, transparent 78%),
+    radial-gradient(36vw 4.6vh at 49.5% 45.9%, rgba(130, 95, 247, 0.58) 0%, rgba(124, 58, 237, 0.26) 46%, transparent 80%),
+    radial-gradient(62vw 2.3vh at 50.5% 46.1%, rgba(124, 90, 246, 0.56) 0%, rgba(109, 40, 217, 0.2) 46%, transparent 82%),
+    radial-gradient(90vw 0.9vh at 50% 46%, rgba(139, 92, 246, 0.4) 0%, transparent 80%),
+    radial-gradient(44vh 36vh at 50% 46%, rgba(167, 139, 250, 0.26) 0%, transparent 72%);
 
   --cer-texto: #2e1065;
   --cer-texto-suave: #6d28d9;
