@@ -1,30 +1,33 @@
 import { useEffect, useState, Suspense, lazy } from 'react'
 import { useLanguage } from '../../contexts/LanguageContext'
 import { getOsData } from '../../data/os'
-import CrystalMark from './CrystalMark'
-
 import './boot.css'
 
-// O cristal de verdade e pesado (three + fiber + drei). Carrega sob demanda;
-// ate chegar, a marca em SVG se monta faceta a faceta no lugar dele — o que
-// torna o fallback um indicador de carregamento honesto em vez de um vazio.
+// O cristal da identidade. O App dispara este mesmo import no escopo do
+// módulo, então quando o boot monta o chunk já costuma estar a caminho.
 const Crystal = lazy(() => import('../../components/Crystal'))
 
-// Duração da cerimônia. A montagem das facetas ocupa os primeiros ~900ms; o
-// resto é o nome entrando e um respiro antes da tela de bloqueio.
-const BOOT_DURATION_MS = 2000
+/**
+ * Duração da cerimônia.
+ *
+ * Longa de propósito: o cristal gira e flutua, e a graça é ter tempo de ver
+ * isso acontecer. Abaixo de ~3s a sequência vira um flash e o visitante só
+ * registra que "piscou alguma coisa". Pulável a qualquer momento, então quem
+ * tem pressa não paga o preço.
+ */
+const BOOT_DURATION_MS = 4200
 
 /**
- * BootScreen — inicialização do Marocos SO.
+ * BootScreen — inicialização do Marocos OS.
  * --------------------------------------------------
- * Sem barra de progresso e sem anel de bolinhas. O cristal da identidade
- * aparece assim que o chunk 3D chega; enquanto ele não chega, a marca em SVG
- * se monta faceta a faceta no lugar. O indicador de progresso é a própria
- * marca se formando — nasce da geometria do logo em vez de ser aplicada por
- * cima dele, e some sozinho quando a peça real assume.
+ * Sequência: halo acende → cristal entra girando → nome sobe → assinatura →
+ * a barra completa e o sistema vai para a tela de bloqueio.
  *
- * Pulável a qualquer momento por tecla ou clique. Com
- * `prefers-reduced-motion: reduce` nem chega a pintar: onDone() na hora.
+ * Não há mais cristal desenhado à mão aqui. Enquanto o chunk 3D não chega, o
+ * lugar dele é ocupado só pelo halo pulsando: um vazio honesto é melhor do que
+ * uma segunda versão da marca que não é a marca.
+ *
+ * Com `prefers-reduced-motion: reduce` nem chega a pintar: onDone() na hora.
  */
 const BootScreen = ({ onDone }) => {
   const { language } = useLanguage()
@@ -69,12 +72,23 @@ const BootScreen = ({ onDone }) => {
   return (
     <div className="boot-screen" role="status" aria-label={strings.ariaLabel}>
       <div className="boot-content">
-        <Suspense fallback={<CrystalMark size={168} pulse={false} assemble />}>
-          <Crystal size={168} animated />
-        </Suspense>
+        <div className="boot-crystal">
+          <Suspense fallback={<div className="crystal-loading" aria-hidden="true" />}>
+            <Crystal size={300} animated />
+          </Suspense>
+        </div>
 
         <p className="boot-title">{strings.systemName}</p>
         {strings.tagline && <p className="boot-tagline">{strings.tagline}</p>}
+
+        {/* A barra torna a duração legível: sem ela, quatro segundos de tela
+            quieta leem como travamento em vez de inicialização. */}
+        <div className="boot-progress" aria-hidden="true">
+          <span
+            className="boot-progress-fill"
+            style={{ animationDuration: `${BOOT_DURATION_MS}ms` }}
+          />
+        </div>
       </div>
 
       <p className="boot-skip-hint">{strings.skipHint}</p>

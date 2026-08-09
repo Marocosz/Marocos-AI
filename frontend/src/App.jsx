@@ -12,6 +12,11 @@ import ShutdownScreen from './os/boot/ShutdownScreen'
 import LockScreen from './os/boot/LockScreen'
 import './os/tokens.css'
 
+// Dispara o download do chunk 3D assim que este módulo carrega, em paralelo
+// com tudo. O boot e a tela de bloqueio o consomem via React.lazy; começar
+// aqui faz o fallback de carregamento quase nunca aparecer.
+import('./components/Crystal')
+
 /**
  * Shell do Marocos OS.
  *

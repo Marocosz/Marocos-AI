@@ -8,83 +8,32 @@
  */
 
 /* ==================================================
-   A MARCA
+   PLACEHOLDER DO CRISTAL
+   Enquanto o chunk 3D nao chega, so o halo pulsa. Nao existe mais um cristal
+   desenhado a mao: uma segunda versao da marca que nao e a marca confundia
+   mais do que ajudava.
    ================================================== */
 
-.crystal-mark {
-  position: relative;
-  display: grid;
-  place-items: center;
-  filter: drop-shadow(0 0 26px rgba(168, 85, 247, 0.45));
-}
-
-.crystal-mark-svg {
+.crystal-loading {
   width: 100%;
   height: 100%;
-  overflow: visible;
+  border-radius: 50%;
+  background: radial-gradient(
+    circle at 50% 50%,
+    rgba(168, 85, 247, 0.3) 0%,
+    rgba(124, 58, 237, 0.12) 45%,
+    transparent 70%
+  );
+  animation: crystal-loading-pulse 1.9s ease-in-out infinite;
 }
 
-/* Respiro lento. Puramente compositor — não redesenha o SVG. */
-.crystal-mark-pulse {
-  animation: crystal-breathe 4.5s ease-in-out infinite;
-}
-
-@keyframes crystal-breathe {
-  0%,
-  100% {
-    transform: translateY(0) scale(1);
-    filter: drop-shadow(0 0 26px rgba(168, 85, 247, 0.45));
-  }
-  50% {
-    transform: translateY(-6px) scale(1.015);
-    filter: drop-shadow(0 0 38px rgba(168, 85, 247, 0.6));
-  }
-}
-
-/* --- Montagem faceta a faceta: o indicador de progresso do boot --- */
-
-.crystal-mark-assemble .crystal-mark-facet {
-  opacity: 0;
-  /* transform-box faz o transform-origin valer para a caixa da própria
-     forma, e não para o viewBox inteiro — sem isso cada faceta gira em
-     torno do canto do SVG. */
-  transform-box: fill-box;
-  transform-origin: center;
-  animation: crystal-facet-in 620ms cubic-bezier(0.22, 1, 0.36, 1) forwards;
-}
-
-.crystal-mark-assemble .crystal-mark-glow {
-  opacity: 0;
-  animation: crystal-glow-in 900ms ease-out 620ms forwards;
-}
-
-@keyframes crystal-facet-in {
-  from {
-    opacity: 0;
-    transform: scale(0.55) translateY(10px);
-  }
-  to {
-    /* A opacidade final de cada faceta vem do atributo `opacity` do SVG,
-       então aqui vai 1 e o atributo modula o resultado. */
-    opacity: 1;
-    transform: scale(1) translateY(0);
-  }
-}
-
-@keyframes crystal-glow-in {
-  to {
-    opacity: 1;
-  }
+@keyframes crystal-loading-pulse {
+  0%, 100% { opacity: 0.45; transform: scale(0.94); }
+  50%      { opacity: 0.9;  transform: scale(1); }
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .crystal-mark-pulse,
-  .crystal-mark-assemble .crystal-mark-facet,
-  .crystal-mark-assemble .crystal-mark-glow {
-    animation: none;
-    opacity: 1;
-    transform: none;
-  }
+  .crystal-loading { animation: none; opacity: 0.7; }
 }
 
 /* ==================================================
@@ -113,7 +62,54 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 22px;
+  gap: 20px;
+}
+
+/* Caixa do cristal. O <Crystal> ja e quadrado e do tamanho pedido; isto so
+   reserva o espaco e da a entrada. */
+.boot-crystal {
+  position: relative;
+  width: 300px;
+  height: 300px;
+  display: grid;
+  place-items: center;
+  opacity: 0;
+  animation: boot-crystal-in 1100ms cubic-bezier(0.22, 1, 0.36, 1) 250ms forwards;
+}
+
+@keyframes boot-crystal-in {
+  from { opacity: 0; transform: scale(0.86); }
+  to   { opacity: 1; transform: scale(1); }
+}
+
+/* Barra de progresso: torna os 4,2s legiveis como inicializacao em vez de
+   travamento. Anima a largura por transform, que e composicao pura. */
+.boot-progress {
+  width: 190px;
+  height: 2px;
+  border-radius: 2px;
+  background: rgba(196, 181, 253, 0.16);
+  overflow: hidden;
+  opacity: 0;
+  animation: boot-rise 600ms ease-out 900ms forwards;
+}
+
+.boot-progress-fill {
+  display: block;
+  width: 100%;
+  height: 100%;
+  border-radius: inherit;
+  background: linear-gradient(90deg, #7c3aed, #c4b5fd);
+  transform-origin: left center;
+  transform: scaleX(0);
+  animation-name: boot-progress-grow;
+  animation-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+  animation-fill-mode: forwards;
+  /* animation-duration vem inline, do BOOT_DURATION_MS */
+}
+
+@keyframes boot-progress-grow {
+  to { transform: scaleX(1); }
 }
 
 .boot-title {
@@ -127,7 +123,7 @@
   padding-left: 0.34em;
   color: #f5f3ff;
   opacity: 0;
-  animation: boot-rise 700ms cubic-bezier(0.22, 1, 0.36, 1) 780ms forwards;
+  animation: boot-rise 800ms cubic-bezier(0.22, 1, 0.36, 1) 1300ms forwards;
 }
 
 .boot-tagline {
@@ -138,7 +134,7 @@
   text-transform: uppercase;
   color: #a78bfa;
   opacity: 0;
-  animation: boot-rise 700ms cubic-bezier(0.22, 1, 0.36, 1) 980ms forwards;
+  animation: boot-rise 800ms cubic-bezier(0.22, 1, 0.36, 1) 1750ms forwards;
 }
 
 @keyframes boot-rise {
@@ -161,16 +157,21 @@
   letter-spacing: 0.12em;
   color: #6d5b8c;
   opacity: 0;
-  animation: boot-rise 800ms ease-out 1400ms forwards;
+  animation: boot-rise 800ms ease-out 2600ms forwards;
 }
 
 @media (prefers-reduced-motion: reduce) {
+  .boot-crystal,
   .boot-title,
   .boot-tagline,
+  .boot-progress,
   .boot-skip-hint {
     animation: none;
     opacity: 1;
+    transform: none;
   }
+
+  .boot-progress-fill { transform: scaleX(1); }
 }
 
 /* ==================================================

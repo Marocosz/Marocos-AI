@@ -13,11 +13,10 @@ import { Float, Environment, Lightformer, Sparkles } from '@react-three/drei'
  * obrigava cada consumidor a inventar um recorte. Aqui o componente é um bloco
  * comum do tamanho que você pedir: quem posiciona é quem usa.
  *
- * POR QUE QUADRADO: a câmera fica em z=7 com fov 45, o que mostra ±2.9 de
- * altura no plano do objeto; o cristal tem 1.8 de meia-altura, então sobra
- * margem. Na horizontal o visível é 2.9 x (largura/altura) — numa caixa
- * estreita e alta isso encolhe abaixo de 0.7 e o cristal encosta na borda.
- * Manter o canvas quadrado garante o mesmo enquadramento em qualquer tamanho.
+ * POR QUE QUADRADO: o visível na horizontal é proporcional à largura da caixa,
+ * então numa caixa estreita e alta o cristal encostaria nas bordas laterais.
+ * Canvas quadrado dá o mesmo enquadramento em qualquer tamanho. O cálculo da
+ * distância da câmera está em DISTANCIA_CAMERA, abaixo.
  *
  *   <Crystal size={220} />            estático, sem loop de render
  *   <Crystal size={320} animated />   girando e flutuando, como em produção
@@ -27,6 +26,20 @@ import { Float, Environment, Lightformer, Sparkles } from '@react-three/drei'
 // Pose de repouso: leve giro no Y e inclinação no X para as facetas pegarem a
 // luz. Sem isto o cristal estático fica de frente e chapado.
 const POSE_PARADA = [0.14, 0.6, 0.05]
+
+/**
+ * Distância da câmera, escolhida por conta e não por tentativa.
+ *
+ * A malha tem meia-altura 1.8 (escala y) e meia-largura 0.7. Com fov 45, o
+ * visível no plano do objeto é tan(22.5°) x z. Em z=7 dava ±2.90, e o cristal
+ * ocupava apenas 62% da altura e 24% da largura da caixa — muito canvas vazio,
+ * e é por isso que ele lia como pequeno mesmo com `size` grande.
+ *
+ * Em z=5.6 o visível cai para ±2.32: o cristal passa a ocupar 78% da altura, e
+ * os Sparkles (que se espalham até 1.5) ficam em 65% — ainda dentro do quadro,
+ * sem encostar na borda.
+ */
+const DISTANCIA_CAMERA = 5.6
 
 const CrystalMesh = ({ animated }) => {
   const meshRef = useRef()
@@ -78,7 +91,7 @@ const Crystal = ({
       aria-hidden="true"
     >
       <Canvas
-        camera={{ position: [0, 0, 7], fov: 45 }}
+        camera={{ position: [0, 0, DISTANCIA_CAMERA], fov: 45 }}
         /* Parado, renderiza um frame e dorme: 0% de GPU em repouso. */
         frameloop={animated ? 'always' : 'demand'}
         /* Clampa o pixel ratio: evita renderizar 3x ou 4x pixels em telas
