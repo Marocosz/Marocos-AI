@@ -35,21 +35,23 @@ const osContentEn = {
     quickSettings: { open: 'Open quick settings', title: 'Quick settings' },
   },
   boot: {
-    systemName: 'NoiseOS',
+    systemName: 'MAROCOS OS',
     tagline: 'Marocos Systems',
     skipHint: 'click to skip',
     ariaLabel: 'Starting the system',
   },
+  lock: {
+    systemName: 'MAROCOS OS',
+    enter: 'Enter',
+    enterAria: 'Enter the desktop',
+    hint: 'click anywhere to enter',
+    ariaLabel: 'Lock screen',
+  },
   shutdown: {
     message: "It's now safe to turn off your computer.",
-    subMessage: 'NoiseOS has been shut down.',
+    subMessage: 'Marocos OS has been shut down.',
     powerOnLabel: 'Turn on again',
     ariaLabel: 'System off',
-  },
-  screensaver: {
-    crystalAlt: 'NoiseOS logo floating',
-    dismissHint: 'press any key to return',
-    ariaLabel: 'Screen saver',
   },
   startMenu: {
     title: 'Start menu',
@@ -186,21 +188,23 @@ const osContentPt = {
     quickSettings: { open: 'Abrir ajustes rápidos', title: 'Ajustes rápidos' },
   },
   boot: {
-    systemName: 'NoiseOS',
+    systemName: 'MAROCOS SO',
     tagline: 'Marocos Systems',
     skipHint: 'clique para pular',
     ariaLabel: 'Iniciando o sistema',
   },
+  lock: {
+    systemName: 'MAROCOS SO',
+    enter: 'Entrar',
+    enterAria: 'Entrar na área de trabalho',
+    hint: 'clique em qualquer lugar para entrar',
+    ariaLabel: 'Tela de bloqueio',
+  },
   shutdown: {
     message: 'É seguro desligar o seu computador.',
-    subMessage: 'O NoiseOS foi encerrado.',
+    subMessage: 'O Marocos SO foi encerrado.',
     powerOnLabel: 'Ligar novamente',
     ariaLabel: 'Sistema desligado',
-  },
-  screensaver: {
-    crystalAlt: 'Logotipo do NoiseOS flutuando',
-    dismissHint: 'pressione qualquer tecla para voltar',
-    ariaLabel: 'Protetor de tela',
   },
   startMenu: {
     title: 'Menu Iniciar',

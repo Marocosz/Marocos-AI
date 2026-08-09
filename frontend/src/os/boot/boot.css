@@ -1,88 +1,112 @@
-/* --------------------------------------------------
-   CERIMÔNIA DE SISTEMA DO NOISEOS
-   Boot, desligamento e protetor de tela. As três telas são overlays de tela
-   cheia na mesma camada (--z-boot, definido em os/tokens.css) — quem decide
-   qual delas está montada é o dono do estado (fora daqui).
-   -------------------------------------------------- */
+/* src/os/boot/boot.css
+ *
+ * Cerimônia de sistema: boot e tela de bloqueio.
+ *
+ * Nenhuma das duas usa backdrop-filter. Um blur de tela cheia sobre o shader
+ * animado é justamente o custo que o resto do sistema evita — aqui a
+ * profundidade vem de gradiente e de halo, que não custam nada por frame.
+ */
 
-.boot-screen,
-.shutdown-screen,
-.screensaver {
-  position: fixed;
-  inset: 0;
-  z-index: var(--z-boot);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  flex-direction: column;
-  gap: 24px;
-  text-align: center;
-  /* Full-bleed: nenhum toque deve "vazar" para o que está por baixo. */
-  overflow: hidden;
-}
-
-@media (prefers-reduced-motion: no-preference) {
-  .boot-screen,
-  .shutdown-screen,
-  .screensaver {
-    animation: noiseos-fade-in 0.35s ease-out;
-  }
-}
-
-@keyframes noiseos-fade-in {
-  from {
-    opacity: 0;
-  }
-  to {
-    opacity: 1;
-  }
-}
-
-/* --------------------------------------------------
-   CRYSTAL MARK — cristal em CSS/SVG (sem WebGL)
-   -------------------------------------------------- */
+/* ==================================================
+   A MARCA
+   ================================================== */
 
 .crystal-mark {
   position: relative;
-  margin: 0 auto;
-  filter: drop-shadow(0 0 24px rgba(168, 85, 247, 0.55));
+  display: grid;
+  place-items: center;
+  filter: drop-shadow(0 0 26px rgba(168, 85, 247, 0.45));
 }
 
 .crystal-mark-svg {
   width: 100%;
   height: 100%;
-  display: block;
+  overflow: visible;
 }
 
+/* Respiro lento. Puramente compositor — não redesenha o SVG. */
 .crystal-mark-pulse {
-  animation: crystal-mark-pulse 3.2s ease-in-out infinite;
+  animation: crystal-breathe 4.5s ease-in-out infinite;
 }
 
-@keyframes crystal-mark-pulse {
+@keyframes crystal-breathe {
   0%,
   100% {
-    filter: drop-shadow(0 0 18px rgba(168, 85, 247, 0.45));
-    transform: scale(1);
+    transform: translateY(0) scale(1);
+    filter: drop-shadow(0 0 26px rgba(168, 85, 247, 0.45));
   }
   50% {
-    filter: drop-shadow(0 0 34px rgba(216, 180, 254, 0.7));
-    transform: scale(1.035);
+    transform: translateY(-6px) scale(1.015);
+    filter: drop-shadow(0 0 38px rgba(168, 85, 247, 0.6));
+  }
+}
+
+/* --- Montagem faceta a faceta: o indicador de progresso do boot --- */
+
+.crystal-mark-assemble .crystal-mark-facet {
+  opacity: 0;
+  /* transform-box faz o transform-origin valer para a caixa da própria
+     forma, e não para o viewBox inteiro — sem isso cada faceta gira em
+     torno do canto do SVG. */
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: crystal-facet-in 620ms cubic-bezier(0.22, 1, 0.36, 1) forwards;
+}
+
+.crystal-mark-assemble .crystal-mark-glow {
+  opacity: 0;
+  animation: crystal-glow-in 900ms ease-out 620ms forwards;
+}
+
+@keyframes crystal-facet-in {
+  from {
+    opacity: 0;
+    transform: scale(0.55) translateY(10px);
+  }
+  to {
+    /* A opacidade final de cada faceta vem do atributo `opacity` do SVG,
+       então aqui vai 1 e o atributo modula o resultado. */
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+@keyframes crystal-glow-in {
+  to {
+    opacity: 1;
   }
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .crystal-mark-pulse {
+  .crystal-mark-pulse,
+  .crystal-mark-assemble .crystal-mark-facet,
+  .crystal-mark-assemble .crystal-mark-glow {
     animation: none;
+    opacity: 1;
+    transform: none;
   }
 }
 
-/* --------------------------------------------------
-   BOOT SCREEN
-   -------------------------------------------------- */
+/* ==================================================
+   BOOT
+   ================================================== */
 
 .boot-screen {
-  background: radial-gradient(circle at 50% 38%, #2e1065 0%, #120820 55%, #05030a 100%);
-  color: #f5f3ff;
+  position: fixed;
+  inset: 0;
+  z-index: var(--z-boot);
+  display: grid;
+  place-items: center;
+  /* Vazio profundo: o boot é o único momento em que o roxo do sistema ainda
+     não acendeu. */
+  background: radial-gradient(120% 90% at 50% 45%, #170b2b 0%, #0a0514 60%, #050208 100%);
+  animation: boot-fade-in 260ms ease-out;
+}
+
+@keyframes boot-fade-in {
+  from {
+    opacity: 0;
+  }
 }
 
 .boot-content {
@@ -90,170 +114,272 @@
   flex-direction: column;
   align-items: center;
   gap: 22px;
-  padding: 0 24px;
 }
 
 .boot-title {
   margin: 0;
-  font-size: clamp(1.8rem, 5vw, 2.6rem);
-  font-weight: 600;
-  letter-spacing: 0.08em;
-}
-
-.boot-title-inner {
-  display: inline-block;
-}
-
-.boot-title-char {
+  font-family: 'Poppins', system-ui, sans-serif;
+  font-size: clamp(1.35rem, 2.6vw, 1.9rem);
+  font-weight: 900;
+  letter-spacing: 0.34em;
+  /* O tracking largo abre um vão à direita da última letra; o padding
+     compensa para o bloco ficar opticamente centrado. */
+  padding-left: 0.34em;
   color: #f5f3ff;
-}
-
-.boot-title-char-encrypted {
-  color: #a78bfa;
-  opacity: 0.7;
+  opacity: 0;
+  animation: boot-rise 700ms cubic-bezier(0.22, 1, 0.36, 1) 780ms forwards;
 }
 
 .boot-tagline {
-  margin: -8px 0 0;
-  font-size: 0.9rem;
-  color: rgba(245, 243, 255, 0.6);
-  letter-spacing: 0.03em;
+  margin: -14px 0 0;
+  font-family: system-ui, sans-serif;
+  font-size: 0.72rem;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: #a78bfa;
+  opacity: 0;
+  animation: boot-rise 700ms cubic-bezier(0.22, 1, 0.36, 1) 980ms forwards;
 }
 
-.boot-progress {
-  width: min(220px, 60vw);
-  height: 4px;
-  border-radius: 999px;
-  background: rgba(168, 85, 247, 0.18);
-  overflow: hidden;
-}
-
-.boot-progress-fill {
-  height: 100%;
-  width: 0%;
-  border-radius: 999px;
-  background: linear-gradient(90deg, #a855f7, #d8b4fe);
-  animation-name: boot-progress-fill;
-  animation-timing-function: linear;
-  animation-fill-mode: forwards;
-}
-
-@keyframes boot-progress-fill {
+@keyframes boot-rise {
   from {
-    width: 0%;
+    opacity: 0;
+    transform: translateY(10px);
   }
   to {
-    width: 100%;
+    opacity: 1;
+    transform: translateY(0);
   }
 }
 
 .boot-skip-hint {
+  position: absolute;
+  bottom: 40px;
   margin: 0;
-  font-size: 0.75rem;
-  color: rgba(245, 243, 255, 0.4);
-  letter-spacing: 0.02em;
+  font-family: system-ui, sans-serif;
+  font-size: 0.7rem;
+  letter-spacing: 0.12em;
+  color: #6d5b8c;
+  opacity: 0;
+  animation: boot-rise 800ms ease-out 1400ms forwards;
 }
 
-/* --------------------------------------------------
-   SHUTDOWN SCREEN
-   Homenagem direta à tela "It's now safe to turn off your computer" do
-   Windows 9x: preto, âmbar, monoespaçado.
-   -------------------------------------------------- */
-
-.shutdown-screen {
-  background: #000000;
-  color: #ffb000;
-  font-family: ui-monospace, SFMono-Regular, 'Cascadia Mono', Menlo, Consolas, monospace;
+@media (prefers-reduced-motion: reduce) {
+  .boot-title,
+  .boot-tagline,
+  .boot-skip-hint {
+    animation: none;
+    opacity: 1;
+  }
 }
 
-.shutdown-content {
+/* ==================================================
+   TELA DE BLOQUEIO
+   ================================================== */
+
+.lock-screen {
+  position: fixed;
+  inset: 0;
+  z-index: var(--z-boot);
+  display: grid;
+  grid-template-rows: auto 1fr auto;
+  padding: 46px 48px 40px;
+  /* Roxo do sistema já aceso, mas ainda fechado. O halo central prepara o
+     olho para o cristal antes mesmo de ele aparecer. */
+  background:
+    radial-gradient(90% 70% at 50% 46%, rgba(124, 58, 237, 0.4) 0%, transparent 62%),
+    linear-gradient(170deg, #1a0d33 0%, #12082180 38%, #0a0514 100%),
+    #0a0514;
+  animation: lock-in 520ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+@keyframes lock-in {
+  from {
+    opacity: 0;
+  }
+}
+
+/* Destrancar: a camada sobe e revela a área de trabalho, que já está
+   montada por baixo. É a saída que todo sistema usa, e aqui ela é honesta —
+   não há carregamento escondido atrás dela. */
+.lock-screen-leaving {
+  animation: lock-out 600ms cubic-bezier(0.65, 0, 0.35, 1) forwards;
+}
+
+@keyframes lock-out {
+  to {
+    transform: translateY(-100%);
+    opacity: 0.2;
+  }
+}
+
+.lock-clock {
   display: flex;
   flex-direction: column;
-  align-items: center;
-  gap: 28px;
-  padding: 0 24px;
-  max-width: 560px;
+  gap: 2px;
+  color: #f5f3ff;
+  animation: lock-rise 700ms cubic-bezier(0.22, 1, 0.36, 1) 120ms both;
 }
 
-.shutdown-message {
-  margin: 0;
-  font-size: clamp(1.1rem, 3.4vw, 1.6rem);
-  line-height: 1.6;
-}
-
-.shutdown-submessage {
-  margin: -16px 0 0;
-  font-size: 0.95rem;
-  opacity: 0.75;
-}
-
-.shutdown-power-btn {
-  padding: 10px 28px;
-  font-family: inherit;
-  font-size: 0.95rem;
-  color: #ffb000;
-  background: transparent;
-  border: 1px solid #ffb000;
-  border-radius: 4px;
-  cursor: pointer;
-  transition: background 0.15s ease, color 0.15s ease;
-}
-
-.shutdown-power-btn:hover,
-.shutdown-power-btn:focus-visible {
-  background: #ffb000;
-  color: #000000;
-  outline: none;
-}
-
-/* --------------------------------------------------
-   SCREENSAVER
-   Desktop escurecido: gradiente na paleta noturna do wallpaper (ver
-   .theme-dark em os/tokens.css), cristal centralizado e relógio grande.
-   -------------------------------------------------- */
-
-.screensaver {
-  background: radial-gradient(circle at 50% 34%, #1e1b4b 0%, #100a18 55%, #000000 100%);
-  color: #e9e4ff;
-  cursor: none;
-}
-
-.screensaver-crystal {
-  position: relative;
-  width: 260px;
-  height: 260px;
-  overflow: hidden;
-}
-
-.screensaver-clock {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 4px;
-}
-
-.screensaver-time {
-  font-size: clamp(3rem, 10vw, 6rem);
-  font-weight: 300;
-  letter-spacing: 0.02em;
+.lock-time {
+  font-family: system-ui, sans-serif;
+  font-size: clamp(2.6rem, 6vw, 4.6rem);
+  font-weight: 200;
   line-height: 1;
+  letter-spacing: -0.02em;
+  font-variant-numeric: tabular-nums;
 }
 
-.screensaver-date {
-  font-size: 1rem;
-  color: rgba(233, 228, 255, 0.65);
+.lock-date {
+  font-family: system-ui, sans-serif;
+  font-size: 0.92rem;
+  font-weight: 400;
+  color: #c4b5fd;
+  opacity: 0.75;
+  /* Nomes de dia e mês vêm em minúsculas do locale pt-BR. */
   text-transform: capitalize;
 }
 
-.screensaver-hint {
-  margin: 0;
-  font-size: 0.8rem;
-  color: rgba(233, 228, 255, 0.4);
+.lock-center {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 14px;
 }
 
-@media (max-width: 480px) {
-  .screensaver-crystal {
-    width: 180px;
-    height: 180px;
+/* A PORTA: o cristal é o botão. Um elemento, um trabalho. */
+.lock-door {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 18px;
+  padding: 26px 44px 22px;
+  border: 1px solid transparent;
+  border-radius: 20px;
+  background: transparent;
+  cursor: pointer;
+  animation: lock-rise 800ms cubic-bezier(0.22, 1, 0.36, 1) 220ms both;
+  transition: border-color 0.25s ease, background 0.25s ease, transform 0.25s ease;
+}
+
+.lock-door:hover,
+.lock-door:focus-visible {
+  border-color: rgba(196, 181, 253, 0.28);
+  background: rgba(168, 85, 247, 0.08);
+  transform: translateY(-2px);
+}
+
+.lock-door:focus-visible {
+  outline: 2px solid var(--accent-color);
+  outline-offset: 4px;
+}
+
+.lock-wordmark {
+  font-family: 'Poppins', system-ui, sans-serif;
+  font-size: clamp(1.25rem, 2.4vw, 1.75rem);
+  font-weight: 900;
+  letter-spacing: 0.3em;
+  padding-left: 0.3em; /* compensa o vão do tracking, como no boot */
+  color: #f5f3ff;
+}
+
+.lock-enter {
+  font-family: system-ui, sans-serif;
+  font-size: 0.74rem;
+  font-weight: 600;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: #c4b5fd;
+  position: relative;
+  padding-bottom: 4px;
+}
+
+/* Sublinhado que cresce do centro no hover: confirma que aquilo é um destino,
+   não um rótulo. */
+.lock-enter::after {
+  content: '';
+  position: absolute;
+  left: 50%;
+  bottom: 0;
+  width: 0;
+  height: 1px;
+  background: var(--accent-color);
+  transform: translateX(-50%);
+  transition: width 0.28s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.lock-door:hover .lock-enter::after,
+.lock-door:focus-visible .lock-enter::after {
+  width: 100%;
+}
+
+/* Quem esta entrando, logo acima da porta — convencao de tela de bloqueio, e
+   perto do elemento a que se refere em vez de orfao no rodape. */
+.lock-user {
+  font-family: system-ui, sans-serif;
+  font-size: 0.82rem;
+  font-weight: 500;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: #c4b5fd;
+  opacity: 0.7;
+  animation: lock-rise 700ms cubic-bezier(0.22, 1, 0.36, 1) 180ms both;
+}
+
+.lock-hint {
+  margin: 0;
+  justify-self: center;
+  align-self: center;
+  font-family: system-ui, sans-serif;
+  font-size: 0.72rem;
+  letter-spacing: 0.1em;
+  color: #a78bfa;
+  opacity: 0.5;
+  animation: lock-rise 700ms cubic-bezier(0.22, 1, 0.36, 1) 420ms both;
+}
+
+@keyframes lock-rise {
+  from {
+    opacity: 0;
+    transform: translateY(16px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .lock-screen,
+  .lock-clock,
+  .lock-door,
+  .lock-user,
+  .lock-hint {
+    animation: none;
+    opacity: 1;
+    transform: none;
+  }
+
+  /* A saída vira um corte seco: sem deslizar, mas ainda sai da frente. */
+  .lock-screen-leaving {
+    animation: none;
+    opacity: 0;
+  }
+}
+
+/* --- Telas estreitas --- */
+@media (max-width: 600px) {
+  .lock-screen {
+    padding: 34px 26px 30px;
+  }
+
+  .lock-door {
+    padding: 20px 26px 18px;
+  }
+
+  .lock-wordmark {
+    letter-spacing: 0.22em;
+    padding-left: 0.22em;
   }
 }

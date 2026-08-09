@@ -9,7 +9,7 @@ import Taskbar from './os/desktop/Taskbar'
 import MobileShell from './os/mobile/MobileShell'
 import BootScreen from './os/boot/BootScreen'
 import ShutdownScreen from './os/boot/ShutdownScreen'
-import ScreenSaver from './os/boot/ScreenSaver'
+import LockScreen from './os/boot/LockScreen'
 import './os/tokens.css'
 
 /**
@@ -22,39 +22,6 @@ import './os/tokens.css'
  * como conjunto, o mobile lê como pilha. É a premissa central do design, e é o
  * que evita manter dois frontends.
  */
-
-// Uma chave só para "primeira vez nesta sessão": ela controla o boot E a
-// janela de boas-vindas. Recarregar na mesma aba cai direto no desktop limpo.
-const CHAVE_VISITA = 'noiseos:visited'
-
-const OCIOSIDADE_MS = 90_000
-
-/**
- * Leitura e escrita da marca de visita ficam SEPARADAS de propósito.
- *
- * Escrever no sessionStorage dentro do inicializador do useState seria efeito
- * colateral numa função que precisa ser pura: o StrictMode invoca
- * inicializadores duas vezes em desenvolvimento, então a primeira chamada
- * gravaria a marca e a segunda leria "já visitou" — o boot nunca apareceria em
- * dev. A leitura fica no inicializador; a escrita, num efeito.
- */
-function jaVisitouNestaSessao() {
-  try {
-    return Boolean(sessionStorage.getItem(CHAVE_VISITA))
-  } catch {
-    // Modo privado com storage bloqueado: trata como visita repetida, que é o
-    // caminho sem cerimônia. Melhor pular o boot do que quebrar a montagem.
-    return true
-  }
-}
-
-function marcarVisitado() {
-  try {
-    sessionStorage.setItem(CHAVE_VISITA, '1')
-  } catch {
-    /* storage bloqueado: sem marca, e sem quebrar nada */
-  }
-}
 
 /**
  * Sincroniza título e canonical com a janela em foco. Precisa viver dentro do
@@ -83,47 +50,25 @@ const BoasVindas = ({ ativa }) => {
   return null
 }
 
-/** Monta o protetor de tela após OCIOSIDADE_MS sem interação. */
-const ProtetorDeTela = ({ isAnimated }) => {
-  const [ativo, setAtivo] = useState(false)
-
-  useEffect(() => {
-    // Com movimento desligado (inclui prefers-reduced-motion, que o
-    // ThemeContext já respeita), o timer nem é armado.
-    if (!isAnimated) return
-
-    let id
-    const rearmar = () => {
-      clearTimeout(id)
-      id = setTimeout(() => setAtivo(true), OCIOSIDADE_MS)
-    }
-
-    const eventos = ['pointermove', 'pointerdown', 'keydown', 'wheel', 'touchstart']
-    eventos.forEach((e) => window.addEventListener(e, rearmar, { passive: true }))
-    rearmar()
-
-    return () => {
-      clearTimeout(id)
-      eventos.forEach((e) => window.removeEventListener(e, rearmar))
-    }
-  }, [isAnimated])
-
-  if (!ativo) return null
-  return <ScreenSaver isAnimated={isAnimated} onDismiss={() => setAtivo(false)} />
-}
-
 const Shell = () => {
   const { isDark, isAnimated } = useTheme()
   const modo = useDeviceMode()
 
-  // 'boot' -> 'pronto' -> ('desligado' -> 'pronto')
-  const [fase, setFase] = useState(() => (jaVisitouNestaSessao() ? 'pronto' : 'boot'))
+  // 'boot' -> 'bloqueio' -> 'pronto' -> ('desligado' -> 'bloqueio')
+  //
+  // A cerimonia roda em TODO carregamento, inclusive F5: o fluxo de ligar a
+  // maquina e entrar por ela e parte da experiencia, nao um tutorial de
+  // primeira visita. Deep link continua funcionando — a janela da rota ja
+  // esta montada atras do bloqueio e aparece assim que ele sai.
+  //
+  // Desligar volta para o bloqueio, nao para o boot: religar um computador que
+  // ja estava ligado nao repete a inicializacao, mostra a tela de entrada.
+  const [fase, setFase] = useState('boot')
 
-  useEffect(marcarVisitado, [])
-
-  const concluirBoot = useCallback(() => setFase('pronto'), [])
+  const concluirBoot = useCallback(() => setFase('bloqueio'), [])
+  const destrancar = useCallback(() => setFase('pronto'), [])
   const desligar = useCallback(() => setFase('desligado'), [])
-  const ligar = useCallback(() => setFase('pronto'), [])
+  const ligar = useCallback(() => setFase('bloqueio'), [])
 
   const desligado = fase === 'desligado'
 
@@ -145,14 +90,10 @@ const Shell = () => {
           ))}
 
         {fase === 'boot' && <BootScreen onDone={concluirBoot} />}
+        {fase === 'bloqueio' && <LockScreen onUnlock={destrancar} />}
         {desligado && <ShutdownScreen onPowerOn={ligar} />}
 
-        {fase === 'pronto' && (
-          <>
-            <BoasVindas ativa={modo === 'desktop'} />
-            <ProtetorDeTela isAnimated={isAnimated && modo === 'desktop'} />
-          </>
-        )}
+        {fase === 'pronto' && <BoasVindas ativa={modo === 'desktop'} />}
       </WindowManagerProvider>
     </div>
   )

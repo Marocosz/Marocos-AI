@@ -4,29 +4,40 @@ import './boot.css'
 /**
  * CrystalMark — a marca do sistema em CSS/SVG puro.
  * --------------------------------------------------
- * O cristal "de verdade" (CrystalScene, em components/sections) monta um
- * <Canvas> do @react-three/fiber: cria contexto WebGL, ambiente procedural,
- * material com transmissão etc. Só isso já custa centenas de ms — ótimo numa
- * janela que abre depois de um clique, péssimo no boot ou em qualquer tela
- * que precisa aparecer instantaneamente.
+ * O cristal "de verdade" (CrystalScene) monta um <Canvas> do
+ * @react-three/fiber: cria contexto WebGL, ambiente procedural, material com
+ * transmissão. Só isso já custa centenas de ms — ótimo numa janela que abre
+ * depois de um clique, péssimo numa tela que precisa aparecer instantaneamente.
  *
- * Este componente é o mesmo losango facetado, sem nenhum WebGL: só um SVG com
- * gradientes lineares e um brilho via drop-shadow/CSS. Serve de logo do boot
- * e de retrato estático do cristal onde a versão 3D estiver desligada
- * (protetor de tela com isAnimated=false) ou ainda carregando via React.lazy.
+ * Aqui é o mesmo losango facetado sem nenhum WebGL: SVG com gradientes e um
+ * brilho por drop-shadow.
  *
- * `useId()` prefixa os ids dos gradientes: como o SVG pode aparecer em mais
- * de um lugar ao mesmo tempo (ex.: fallback do Suspense por um instante),
- * ids fixos colidiriam no DOM.
+ * `assemble` faz as quatro facetas entrarem em sequência, e é o que serve de
+ * indicador de carregamento no boot: em vez de uma barra de progresso
+ * genérica, o que "carrega" é a própria marca se formando.
+ *
+ * `useId()` prefixa os ids dos gradientes porque o SVG pode aparecer em mais
+ * de um lugar ao mesmo tempo, e ids fixos colidiriam no DOM.
  */
-const CrystalMark = ({ size = 120, pulse = true, className = '' }) => {
+const CrystalMark = ({ size = 120, pulse = true, assemble = false, className = '' }) => {
   const uid = useId()
   const idFacetA = `crystal-facet-a-${uid}`
   const idFacetB = `crystal-facet-b-${uid}`
+  const idGlow = `crystal-glow-${uid}`
 
   const classes = ['crystal-mark']
   if (pulse) classes.push('crystal-mark-pulse')
+  if (assemble) classes.push('crystal-mark-assemble')
   if (className) classes.push(className)
+
+  // Ordem de entrada: as duas facetas grandes primeiro (a silhueta aparece),
+  // depois as duas de luz e sombra (o volume aparece).
+  const facetas = [
+    { points: '50,4 90,38 50,50 10,38', fill: `url(#${idFacetA})`, opacity: 1, atraso: 0 },
+    { points: '50,50 90,38 50,96 10,38', fill: `url(#${idFacetB})`, opacity: 1, atraso: 180 },
+    { points: '50,4 50,50 10,38', fill: '#c4b5fd', opacity: 0.55, atraso: 380 },
+    { points: '50,50 50,96 90,38', fill: '#2e1065', opacity: 0.35, atraso: 520 },
+  ]
 
   return (
     <div className={classes.join(' ')} style={{ width: size, height: size }} aria-hidden="true">
@@ -40,15 +51,26 @@ const CrystalMark = ({ size = 120, pulse = true, className = '' }) => {
             <stop offset="0%" stopColor="#a855f7" />
             <stop offset="100%" stopColor="#4c1d95" />
           </linearGradient>
+          <radialGradient id={idGlow}>
+            <stop offset="0%" stopColor="#a855f7" stopOpacity="0.55" />
+            <stop offset="100%" stopColor="#a855f7" stopOpacity="0" />
+          </radialGradient>
         </defs>
 
-        {/* Quatro triângulos bastam para a leitura de "gema facetada": dois
-            grandes (topo/base) que recebem o gradiente principal e dois
-            menores nas laterais para simular luz e sombra lateral. */}
-        <polygon points="50,4 90,38 50,50 10,38" fill={`url(#${idFacetA})`} />
-        <polygon points="50,50 90,38 50,96 10,38" fill={`url(#${idFacetB})`} />
-        <polygon points="50,4 50,50 10,38" fill="#c4b5fd" opacity="0.55" />
-        <polygon points="50,50 50,96 90,38" fill="#2e1065" opacity="0.35" />
+        {/* Halo atrás das facetas: dá a impressão de que o cristal emite luz,
+            em vez de só refletir. Entra por último na montagem. */}
+        <circle cx="50" cy="50" r="46" fill={`url(#${idGlow})`} className="crystal-mark-glow" />
+
+        {facetas.map((f) => (
+          <polygon
+            key={f.points}
+            points={f.points}
+            fill={f.fill}
+            opacity={f.opacity}
+            className="crystal-mark-facet"
+            style={assemble ? { animationDelay: `${f.atraso}ms` } : undefined}
+          />
+        ))}
       </svg>
     </div>
   )
