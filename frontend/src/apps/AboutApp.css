@@ -20,23 +20,24 @@
   flex-wrap: wrap;
 }
 
-/* Recorte do CrystalScene: o componente vem com width/height: 700px e
-   position: absolute chumbados nele mesmo. Este wrapper é o ancestral
-   posicionado mais próximo, então o canvas gigante é centrado em
-   (50%, 40%) DESTE container e tudo que sobra é cortado pelo overflow.
-   O resultado é um "chip" com o facetado do cristal, não a peça inteira —
-   é o comportamento esperado ao aceitar o recorte em vez de editar o 3D. */
+/* Moldura do cristal — sem recorte.
+   Antes este wrapper tinha overflow:hidden e uma caixa 150x190 para conter um
+   componente que vinha com 700x700 e position:absolute chumbados; o resultado
+   era um "chip" com um pedaco do facetado, nao a peca inteira. O <Crystal>
+   agora e um bloco quadrado do tamanho que recebe, entao a moldura so precisa
+   acompanhar esse tamanho. */
 .about-crystal {
   position: relative;
-  overflow: hidden;
   flex: 0 0 auto;
-  width: 150px;
+  width: 190px;
   height: 190px;
+  display: grid;
+  place-items: center;
   border-radius: 22px;
   background: radial-gradient(
-    circle at 50% 42%,
-    rgba(88, 28, 135, 0.35),
-    rgba(10, 6, 18, 0.5) 70%
+    circle at 50% 45%,
+    rgba(88, 28, 135, 0.32),
+    rgba(10, 6, 18, 0.42) 72%
   );
   border: 1px solid rgba(168, 85, 247, 0.3);
   box-shadow: 0 0 30px rgba(168, 85, 247, 0.18);

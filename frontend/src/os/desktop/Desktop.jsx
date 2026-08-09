@@ -39,7 +39,7 @@ const Desktop = ({ isAnimated = true }) => {
   /**
    * PERFORMANCE: pré-carrega o chunk 3D quando a máquina estiver ociosa.
    *
-   * O AboutApp importa CrystalScene por React.lazy, o que mantém three/fiber/
+   * O AboutApp importa Crystal por React.lazy, o que mantém three/fiber/
    * drei fora do bundle inicial — bom para a primeira pintura. O efeito
    * colateral era um travão de segundos no CLIQUE, porque o download e o parse
    * dessas libs aconteciam no meio da interação. Buscando o chunk em idle, a
@@ -52,7 +52,7 @@ const Desktop = ({ isAnimated = true }) => {
 
     let cancelado = false
     const buscar = () => {
-      if (!cancelado) import('../../components/CrystalScene')
+      if (!cancelado) import('../../components/Crystal')
     }
 
     if ('requestIdleCallback' in window) {

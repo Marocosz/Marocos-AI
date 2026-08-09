@@ -4,7 +4,7 @@ import './boot.css'
 /**
  * CrystalMark — a marca do sistema em CSS/SVG puro.
  * --------------------------------------------------
- * O cristal "de verdade" (CrystalScene) monta um <Canvas> do
+ * O cristal "de verdade" (Crystal, em components/) monta um <Canvas> do
  * @react-three/fiber: cria contexto WebGL, ambiente procedural, material com
  * transmissão. Só isso já custa centenas de ms — ótimo numa janela que abre
  * depois de um clique, péssimo numa tela que precisa aparecer instantaneamente.

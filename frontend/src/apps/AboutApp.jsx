@@ -7,9 +7,9 @@ import DecryptedText from '../components/effects/DecryptedText'
 import './AboutApp.css'
 
 // three + @react-three/fiber + @react-three/drei são pesados demais pra
-// entrar no bundle principal só por causa de um diálogo "Sobre". Carrega
-// sob demanda e só em desktop (ver useDeviceMode mais abaixo).
-const CrystalScene = lazy(() => import('../components/CrystalScene'))
+// entrar no bundle principal só por causa de um diálogo "Sobre". Carrega sob
+// demanda e só em desktop (ver useDeviceMode mais abaixo).
+const Crystal = lazy(() => import('../components/Crystal'))
 
 /**
  * "Sobre este PC" — o winver do NoiseOS: identidade + especificações.
@@ -60,7 +60,7 @@ const AboutApp = () => {
         {deviceMode === 'desktop' && montarCristal && (
           <div className="about-crystal" role="img" aria-label={os.about.crystalAlt}>
             <Suspense fallback={<div className="about-crystal-fallback" aria-hidden="true" />}>
-              <CrystalScene />
+              <Crystal size={190} animated />
             </Suspense>
           </div>
         )}

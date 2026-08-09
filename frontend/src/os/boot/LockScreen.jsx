@@ -1,9 +1,14 @@
-import { useEffect, useState, useRef } from 'react'
+import { useEffect, useState, useRef, Suspense, lazy } from 'react'
 import { useLanguage } from '../../contexts/LanguageContext'
 import { getOsData } from '../../data/os'
 import { getStartMenuData } from '../../data/startMenu'
 import CrystalMark from './CrystalMark'
+
 import './boot.css'
+
+// Mesmo cristal da identidade, carregado sob demanda. A esta altura o boot ja
+// disparou o mesmo import, entao o chunk normalmente ja esta em memoria.
+const Crystal = lazy(() => import('../../components/Crystal'))
 
 /**
  * LockScreen — a porta do Marocos SO.
@@ -72,7 +77,9 @@ const LockScreen = ({ onUnlock }) => {
           aria-label={t.enterAria}
           onClick={destrancar}
         >
-          <CrystalMark size={132} pulse className="lock-crystal" />
+          <Suspense fallback={<CrystalMark size={300} pulse className="lock-crystal" />}>
+            <Crystal size={300} animated className="lock-crystal" />
+          </Suspense>
 
           <span className="lock-wordmark">{t.systemName}</span>
           <span className="lock-enter">{t.enter}</span>

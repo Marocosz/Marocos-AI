@@ -1,8 +1,14 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useState, Suspense, lazy } from 'react'
 import { useLanguage } from '../../contexts/LanguageContext'
 import { getOsData } from '../../data/os'
 import CrystalMark from './CrystalMark'
+
 import './boot.css'
+
+// O cristal de verdade e pesado (three + fiber + drei). Carrega sob demanda;
+// ate chegar, a marca em SVG se monta faceta a faceta no lugar dele — o que
+// torna o fallback um indicador de carregamento honesto em vez de um vazio.
+const Crystal = lazy(() => import('../../components/Crystal'))
 
 // Duração da cerimônia. A montagem das facetas ocupa os primeiros ~900ms; o
 // resto é o nome entrando e um respiro antes da tela de bloqueio.
@@ -11,11 +17,11 @@ const BOOT_DURATION_MS = 2000
 /**
  * BootScreen — inicialização do Marocos SO.
  * --------------------------------------------------
- * Sem barra de progresso e sem anel de bolinhas. A marca do sistema é um
- * cristal FACETADO, então o carregamento é o cristal se montando faceta por
- * faceta: o indicador de progresso é a própria marca se formando. É a única
- * animação de boot que este projeto poderia ter, porque nasce da geometria do
- * logo em vez de ser aplicada por cima dele.
+ * Sem barra de progresso e sem anel de bolinhas. O cristal da identidade
+ * aparece assim que o chunk 3D chega; enquanto ele não chega, a marca em SVG
+ * se monta faceta a faceta no lugar. O indicador de progresso é a própria
+ * marca se formando — nasce da geometria do logo em vez de ser aplicada por
+ * cima dele, e some sozinho quando a peça real assume.
  *
  * Pulável a qualquer momento por tecla ou clique. Com
  * `prefers-reduced-motion: reduce` nem chega a pintar: onDone() na hora.
@@ -63,7 +69,9 @@ const BootScreen = ({ onDone }) => {
   return (
     <div className="boot-screen" role="status" aria-label={strings.ariaLabel}>
       <div className="boot-content">
-        <CrystalMark size={104} pulse={false} assemble />
+        <Suspense fallback={<CrystalMark size={168} pulse={false} assemble />}>
+          <Crystal size={168} animated />
+        </Suspense>
 
         <p className="boot-title">{strings.systemName}</p>
         {strings.tagline && <p className="boot-tagline">{strings.tagline}</p>}

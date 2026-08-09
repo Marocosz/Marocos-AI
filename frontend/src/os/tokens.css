@@ -152,3 +152,50 @@
 .noiseos-window-body::-webkit-scrollbar-corner {
   background: transparent;
 }
+
+/* --------------------------------------------------
+   CRISTAL 3D
+   Bloco comum, sem posicionamento embutido: quem coloca é quem usa. A versão
+   antiga se posicionava sozinha em absolute e transbordava o container, o que
+   obrigava cada consumidor a inventar um recorte.
+   -------------------------------------------------- */
+
+.crystal-3d {
+  position: relative;
+  display: block;
+  flex: 0 0 auto;
+  /* Decorativo: nunca rouba clique de quem está atrás. */
+  pointer-events: none;
+  /* O canvas já é o limite do desenho, mas isto garante que nenhum ancestral
+     com overflow corte o brilho. */
+  overflow: visible;
+}
+
+/* HALO. O material do cristal tem transmission: 1.0 — ele e totalmente
+   transmissivo e mostra o que esta ATRAS dele. Em producao isso funcionava
+   porque ele ficava sobre uma faixa de vidro clara; sobre fundo escuro ele
+   simplesmente some. Este brilho da a ele algo para transmitir. */
+.crystal-3d::before {
+  content: '';
+  position: absolute;
+  inset: -18%;
+  border-radius: 50%;
+  background: radial-gradient(
+    circle at 50% 50%,
+    rgba(168, 85, 247, 0.34) 0%,
+    rgba(124, 58, 237, 0.16) 42%,
+    transparent 68%
+  );
+  pointer-events: none;
+}
+
+.crystal-3d-sem-halo::before {
+  display: none;
+}
+
+.crystal-3d canvas {
+  position: relative;
+  display: block;
+  width: 100% !important;
+  height: 100% !important;
+}
