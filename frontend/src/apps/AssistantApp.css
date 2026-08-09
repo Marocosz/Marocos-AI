@@ -10,7 +10,7 @@
    pelo spec.
 
    Sem backdrop-filter aqui dentro: o blur já é do chrome da janela
-   (noiseos-window), e empilhar blur quebra o Safari do iOS.
+   (marocos-window), e empilhar blur quebra o Safari do iOS.
 
    As variáveis de tema (--text-primary, --text-secondary, --accent-color)
    já trocam sozinhas via .theme-dark/.theme-light no elemento raiz do Shell

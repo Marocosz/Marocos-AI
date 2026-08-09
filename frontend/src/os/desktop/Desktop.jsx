@@ -71,19 +71,19 @@ const Desktop = ({ isAnimated = true }) => {
   }, [isDesktop])
 
   return (
-    <div className="noiseos-desktop" ref={desktopRef}>
+    <div className="marocos-desktop" ref={desktopRef}>
       <ContextMenu targetRef={desktopRef} items={itensDoMenu} />
       <Hills isAnimated={isAnimated} />
 
       {/* Assinatura: é aqui que vive o <h1> da página. A Hero deixou de
           existir, e sem isto o site perde o cabeçalho principal. */}
-      <div className="noiseos-signature">
+      <div className="marocos-signature">
         <h1>Marcos Rodrigues</h1>
         <p>{os.signature.role}</p>
-        <span className="noiseos-signature-bio">{profile.bio_highlight}</span>
+        <span className="marocos-signature-bio">{profile.bio_highlight}</span>
       </div>
 
-      <ul className="noiseos-icons">
+      <ul className="marocos-icons">
         {icons.map((app, i) => {
           const Icon = app.icon
           return (
@@ -96,10 +96,10 @@ const Desktop = ({ isAnimated = true }) => {
               {/* Clique único abre: desvio deliberado da metáfora, porque
                   estes ícones são a navegação principal do site. */}
               <button type="button" onClick={() => open(app.id)}>
-                <span className="noiseos-icon-tile">
+                <span className="marocos-icon-tile">
                   <Icon size={26} strokeWidth={1.75} />
                 </span>
-                <span className="noiseos-icon-label">{os.windows[app.titleKey]}</span>
+                <span className="marocos-icon-label">{os.windows[app.titleKey]}</span>
               </button>
             </motion.li>
           )

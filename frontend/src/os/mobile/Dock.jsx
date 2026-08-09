@@ -21,7 +21,7 @@ const Dock = () => {
   const apps = APPS.filter((a) => a.inDock)
 
   return (
-    <nav className="noiseos-mobile-dock" aria-label={os.mobile.dock.label}>
+    <nav className="marocos-mobile-dock" aria-label={os.mobile.dock.label}>
       {apps.map((app) => {
         const Icon = app.icon
         const title = app.titleKey ? os.windows[app.titleKey] : ''
@@ -30,7 +30,7 @@ const Dock = () => {
           <button
             key={app.id}
             type="button"
-            className="noiseos-mobile-dock-btn"
+            className="marocos-mobile-dock-btn"
             onClick={() => open(app.id)}
             aria-label={title}
             title={title}

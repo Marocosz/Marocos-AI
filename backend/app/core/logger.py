@@ -31,7 +31,7 @@ if not os.path.exists(LOG_DIR):
     os.makedirs(LOG_DIR)
 
 # Inicializa o objeto Logger Singleton
-logger = logging.getLogger("noiseportfolio_backend")
+logger = logging.getLogger("marocos_backend")
 logger.setLevel(logging.INFO)
 
 # --------------------------------------------------

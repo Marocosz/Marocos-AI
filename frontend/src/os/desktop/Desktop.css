@@ -1,10 +1,10 @@
-.noiseos-desktop {
+.marocos-desktop {
   position: fixed;
   inset: 0;
   overflow: hidden;
 }
 
-.noiseos-icons {
+.marocos-icons {
   position: absolute;
   top: 20px;
   left: 20px;
@@ -20,7 +20,7 @@
   list-style: none;
 }
 
-.noiseos-icons button {
+.marocos-icons button {
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -33,10 +33,10 @@
   cursor: pointer;
 }
 
-.noiseos-icons button:hover { background: rgba(255, 255, 255, 0.12); }
-.noiseos-icons button:focus-visible { outline: 2px solid var(--accent-color); }
+.marocos-icons button:hover { background: rgba(255, 255, 255, 0.12); }
+.marocos-icons button:focus-visible { outline: 2px solid var(--accent-color); }
 
-.noiseos-icon-tile {
+.marocos-icon-tile {
   display: grid;
   place-items: center;
   width: 56px;
@@ -48,7 +48,7 @@
   color: #fff;
 }
 
-.noiseos-icon-label {
+.marocos-icon-label {
   font-family: system-ui, sans-serif;
   font-size: 0.72rem;
   line-height: 1.25;
@@ -59,7 +59,7 @@
 
 /* No tema claro o wallpaper fica lilás pálido: texto branco com sombra escura
    viraria um borrão. Inverte para texto escuro com halo claro. */
-.theme-light .noiseos-icon-label {
+.theme-light .marocos-icon-label {
   color: #2e1065;
   text-shadow: 0 1px 2px rgba(255, 255, 255, 0.85);
 }
@@ -69,7 +69,7 @@
    ANCORADA NO CANTO SUPERIOR DIREITO: as janelas nascem em (96,64) no canto
    superior esquerdo e descem em cascata para a direita e para baixo, entao
    este e o canto que a cascata leva mais tempo para cobrir. */
-.noiseos-signature {
+.marocos-signature {
   position: absolute;
   top: 40px;
   right: 40px;
@@ -79,7 +79,7 @@
   pointer-events: none;
 }
 
-.noiseos-signature h1 {
+.marocos-signature h1 {
   margin: 0;
   font-family: 'Poppins', sans-serif;
   font-size: clamp(2.4rem, 4vw, 3.6rem);
@@ -91,7 +91,7 @@
   opacity: 0.92;
 }
 
-.noiseos-signature p {
+.marocos-signature p {
   margin: 10px 0 0;
   font-family: system-ui, sans-serif;
   font-size: 0.95rem;
@@ -101,7 +101,7 @@
   opacity: 0.7;
 }
 
-.noiseos-signature-bio {
+.marocos-signature-bio {
   display: block;
   margin-top: 14px;
   font-size: 0.86rem;
@@ -110,9 +110,9 @@
   opacity: 0.62;
 }
 
-.theme-light .noiseos-signature h1,
-.theme-light .noiseos-signature p,
-.theme-light .noiseos-signature-bio {
+.theme-light .marocos-signature h1,
+.theme-light .marocos-signature p,
+.theme-light .marocos-signature-bio {
   color: #1e1b4b;
   text-shadow: 0 1px 2px rgba(255, 255, 255, 0.6);
 }
@@ -120,21 +120,21 @@
 /* Encolhe em tela menor, mas NUNCA esconde: este bloco carrega o <h1> da
    página, e display:none aqui seria regressão de SEO em todo mobile. */
 @media (max-width: 1200px) {
-  .noiseos-signature {
+  .marocos-signature {
     top: 24px;
     right: 24px;
     max-width: 52vw;
   }
 
-  .noiseos-signature h1 {
+  .marocos-signature h1 {
     font-size: clamp(1.7rem, 5vw, 2.4rem);
   }
 
-  .noiseos-signature p {
+  .marocos-signature p {
     font-size: 0.82rem;
   }
 
-  .noiseos-signature-bio {
+  .marocos-signature-bio {
     display: none; /* só a bio sai; h1 e cargo permanecem */
   }
 }

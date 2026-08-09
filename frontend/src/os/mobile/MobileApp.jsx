@@ -39,25 +39,25 @@ const MobileApp = ({ win }) => {
 
   return (
     <motion.div
-      className="noiseos-mobile-app"
+      className="marocos-mobile-app"
       initial={prefersReducedMotion ? false : { x: '100%' }}
       animate={{ x: 0 }}
       transition={{ duration: prefersReducedMotion ? 0 : 0.28, ease: 'easeOut' }}
     >
-      <header className="noiseos-mobile-app-header">
-        <button type="button" className="noiseos-mobile-back" onClick={() => close(win.key)}>
+      <header className="marocos-mobile-app-header">
+        <button type="button" className="marocos-mobile-back" onClick={() => close(win.key)}>
           <ChevronLeft size={20} strokeWidth={2.25} />
           <span>{os.mobile.back}</span>
         </button>
 
-        <span className="noiseos-mobile-app-title">{title}</span>
+        <span className="marocos-mobile-app-title">{title}</span>
 
         {/* Espaçador simétrico ao botão Voltar, para o título ficar
             visualmente centralizado mesmo com Voltar só de um lado. */}
-        <span className="noiseos-mobile-app-spacer" aria-hidden="true" />
+        <span className="marocos-mobile-app-spacer" aria-hidden="true" />
       </header>
 
-      <div className="noiseos-mobile-app-body" ref={bodyRef}>
+      <div className="marocos-mobile-app-body" ref={bodyRef}>
         {AppComponent ? <AppComponent params={win.params} /> : null}
       </div>
     </motion.div>

@@ -8,7 +8,7 @@ import { getStartMenuData } from '../../data/startMenu'
 import './StartMenu.css'
 
 /**
- * MENU INICIAR DO NOISEOS
+ * MENU INICIAR DO MAROCOS OS
  * --------------------------------------------------
  * Continua a linguagem visual da taskbar (mesmo material mica, mesmo raio,
  * mesmas transições de tema) e ancora acima do botão Iniciar, no canto

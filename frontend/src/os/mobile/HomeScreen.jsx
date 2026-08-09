@@ -33,9 +33,9 @@ const HomeScreen = ({ onOpenQuickSettings }) => {
   }, [])
 
   return (
-    <div className="noiseos-mobile-home">
+    <div className="marocos-mobile-home">
       <motion.div
-        className="noiseos-mobile-statusbar"
+        className="marocos-mobile-statusbar"
         role="button"
         tabIndex={0}
         aria-label={os.mobile.quickSettings.open}
@@ -49,16 +49,16 @@ const HomeScreen = ({ onOpenQuickSettings }) => {
           if (info.offset.y > 20) onOpenQuickSettings()
         }}
       >
-        <span className="noiseos-mobile-clock">
+        <span className="marocos-mobile-clock">
           {now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
         </span>
-        <span className="noiseos-mobile-statusicons" aria-hidden="true">
+        <span className="marocos-mobile-statusicons" aria-hidden="true">
           <Signal size={14} strokeWidth={2.2} />
           <BatteryFull size={17} strokeWidth={2.2} />
         </span>
       </motion.div>
 
-      <ul className="noiseos-mobile-grid">
+      <ul className="marocos-mobile-grid">
         {icons.map((app, i) => {
           const Icon = app.icon
           return (
@@ -69,10 +69,10 @@ const HomeScreen = ({ onOpenQuickSettings }) => {
               transition={{ delay: 0.03 * i, duration: 0.25 }}
             >
               <button type="button" onClick={() => open(app.id)}>
-                <span className="noiseos-mobile-tile">
+                <span className="marocos-mobile-tile">
                   <Icon size={26} strokeWidth={1.75} />
                 </span>
-                <span className="noiseos-mobile-label">{os.windows[app.titleKey]}</span>
+                <span className="marocos-mobile-label">{os.windows[app.titleKey]}</span>
               </button>
             </motion.li>
           )

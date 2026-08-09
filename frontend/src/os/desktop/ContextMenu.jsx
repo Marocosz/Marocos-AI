@@ -6,7 +6,7 @@ import { getOsData } from '../../data/os'
 import './ContextMenu.css'
 
 /**
- * MENU DE CONTEXTO DO NOISEOS
+ * MENU DE CONTEXTO DO MAROCOS OS
  * --------------------------------------------------
  * Se registra sozinho no elemento apontado por `targetRef`, escutando o
  * evento nativo `contextmenu` — não precisa de nenhum contêiner especial
@@ -14,7 +14,7 @@ import './ContextMenu.css'
  *
  * Crítico: só assume o clique quando o alvo é a própria superfície do
  * wallpaper. Texto, link, campo de formulário ou o interior de uma janela
- * (`.noiseos-window`) continuam abrindo o menu nativo do navegador — o
+ * (`.marocos-window`) continuam abrindo o menu nativo do navegador — o
  * visitante precisa poder copiar texto normalmente (o e-mail, por exemplo).
  * Um elemento pode pedir esse comportamento nativo explicitamente com
  * `data-menu-nativo`.
@@ -39,7 +39,7 @@ export default function ContextMenu({ targetRef, items }) {
 
     const onContextMenu = (event) => {
       const isNativeSurface = event.target.closest(
-        '.noiseos-window, a, input, textarea, [data-menu-nativo]',
+        '.marocos-window, a, input, textarea, [data-menu-nativo]',
       )
       if (isNativeSurface) return // desiste: deixa o menu nativo aparecer
 
@@ -120,7 +120,7 @@ export default function ContextMenu({ targetRef, items }) {
   return (
     <ul
       ref={menuRef}
-      className="noiseos-context-menu"
+      className="marocos-context-menu"
       role="menu"
       aria-label={os.contextMenu.ariaLabel}
       style={{ top: position.y, left: position.x }}
@@ -132,7 +132,7 @@ export default function ContextMenu({ targetRef, items }) {
             type="button"
             role="menuitem"
             ref={(el) => { itemRefs.current[index] = el }}
-            className="noiseos-context-menu-item"
+            className="marocos-context-menu-item"
             onClick={() => {
               item.onSelect?.()
               close()

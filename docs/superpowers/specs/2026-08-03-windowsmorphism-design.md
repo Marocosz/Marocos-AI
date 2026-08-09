@@ -1,4 +1,4 @@
-# NoiseOS — Redesign do portfólio como sistema operacional
+# Marocos OS — Redesign do portfólio como sistema operacional
 
 **Data:** 2026-08-03
 **Branch:** `feat/windowsmorphism`
@@ -8,11 +8,11 @@
 
 ## 1. Objetivo
 
-Substituir o site linear atual por um ambiente de desktop navegável — "NoiseOS" — onde cada
+Substituir o site linear atual por um ambiente de desktop navegável — "Marocos OS" — onde cada
 tópico do portfólio é um app que abre em janela arrastável. O conteúdo textual existente é
 preservado integralmente; o que muda é o invólucro e a navegação.
 
-O portfólio já se autodeclara `NoisePortfolio OS [Version 3.0.1]` no conteúdo da seção de
+O portfólio já se autodeclara `Marocos OS [Version 3.0.1]` no conteúdo da seção de
 contato, e a navbar atual já imita uma taskbar. Este redesign leva a metáfora que já estava
 latente até o fim.
 
@@ -31,7 +31,7 @@ latente até o fim.
 | # | Decisão | Alternativas descartadas |
 |---|---|---|
 | 1 | **Desktop puro, sem scroll de página.** Todo scroll acontece dentro de janelas. | Site atual dentro de uma janela "navegador"; híbrido desktop-em-cima/scroll-embaixo |
-| 2 | **NoiseOS autoral** — gramática de SO com chrome de vidro roxo, evoluindo o glassmorphism atual. | Clone fiel do XP Luna repintado; Aero/Windows 7 |
+| 2 | **Marocos OS autoral** — gramática de SO com chrome de vidro roxo, evoluindo o glassmorphism atual. | Clone fiel do XP Luna repintado; Aero/Windows 7 |
 | 3 | **Mobile vira SO mobile** — home screen de ícones, apps em tela cheia. | Desktop comprimido com janela maximizada; servir o site linear atual no mobile |
 | 4 | **Window manager essencial + taskbar viva.** Arrastar, foco/z-order, fechar, minimizar, maximizar, botões na taskbar, deep links. Sem resize, sem snap, sem persistir posição entre visitas. | Completo com resize/snap/localStorage; mínimo só com drag e fechar |
 | 5 | **Boot curto (~1,8s), pulável, 1× por sessão.** | Sem boot; POST estilo BIOS de ~4s |
@@ -66,8 +66,8 @@ cúmulos pequenas.
 - Céu: gradiente `#2e1065` (topo) → `#6d28d9` → `#a78bfa` → `#ddd6fe` (horizonte)
 - Colinas: 3 paths SVG sobrepostos em `#7c3aed`, `#6b21a8`, `#581c87`
 - Nuvens: elipses brancas com blur, `opacity: .5`, deriva lenta (desligável)
-- Grão de filme por cima via `feTurbulence` — o projeto se chama **noise**portfolio, então ruído
-  real na textura do sistema amarra o nome à coisa
+- Grão de filme por cima via `feTurbulence` — ruído real na textura dá
+  materialidade ao gradiente (removido depois, ver histórico)
 
 **Claro/escuro = dia/noite da mesma paisagem.** Mesma geometria SVG, dois conjuntos de token:
 dia com céu lilás pálido e colinas iluminadas; noite com índigo profundo, colinas em silhueta e
@@ -80,7 +80,7 @@ Configurações, ao lado de *Colinas*. Deleção convertida em funcionalidade.
 
 Três aparições, cada uma onde ele ganha presença em vez de competir por atenção:
 
-1. **Boot** — logo do NoiseOS na splash
+1. **Boot** — logo do Marocos OS na splash
 2. **Sobre este PC** — o slot onde o Windows põe a bandeirinha; o cristal é o logo do sistema
 3. **Screensaver** — após 90s de inatividade, o desktop escurece e ele flutua com os `Sparkles`
 
@@ -245,7 +245,7 @@ Duas medidas:
 2. **Na primeira visita da sessão, "Sobre este PC" abre sozinho** — ninguém deve cair num
    desktop vazio sem saber o que clicar.
 
-Ambos usam a **mesma** chave `sessionStorage['noiseos:visited']` que controla o boot: a primeira
+Ambos usam a **mesma** chave `sessionStorage['marocos:visited']` que controla o boot: a primeira
 visita da sessão recebe boot + janela de boas-vindas; recarregar na mesma aba cai direto num
 desktop limpo. Uma chave, um conceito ("primeira vez nesta sessão").
 

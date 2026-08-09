@@ -15,7 +15,7 @@ import StartMenu from './StartMenu'
 import './Taskbar.css'
 
 /**
- * TASKBAR DO NOISEOS
+ * TASKBAR DO MAROCOS OS
  * --------------------------------------------------
  * Continuação direta da Navbar que o projeto já tinha: mesma altura de 52px,
  * mesmo material mica, mesmos tooltips com delay, mesmo system tray à direita

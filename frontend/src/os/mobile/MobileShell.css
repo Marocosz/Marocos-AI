@@ -1,5 +1,5 @@
 /* --------------------------------------------------
-   SHELL MOBILE DO NOISEOS
+   SHELL MOBILE DO MAROCOS OS
    CSS de MobileShell, HomeScreen, MobileApp, Dock e QuickSettings — tudo num
    arquivo só por simplicidade, já que os cinco componentes formam uma
    unidade fechada (nenhum é reutilizado fora deste shell).
@@ -10,7 +10,7 @@
    dimensão que não interessam ao desktop.
    -------------------------------------------------- */
 
-.noiseos-mobile-shell {
+.marocos-mobile-shell {
   position: fixed;
   inset: 0;
   overflow: hidden;
@@ -25,7 +25,7 @@
    HOME SCREEN
    -------------------------------------------------- */
 
-.noiseos-mobile-home {
+.marocos-mobile-home {
   position: absolute;
   inset: 0;
   z-index: var(--z-icons);
@@ -38,7 +38,7 @@
 }
 
 /* --- Barra de status --- */
-.noiseos-mobile-statusbar {
+.marocos-mobile-statusbar {
   flex: 0 0 auto;
   display: flex;
   align-items: center;
@@ -54,7 +54,7 @@
   user-select: none;
 }
 
-.noiseos-mobile-clock {
+.marocos-mobile-clock {
   font-family: system-ui, sans-serif;
   font-size: 0.82rem;
   font-weight: 600;
@@ -62,7 +62,7 @@
   text-shadow: var(--icon-label-shadow);
 }
 
-.noiseos-mobile-statusicons {
+.marocos-mobile-statusicons {
   display: flex;
   align-items: center;
   gap: 6px;
@@ -70,15 +70,15 @@
   filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.6));
 }
 
-.theme-light .noiseos-mobile-clock,
-.theme-light .noiseos-mobile-statusicons {
+.theme-light .marocos-mobile-clock,
+.theme-light .marocos-mobile-statusicons {
   color: #2e1065;
   text-shadow: 0 1px 2px rgba(255, 255, 255, 0.7);
   filter: drop-shadow(0 1px 1px rgba(255, 255, 255, 0.7));
 }
 
 /* --- Grade de apps --- */
-.noiseos-mobile-grid {
+.marocos-mobile-grid {
   flex: 1 1 auto;
   display: grid;
   grid-template-columns: repeat(3, 1fr);
@@ -89,7 +89,7 @@
   list-style: none;
 }
 
-.noiseos-mobile-grid button {
+.marocos-mobile-grid button {
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -103,7 +103,7 @@
   cursor: pointer;
 }
 
-.noiseos-mobile-tile {
+.marocos-mobile-tile {
   display: grid;
   place-items: center;
   width: 60px;
@@ -116,11 +116,11 @@
   transition: transform 0.1s ease;
 }
 
-.noiseos-mobile-grid button:active .noiseos-mobile-tile {
+.marocos-mobile-grid button:active .marocos-mobile-tile {
   transform: scale(0.94);
 }
 
-.noiseos-mobile-label {
+.marocos-mobile-label {
   font-family: system-ui, sans-serif;
   font-size: 0.72rem;
   line-height: 1.25;
@@ -130,7 +130,7 @@
 }
 
 /* Wallpaper claro é lilás pálido: texto branco desapareceria. */
-.theme-light .noiseos-mobile-label {
+.theme-light .marocos-mobile-label {
   color: #2e1065;
   text-shadow: 0 1px 2px rgba(255, 255, 255, 0.85);
 }
@@ -139,7 +139,7 @@
    APP EM TELA CHEIA
    -------------------------------------------------- */
 
-.noiseos-mobile-app {
+.marocos-mobile-app {
   position: absolute;
   inset: 0;
   z-index: var(--z-windows);
@@ -148,7 +148,7 @@
   background: var(--win-body-solid);
 }
 
-.noiseos-mobile-app-header {
+.marocos-mobile-app-header {
   flex: 0 0 auto;
   display: flex;
   align-items: center;
@@ -162,7 +162,7 @@
   backdrop-filter: var(--win-glass-blur);
 }
 
-.noiseos-mobile-back {
+.marocos-mobile-back {
   display: flex;
   align-items: center;
   gap: 2px;
@@ -177,11 +177,11 @@
   cursor: pointer;
 }
 
-.noiseos-mobile-back:active {
+.marocos-mobile-back:active {
   background: rgba(255, 255, 255, 0.12);
 }
 
-.noiseos-mobile-app-title {
+.marocos-mobile-app-title {
   flex: 1 1 auto;
   overflow: hidden;
   text-align: center;
@@ -195,11 +195,11 @@
 
 /* Mesma largura do botão Voltar, para o título ficar centralizado de
    verdade em vez de puxado para a direita. */
-.noiseos-mobile-app-spacer {
+.marocos-mobile-app-spacer {
   min-width: 44px;
 }
 
-.noiseos-mobile-app-body {
+.marocos-mobile-app-body {
   flex: 1 1 auto;
   overflow-y: auto;
   -webkit-overflow-scrolling: touch;
@@ -211,7 +211,7 @@
    DOCK
    -------------------------------------------------- */
 
-.noiseos-mobile-dock {
+.marocos-mobile-dock {
   position: absolute;
   left: 0;
   right: 0;
@@ -230,7 +230,7 @@
   backdrop-filter: blur(12px);
 }
 
-.noiseos-mobile-dock-btn {
+.marocos-mobile-dock-btn {
   display: grid;
   place-items: center;
   width: 48px;
@@ -243,21 +243,21 @@
   transition: background 0.15s ease, color 0.15s ease;
 }
 
-.noiseos-mobile-dock-btn:active {
+.marocos-mobile-dock-btn:active {
   background: rgba(255, 255, 255, 0.1);
   color: #fff;
 }
 
-.theme-light .noiseos-mobile-dock {
+.theme-light .marocos-mobile-dock {
   background: rgba(245, 245, 245, 0.85);
   border-top: 1px solid rgba(0, 0, 0, 0.08);
 }
 
-.theme-light .noiseos-mobile-dock-btn {
+.theme-light .marocos-mobile-dock-btn {
   color: #555;
 }
 
-.theme-light .noiseos-mobile-dock-btn:active {
+.theme-light .marocos-mobile-dock-btn:active {
   background: rgba(0, 0, 0, 0.06);
   color: #000;
 }
@@ -266,14 +266,14 @@
    QUICK SETTINGS
    -------------------------------------------------- */
 
-.noiseos-mobile-qs-backdrop {
+.marocos-mobile-qs-backdrop {
   position: fixed;
   inset: 0;
   z-index: var(--z-startmenu);
   background: rgba(0, 0, 0, 0.35);
 }
 
-.noiseos-mobile-qs-panel {
+.marocos-mobile-qs-panel {
   position: fixed;
   top: 0;
   left: 0;
@@ -290,21 +290,21 @@
   touch-action: none;
 }
 
-.noiseos-mobile-qs-header {
+.marocos-mobile-qs-header {
   display: flex;
   align-items: center;
   justify-content: space-between;
   margin-bottom: 12px;
 }
 
-.noiseos-mobile-qs-title {
+.marocos-mobile-qs-title {
   font-family: system-ui, sans-serif;
   font-size: 0.98rem;
   font-weight: 600;
   color: var(--text-primary);
 }
 
-.noiseos-mobile-qs-close {
+.marocos-mobile-qs-close {
   display: grid;
   place-items: center;
   width: 44px;
@@ -316,11 +316,11 @@
   cursor: pointer;
 }
 
-.noiseos-mobile-qs-close:active {
+.marocos-mobile-qs-close:active {
   background: rgba(255, 255, 255, 0.12);
 }
 
-.noiseos-mobile-qs-list {
+.marocos-mobile-qs-list {
   display: flex;
   flex-direction: column;
   gap: 4px;
@@ -329,7 +329,7 @@
   list-style: none;
 }
 
-.noiseos-mobile-qs-row {
+.marocos-mobile-qs-row {
   display: flex;
   align-items: center;
   gap: 12px;
@@ -344,21 +344,21 @@
   text-align: left;
 }
 
-.noiseos-mobile-qs-row:active {
+.marocos-mobile-qs-row:active {
   background: rgba(255, 255, 255, 0.08);
 }
 
-.theme-light .noiseos-mobile-qs-row:active {
+.theme-light .marocos-mobile-qs-row:active {
   background: rgba(0, 0, 0, 0.05);
 }
 
-.noiseos-mobile-qs-label {
+.marocos-mobile-qs-label {
   flex: 1 1 auto;
   font-family: system-ui, sans-serif;
   font-size: 0.88rem;
 }
 
-.noiseos-mobile-qs-value {
+.marocos-mobile-qs-value {
   font-family: system-ui, sans-serif;
   font-size: 0.8rem;
   font-weight: 600;

@@ -30,11 +30,11 @@ const Hills = ({ isAnimated = true }) => {
   const { isDark } = useTheme()
 
   return (
-    <div className="noiseos-wallpaper" aria-hidden="true">
-      <div className="noiseos-sky">
+    <div className="marocos-wallpaper" aria-hidden="true">
+      <div className="marocos-sky">
         {isMobile ? (
           // Celular não paga o custo de WebGL de tela cheia: só o gradiente.
-          <div className="noiseos-sky-fallback" />
+          <div className="marocos-sky-fallback" />
         ) : isDark ? (
           <Silk
             color={SILK_DARK}

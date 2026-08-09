@@ -12,7 +12,7 @@ import './AboutApp.css'
 const Crystal = lazy(() => import('../components/Crystal'))
 
 /**
- * "Sobre este PC" — o winver do NoiseOS: identidade + especificações.
+ * "Sobre este PC" — o winver do Marocos OS: identidade + especificações.
  *
  * A piada é ler bio/skills como se fossem specs de hardware. Conteúdo vem
  * inteiro de getProfileData (mesma fonte do Profile.jsx da página clássica);

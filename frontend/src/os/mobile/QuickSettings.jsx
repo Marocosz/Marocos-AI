@@ -51,7 +51,7 @@ const QuickSettings = ({ open, onClose }) => {
       {open && (
         <React.Fragment>
           <motion.div
-            className="noiseos-mobile-qs-backdrop"
+            className="marocos-mobile-qs-backdrop"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
@@ -60,7 +60,7 @@ const QuickSettings = ({ open, onClose }) => {
           />
 
           <motion.div
-            className="noiseos-mobile-qs-panel"
+            className="marocos-mobile-qs-panel"
             role="dialog"
             aria-label={os.mobile.quickSettings.title}
             initial={prefersReducedMotion ? { opacity: 0 } : { y: '-100%' }}
@@ -73,11 +73,11 @@ const QuickSettings = ({ open, onClose }) => {
               if (info.offset.y < -20) onClose()
             }}
           >
-            <div className="noiseos-mobile-qs-header">
-              <span className="noiseos-mobile-qs-title">{os.mobile.quickSettings.title}</span>
+            <div className="marocos-mobile-qs-header">
+              <span className="marocos-mobile-qs-title">{os.mobile.quickSettings.title}</span>
               <button
                 type="button"
-                className="noiseos-mobile-qs-close"
+                className="marocos-mobile-qs-close"
                 onClick={onClose}
                 aria-label={os.controls.close}
               >
@@ -85,15 +85,15 @@ const QuickSettings = ({ open, onClose }) => {
               </button>
             </div>
 
-            <ul className="noiseos-mobile-qs-list">
+            <ul className="marocos-mobile-qs-list">
               {rows.map((row) => {
                 const Icon = row.icon
                 return (
                   <li key={row.id}>
-                    <button type="button" className="noiseos-mobile-qs-row" onClick={row.onToggle}>
+                    <button type="button" className="marocos-mobile-qs-row" onClick={row.onToggle}>
                       <Icon size={20} strokeWidth={1.8} />
-                      <span className="noiseos-mobile-qs-label">{row.label}</span>
-                      <span className="noiseos-mobile-qs-value">{row.value}</span>
+                      <span className="marocos-mobile-qs-label">{row.label}</span>
+                      <span className="marocos-mobile-qs-value">{row.value}</span>
                     </button>
                   </li>
                 )

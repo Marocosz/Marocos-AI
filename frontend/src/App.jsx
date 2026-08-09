@@ -13,7 +13,7 @@ import LockScreen from './os/boot/LockScreen'
 import './os/tokens.css'
 
 /**
- * Shell do NoiseOS.
+ * Shell do Marocos OS.
  *
  * O Lenis saiu junto com o scroll de página: não há mais o que suavizar,
  * porque todo scroll agora acontece dentro de janelas.

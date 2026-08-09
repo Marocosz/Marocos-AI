@@ -1,7 +1,7 @@
 /**
  * DOCUMENT HEAD POR ROTA
  * --------------------------------------------------
- * O NoiseOS ganhou rotas de verdade (ver registry.js), mas o <title> e o
+ * O Marocos OS ganhou rotas de verdade (ver registry.js), mas o <title> e o
  * <link rel="canonical"> continuavam chumbados em index.html apontando pra
  * raiz. Toda URL do site anunciava a mesma canônica, o que atrapalha
  * indexação em vez de ajudar.

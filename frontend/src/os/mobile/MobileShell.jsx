@@ -8,7 +8,7 @@ import QuickSettings from './QuickSettings'
 import './MobileShell.css'
 
 /**
- * SHELL MOBILE DO NOISEOS
+ * SHELL MOBILE DO MAROCOS OS
  * --------------------------------------------------
  * Lê o MESMO estado de `useWindows()` que o desktop, só que como PILHA em vez
  * de conjunto: no desktop todas as janelas ficam visíveis e a diferença entre
@@ -33,7 +33,7 @@ const MobileShell = ({ isAnimated = true }) => {
   const wallpaperAnimado = isAnimated && !topWindow
 
   return (
-    <div className="noiseos-mobile-shell">
+    <div className="marocos-mobile-shell">
       <Hills isAnimated={wallpaperAnimado} />
 
       {topWindow ? (

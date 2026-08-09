@@ -1,5 +1,5 @@
 /* --------------------------------------------------
-   TOKENS DO NOISEOS
+   TOKENS DO MAROCOS OS
    Chrome de janela, escala de z-index e paleta do wallpaper.
    Convive com index.css, que segue dono das variáveis de conteúdo.
    -------------------------------------------------- */
@@ -62,7 +62,7 @@
    Shader animado (ou gradiente CSS no mobile), sem camadas por cima.
    -------------------------------------------------- */
 
-.noiseos-wallpaper {
+.marocos-wallpaper {
   position: fixed;
   inset: 0;
   z-index: var(--z-wallpaper);
@@ -78,13 +78,13 @@
   );
 }
 
-.noiseos-sky {
+.marocos-sky {
   position: absolute;
   inset: 0;
 }
 
 /* Mobile e fallback: sem WebGL, só o gradiente do container aparece. */
-.noiseos-sky-fallback {
+.marocos-sky-fallback {
   width: 100%;
   height: 100%;
 }
@@ -109,30 +109,30 @@
 }
 
 /* Firefox */
-.noiseos-window-body,
-.noiseos-window-body *,
-.noiseos-desktop [class*='-scroll'],
+.marocos-window-body,
+.marocos-window-body *,
+.marocos-desktop [class*='-scroll'],
 .tray-menu-popup {
   scrollbar-width: thin;
   scrollbar-color: var(--scroll-thumb) transparent;
 }
 
 /* WebKit / Blink */
-.noiseos-window-body ::-webkit-scrollbar,
-.noiseos-window-body::-webkit-scrollbar {
+.marocos-window-body ::-webkit-scrollbar,
+.marocos-window-body::-webkit-scrollbar {
   width: 10px;
   height: 10px;
 }
 
-.noiseos-window-body ::-webkit-scrollbar-track,
-.noiseos-window-body::-webkit-scrollbar-track {
+.marocos-window-body ::-webkit-scrollbar-track,
+.marocos-window-body::-webkit-scrollbar-track {
   background: var(--scroll-track);
   /* Acompanha o arredondamento da janela em vez de encostar quadrado nela. */
   border-radius: 0 var(--win-radius) var(--win-radius) 0;
 }
 
-.noiseos-window-body ::-webkit-scrollbar-thumb,
-.noiseos-window-body::-webkit-scrollbar-thumb {
+.marocos-window-body ::-webkit-scrollbar-thumb,
+.marocos-window-body::-webkit-scrollbar-thumb {
   background: var(--scroll-thumb);
   border-radius: 6px;
   /* A borda transparente afina o polegar sem mexer na área de clique. */
@@ -141,15 +141,15 @@
   transition: background 0.15s ease;
 }
 
-.noiseos-window-body ::-webkit-scrollbar-thumb:hover,
-.noiseos-window-body::-webkit-scrollbar-thumb:hover {
+.marocos-window-body ::-webkit-scrollbar-thumb:hover,
+.marocos-window-body::-webkit-scrollbar-thumb:hover {
   background: var(--scroll-thumb-hover);
   background-clip: content-box;
 }
 
 /* Cantinho onde as duas barras se encontram: sem quadrado cinza. */
-.noiseos-window-body ::-webkit-scrollbar-corner,
-.noiseos-window-body::-webkit-scrollbar-corner {
+.marocos-window-body ::-webkit-scrollbar-corner,
+.marocos-window-body::-webkit-scrollbar-corner {
   background: transparent;
 }
 

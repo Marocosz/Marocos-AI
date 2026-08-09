@@ -49,7 +49,7 @@ const contactPageContentEn = {
   terminal: {
     title: "visitor@portfolio: ~",
     prompt: "visitor@portfolio:~$",
-    version: "NoisePortfolio OS [Version 3.0.1]",
+    version: "Marocos OS [Version 3.0.1]",
     copyright: "(c) 2026 Marcos Rodrigues. All rights reserved.",
     systemCheck: "System check: OK. Loading shell...",
     logs: [
@@ -75,7 +75,7 @@ const contactPageContentPt = {
   terminal: {
     title: "visitante@portfolio: ~",
     prompt: "visitante@portfolio:~$",
-    version: "NoisePortfolio OS [Versão 3.0.1]",
+    version: "Marocos OS [Versão 3.0.1]",
     copyright: "(c) 2026 Marcos Rodrigues. Todos os direitos reservados.",
     systemCheck: "Verificação do sistema: OK. Carregando shell...",
     logs: [

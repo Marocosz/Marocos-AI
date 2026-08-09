@@ -7,7 +7,7 @@ import { getOsData } from '../data/os'
 import './TerminalApp.css'
 
 /**
- * Terminal.jsx — o app de contato do NoiseOS.
+ * Terminal.jsx — o app de contato do Marocos OS.
  *
  * Contact.jsx (components/sections) já simulava um terminal com boa
  * linguagem visual (janela de semáforo, prompt roxo, logs com status
@@ -89,7 +89,7 @@ const buildVpsEntries = ({ content }) => {
 }
 
 // Os dois únicos comandos que saem do terminal: abrem outra janela do
-// NoiseOS via `open` (vindo de useWindows, injetado no ctx pelo componente)
+// Marocos OS via `open` (vindo de useWindows, injetado no ctx pelo componente)
 // e imprimem uma linha de confirmação na própria transcrição.
 const buildProjetosEntries = ({ strings, open }) => {
   open('projects')

@@ -14,7 +14,7 @@ import './AssistantApp.css'
 const API_BASE = import.meta.env.DEV ? 'http://localhost:8000/api' : 'https://api.marocos.dev/api'
 
 /**
- * Marcos Virtual — chat com o agente RAG, dentro de uma janela do NoiseOS.
+ * Marcos Virtual — chat com o agente RAG, dentro de uma janela do Marocos OS.
  *
  * A lógica de rede (status de cota, streaming SSE manual, timeout de 60s,
  * tratamento de 429) veio de StartMenu.jsx. O invólucro mudou: sem backdrop,

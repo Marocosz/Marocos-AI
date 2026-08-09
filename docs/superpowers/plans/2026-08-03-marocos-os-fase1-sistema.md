@@ -1,8 +1,8 @@
-# NoiseOS Fase 1 — O Sistema (Implementation Plan)
+# Marocos OS Fase 1 — O Sistema (Implementation Plan)
 
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
-**Goal:** Colocar de pé o window manager, o shell de desktop e o wallpaper do NoiseOS, validados com um único app trivial (`ReadmeApp`), sem migrar nenhum outro conteúdo.
+**Goal:** Colocar de pé o window manager, o shell de desktop e o wallpaper do Marocos OS, validados com um único app trivial (`ReadmeApp`), sem migrar nenhum outro conteúdo.
 
 **Architecture:** Um reducer puro (`os/windowManager.js`) é a fonte única de verdade sobre janelas abertas, foco e z-order — sem React, testável em Node. Um registry declarativo (`os/registry.js`) descreve cada app. Um par de funções puras (`os/routes.js`) traduz `pathname ⇄ appId`. O `WindowManagerContext` costura os três e expõe ações. `<Window>` é chrome genérico que recebe qualquer app como children — apps nunca sabem que janelas existem.
 
@@ -31,7 +31,7 @@
   **Atualização (commit `8643d2e`):** o baseline caiu para **8 erros**, todos `no-unused-vars`. A
   regra `react-refresh/only-export-components` foi desligada em `**/*Context.jsx` porque arquivo
   de contexto exportar Provider + hook junto é padrão intencional e permanente do projeto (já
-  existia no `LanguageContext`, e o NoiseOS repete no `WindowManagerContext` e no `ThemeContext`).
+  existia no `LanguageContext`, e o Marocos OS repete no `WindowManagerContext` e no `ThemeContext`).
   O custo é só de fast-refresh, não de correção. Essa é a **única** exceção de config autorizada
   na Fase 1 — não adicione outras para esconder os 8 restantes.
 
@@ -834,7 +834,7 @@ import { useLanguage } from '../contexts/LanguageContext'
 /**
  * leia-me.txt — o portfólio como case técnico.
  *
- * Primeiro app do NoiseOS de propósito: é só texto, então serve para validar
+ * Primeiro app do Marocos OS de propósito: é só texto, então serve para validar
  * o chrome de janela sem que bug de conteúdo se confunda com bug de sistema.
  * Não sabe que janelas existem.
  */
@@ -901,7 +901,7 @@ Criar `frontend/src/os/registry.js`:
 /**
  * REGISTRY DE APPS
  * --------------------------------------------------
- * Declaração única de cada app do NoiseOS. Quem quiser adicionar um app
+ * Declaração única de cada app do Marocos OS. Quem quiser adicionar um app
  * mexe só aqui e no componente — nem o reducer nem o shell precisam saber.
  *
  * Campos:
@@ -1125,7 +1125,7 @@ git commit -m "feat: hook useDeviceMode com breakpoint unico em 1024px"
 
 **Interfaces:**
 - Consumes: nada
-- Produces: `<Hills isDark isAnimated />`; classes CSS `.noiseos-*` e as variáveis `--win-*`
+- Produces: `<Hills isDark isAnimated />`; classes CSS `.marocos-*` e as variáveis `--win-*`
 
 Esta é a única task da Fase 1 que escreve CSS global, o que a torna segura para rodar em paralelo com as outras.
 
@@ -1137,7 +1137,7 @@ Criar `frontend/src/os/tokens.css`:
 
 ```css
 /* --------------------------------------------------
-   TOKENS DO NOISEOS
+   TOKENS DO MAROCOS OS
    Chrome de janela, escala de z-index e paleta do wallpaper.
    Convive com index.css, que segue dono das variáveis de conteúdo.
    -------------------------------------------------- */
@@ -1199,13 +1199,13 @@ Criar `frontend/src/os/tokens.css`:
 }
 
 /* Deriva das nuvens — desligada por preferência do sistema */
-@keyframes noiseos-cloud-drift {
+@keyframes marocos-cloud-drift {
   from { transform: translateX(0); }
   to   { transform: translateX(60px); }
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .noiseos-cloud { animation: none !important; }
+  .marocos-cloud { animation: none !important; }
 }
 ```
 
@@ -1227,34 +1227,34 @@ import React from 'react'
  */
 
 const Hills = ({ isAnimated = true }) => (
-  <div className="noiseos-wallpaper" aria-hidden="true">
+  <div className="marocos-wallpaper" aria-hidden="true">
     <svg
       viewBox="0 0 1440 900"
       preserveAspectRatio="xMidYMid slice"
-      className="noiseos-wallpaper-svg"
+      className="marocos-wallpaper-svg"
     >
       <defs>
-        <linearGradient id="noiseos-sky" x1="0" y1="0" x2="0" y2="1">
+        <linearGradient id="marocos-sky" x1="0" y1="0" x2="0" y2="1">
           <stop offset="0%" stopColor="var(--hill-sky-top)" />
           <stop offset="55%" stopColor="var(--hill-sky-mid)" />
           <stop offset="100%" stopColor="var(--hill-sky-low)" />
         </linearGradient>
 
-        <filter id="noiseos-cloud-blur">
+        <filter id="marocos-cloud-blur">
           <feGaussianBlur stdDeviation="18" />
         </filter>
 
-        {/* Grão de filme: o projeto se chama noiseportfolio, então o ruído
+        {/* Grão de filme: ruído real dá materialidade ao gradiente. O
             na textura do sistema é literal, não decorativo. */}
-        <filter id="noiseos-grain">
+        <filter id="marocos-grain">
           <feTurbulence type="fractalNoise" baseFrequency="0.8" numOctaves="3" />
           <feColorMatrix type="saturate" values="0" />
         </filter>
       </defs>
 
-      <rect width="1440" height="900" fill="url(#noiseos-sky)" />
+      <rect width="1440" height="900" fill="url(#marocos-sky)" />
 
-      <g filter="url(#noiseos-cloud-blur)" opacity="var(--hill-cloud-opacity)">
+      <g filter="url(#marocos-cloud-blur)" opacity="var(--hill-cloud-opacity)">
         {[
           { cx: 240, cy: 150, rx: 120, ry: 34, dur: 90 },
           { cx: 700, cy: 100, rx: 90, ry: 26, dur: 120 },
@@ -1263,7 +1263,7 @@ const Hills = ({ isAnimated = true }) => (
         ].map((c, i) => (
           <ellipse
             key={i}
-            className="noiseos-cloud"
+            className="marocos-cloud"
             cx={c.cx}
             cy={c.cy}
             rx={c.rx}
@@ -1272,7 +1272,7 @@ const Hills = ({ isAnimated = true }) => (
             style={
               isAnimated
                 ? {
-                    animation: `noiseos-cloud-drift ${c.dur}s ease-in-out ${i * -20}s infinite alternate`,
+                    animation: `marocos-cloud-drift ${c.dur}s ease-in-out ${i * -20}s infinite alternate`,
                   }
                 : undefined
             }
@@ -1289,7 +1289,7 @@ const Hills = ({ isAnimated = true }) => (
       <path d="M0,900 C240,820 480,862 780,784 C1060,712 1260,748 1440,714 L1440,900 Z"
             fill="var(--hill-front)" />
 
-      <rect width="1440" height="900" filter="url(#noiseos-grain)" opacity="0.05" />
+      <rect width="1440" height="900" filter="url(#marocos-grain)" opacity="0.05" />
     </svg>
   </div>
 )
@@ -1302,7 +1302,7 @@ export default Hills
 Adicionar ao final de `frontend/src/os/tokens.css`:
 
 ```css
-.noiseos-wallpaper {
+.marocos-wallpaper {
   position: fixed;
   inset: 0;
   z-index: var(--z-wallpaper);
@@ -1310,7 +1310,7 @@ Adicionar ao final de `frontend/src/os/tokens.css`:
   overflow: hidden;
 }
 
-.noiseos-wallpaper-svg {
+.marocos-wallpaper-svg {
   width: 100%;
   height: 100%;
   display: block;
@@ -1327,7 +1327,7 @@ erros em arquivos legados (ver Global Constraints) e eles não são para consert
 
 ```bash
 git add frontend/src/wallpapers/Hills.jsx frontend/src/os/tokens.css
-git commit -m "feat: wallpaper Colinas em SVG e tokens do NoiseOS"
+git commit -m "feat: wallpaper Colinas em SVG e tokens do Marocos OS"
 ```
 
 ---
@@ -1561,7 +1561,7 @@ const Window = ({ win }) => {
   return (
     <motion.div
       ref={ref}
-      className={`noiseos-window${win.maximized ? ' maximized' : ''}${isFocused ? ' focused' : ''}`}
+      className={`marocos-window${win.maximized ? ' maximized' : ''}${isFocused ? ' focused' : ''}`}
       role="dialog"
       aria-labelledby={`win-title-${win.key}`}
       tabIndex={-1}
@@ -1606,7 +1606,7 @@ const Window = ({ win }) => {
         onClose={() => close(win.key)}
       />
 
-      <div className="noiseos-window-body">
+      <div className="marocos-window-body">
         {AppComponent ? <AppComponent params={win.params} /> : null}
       </div>
     </motion.div>
@@ -1621,13 +1621,13 @@ const TitleBar = ({
   title, titleId, Icon, maximized, labels, onDragStart,
   onMinimize, onToggleMaximize, onClose,
 }) => (
-  <div className="noiseos-titlebar" onPointerDown={onDragStart}>
-    <div className="noiseos-titlebar-label">
+  <div className="marocos-titlebar" onPointerDown={onDragStart}>
+    <div className="marocos-titlebar-label">
       {Icon ? <Icon size={15} strokeWidth={2} /> : null}
       <span id={titleId}>{title}</span>
     </div>
 
-    <div className="noiseos-titlebar-controls">
+    <div className="marocos-titlebar-controls">
       <button type="button" aria-label={labels.minimize} onClick={onMinimize}>
         <Minus size={14} />
       </button>
@@ -1653,7 +1653,7 @@ export default Window
 Criar `frontend/src/os/desktop/Window.css`:
 
 ```css
-.noiseos-window {
+.marocos-window {
   position: fixed;
   top: 0;
   left: 0;
@@ -1669,18 +1669,18 @@ Criar `frontend/src/os/desktop/Window.css`:
   outline: none;
 }
 
-.noiseos-window.focused {
+.marocos-window.focused {
   box-shadow: var(--win-shadow), 0 0 0 1px var(--accent-color);
 }
 
-.noiseos-window.maximized {
+.marocos-window.maximized {
   inset: 0 0 var(--win-titlebar-h) 0;
   width: 100vw !important;
   height: auto !important;
   border-radius: 0;
 }
 
-.noiseos-titlebar {
+.marocos-titlebar {
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -1694,9 +1694,9 @@ Criar `frontend/src/os/desktop/Window.css`:
   flex: 0 0 auto;
 }
 
-.noiseos-titlebar:active { cursor: grabbing; }
+.marocos-titlebar:active { cursor: grabbing; }
 
-.noiseos-titlebar-label {
+.marocos-titlebar-label {
   display: flex;
   align-items: center;
   gap: 8px;
@@ -1709,9 +1709,9 @@ Criar `frontend/src/os/desktop/Window.css`:
   text-overflow: ellipsis;
 }
 
-.noiseos-titlebar-controls { display: flex; gap: 2px; }
+.marocos-titlebar-controls { display: flex; gap: 2px; }
 
-.noiseos-titlebar-controls button {
+.marocos-titlebar-controls button {
   display: grid;
   place-items: center;
   width: 32px;
@@ -1724,13 +1724,13 @@ Criar `frontend/src/os/desktop/Window.css`:
   transition: background 0.15s;
 }
 
-.noiseos-titlebar-controls button:hover { background: rgba(255, 255, 255, 0.16); }
-.noiseos-titlebar-controls button.close:hover { background: #e81123; color: #fff; }
-.noiseos-titlebar-controls button:focus-visible { outline: 2px solid var(--accent-color); }
+.marocos-titlebar-controls button:hover { background: rgba(255, 255, 255, 0.16); }
+.marocos-titlebar-controls button.close:hover { background: #e81123; color: #fff; }
+.marocos-titlebar-controls button:focus-visible { outline: 2px solid var(--accent-color); }
 
 /* Blur fica só no chrome. Repetir backdrop-filter aqui dentro derruba
    o Safari do iOS — ver riscos do spec. */
-.noiseos-window-body {
+.marocos-window-body {
   flex: 1 1 auto;
   overflow-y: auto;
   padding: 20px 22px;
@@ -1792,18 +1792,18 @@ const Desktop = ({ isAnimated = true }) => {
   const icons = APPS.filter((a) => a.onDesktop)
 
   return (
-    <div className="noiseos-desktop">
+    <div className="marocos-desktop">
       <Hills isAnimated={isAnimated} />
 
       {/* Assinatura: é aqui que vive o <h1> da página. A Hero deixou de
           existir, e sem isto o site perde o cabeçalho principal. */}
-      <div className="noiseos-signature">
+      <div className="marocos-signature">
         <h1>Marcos Rodrigues</h1>
         <p>{os.signature.role}</p>
-        <span className="noiseos-signature-bio">{profile.bio_highlight}</span>
+        <span className="marocos-signature-bio">{profile.bio_highlight}</span>
       </div>
 
-      <ul className="noiseos-icons">
+      <ul className="marocos-icons">
         {icons.map((app, i) => {
           const Icon = app.icon
           return (
@@ -1816,10 +1816,10 @@ const Desktop = ({ isAnimated = true }) => {
               {/* Clique único abre: desvio deliberado da metáfora, porque
                   estes ícones são a navegação principal do site. */}
               <button type="button" onClick={() => open(app.id)}>
-                <span className="noiseos-icon-tile">
+                <span className="marocos-icon-tile">
                   <Icon size={26} strokeWidth={1.75} />
                 </span>
-                <span className="noiseos-icon-label">{os.windows[app.titleKey]}</span>
+                <span className="marocos-icon-label">{os.windows[app.titleKey]}</span>
               </button>
             </motion.li>
           )
@@ -1841,13 +1841,13 @@ export default Desktop
 Criar `frontend/src/os/desktop/Desktop.css`:
 
 ```css
-.noiseos-desktop {
+.marocos-desktop {
   position: fixed;
   inset: 0;
   overflow: hidden;
 }
 
-.noiseos-icons {
+.marocos-icons {
   position: absolute;
   top: 20px;
   left: 20px;
@@ -1863,7 +1863,7 @@ Criar `frontend/src/os/desktop/Desktop.css`:
   list-style: none;
 }
 
-.noiseos-icons button {
+.marocos-icons button {
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -1876,10 +1876,10 @@ Criar `frontend/src/os/desktop/Desktop.css`:
   cursor: pointer;
 }
 
-.noiseos-icons button:hover { background: rgba(255, 255, 255, 0.12); }
-.noiseos-icons button:focus-visible { outline: 2px solid var(--accent-color); }
+.marocos-icons button:hover { background: rgba(255, 255, 255, 0.12); }
+.marocos-icons button:focus-visible { outline: 2px solid var(--accent-color); }
 
-.noiseos-icon-tile {
+.marocos-icon-tile {
   display: grid;
   place-items: center;
   width: 56px;
@@ -1891,7 +1891,7 @@ Criar `frontend/src/os/desktop/Desktop.css`:
   color: #fff;
 }
 
-.noiseos-icon-label {
+.marocos-icon-label {
   font-family: system-ui, sans-serif;
   font-size: 0.72rem;
   line-height: 1.25;
@@ -1902,7 +1902,7 @@ Criar `frontend/src/os/desktop/Desktop.css`:
 
 /* Assinatura tratada como marca d'água: integrada ao wallpaper, sem card.
    Baixo contraste no tratamento, mas o h1 continua grande de propósito. */
-.noiseos-signature {
+.marocos-signature {
   position: absolute;
   top: 50%;
   left: 148px;
@@ -1912,7 +1912,7 @@ Criar `frontend/src/os/desktop/Desktop.css`:
   pointer-events: none;
 }
 
-.noiseos-signature h1 {
+.marocos-signature h1 {
   margin: 0;
   font-family: 'Poppins', sans-serif;
   font-size: clamp(2.4rem, 4vw, 3.6rem);
@@ -1924,7 +1924,7 @@ Criar `frontend/src/os/desktop/Desktop.css`:
   opacity: 0.92;
 }
 
-.noiseos-signature p {
+.marocos-signature p {
   margin: 10px 0 0;
   font-family: system-ui, sans-serif;
   font-size: 0.95rem;
@@ -1934,7 +1934,7 @@ Criar `frontend/src/os/desktop/Desktop.css`:
   opacity: 0.7;
 }
 
-.noiseos-signature-bio {
+.marocos-signature-bio {
   display: block;
   margin-top: 14px;
   font-size: 0.86rem;
@@ -1943,15 +1943,15 @@ Criar `frontend/src/os/desktop/Desktop.css`:
   opacity: 0.52;
 }
 
-.theme-light .noiseos-signature h1,
-.theme-light .noiseos-signature p,
-.theme-light .noiseos-signature-bio {
+.theme-light .marocos-signature h1,
+.theme-light .marocos-signature p,
+.theme-light .marocos-signature-bio {
   color: #2e1065;
   text-shadow: none;
 }
 
 @media (max-width: 1200px) {
-  .noiseos-signature { display: none; }
+  .marocos-signature { display: none; }
 }
 ```
 
@@ -2001,14 +2001,14 @@ const Taskbar = () => {
   const os = getOsData(language)
 
   return (
-    <div className="noiseos-taskbar">
-      <button type="button" className="noiseos-start" aria-label={os.taskbar.start}>
+    <div className="marocos-taskbar">
+      <button type="button" className="marocos-start" aria-label={os.taskbar.start}>
         <LayoutGrid size={20} />
       </button>
 
-      <div className="noiseos-taskbar-divider" />
+      <div className="marocos-taskbar-divider" />
 
-      <ul className="noiseos-taskbar-windows">
+      <ul className="marocos-taskbar-windows">
         {windows.map((win) => {
           const app = getApp(win.appId)
           const Icon = app?.icon
@@ -2033,8 +2033,8 @@ const Taskbar = () => {
         })}
       </ul>
 
-      <div className="noiseos-taskbar-right">
-        <div className="noiseos-tray" aria-hidden="true">
+      <div className="marocos-taskbar-right">
+        <div className="marocos-tray" aria-hidden="true">
           <Wifi size={15} />
           <Volume2 size={15} />
           <BatteryMedium size={15} />
@@ -2042,7 +2042,7 @@ const Taskbar = () => {
         <Clock />
         <button
           type="button"
-          className="noiseos-show-desktop"
+          className="marocos-show-desktop"
           aria-label={os.taskbar.showDesktop}
           onClick={minimizeAll}
         />
@@ -2061,7 +2061,7 @@ const Clock = React.memo(function Clock() {
   }, [])
 
   return (
-    <div className="noiseos-clock">
+    <div className="marocos-clock">
       <span>{now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>
       <span>{now.toLocaleDateString([], { day: '2-digit', month: '2-digit', year: 'numeric' })}</span>
     </div>
@@ -2076,7 +2076,7 @@ export default Taskbar
 Criar `frontend/src/os/desktop/Taskbar.css`:
 
 ```css
-.noiseos-taskbar {
+.marocos-taskbar {
   position: fixed;
   bottom: 0;
   left: 0;
@@ -2094,7 +2094,7 @@ Criar `frontend/src/os/desktop/Taskbar.css`:
   font-family: system-ui, sans-serif;
 }
 
-.noiseos-start {
+.marocos-start {
   display: grid;
   place-items: center;
   width: 40px;
@@ -2106,9 +2106,9 @@ Criar `frontend/src/os/desktop/Taskbar.css`:
   cursor: pointer;
 }
 
-.noiseos-start:hover { background: rgba(255, 255, 255, 0.16); }
+.marocos-start:hover { background: rgba(255, 255, 255, 0.16); }
 
-.noiseos-taskbar-divider {
+.marocos-taskbar-divider {
   width: 1px;
   height: 20px;
   background: rgba(255, 255, 255, 0.22);
@@ -2116,7 +2116,7 @@ Criar `frontend/src/os/desktop/Taskbar.css`:
 
 /* Ancorada à esquerda: botões de janela entram e saem, e num grupo
    centralizado cada janela nova empurraria os alvos de lugar. */
-.noiseos-taskbar-windows {
+.marocos-taskbar-windows {
   display: flex;
   gap: 4px;
   flex: 1 1 auto;
@@ -2127,7 +2127,7 @@ Criar `frontend/src/os/desktop/Taskbar.css`:
   overflow: hidden;
 }
 
-.noiseos-taskbar-windows button {
+.marocos-taskbar-windows button {
   display: flex;
   align-items: center;
   gap: 7px;
@@ -2142,29 +2142,29 @@ Criar `frontend/src/os/desktop/Taskbar.css`:
   cursor: pointer;
 }
 
-.noiseos-taskbar-windows button span {
+.marocos-taskbar-windows button span {
   overflow: hidden;
   white-space: nowrap;
   text-overflow: ellipsis;
 }
 
-.noiseos-taskbar-windows button:hover { background: rgba(255, 255, 255, 0.18); }
-.noiseos-taskbar-windows button.minimized { opacity: 0.55; }
-.noiseos-taskbar-windows button.focused {
+.marocos-taskbar-windows button:hover { background: rgba(255, 255, 255, 0.18); }
+.marocos-taskbar-windows button.minimized { opacity: 0.55; }
+.marocos-taskbar-windows button.focused {
   background: rgba(255, 255, 255, 0.22);
   border-color: var(--accent-color);
 }
 
-.noiseos-taskbar-right {
+.marocos-taskbar-right {
   display: flex;
   align-items: center;
   gap: 10px;
   flex: 0 0 auto;
 }
 
-.noiseos-tray { display: flex; gap: 10px; color: var(--text-secondary); }
+.marocos-tray { display: flex; gap: 10px; color: var(--text-secondary); }
 
-.noiseos-clock {
+.marocos-clock {
   display: flex;
   flex-direction: column;
   align-items: flex-end;
@@ -2173,7 +2173,7 @@ Criar `frontend/src/os/desktop/Taskbar.css`:
   color: var(--text-primary);
 }
 
-.noiseos-show-desktop {
+.marocos-show-desktop {
   width: 8px;
   height: 100%;
   border: none;
@@ -2182,7 +2182,7 @@ Criar `frontend/src/os/desktop/Taskbar.css`:
   cursor: pointer;
 }
 
-.noiseos-show-desktop:hover { background: rgba(255, 255, 255, 0.14); }
+.marocos-show-desktop:hover { background: rgba(255, 255, 255, 0.14); }
 ```
 
 - [ ] **Step 3: Verificar que o lint passa**
@@ -2287,7 +2287,7 @@ import Taskbar from './os/desktop/Taskbar'
 import './os/tokens.css'
 
 /**
- * Shell do NoiseOS.
+ * Shell do Marocos OS.
  *
  * O Lenis saiu junto com o scroll de página: não há mais o que suavizar,
  * porque todo scroll agora acontece dentro de janelas.
@@ -2382,7 +2382,7 @@ Confirmar no navegador:
 
 ```bash
 git add frontend/src/App.jsx frontend/src/contexts/ThemeContext.jsx frontend/src/index.css frontend/package.json frontend/package-lock.json frontend/eslint.config.js
-git commit -m "feat: montar shell do NoiseOS e remover Lenis e CSS morto"
+git commit -m "feat: montar shell do Marocos OS e remover Lenis e CSS morto"
 ```
 
 ---

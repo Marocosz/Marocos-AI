@@ -5,7 +5,7 @@
  * Aqui o backdrop-filter grande é aceitável — o menu é pequeno.
  */
 
-.noiseos-context-menu {
+.marocos-context-menu {
   position: fixed;
   margin: 0;
   padding: 4px;
@@ -23,11 +23,11 @@
   transition: background 1.5s ease, border-color 1.5s ease;
 }
 
-.noiseos-context-menu li {
+.marocos-context-menu li {
   margin: 0;
 }
 
-.noiseos-context-menu-item {
+.marocos-context-menu-item {
   width: 100%;
   display: block;
   text-align: left;
@@ -42,14 +42,14 @@
   transition: background 0.1s ease, color 0.1s ease;
 }
 
-.noiseos-context-menu-item:hover,
-.noiseos-context-menu-item:focus-visible {
+.marocos-context-menu-item:hover,
+.marocos-context-menu-item:focus-visible {
   background: rgba(255, 255, 255, 0.1);
   color: #fff;
   outline: none;
 }
 
-.noiseos-context-menu-item:active {
+.marocos-context-menu-item:active {
   background: rgba(255, 255, 255, 0.06);
 }
 
@@ -57,22 +57,22 @@
    THEME LIGHT OVERRIDES
    ======================================== */
 
-.theme-light .noiseos-context-menu {
+.theme-light .marocos-context-menu {
   background: rgba(255, 255, 255, 0.92);
   border: 1px solid rgba(0, 0, 0, 0.08);
   box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
 }
 
-.theme-light .noiseos-context-menu-item {
+.theme-light .marocos-context-menu-item {
   color: #333;
 }
 
-.theme-light .noiseos-context-menu-item:hover,
-.theme-light .noiseos-context-menu-item:focus-visible {
+.theme-light .marocos-context-menu-item:hover,
+.theme-light .marocos-context-menu-item:focus-visible {
   background: rgba(0, 0, 0, 0.06);
   color: #000;
 }
 
-.theme-light .noiseos-context-menu-item:active {
+.theme-light .marocos-context-menu-item:active {
   background: rgba(0, 0, 0, 0.04);
 }

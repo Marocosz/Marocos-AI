@@ -1,7 +1,7 @@
 /**
  * REGISTRY DE APPS
  * --------------------------------------------------
- * Declaração única de cada app do NoiseOS. Quem quiser adicionar um app mexe
+ * Declaração única de cada app do Marocos OS. Quem quiser adicionar um app mexe
  * só aqui e no componente — nem o reducer nem o shell precisam saber.
  *
  * Campos:

@@ -51,7 +51,7 @@ const Window = ({ win }) => {
   return (
     <motion.div
       ref={ref}
-      className={`noiseos-window${win.maximized ? ' maximized' : ''}${isFocused ? ' focused' : ''}`}
+      className={`marocos-window${win.maximized ? ' maximized' : ''}${isFocused ? ' focused' : ''}`}
       role="dialog"
       aria-labelledby={`win-title-${win.key}`}
       tabIndex={-1}
@@ -99,7 +99,7 @@ const Window = ({ win }) => {
         onClose={() => close(win.key)}
       />
 
-      <div className="noiseos-window-body">
+      <div className="marocos-window-body">
         {AppComponent ? <AppComponent params={win.params} /> : null}
       </div>
     </motion.div>
@@ -114,13 +114,13 @@ const TitleBar = ({
   title, titleId, Icon, maximized, labels, onDragStart,
   onMinimize, onToggleMaximize, onClose,
 }) => (
-  <div className="noiseos-titlebar" onPointerDown={onDragStart}>
-    <div className="noiseos-titlebar-label">
+  <div className="marocos-titlebar" onPointerDown={onDragStart}>
+    <div className="marocos-titlebar-label">
       {Icon ? <Icon size={15} strokeWidth={2} /> : null}
       <span id={titleId}>{title}</span>
     </div>
 
-    <div className="noiseos-titlebar-controls">
+    <div className="marocos-titlebar-controls">
       <button type="button" aria-label={labels.minimize} onClick={onMinimize}>
         <Minus size={14} />
       </button>

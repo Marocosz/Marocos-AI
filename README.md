@@ -167,7 +167,7 @@ O sistema respeita as preferências do visitante com controles acessíveis na ba
 # 📂 Estrutura do Projeto
 
 ```text
-NoisePortfolio/
+MarocosPortfolio/
 ├── 📁 backend/                # O Cérebro (API & IA)
 │   ├── 📂 app/
 │   │   ├── 📂 api/            # Rotas (SSE, Chat)

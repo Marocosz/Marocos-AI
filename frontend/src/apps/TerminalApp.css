@@ -13,7 +13,7 @@
  */
 
 .terminal-app {
-  /* O corpo da janela (.noiseos-window-body) já dá padding 20px/22px e
+  /* O corpo da janela (.marocos-window-body) já dá padding 20px/22px e
      overflow-y:auto. Um terminal precisa do prompt fixo embaixo e só o
      histórico rolando por cima — então a gente recupera esse espaço com
      margem negativa e devolve o respiro por dentro, nas subáreas. */

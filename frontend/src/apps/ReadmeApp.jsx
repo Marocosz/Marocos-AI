@@ -4,7 +4,7 @@ import { useLanguage } from '../contexts/LanguageContext'
 /**
  * leia-me.txt — o portfólio como case técnico.
  *
- * Primeiro app do NoiseOS de propósito: é só texto, então serve para validar
+ * Primeiro app do Marocos OS de propósito: é só texto, então serve para validar
  * o chrome de janela sem que bug de conteúdo se confunda com bug de sistema.
  * Não sabe que janelas existem.
  */

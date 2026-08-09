@@ -6,7 +6,7 @@ import { getOsData } from '../data/os'
 import './SettingsApp.css'
 
 /**
- * CONFIGURAÇÕES DO NOISEOS
+ * CONFIGURAÇÕES DO MAROCOS OS
  * --------------------------------------------------
  * Casa definitiva dos três controles que antes viviam só na bandeja: tema,
  * idioma e animação. Eles continuam na taskbar como atalho rápido — o que
