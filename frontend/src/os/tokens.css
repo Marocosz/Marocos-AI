@@ -33,31 +33,16 @@
   --z-boot: 2000;
 
   /* Wallpaper — dia */
-  --hill-sky-top: #6d28d9;
-  --hill-sky-mid: #a78bfa;
-  --hill-sky-low: #ddd6fe;
-  /* Ondas (dia). Um gradiente vertical serve as cinco cristas; a opacidade
-     de cada uma faz o resto. A vinheta e escura para separar a onda da frente
-     do ceu pastel do Iridescence. */
-  --wave-top: #c4b5fd;
-  --wave-mid: #8b5cf6;
-  --wave-bottom: #5b21b6;
-  --wave-crest: #f5f3ff;
-  --wave-vignette: rgba(46, 16, 101, 0.55);
+  --sky-top: #6d28d9;
+  --sky-mid: #a78bfa;
+  --sky-low: #ddd6fe;
 }
 
 /* Wallpaper — noite */
 .theme-dark {
-  --hill-sky-top: #1e1b4b;
-  --hill-sky-mid: #2e1065;
-  --hill-sky-low: #4c1d95;
-  /* Ondas (noite): mesma ideia, valores muito mais baixos. A crista recebe um
-     violeta apenas visivel, como luar, e a vinheta e quase preta. */
-  --wave-top: #6d28d9;
-  --wave-mid: #2e1065;
-  --wave-bottom: #120820;
-  --wave-crest: #c4b5fd;
-  --wave-vignette: rgba(4, 2, 10, 0.8);
+  --sky-top: #1e1b4b;
+  --sky-mid: #2e1065;
+  --sky-low: #4c1d95;
 
   --win-titlebar-bg: rgba(76, 29, 149, 0.4);
   --win-body-bg: rgba(14, 9, 22, 0.6);
@@ -73,9 +58,8 @@
 }
 
 /* --------------------------------------------------
-   WALLPAPER EM DUAS CAMADAS
-   Céu = shader Silk animado (ou gradiente CSS no mobile).
-   Colinas = SVG opaco ancorado embaixo.
+   WALLPAPER
+   Shader animado (ou gradiente CSS no mobile), sem camadas por cima.
    -------------------------------------------------- */
 
 .noiseos-wallpaper {
@@ -88,9 +72,9 @@
      inicializar nem faixa vazia se ele falhar. */
   background: linear-gradient(
     to bottom,
-    var(--hill-sky-top) 0%,
-    var(--hill-sky-mid) 55%,
-    var(--hill-sky-low) 100%
+    var(--sky-top) 0%,
+    var(--sky-mid) 55%,
+    var(--sky-low) 100%
   );
 }
 
@@ -103,28 +87,6 @@
 .noiseos-sky-fallback {
   width: 100%;
   height: 100%;
-}
-
-.noiseos-hills {
-  position: absolute;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  /* Altura da faixa de terra. Ancorada embaixo, o céu fica com o resto. */
-  height: 46vh;
-  min-height: 260px;
-}
-
-/* Sem brilho de horizonte: a tentativa anterior virou uma faixa clara visível
-   atravessando a tela no meio, em vez de suavizar o encontro céu/terra. As
-   próprias camadas de colina com opacidade escalonada já dão a profundidade. */
-
-.noiseos-hills-svg {
-  position: absolute;
-  inset: 0;
-  width: 100%;
-  height: 100%;
-  display: block;
 }
 
 /* --------------------------------------------------

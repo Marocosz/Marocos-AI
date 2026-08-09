@@ -1,5 +1,5 @@
-import { Canvas, useFrame } from '@react-three/fiber';
-import { forwardRef, useRef, useMemo } from 'react';
+import { Canvas, useFrame, useThree } from '@react-three/fiber';
+import { forwardRef, useRef, useMemo, useEffect } from 'react';
 import { Color } from 'three';
 
 const hexToNormalizedRGB = hex => {
@@ -65,6 +65,29 @@ void main() {
 }
 `;
 
+/**
+ * TETO DE FPS
+ *
+ * O custo do backdrop-filter das janelas e (custo do blur) x (frames por
+ * segundo do fundo): sempre que este canvas redesenha, o navegador refaz o
+ * blur de tudo que estiver por cima dele. Como isto e um gradiente lento,
+ * 20fps e visualmente indistinguivel de 60 e custa um terco.
+ *
+ * Com frameloop="demand" o r3f so desenha quando invalidate() e chamado —
+ * entao o intervalo abaixo e quem dita a taxa real.
+ */
+const TetoDeFps = ({ isAnimated, fps = 20 }) => {
+  const invalidate = useThree((estado) => estado.invalidate);
+
+  useEffect(() => {
+    if (!isAnimated) return;
+    const id = setInterval(invalidate, 1000 / fps);
+    return () => clearInterval(id);
+  }, [isAnimated, invalidate, fps]);
+
+  return null;
+};
+
 const SilkPlane = forwardRef(function SilkPlane({ uniforms, isAnimated }, ref) {
   useFrame((_, delta) => {
     if (ref.current?.material?.uniforms && isAnimated) {
@@ -110,8 +133,9 @@ const Silk = ({ speed = 1, scale = 2, color = '#121212', noiseIntensity = 0.5, r
            Como o efeito é de "fumaça", a perda de nitidez é imperceptível e até desejável.
         */
         dpr={0.6} 
-        // PERFORMANCE FIX: Pausa o loop de renderização (0% GPU) se a animação estiver desligada
-        frameloop={isAnimated ? "always" : "demand"}
+        // Sempre sob demanda: o TetoDeFps controla a taxa, e com a animacao
+        // desligada ninguem invalida, entao o custo vai a zero.
+        frameloop="demand"
         resize={{ scroll: false }} 
         gl={{ 
           alpha: true, 
@@ -121,6 +145,7 @@ const Silk = ({ speed = 1, scale = 2, color = '#121212', noiseIntensity = 0.5, r
           depth: false
         }} 
       >
+        <TetoDeFps isAnimated={isAnimated} />
         <SilkPlane ref={meshRef} uniforms={uniforms} isAnimated={isAnimated} />
       </Canvas>
     </div>

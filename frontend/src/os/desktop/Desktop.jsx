@@ -20,21 +20,7 @@ const Desktop = ({ isAnimated = true }) => {
 
   const icons = APPS.filter((a) => a.onDesktop)
 
-  /**
-   * PERFORMANCE: o wallpaper para de animar enquanto houver janela visível.
-   *
-   * Duas contas caem juntas com isso. O shader deixa de renderizar (o Silk
-   * respeita `isAnimated` via frameloop), e — mais importante — o
-   * backdrop-filter das janelas passa a ter um fundo ESTÁTICO atrás: sem
-   * conteúdo mudando, o navegador não precisa refazer o blur a cada frame, que
-   * era o custo dominante ao mover e abrir janelas.
-   *
-   * O movimento volta sozinho quando a última janela fecha ou é minimizada.
-   * Perde-se pouco: quando há janela aberta o visitante está lendo conteúdo,
-   * não admirando o papel de parede.
-   */
-  const temJanelaVisivel = windows.some((w) => !w.minimized)
-  const wallpaperAnimado = isAnimated && !temJanelaVisivel
+
 
   // O menu de contexto escuta no proprio desktop; ele so intercepta o clique
   // quando o alvo nao e janela, link nem campo de texto, para o menu nativo
@@ -87,7 +73,7 @@ const Desktop = ({ isAnimated = true }) => {
   return (
     <div className="noiseos-desktop" ref={desktopRef}>
       <ContextMenu targetRef={desktopRef} items={itensDoMenu} />
-      <Hills isAnimated={wallpaperAnimado} />
+      <Hills isAnimated={isAnimated} />
 
       {/* Assinatura: é aqui que vive o <h1> da página. A Hero deixou de
           existir, e sem isto o site perde o cabeçalho principal. */}

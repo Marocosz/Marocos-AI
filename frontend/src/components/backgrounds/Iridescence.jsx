@@ -113,10 +113,22 @@ export default function Iridescence({ color = [1, 1, 1], speed = 1.0, amplitude 
     mesh = new Mesh(gl, { geometry, program });
     let animateId;
 
+    // PERFORMANCE: teto de FPS.
+    //
+    // O custo do backdrop-filter das janelas e (custo do blur) x (frames por
+    // segundo do fundo): sempre que este canvas redesenha, o navegador refaz o
+    // blur de tudo que estiver por cima. Como isto e um gradiente lento, 20fps
+    // e visualmente indistinguivel de 60 e custa um terco.
+    const INTERVALO_MS = 1000 / 20;
+    let ultimoDesenho = 0;
+
     function update(t) {
       animateId = requestAnimationFrame(update);
-      if (!isAnimated) return; // FIX: Stop rendering completely if paused/hidden to save GPU
-      
+      if (!isAnimated) return; // Pausado: nao desenha nada, 0% de GPU
+
+      if (t - ultimoDesenho < INTERVALO_MS) return;
+      ultimoDesenho = t;
+
       program.uniforms.uTime.value = t * 0.001;
       lastTime.current = t * 0.001;
       renderer.render({ scene: mesh });
