@@ -25,6 +25,21 @@ const Crystal = lazy(() => import('../../components/Crystal'))
 const BOOT_DURATION_MS = 4800
 
 /**
+ * Duração com movimento reduzido.
+ *
+ * Mais curta, mas NÃO zero. A versão anterior devolvia `null` e chamava onDone()
+ * na hora, ou seja: quem tem "efeitos de animação" desligado no sistema — o que
+ * é comum em máquina ajustada para performance — nunca via a inicialização,
+ * caía direto na tela de bloqueio e concluía, com razão, que ela não existia.
+ *
+ * Movimento reduzido pede MENOS MOVIMENTO, não menos conteúdo. Aqui a cerimônia
+ * acontece igual, só que quieta: o cristal fica na pose parada, nada sobe ao
+ * entrar, a varredura da barra some. Sobram a barra avançando e as etapas
+ * trocando, que são informação de progresso e não gesto.
+ */
+const BOOT_DURATION_REDUZIDA_MS = 2600
+
+/**
  * BootScreen — inicialização do Marocos OS.
  * --------------------------------------------------
  * Sequência: halo acende → cristal entra girando → nome sobe → assinatura →
@@ -34,44 +49,42 @@ const BOOT_DURATION_MS = 4800
  * lugar dele é ocupado só pelo halo pulsando: um vazio honesto é melhor do que
  * uma segunda versão da marca que não é a marca.
  *
- * Com `prefers-reduced-motion: reduce` nem chega a pintar: onDone() na hora.
+ * Com `prefers-reduced-motion: reduce` a cerimônia acontece igual, só que mais
+ * curta e sem gesto nenhum — ver BOOT_DURATION_REDUZIDA_MS.
  */
 const BootScreen = ({ onDone }) => {
   const { language } = useLanguage()
   const os = getOsData(language)
   const strings = os.boot || {}
 
-  // Lido uma vez, na montagem: decide se a cerimônia roda ou é pulada por
-  // inteiro. Ler aqui, e não dentro do efeito, evita que o primeiro frame
-  // chegue a pintar o boot antes de ser descartado.
+  // Lido uma vez, na montagem: define o ritmo da cerimônia. Ler aqui, e não
+  // dentro do efeito, garante que o primeiro frame já pinte na versão certa.
   const [reduceMotion] = useState(
     () =>
       typeof window !== 'undefined' &&
       window.matchMedia('(prefers-reduced-motion: reduce)').matches,
   )
 
+  const duracao = reduceMotion ? BOOT_DURATION_REDUZIDA_MS : BOOT_DURATION_MS
+
   // Etapa atual. É o que carrega a segunda metade da cerimônia: a barra sozinha
-  // é uma medida sem assunto, e o texto dá ao tempo um porquê.
+  // é uma medida sem assunto, e o texto dá ao tempo um porquê. Trocar texto não
+  // é movimento, então isto roda nos dois modos.
   const etapas = strings.stages || []
   const [etapa, setEtapa] = useState(0)
 
   useEffect(() => {
-    if (reduceMotion || etapas.length < 2) return
-    const passo = BOOT_DURATION_MS / etapas.length
+    if (etapas.length < 2) return
+    const passo = duracao / etapas.length
     const id = setInterval(() => {
       // Trava na última: o intervalo é limpo no desmonte, mas a fase pode ser
       // encurtada por quem pula o boot.
       setEtapa((n) => (n + 1 < etapas.length ? n + 1 : n))
     }, passo)
     return () => clearInterval(id)
-  }, [reduceMotion, etapas.length])
+  }, [duracao, etapas.length])
 
   useEffect(() => {
-    if (reduceMotion) {
-      onDone()
-      return
-    }
-
     let pronto = false
     const encerrar = () => {
       if (pronto) return
@@ -79,7 +92,7 @@ const BootScreen = ({ onDone }) => {
       onDone()
     }
 
-    const timer = setTimeout(encerrar, BOOT_DURATION_MS)
+    const timer = setTimeout(encerrar, duracao)
     window.addEventListener('keydown', encerrar)
     window.addEventListener('pointerdown', encerrar)
 
@@ -88,9 +101,7 @@ const BootScreen = ({ onDone }) => {
       window.removeEventListener('keydown', encerrar)
       window.removeEventListener('pointerdown', encerrar)
     }
-  }, [reduceMotion, onDone])
-
-  if (reduceMotion) return null
+  }, [duracao, onDone])
 
   return (
     <div className="boot-screen" role="status" aria-label={strings.ariaLabel}>
@@ -99,8 +110,9 @@ const BootScreen = ({ onDone }) => {
           <Suspense fallback={<div className="crystal-loading" aria-hidden="true" />}>
             {/* spin alto: no boot o movimento precisa comunicar que o sistema
                 está trabalhando. Em spin=1 o cristal gira 48° em quatro
-                segundos, o que lê como parado. */}
-            <Crystal size={300} animated spin={3.2} />
+                segundos, o que lê como parado. Com movimento reduzido ele fica
+                na pose parada — presente, mas sem girar. */}
+            <Crystal size={300} animated={!reduceMotion} spin={3.2} />
           </Suspense>
         </div>
 
@@ -117,7 +129,7 @@ const BootScreen = ({ onDone }) => {
         <div className="boot-progress" aria-hidden="true">
           <span
             className="boot-progress-fill"
-            style={{ animationDuration: `${BOOT_DURATION_MS}ms` }}
+            style={{ animationDuration: `${duracao}ms` }}
           />
         </div>
 

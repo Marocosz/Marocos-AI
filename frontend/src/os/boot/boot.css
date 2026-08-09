@@ -219,20 +219,35 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
+  /* A CERIMONIA CONTINUA ACONTECENDO — o que sai daqui e o gesto, nao a tela.
+     Nada sobe ao entrar, o cristal nao gira (o proprio BootScreen o poe na pose
+     parada) e a varredura some. Ficam de pe a barra medindo e as etapas
+     trocando de texto: as duas sao informacao de progresso, e sem elas a tela
+     de inicializacao vira um cartaz imovel. */
+  .boot-screen,
   .boot-crystal,
   .boot-title,
   .boot-tagline,
   .boot-progress,
   .boot-stage,
-  .boot-stage-text,
   .boot-skip-hint {
     animation: none;
     opacity: 1;
     transform: none;
   }
 
-  .boot-progress-fill { transform: scaleX(1); }
-  .boot-progress::after { animation: none; opacity: 0; }
+  .boot-stage-text {
+    animation: none;
+    opacity: 0.85;
+  }
+
+  /* A barra de progresso NAO entra na lista acima de proposito: ela precisa
+     continuar avancando. Sao 3px de altura crescendo em linha reta, o oposto
+     do movimento amplo que esta media existe para conter. */
+  .boot-progress::after {
+    animation: none;
+    opacity: 0;
+  }
 }
 
 /* ==================================================
