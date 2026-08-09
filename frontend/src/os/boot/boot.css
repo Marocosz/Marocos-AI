@@ -164,10 +164,17 @@
   }
 }
 
-.cerimonia:not([data-fase='boot']) .cerimonia-ceu--boot {
-  opacity: 0;
-}
-
+/* O CÉU DA INICIALIZAÇÃO NÃO SE APAGA — É COBERTO.
+ *
+ * Antes os dois faziam crossfade, cada um indo a 50% no meio do caminho. Só que
+ * empilhar duas camadas opacas a meia opacidade deixa o SÓLIDO DO PALCO aparecer
+ * por baixo: no meio da travessia a tela recebia ~25% de --cer-base. Enquanto os
+ * três tinham brilho parecido isso não aparecia; com a inicialização indo a
+ * quase preto, a passagem passaria a escurecer no meio antes de clarear — um
+ * afundamento no exato momento em que a cena deveria abrir.
+ *
+ * Como o céu do bloqueio é opaco, basta ele entrar POR CIMA. A travessia fica
+ * monotônica, e ainda sai uma camada da conta do compositor. */
 .cerimonia:not([data-fase='boot']) .cerimonia-ceu--lock,
 .cerimonia:not([data-fase='boot']) .cerimonia-nebulosa {
   opacity: 1;

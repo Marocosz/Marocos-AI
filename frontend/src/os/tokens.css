@@ -56,30 +56,28 @@
      o resto do sistema não tem. A distinção sobrevive inteira em tons próximos:
      o olho reconhece coluna e arco muito antes de reparar na diferença de
      luminosidade. */
-  --cer-base: #120a20;
-  /* TEMPERATURA — o terceiro eixo de separação, depois de forma e de textura.
-     A inicialização puxa para o índigo: é a máquina antes de o roxo dela
-     acender, e frio lê como "ainda não". O bloqueio puxa para o violeta quente,
-     que é a cor da identidade tendo chegado. Os dois continuam sendo roxo, então
-     nada foge do padrão — mas lado a lado a diferença é imediata. */
-  /* VINHETA FORTE — o quinto eixo, e o que fecha o enquadramento.
+  /* O sólido do palco acompanha a inicialização, que é quem ele fica atrás. */
+  --cer-base: #04020c;
+
+  /* A INICIALIZAÇÃO É O QUARTO ESCURO. VALOR é o eixo mais forte que separa as
+   * duas telas, e aqui ele foi levado até o fim: o fundo vai a quase preto e a
+   * vinheta fecha o enquadramento com força. Contra o bloqueio — que é um campo
+   * violeta aberto, com estrelas até as quatro pontas — a diferença deixa de ser
+   * de nuance e vira de natureza. Uma sala escura com um facho de luz, e depois
+   * um céu.
    *
-   * Ela é o que faz um facho ler como facho: sem escuro nas bordas, luz no meio
-   * é só um degradê. E dá à inicialização uma leitura oposta à do bloqueio, que
-   * é aberto e vai até as quatro pontas — aqui a cena é FECHADA, contida; lá é
-   * infinita.
+   * A TEMPERATURA CONTINUA SEPARANDO O QUE SOBRA DE COR. A luz do facho puxa
+   * para o índigo: é a máquina antes de o roxo dela acender, e frio lê como
+   * "ainda não". O bloqueio é violeta quente, a identidade tendo chegado.
    *
-   * A VINHETA ASSENTA EM VIOLETA, NÃO EM PRETO. Uma versão anterior morria em
-   * #030106 e a tela inteira ficou dura; o problema nunca foi a vinheta, foi o
-   * destino dela. Aqui os cantos param por volta de #0d0b22 — bem escuro, e
-   * ainda assim visivelmente uma cor.
-   *
-   * O campo por baixo subiu de brilho junto: com as bordas puxadas para baixo, o
-   * miolo lê mais aceso sem precisar de mais luz de verdade. É de graça. */
+   * Nota de histórico, porque o código já disse o contrário: houve uma versão
+   * com vinheta quase preta que foi rejeitada por pesada, e uma seguinte que
+   * assentava em violeta. Esta volta ao escuro por decisão explícita do dono do
+   * projeto, agora com o facho central mais aceso para o miolo não ir junto. */
   --cer-ceu-boot:
-    radial-gradient(112% 86% at 50% 44%, transparent 30%, rgba(12, 10, 30, 0.4) 68%, rgba(11, 9, 26, 0.78) 100%),
-    radial-gradient(36% 74% at 50% 28%, rgba(133, 134, 242, 0.26) 0%, rgba(79, 70, 200, 0.09) 48%, transparent 74%),
-    radial-gradient(120% 100% at 50% 42%, #1d1843 0%, #171331 58%, #131024 100%);
+    radial-gradient(104% 80% at 50% 44%, transparent 20%, rgba(2, 1, 8, 0.74) 58%, rgba(1, 0, 4, 0.97) 100%),
+    radial-gradient(34% 70% at 50% 28%, rgba(140, 141, 248, 0.34) 0%, rgba(79, 70, 200, 0.11) 46%, transparent 72%),
+    radial-gradient(120% 100% at 50% 42%, #15113c 0%, #0b0821 58%, #050310 100%);
   /* O campo do bloqueio é mais QUENTE que o da inicialização — ver a nota de
      temperatura em --cer-ceu-boot. */
   --cer-campo-lock: linear-gradient(180deg, #1a0d2e 0%, #160a26 58%, #120821 100%);
@@ -135,7 +133,10 @@
 
   --cer-texto: #f5f3ff;
   --cer-texto-suave: #c4b5fd;
-  --cer-texto-fraco: #6d5b8c;
+  /* Subiu junto com o escurecimento do fundo. Em #6d5b8c a dica de pular ficava
+     em ~3:1 contra o quase preto — legível a duras penas, e ela aparece no canto
+     inferior, que é a parte mais fechada da vinheta. */
+  --cer-texto-fraco: #8b7ab0;
 
   --cer-trilho: rgba(196, 181, 253, 0.14);
   --cer-preenchimento: linear-gradient(90deg, #7c3aed, #c4b5fd 70%, #f5f3ff);
@@ -172,18 +173,17 @@
      tela de bloqueio que traz a lavanda. Só a temperatura se inverte. */
   /* Mesma leitura de dia — coluna na inicialização, arco no bloqueio —, e a
      mesma suavidade: aqui a luz é o branco e o que recua é a lavanda. */
-  --cer-base: #f7f4fd;
-  /* A mesma separação de temperatura, traduzida para o dia: a inicialização é um
-     branco frio, levemente azulado; o bloqueio é um branco quente, puxado para o
-     violeta. */
-  /* A mesma vinheta, contida. De dia ela não pode ser forte como à noite: cantos
-     escuros sobre campo claro leem como sujeira, não como enquadramento. O que
-     sobrevive é a direção — os cantos recuam para um cinza-lavanda enquanto o
-     miolo vai a branco puro. */
+  --cer-base: #e6e9f4;
+  /* De dia não existe "quase preto", mas existe a RELAÇÃO, que é o que importa:
+     a inicialização continua sendo a mais escura das duas, e o bloqueio o campo
+     mais claro. Aqui isso vira um cinza-lavanda fechando os cantos contra um
+     miolo branco puro — luz de estúdio. A vinheta é forte, mas não tanto quanto
+     à noite: sobre campo claro, canto escuro demais lê como sujeira em vez de
+     enquadramento. */
   --cer-ceu-boot:
-    radial-gradient(112% 86% at 50% 44%, transparent 32%, rgba(176, 178, 208, 0.2) 70%, rgba(158, 160, 194, 0.38) 100%),
-    radial-gradient(36% 74% at 50% 28%, #ffffff 0%, rgba(240, 242, 253, 0.7) 48%, transparent 74%),
-    radial-gradient(120% 100% at 50% 42%, #fdfeff 0%, #f3f5fd 58%, #e9ecf7 100%);
+    radial-gradient(104% 80% at 50% 44%, transparent 22%, rgba(126, 130, 166, 0.3) 62%, rgba(104, 108, 146, 0.52) 100%),
+    radial-gradient(34% 70% at 50% 28%, #ffffff 0%, rgba(240, 242, 253, 0.78) 46%, transparent 72%),
+    radial-gradient(120% 100% at 50% 42%, #fdfeff 0%, #eef1fb 58%, #dfe3f2 100%);
   /* De dia não há estrelas — céu claro não tem. O que sobrevive da ideia é a
      luz: o mesmo núcleo com dois braços, só que agora ele é o ponto MAIS CLARO
      de um campo pálido, em vez do mais brilhante de um campo escuro. A leitura
