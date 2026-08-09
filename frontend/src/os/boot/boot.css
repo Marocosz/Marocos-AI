@@ -1,127 +1,397 @@
 /* src/os/boot/boot.css
  *
- * Cerimônia de sistema: boot e tela de bloqueio.
+ * Cerimônia de sistema: inicialização e tela de bloqueio, num palco só.
  *
- * Nenhuma das duas usa backdrop-filter. Um blur de tela cheia sobre o shader
- * animado é justamente o custo que o resto do sistema evita — aqui a
- * profundidade vem de gradiente e de halo, que não custam nada por frame.
+ * A ARQUITETURA EM UMA FRASE: o cristal e a marca ficam parados no centro, e é
+ * a cena ao redor deles que troca. Ver o cabeçalho de Ceremony.jsx para o
+ * porquê; aqui está o como.
+ *
+ * A coreografia inteira é lida de `[data-fase]` no elemento raiz. Os seletores
+ * usam `:not([data-fase='boot'])` em vez de `[data-fase='bloqueio']` de
+ * propósito: quando a fase vira 'pronto' (cortina subindo) um seletor preso a
+ * 'bloqueio' deixaria de casar, as animações seriam removidas e a cena inteira
+ * daria um salto de volta ao estado inicial no pior momento possível.
+ *
+ * Nada aqui usa backdrop-filter. Um blur de tela cheia sobre o shader animado é
+ * justamente o custo que o resto do sistema evita — a profundidade vem de
+ * gradiente e de halo, que não custam nada por frame.
  */
 
 /* ==================================================
-   PLACEHOLDER DO CRISTAL
-   Enquanto o chunk 3D nao chega, so o halo pulsa. Nao existe mais um cristal
-   desenhado a mao: uma segunda versao da marca que nao e a marca confundia
-   mais do que ajudava.
+   PALCO
    ================================================== */
 
-.crystal-loading {
-  width: 100%;
-  height: 100%;
-  min-width: 180px;
-  min-height: 180px;
-  border-radius: 50%;
-  background: radial-gradient(
-    circle at 50% 50%,
-    rgba(168, 85, 247, 0.3) 0%,
-    rgba(124, 58, 237, 0.12) 45%,
-    transparent 70%
-  );
-  animation: crystal-loading-pulse 1.9s ease-in-out infinite;
-}
-
-@keyframes crystal-loading-pulse {
-  0%, 100% { opacity: 0.45; transform: scale(0.94); }
-  50%      { opacity: 0.9;  transform: scale(1); }
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .crystal-loading { animation: none; opacity: 0.7; }
-}
-
-/* ==================================================
-   BOOT
-   ================================================== */
-
-.boot-screen {
+.cerimonia {
   position: fixed;
   inset: 0;
   z-index: var(--z-boot);
   display: grid;
   place-items: center;
-  /* Vazio profundo: o boot é o único momento em que o roxo do sistema ainda
-     não acendeu. */
-  background: radial-gradient(120% 90% at 50% 45%, #170b2b 0%, #0a0514 60%, #050208 100%);
-  animation: boot-fade-in 260ms ease-out;
+  /* A cúpula é maior que a tela de propósito; recortar aqui evita que ela
+     gere barra de rolagem. Nada da cerimônia precisa escapar do quadro. */
+  overflow: hidden;
+  /* Fundo sólido por baixo dos céus: garante que nunca dá para ver a área de
+     trabalho através da cerimônia, nem no primeiro frame. */
+  background: var(--cer-base);
+  /* `will-change` desde já, e não só na saída: promover a camada no instante em
+     que a animação começa causa um engasgo no primeiro frame. A cerimônia vive
+     poucos segundos, então o custo de memória é limitado. */
+  will-change: transform;
+
+  /* Meia altura do núcleo, usada para pendurar as cenas acima e abaixo dele sem
+     que elas participem do seu fluxo. Some com o tamanho do cristal, que vem
+     inline do componente para não haver duas fontes de verdade.
+     73px = metade do que o núcleo tem além do cristal (rótulo, marca, "Entrar"
+     e os paddings da porta). */
+  --nucleo-meio: calc(var(--cristal, 300px) / 2 + 73px);
 }
 
-@keyframes boot-fade-in {
-  from {
-    opacity: 0;
+/* A cortina sobe e revela a área de trabalho, que já está montada por baixo.
+   SÓ TRANSFORM: animar opacidade junto dobraria o trabalho do compositor numa
+   camada de tela cheia com gradientes empilhados. Cortina não desbota, sai de
+   cena — e leva o cristal junto, que é o ponto. */
+.cerimonia-saindo {
+  animation: cerimonia-sai 620ms cubic-bezier(0.65, 0, 0.35, 1) forwards;
+  pointer-events: none;
+}
+
+@keyframes cerimonia-sai {
+  to {
+    transform: translateY(-100%);
   }
 }
 
-.boot-content {
+/* ==================================================
+   CÉUS — a camada mais funda do parallax
+   ================================================== */
+
+.cerimonia-ceu {
+  position: absolute;
+  inset: 0;
+}
+
+/* Vazio profundo: a inicialização é o único momento em que o roxo do sistema
+   ainda não acendeu. */
+.cerimonia-ceu--boot {
+  background: var(--cer-ceu-boot);
+  opacity: 1;
+  transition: opacity 720ms ease-out;
+}
+
+/* Roxo do sistema já aceso, mas ainda fechado. */
+.cerimonia-ceu--lock {
+  background: var(--cer-ceu-lock);
+  opacity: 0;
+  transition: opacity 720ms ease-out;
+}
+
+/* A CÚPULA — o que faz a tela de bloqueio não ser a inicialização com outra cor.
+ *
+ * As duas cenas eram brilho radial atrás de um cristal centralizado, e é por
+ * isso que liam como a mesma tela. Aqui elas passam a ser de naturezas
+ * diferentes: a inicialização é ATMOSFERA (um facho vertical num vazio, sem
+ * contorno nenhum) e o bloqueio é GEOMETRIA — um círculo enorme ancorado acima
+ * do topo, do qual só se vê o arco de baixo cortando a tela, com espaço livre
+ * embaixo. A borda é o que faz a diferença: com contorno aquilo é uma forma;
+ * sem contorno seria mais um degradê.
+ *
+ * A conta: o ponto mais baixo do círculo fica a 18vh do rodapé, então o arco
+ * cruza o centro da tela a 82vh — abaixo do "Entrar" e acima da dica, que fica
+ * na faixa lisa de baixo. Com 148vw de diâmetro as laterais saem de quadro e o
+ * arco chega às bordas bem mais alto, que é o que dá a curvatura visível.
+ *
+ * Desce enquanto aparece: é o único elemento que se move em direção ao
+ * observador, e é ele que dá profundidade ao cristal parado. */
+.cerimonia-domo {
+  position: absolute;
+  left: 50%;
+  bottom: 18vh;
+  width: 148vw;
+  aspect-ratio: 1;
+  border-radius: 50%;
+  border: 1px solid var(--cer-domo-borda);
+  background: var(--cer-domo);
+  opacity: 0;
+  transform: translate(-50%, -7vh);
+  transition: opacity 820ms ease-out, transform 1100ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.cerimonia:not([data-fase='boot']) .cerimonia-ceu--boot {
+  opacity: 0;
+}
+
+.cerimonia:not([data-fase='boot']) .cerimonia-ceu--lock,
+.cerimonia:not([data-fase='boot']) .cerimonia-domo {
+  opacity: 1;
+}
+
+.cerimonia:not([data-fase='boot']) .cerimonia-domo {
+  transform: translate(-50%, 0);
+}
+
+/* ==================================================
+   NÚCLEO — o que atravessa as duas cenas
+   ================================================== */
+
+.cerimonia-nucleo {
+  position: relative;
+  z-index: 2;
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 20px;
 }
 
-/* Caixa do cristal. O <Crystal> ja e quadrado e do tamanho pedido; isto so
-   reserva o espaco e da a entrada. */
-.boot-crystal {
+/* A PORTA: o cristal é o botão, e é o único caminho para entrar.
+   Um cristal decorativo com um botão "Entrar" ao lado poria dois elementos
+   disputando o mesmo trabalho; aqui a marca é a porta.
+
+   Durante o boot ela está `disabled`: existe, ocupa exatamente o mesmo espaço,
+   mas não se oferece. É o que mantém o cristal imóvel na troca de cena. */
+.porta {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 14px;
+  padding: 22px 44px 18px;
+  /* A porta em si não tem pele: quem se acende é o anel do cristal, logo
+     abaixo. `outline: none` no foco é seguro porque o anel É o indicador — não é
+     uma remoção, é uma substituição. Sem essa linha o Chrome desenha o anel
+     retangular padrão dele, que é o UA assumindo quando a página não declara
+     nada. */
+  border: none;
+  background: transparent;
+  cursor: pointer;
+}
+
+.porta:disabled {
+  cursor: default;
+}
+
+.porta:focus-visible {
+  outline: none;
+}
+
+/* Caixa do cristal. O <Crystal> já é quadrado e do tamanho pedido; isto só
+   reserva o espaço, dá a entrada e ancora o anel de realce. */
+.cerimonia-cristal {
   position: relative;
-  width: 300px;
-  height: 300px;
-  display: grid;
-  place-items: center;
+  display: block;
+  width: var(--cristal, 300px);
+  height: var(--cristal, 300px);
   opacity: 0;
-  animation: boot-crystal-in 1100ms cubic-bezier(0.22, 1, 0.36, 1) 250ms forwards;
+  /* Só opacidade. Escalar o container obriga o compositor a reamostrar a textura
+     do canvas WebGL a cada passo, e o cristal já entra em movimento por conta
+     própria. */
+  animation: cerimonia-acende 1100ms cubic-bezier(0.22, 1, 0.36, 1) 250ms forwards;
 }
 
-/* So opacidade. Escalar o container obriga o compositor a reamostrar a textura
-   do canvas WebGL a cada passo, e o cristal ja entra em movimento por conta
-   propria — a escala nao acrescentava nada que ele nao fizesse sozinho. */
-@keyframes boot-crystal-in {
-  from { opacity: 0; }
-  to   { opacity: 1; }
+@keyframes cerimonia-acende {
+  to {
+    opacity: 1;
+  }
 }
 
-/* Barra de progresso: torna a duracao legivel como inicializacao em vez de
-   travamento. Anima a largura por transform, que e composicao pura. */
+/* O REALCE DA PORTA É REDONDO.
+ *
+ * Antes era um retângulo arredondado envolvendo o cristal, a marca e o "Entrar":
+ * emoldurava três coisas de naturezas diferentes e desenhava um contorno de
+ * campo de formulário em volta da peça mais bonita da tela. O anel emoldura só o
+ * cristal, e a curva conversa com o arco da cúpula em vez de brigar com ele.
+ *
+ * `inset` negativo em vez de tamanho fixo: o anel fica centrado no cristal
+ * sozinho, qualquer que seja o `--cristal` ou o padding da porta. E `z-index:-1`
+ * o joga atrás do canvas — o véu de dentro do anel cobriria o cristal, já que
+ * pseudo-elemento posicionado pinta acima de conteúdo estático. O contexto de
+ * empilhamento vem da própria opacidade animada do bloco, então o -1 não escapa
+ * para trás da cena. */
+.cerimonia-cristal::before {
+  content: '';
+  position: absolute;
+  inset: -18px;
+  z-index: -1;
+  border-radius: 50%;
+  border: 1px solid transparent;
+  background: transparent;
+  transition: border-color 0.28s ease, background 0.28s ease, box-shadow 0.28s ease;
+}
+
+.porta:not(:disabled):hover .cerimonia-cristal::before,
+.porta:not(:disabled):focus-visible .cerimonia-cristal::before {
+  border-color: var(--cer-borda);
+  background: var(--cer-veu);
+}
+
+.porta:not(:disabled):focus-visible .cerimonia-cristal::before {
+  border-color: var(--cer-borda-forte);
+  box-shadow: 0 0 42px var(--cer-brilho);
+}
+
+/* O anel não aparece antes de o teclado entrar em uso. A porta é focada na
+   montagem (ver Ceremony.jsx), e foco programático em página recém carregada
+   casa com `:focus-visible` no Chrome — a tela abria com o cristal já circulado,
+   como se estivesse pré-selecionado. O `:not(:hover)` deixa o mouse continuar
+   destacando normalmente. */
+.cerimonia[data-foco='mudo'] .porta:focus-visible:not(:hover) .cerimonia-cristal::before {
+  border-color: transparent;
+  background: transparent;
+  box-shadow: none;
+}
+
+.cerimonia[data-foco='mudo'] .porta:focus-visible:not(:hover) .porta-entrar::after {
+  width: 0;
+}
+
+.cerimonia-marca {
+  font-family: 'Poppins', system-ui, sans-serif;
+  font-size: clamp(1.3rem, 2.5vw, 1.8rem);
+  font-weight: 900;
+  letter-spacing: 0.32em;
+  /* O tracking largo abre um vão à direita da última letra; o padding compensa
+     para o bloco ficar opticamente centrado. */
+  padding-left: 0.32em;
+  color: var(--cer-texto);
+  opacity: 0;
+  animation: cerimonia-sobe 800ms cubic-bezier(0.22, 1, 0.36, 1) 900ms forwards;
+}
+
+/* Rótulos que só valem no bloqueio, mas cujo ESPAÇO existe desde o boot. Se
+   aparecessem do nada, a coluna cresceria e empurraria o cristal — o
+   deslocamento que este arranjo inteiro existe para evitar. */
+.lock-user,
+.porta-entrar {
+  font-family: system-ui, sans-serif;
+  opacity: 0;
+  transition: opacity 520ms ease-out, transform 520ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.lock-user {
+  height: 20px;
+  margin-bottom: 10px;
+  font-size: 0.82rem;
+  font-weight: 500;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--cer-texto-suave);
+  transform: translateY(-10px);
+}
+
+.porta-entrar {
+  height: 18px;
+  font-size: 0.74rem;
+  font-weight: 600;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--cer-texto-suave);
+  transform: translateY(10px);
+}
+
+.cerimonia:not([data-fase='boot']) .lock-user {
+  opacity: 0.7;
+  transform: translateY(0);
+  transition-delay: 320ms;
+}
+
+.cerimonia:not([data-fase='boot']) .porta-entrar {
+  opacity: 1;
+  transform: translateY(0);
+  transition-delay: 400ms;
+}
+
+/* Sublinhado que cresce do centro no hover: confirma que aquilo é um destino,
+   não um rótulo. */
+.porta-entrar {
+  position: relative;
+  padding-bottom: 4px;
+}
+
+.porta-entrar::after {
+  content: '';
+  position: absolute;
+  left: 50%;
+  bottom: 0;
+  width: 0;
+  height: 1px;
+  background: var(--accent-color);
+  transform: translateX(-50%);
+  transition: width 0.28s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.porta:not(:disabled):hover .porta-entrar::after,
+.porta:not(:disabled):focus-visible .porta-entrar::after {
+  width: 100%;
+}
+
+/* ==================================================
+   CENAS — o que troca ao redor do núcleo
+   ================================================== */
+
+.cena {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  /* Nada nas cenas recebe clique: o único alvo da cerimônia é a porta. */
+  pointer-events: none;
+}
+
+/* --- Cena da inicialização --- */
+
+/* Pendurada logo abaixo do núcleo, e fora do fluxo dele. */
+.cena-boot-pilha {
+  position: absolute;
+  left: 0;
+  right: 0;
+  /* Logo abaixo do rodapé do núcleo — incluindo a faixa reservada do "Entrar",
+     que está invisível durante a inicialização. Assim a legenda cai enquanto o
+     "Entrar" sobe para o espaço logo acima dela, em vez de os dois disputarem o
+     mesmo lugar na troca de cena. */
+  top: calc(50% + var(--nucleo-meio) + 6px);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 14px;
+}
+
+.boot-tagline {
+  margin: 0;
+  font-family: system-ui, sans-serif;
+  font-size: 0.72rem;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--cer-texto-suave);
+  opacity: 0;
+  animation: cerimonia-sobe 800ms cubic-bezier(0.22, 1, 0.36, 1) 1300ms forwards;
+}
+
 .boot-progress {
   position: relative;
   width: 260px;
   height: 3px;
   border-radius: 3px;
-  background: rgba(196, 181, 253, 0.14);
-  box-shadow: 0 0 18px rgba(124, 58, 237, 0.25);
+  background: var(--cer-trilho);
+  box-shadow: 0 0 18px var(--cer-brilho);
   overflow: hidden;
   opacity: 0;
-  animation: boot-rise 500ms ease-out 420ms forwards;
+  animation: cerimonia-sobe 500ms ease-out 420ms forwards;
 }
 
-/* Varredura continua sobre o trilho. Existe para que a barra nunca fique
-   totalmente imovel: entre uma etapa e outra o avanco de 3px por segundo e
+/* Varredura contínua sobre o trilho. Existe para que a barra nunca fique
+   totalmente imóvel: entre uma etapa e outra o avanço de 3px por segundo é
    pequeno demais para o olho registrar, e um trilho parado desmente a ideia de
-   que ha trabalho acontecendo. Vive no trilho, e nao no preenchimento, porque
-   o preenchimento esta sob scaleX — um filho dele sairia esmagado. */
+   que há trabalho acontecendo. Vive no trilho, e não no preenchimento, porque o
+   preenchimento está sob scaleX — um filho dele sairia esmagado. */
 .boot-progress::after {
   content: '';
   position: absolute;
   inset: 0;
-  background: linear-gradient(
-    90deg,
-    transparent 0%,
-    rgba(245, 243, 255, 0.55) 50%,
-    transparent 100%
-  );
+  background: linear-gradient(90deg, transparent 0%, var(--cer-varredura) 50%, transparent 100%);
   transform: translateX(-100%);
   animation: boot-sweep 1.5s linear infinite;
 }
 
 @keyframes boot-sweep {
-  to { transform: translateX(100%); }
+  to {
+    transform: translateX(100%);
+  }
 }
 
 .boot-progress-fill {
@@ -129,191 +399,138 @@
   width: 100%;
   height: 100%;
   border-radius: inherit;
-  background: linear-gradient(90deg, #7c3aed, #c4b5fd 70%, #f5f3ff);
-  box-shadow: 0 0 12px rgba(196, 181, 253, 0.55);
+  background: var(--cer-preenchimento);
+  box-shadow: 0 0 12px var(--cer-brilho-forte);
   transform-origin: left center;
   transform: scaleX(0);
   animation-name: boot-progress-grow;
-  /* LINEAR de proposito. Com cubic-bezier(0.4, 0, 0.2, 1) a barra chegava a
-     ~94% no primeiro terco da cerimonia e passava o resto do tempo rastejando:
-     media, mas nao parecia mediar nada. Progresso e informacao, e informacao
-     nao tem easing. */
+  /* LINEAR de propósito. Com cubic-bezier(0.4, 0, 0.2, 1) a barra chegava a
+     ~94% no primeiro terço e passava o resto do tempo rastejando: media, mas
+     não parecia medir nada. Progresso é informação, e informação não tem
+     easing. */
   animation-timing-function: linear;
   animation-fill-mode: forwards;
-  /* animation-duration vem inline, do BOOT_DURATION_MS */
+  /* animation-duration vem inline, da duração da inicialização */
 }
 
 @keyframes boot-progress-grow {
-  to { transform: scaleX(1); }
+  to {
+    transform: scaleX(1);
+  }
 }
 
-/* Etapa corrente. Ocupa a segunda metade da cerimonia, que antes era so espera.
-   A altura reservada impede que a troca de texto empurre o layout — e precisa
-   caber a linha inteira, nao 1.1em: com height menor que o line-height o span
-   transbordava para baixo e ficava desalinhado com a barra. */
+/* Etapa corrente. Ocupa a segunda metade da inicialização, que antes era só
+   espera. A altura reservada precisa caber a linha inteira: com height menor
+   que o line-height o span transbordava e desalinhava com a barra. */
 .boot-stage {
   display: flex;
   align-items: center;
   justify-content: center;
-  margin: -6px 0 0;
+  margin: -4px 0 0;
   min-height: 20px;
   font-family: system-ui, sans-serif;
   font-size: 0.72rem;
   letter-spacing: 0.14em;
-  color: #a78bfa;
+  color: var(--cer-texto-suave);
   opacity: 0;
-  animation: boot-rise 600ms ease-out 700ms forwards;
+  animation: cerimonia-sobe 600ms ease-out 700ms forwards;
 }
 
-/* O span e remontado a cada etapa (key), entao esta entrada roda de novo a cada
-   troca. Por isso ela NAO parte de zero: partindo de zero a linha sumia por
+/* O span é remontado a cada etapa (key), então esta entrada roda de novo a cada
+   troca. Por isso ela NÃO parte de zero: partindo de zero a linha sumia por
    completo entre uma etapa e outra, e um texto que pisca ao trocar chama mais
-   atencao para o buraco do que para o que mudou. O piso baixo da o sinal de
-   "trocou" sem apagar a linha. */
+   atenção para o buraco do que para o que mudou. */
 .boot-stage-text {
   display: inline-block;
   animation: boot-stage-in 300ms cubic-bezier(0.22, 1, 0.36, 1) both;
 }
 
 @keyframes boot-stage-in {
-  from { opacity: 0.18; transform: translateY(4px); }
-  to   { opacity: 0.85; transform: translateY(0); }
-}
-
-.boot-title {
-  margin: 0;
-  font-family: 'Poppins', system-ui, sans-serif;
-  font-size: clamp(1.35rem, 2.6vw, 1.9rem);
-  font-weight: 900;
-  letter-spacing: 0.34em;
-  /* O tracking largo abre um vão à direita da última letra; o padding
-     compensa para o bloco ficar opticamente centrado. */
-  padding-left: 0.34em;
-  color: #f5f3ff;
-  opacity: 0;
-  animation: boot-rise 800ms cubic-bezier(0.22, 1, 0.36, 1) 900ms forwards;
-}
-
-.boot-tagline {
-  margin: -14px 0 0;
-  font-family: system-ui, sans-serif;
-  font-size: 0.72rem;
-  letter-spacing: 0.22em;
-  text-transform: uppercase;
-  color: #a78bfa;
-  opacity: 0;
-  animation: boot-rise 800ms cubic-bezier(0.22, 1, 0.36, 1) 1300ms forwards;
-}
-
-@keyframes boot-rise {
   from {
-    opacity: 0;
-    transform: translateY(10px);
+    opacity: 0.18;
+    transform: translateY(4px);
   }
   to {
-    opacity: 1;
+    opacity: 0.85;
     transform: translateY(0);
   }
 }
 
 .boot-skip-hint {
   position: absolute;
+  left: 0;
+  right: 0;
   bottom: 40px;
   margin: 0;
+  text-align: center;
   font-family: system-ui, sans-serif;
   font-size: 0.7rem;
   letter-spacing: 0.12em;
-  color: #6d5b8c;
+  color: var(--cer-texto-fraco);
   opacity: 0;
-  animation: boot-rise 800ms ease-out 2000ms forwards;
+  animation: cerimonia-sobe 800ms ease-out 2000ms forwards;
 }
 
-@media (prefers-reduced-motion: reduce) {
-  /* A CERIMONIA CONTINUA ACONTECENDO — o que sai daqui e o gesto, nao a tela.
-     Nada sobe ao entrar, o cristal nao gira (o proprio BootScreen o poe na pose
-     parada) e a varredura some. Ficam de pe a barra medindo e as etapas
-     trocando de texto: as duas sao informacao de progresso, e sem elas a tela
-     de inicializacao vira um cartaz imovel. */
-  .boot-screen,
-  .boot-crystal,
-  .boot-title,
-  .boot-tagline,
-  .boot-progress,
-  .boot-stage,
-  .boot-skip-hint {
-    animation: none;
-    opacity: 1;
-    transform: none;
-  }
-
-  .boot-stage-text {
-    animation: none;
-    opacity: 0.85;
-  }
-
-  /* A barra de progresso NAO entra na lista acima de proposito: ela precisa
-     continuar avancando. Sao 3px de altura crescendo em linha reta, o oposto
-     do movimento amplo que esta media existe para conter. */
-  .boot-progress::after {
-    animation: none;
-    opacity: 0;
-  }
+/* A SAÍDA DA CENA DO BOOT — o parallax.
+ *
+ * Cada camada se afasta uma distância diferente: a legenda quase não anda, a
+ * barra anda um pouco, a etapa anda mais, e a dica de pular — a mais periférica
+ * — é a que mais anda. É o princípio do parallax lido na vertical, e é o que faz
+ * o conjunto parecer ter profundidade em vez de sumir em bloco.
+ *
+ * POR QUE ANIMAÇÃO E NÃO TRANSITION. Estes elementos nascem com `opacity: 0` e
+ * são revelados por um keyframe de entrada com `forwards`. Uma transition
+ * compara VALORES-BASE, e o valor-base deles continua sendo 0 — a animação é
+ * que segura o 1 por cima. Com transition, portanto, não havia mudança de base
+ * nenhuma para animar, e a cena inteira sumia de um frame para o outro. Medi:
+ * opacidade 0 e deslocamento final já no instante zero da troca. Substituindo a
+ * animação de entrada pela de saída, a continuidade é exata. */
+.cerimonia:not([data-fase='boot']) .boot-tagline {
+  animation: cena-sai-perto 420ms ease-in both;
+}
+.cerimonia:not([data-fase='boot']) .boot-progress {
+  animation: cena-sai-medio 480ms ease-in 40ms both;
+}
+.cerimonia:not([data-fase='boot']) .boot-stage {
+  animation: cena-sai-longe 520ms ease-in 80ms both;
+}
+.cerimonia:not([data-fase='boot']) .boot-skip-hint {
+  animation: cena-sai-borda 560ms ease-in both;
 }
 
-/* ==================================================
-   TELA DE BLOQUEIO
-   ================================================== */
-
-.lock-screen {
-  position: fixed;
-  inset: 0;
-  z-index: var(--z-lock);
-  display: grid;
-  grid-template-rows: auto 1fr auto;
-  padding: 46px 48px 40px;
-  /* Roxo do sistema já aceso, mas ainda fechado. O halo central prepara o
-     olho para o cristal antes mesmo de ele aparecer. */
-  background:
-    radial-gradient(90% 70% at 50% 46%, rgba(124, 58, 237, 0.4) 0%, transparent 62%),
-    linear-gradient(170deg, #1a0d33 0%, #12082180 38%, #0a0514 100%),
-    #0a0514;
-  /* OPACA DESDE O PRIMEIRO FRAME. Antes havia um `lock-in` animando a opacidade
-     do container de 0 a 1: quando o boot desmontava e esta tela montava, por
-     meio segundo dava para VER a area de trabalho atraves dela, e depois ela
-     era coberta de novo. Era o "sobe e volta". O fundo agora entra solido; quem
-     se anuncia sao os conteudos, cada um com seu lock-rise.
-
-     `will-change` aqui, e nao so na saida: promover a camada no instante em que
-     a animacao comeca causa um engasgo no primeiro frame. A tela vive poucos
-     segundos, entao o custo de memoria e limitado. */
-  will-change: transform;
+@keyframes cena-sai-perto {
+  from { opacity: 1; transform: translateY(0); }
+  to   { opacity: 0; transform: translateY(8px); }
+}
+@keyframes cena-sai-medio {
+  from { opacity: 1; transform: translateY(0); }
+  to   { opacity: 0; transform: translateY(20px); }
+}
+@keyframes cena-sai-longe {
+  from { opacity: 1; transform: translateY(0); }
+  to   { opacity: 0; transform: translateY(32px); }
+}
+@keyframes cena-sai-borda {
+  from { opacity: 1; transform: translateY(0); }
+  to   { opacity: 0; transform: translateY(46px); }
 }
 
-/* Destrancar: a cortina sobe e revela a area de trabalho, que ja esta montada
-   por baixo. E a saida que todo sistema usa, e aqui ela e honesta — nao ha
-   carregamento escondido atras dela.
-
-   SO TRANSFORM. A versao anterior animava tambem a opacidade, o que dobrava o
-   trabalho do compositor numa camada de tela cheia com tres gradientes
-   empilhados. Cortina nao desbota: ela sai de cena. */
-.lock-screen-leaving {
-  animation: lock-out 620ms cubic-bezier(0.65, 0, 0.35, 1) forwards;
-  /* Nada dentro da cortina recebe clique enquanto ela sai. */
-  pointer-events: none;
-}
-
-@keyframes lock-out {
-  to {
-    transform: translateY(-100%);
-  }
-}
+/* --- Cena do bloqueio --- */
 
 .lock-clock {
+  position: absolute;
+  top: 46px;
+  left: 48px;
   display: flex;
   flex-direction: column;
   gap: 2px;
-  color: #f5f3ff;
-  animation: lock-rise 700ms cubic-bezier(0.22, 1, 0.36, 1) 120ms both;
+  color: var(--cer-texto);
+  opacity: 0;
+  /* Entra de cima, e de mais longe que o resto: é o elemento mais periférico da
+     cena, o que mais se move num parallax. */
+  transform: translateY(-26px);
+  transition: opacity 620ms ease-out 240ms,
+    transform 760ms cubic-bezier(0.22, 1, 0.36, 1) 240ms;
 }
 
 .lock-time {
@@ -329,115 +546,83 @@
   font-family: system-ui, sans-serif;
   font-size: 0.92rem;
   font-weight: 400;
-  color: #c4b5fd;
+  color: var(--cer-texto-suave);
   opacity: 0.75;
   /* Nomes de dia e mês vêm em minúsculas do locale pt-BR. */
   text-transform: capitalize;
 }
 
-.lock-center {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: 14px;
-}
-
-/* A PORTA: o cristal é o botão. Um elemento, um trabalho. */
-.lock-door {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 18px;
-  padding: 26px 44px 22px;
-  border: 1px solid transparent;
-  border-radius: 20px;
-  background: transparent;
-  cursor: pointer;
-  animation: lock-rise 800ms cubic-bezier(0.22, 1, 0.36, 1) 220ms both;
-  transition: border-color 0.25s ease, background 0.25s ease, transform 0.25s ease;
-}
-
-.lock-door:hover,
-.lock-door:focus-visible {
-  border-color: rgba(196, 181, 253, 0.28);
-  background: rgba(168, 85, 247, 0.08);
-  transform: translateY(-2px);
-}
-
-.lock-door:focus-visible {
-  outline: 2px solid var(--accent-color);
-  outline-offset: 4px;
-}
-
-.lock-wordmark {
-  font-family: 'Poppins', system-ui, sans-serif;
-  font-size: clamp(1.25rem, 2.4vw, 1.75rem);
-  font-weight: 900;
-  letter-spacing: 0.3em;
-  padding-left: 0.3em; /* compensa o vão do tracking, como no boot */
-  color: #f5f3ff;
-}
-
-.lock-enter {
-  font-family: system-ui, sans-serif;
-  font-size: 0.74rem;
-  font-weight: 600;
-  letter-spacing: 0.2em;
-  text-transform: uppercase;
-  color: #c4b5fd;
-  position: relative;
-  padding-bottom: 4px;
-}
-
-/* Sublinhado que cresce do centro no hover: confirma que aquilo é um destino,
-   não um rótulo. */
-.lock-enter::after {
-  content: '';
-  position: absolute;
-  left: 50%;
-  bottom: 0;
-  width: 0;
-  height: 1px;
-  background: var(--accent-color);
-  transform: translateX(-50%);
-  transition: width 0.28s cubic-bezier(0.22, 1, 0.36, 1);
-}
-
-.lock-door:hover .lock-enter::after,
-.lock-door:focus-visible .lock-enter::after {
-  width: 100%;
-}
-
-/* Quem esta entrando, logo acima da porta — convencao de tela de bloqueio, e
-   perto do elemento a que se refere em vez de orfao no rodape. */
-.lock-user {
-  font-family: system-ui, sans-serif;
-  font-size: 0.82rem;
-  font-weight: 500;
-  letter-spacing: 0.16em;
-  text-transform: uppercase;
-  color: #c4b5fd;
-  opacity: 0.7;
-  animation: lock-rise 700ms cubic-bezier(0.22, 1, 0.36, 1) 180ms both;
-}
-
 .lock-hint {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 40px;
   margin: 0;
-  justify-self: center;
-  align-self: center;
+  text-align: center;
   font-family: system-ui, sans-serif;
   font-size: 0.72rem;
   letter-spacing: 0.1em;
-  color: #a78bfa;
-  opacity: 0.5;
-  animation: lock-rise 700ms cubic-bezier(0.22, 1, 0.36, 1) 420ms both;
+  color: var(--cer-texto-suave);
+  opacity: 0;
+  transform: translateY(30px);
+  transition: opacity 620ms ease-out 480ms,
+    transform 760ms cubic-bezier(0.22, 1, 0.36, 1) 480ms;
 }
 
-@keyframes lock-rise {
+.cerimonia:not([data-fase='boot']) .lock-clock,
+.cerimonia:not([data-fase='boot']) .lock-hint {
+  transform: translateY(0);
+}
+
+.cerimonia:not([data-fase='boot']) .lock-clock {
+  opacity: 1;
+}
+
+.cerimonia:not([data-fase='boot']) .lock-hint {
+  opacity: 0.5;
+}
+
+/* ==================================================
+   PLACEHOLDER DO CRISTAL
+   Enquanto o chunk 3D não chega, só o halo pulsa. Não existe um cristal
+   desenhado à mão: uma segunda versão da marca que não é a marca confundia mais
+   do que ajudava.
+   ================================================== */
+
+.crystal-loading {
+  display: block;
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  background: radial-gradient(
+    circle at 50% 50%,
+    rgba(168, 85, 247, 0.3) 0%,
+    rgba(124, 58, 237, 0.12) 45%,
+    transparent 70%
+  );
+  animation: crystal-loading-pulse 1.9s ease-in-out infinite;
+}
+
+@keyframes crystal-loading-pulse {
+  0%,
+  100% {
+    opacity: 0.45;
+    transform: scale(0.94);
+  }
+  50% {
+    opacity: 0.9;
+    transform: scale(1);
+  }
+}
+
+/* ==================================================
+   ENTRADAS COMPARTILHADAS
+   ================================================== */
+
+@keyframes cerimonia-sobe {
   from {
     opacity: 0;
-    transform: translateY(16px);
+    transform: translateY(10px);
   }
   to {
     opacity: 1;
@@ -445,36 +630,90 @@
   }
 }
 
+/* ==================================================
+   MOVIMENTO REDUZIDO
+   ================================================== */
+
 @media (prefers-reduced-motion: reduce) {
-  .lock-screen,
-  .lock-clock,
-  .lock-door,
-  .lock-user,
-  .lock-hint {
+  /* A CERIMÔNIA CONTINUA ACONTECENDO — o que sai daqui é o gesto, não a tela.
+     Nada sobe, nada desliza, o cristal não gira (o próprio componente o põe na
+     pose parada) e a varredura some. A passagem entre as cenas vira um
+     crossfade limpo: os céus ainda trocam, porque cor não é movimento. */
+  .cerimonia-cristal,
+  .cerimonia-marca,
+  .boot-tagline,
+  .boot-progress,
+  .boot-stage,
+  .boot-skip-hint,
+  .crystal-loading {
     animation: none;
     opacity: 1;
     transform: none;
   }
 
-  /* A saída vira um corte seco: sem deslizar, mas ainda sai da frente. */
-  .lock-screen-leaving {
+  .boot-stage-text {
+    animation: none;
+    opacity: 0.85;
+  }
+
+  .lock-user,
+  .porta-entrar,
+  .lock-clock,
+  .lock-hint {
+    transform: none;
+  }
+
+  /* A cúpula ainda aparece — cor não é movimento —, só não desce. */
+  .cerimonia-domo,
+  .cerimonia:not([data-fase='boot']) .cerimonia-domo {
+    transform: translate(-50%, 0);
+  }
+
+  /* A saída da cena do boot vira um esmaecer no lugar: sem deslocamento, mas
+     ainda com a passagem de uma cena para a outra, que é o conteúdo. */
+  .cerimonia:not([data-fase='boot']) .boot-tagline,
+  .cerimonia:not([data-fase='boot']) .boot-progress,
+  .cerimonia:not([data-fase='boot']) .boot-stage,
+  .cerimonia:not([data-fase='boot']) .boot-skip-hint {
+    animation: cena-sai-parada 380ms ease-in both;
+  }
+
+  @keyframes cena-sai-parada {
+    from { opacity: 1; }
+    to   { opacity: 0; }
+  }
+
+  /* A barra de progresso NÃO entra no reset acima de propósito: ela precisa
+     continuar avançando. São 3px de altura crescendo em linha reta, o oposto do
+     movimento amplo que esta media existe para conter. */
+  .boot-progress::after {
+    animation: none;
+    opacity: 0;
+  }
+
+  /* A cortina vira um corte seco: sem deslizar, mas ainda sai da frente. */
+  .cerimonia-saindo {
     animation: none;
     opacity: 0;
   }
 }
 
-/* --- Telas estreitas --- */
+/* ==================================================
+   TELAS ESTREITAS
+   ================================================== */
+
 @media (max-width: 600px) {
-  .lock-screen {
-    padding: 34px 26px 30px;
+  .porta {
+    padding: 22px 26px 16px;
   }
 
-  .lock-door {
-    padding: 20px 26px 18px;
-  }
-
-  .lock-wordmark {
+  .cerimonia-marca {
     letter-spacing: 0.22em;
     padding-left: 0.22em;
+  }
+
+  .lock-clock {
+    top: 34px;
+    left: 26px;
   }
 }

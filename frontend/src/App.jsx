@@ -7,9 +7,8 @@ import { useDocumentHead } from './os/useDocumentHead'
 import Desktop from './os/desktop/Desktop'
 import Taskbar from './os/desktop/Taskbar'
 import MobileShell from './os/mobile/MobileShell'
-import BootScreen from './os/boot/BootScreen'
+import Ceremony from './os/boot/Ceremony'
 import ShutdownScreen from './os/boot/ShutdownScreen'
-import LockScreen from './os/boot/LockScreen'
 import './os/tokens.css'
 
 // Dispara o download do chunk 3D assim que este módulo carrega, em paralelo
@@ -164,9 +163,15 @@ const Shell = () => {
             </>
           ))}
 
-        {fase === 'boot' && <BootScreen onDone={concluirBoot} />}
+        {/* Inicialização e bloqueio são um palco só, com o cristal e a marca
+            atravessando as duas cenas — ver o cabeçalho de Ceremony.jsx. */}
         {bloqueioNaArvore && !desligado && (
-          <LockScreen onUnlock={destrancar} onUnlockStart={() => setRevelando(true)} />
+          <Ceremony
+            fase={fase}
+            onBootDone={concluirBoot}
+            onUnlock={destrancar}
+            onUnlockStart={() => setRevelando(true)}
+          />
         )}
         {desligado && <ShutdownScreen onPowerOn={ligar} />}
 

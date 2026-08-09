@@ -43,12 +43,33 @@ const DISTANCIA_CAMERA = 5.6
 
 const CrystalMesh = ({ animated, spin }) => {
   const meshRef = useRef()
+  // Tempo de rotação acumulado, e a velocidade que está valendo agora.
+  const faseRef = useRef(0)
+  const spinAtualRef = useRef(spin)
 
-  useFrame((state) => {
+  useFrame((_, delta) => {
     if (!animated || !meshRef.current) return
-    // Rotação orgânica e contínua — os mesmos coeficientes da produção,
-    // multiplicados por `spin`. Em spin=1 o comportamento é idêntico ao de lá.
-    const t = state.clock.getElapsedTime() * spin
+
+    // O ÂNGULO É INTEGRADO, NÃO CALCULADO DO TEMPO ABSOLUTO.
+    //
+    // Antes era `clock.getElapsedTime() * spin`. Enquanto cada tela tinha o seu
+    // próprio cristal isso dava no mesmo, mas com um cristal só atravessando a
+    // cerimônia inteira a velocidade muda em voo — e multiplicar o tempo já
+    // decorrido por um spin novo salta a rotação na hora da troca. Somando por
+    // frame, mudar de velocidade não mexe no ângulo já percorrido.
+    //
+    // `delta` limitado: depois de um engasgo ou de uma aba em segundo plano ele
+    // vem grande e o cristal daria um pulo para recuperar o "atraso".
+    const dt = Math.min(delta, 0.05)
+    // Aproximação exponencial da velocidade alvo: a queda de 3.2 para 1.6 na
+    // passagem para o bloqueio vira uma desaceleração, e não um corte. É o
+    // sistema assentando.
+    spinAtualRef.current += (spin - spinAtualRef.current) * Math.min(1, dt * 2.2)
+    faseRef.current += dt * spinAtualRef.current
+
+    // Mesmos coeficientes da produção. Com spin constante o resultado é
+    // idêntico ao de lá.
+    const t = faseRef.current
     meshRef.current.rotation.y = t * 0.2
     meshRef.current.rotation.x = Math.cos(t * 0.3) * 0.1
     meshRef.current.rotation.z = Math.sin(t * 0.2) * 0.05

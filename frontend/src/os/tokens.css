@@ -30,19 +30,58 @@
   --z-windows: 100;
   --z-taskbar: 1000;
   --z-startmenu: 1100;
-  /* Cerimônia. A tela de bloqueio já está montada DURANTE o boot, de propósito:
-     o cristal dela precisa desse tempo para aquecer o contexto WebGL, senão o
-     custo cai no instante em que o boot sai. Só que as duas dividiam o mesmo
-     valor, e empate de z-index é resolvido pela ordem do DOM — o bloqueio vem
-     depois, é opaco, e cobria o boot inteiro. A inicialização rodava certinho e
-     ninguém nunca viu. Dois degraus, e a ordem fica explícita. */
-  --z-lock: 2000;
-  --z-boot: 2010;
+  /* Cerimônia (inicialização + bloqueio). Um valor só porque é uma camada só:
+     as duas telas eram irmãs empatadas em 2000, e empate de z-index é resolvido
+     pela ordem do DOM — o bloqueio vinha depois, era opaco, e cobria a
+     inicialização inteira. Hoje elas são cenas do mesmo palco. */
+  --z-boot: 2000;
 
   /* Wallpaper — dia */
   --sky-top: #6d28d9;
   --sky-mid: #a78bfa;
   --sky-low: #ddd6fe;
+
+  /* --------------------------------------------------
+     CERIMÔNIA (inicialização + tela de bloqueio)
+
+     Os valores aqui são os da noite, porque foi de noite que a cena nasceu — e
+     porque o tema escuro é o padrão do sistema. `.theme-light` logo abaixo
+     troca a paleta inteira; o boot.css não conhece cor nenhuma, só estes nomes.
+     -------------------------------------------------- */
+  /* O QUE SEPARA AS DUAS CENAS É A FORMA DA LUZ, NÃO A FORÇA DELA.
+     A inicialização é um facho vertical, alto e sem contorno — atmosfera. O
+     bloqueio é um arco de círculo descendo do topo, com borda — geometria. Uma
+     versão anterior tentou separá-las por contraste, com vinheta quase preta e
+     um degrau duro no arco; ficou pesado e as duas telas ganharam uma dureza que
+     o resto do sistema não tem. A distinção sobrevive inteira em tons próximos:
+     o olho reconhece coluna e arco muito antes de reparar na diferença de
+     luminosidade. */
+  --cer-base: #120a20;
+  --cer-ceu-boot:
+    radial-gradient(36% 74% at 50% 28%, rgba(139, 92, 246, 0.24) 0%, rgba(109, 40, 217, 0.09) 48%, transparent 74%),
+    radial-gradient(120% 100% at 50% 42%, #1d1033 0%, #160d28 58%, #11081c 100%);
+  --cer-ceu-lock: linear-gradient(180deg, #1b1132 0%, #180f2c 62%, #150d26 100%);
+  --cer-domo: linear-gradient(
+    180deg,
+    rgba(124, 58, 237, 0.26) 0%,
+    rgba(147, 84, 243, 0.18) 58%,
+    rgba(168, 85, 247, 0.11) 100%
+  );
+  --cer-domo-borda: rgba(196, 181, 253, 0.2);
+
+  --cer-texto: #f5f3ff;
+  --cer-texto-suave: #c4b5fd;
+  --cer-texto-fraco: #6d5b8c;
+
+  --cer-trilho: rgba(196, 181, 253, 0.14);
+  --cer-preenchimento: linear-gradient(90deg, #7c3aed, #c4b5fd 70%, #f5f3ff);
+  --cer-varredura: rgba(245, 243, 255, 0.55);
+  --cer-brilho: rgba(124, 58, 237, 0.25);
+  --cer-brilho-forte: rgba(196, 181, 253, 0.55);
+
+  --cer-borda: rgba(196, 181, 253, 0.28);
+  --cer-borda-forte: rgba(196, 181, 253, 0.5);
+  --cer-veu: rgba(168, 85, 247, 0.08);
 }
 
 /* Wallpaper — noite */
@@ -62,6 +101,40 @@
   --win-body-solid: #faf8ff;
   --win-border: 1px solid rgba(255, 255, 255, 0.6);
   --win-shadow: 0 10px 24px rgba(88, 28, 135, 0.22);
+
+  /* Cerimônia de dia.
+     A leitura da cena não muda: a inicialização acontece antes de o roxo do
+     sistema acender, então aqui ela é um branco frio e quase sem cor, e é a
+     tela de bloqueio que traz a lavanda. Só a temperatura se inverte. */
+  /* Mesma leitura de dia — coluna na inicialização, arco no bloqueio —, e a
+     mesma suavidade: aqui a luz é o branco e o que recua é a lavanda. */
+  --cer-base: #f7f4fd;
+  --cer-ceu-boot:
+    radial-gradient(36% 74% at 50% 28%, #ffffff 0%, rgba(244, 241, 253, 0.6) 48%, transparent 74%),
+    radial-gradient(120% 100% at 50% 42%, #fbf9ff 0%, #f4f1fb 58%, #ebe6f7 100%);
+  --cer-ceu-lock: linear-gradient(180deg, #f5f2fd 0%, #faf8ff 62%, #fdfcff 100%);
+  --cer-domo: linear-gradient(
+    180deg,
+    rgba(139, 92, 246, 0.18) 0%,
+    rgba(167, 139, 250, 0.13) 58%,
+    rgba(196, 181, 253, 0.08) 100%
+  );
+  --cer-domo-borda: rgba(109, 40, 217, 0.22);
+
+  --cer-texto: #2e1065;
+  --cer-texto-suave: #6d28d9;
+  --cer-texto-fraco: #9585b8;
+
+  --cer-trilho: rgba(109, 40, 217, 0.16);
+  --cer-preenchimento: linear-gradient(90deg, #5b21b6, #7c3aed 70%, #a855f7);
+  /* Varredura escura: sobre um trilho claro, um brilho branco não apareceria. */
+  --cer-varredura: rgba(76, 29, 149, 0.28);
+  --cer-brilho: rgba(124, 58, 237, 0.18);
+  --cer-brilho-forte: rgba(124, 58, 237, 0.35);
+
+  --cer-borda: rgba(109, 40, 217, 0.32);
+  --cer-borda-forte: rgba(109, 40, 217, 0.55);
+  --cer-veu: rgba(168, 85, 247, 0.1);
 }
 
 /* --------------------------------------------------
