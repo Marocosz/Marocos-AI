@@ -128,15 +128,24 @@ const Crystal = ({
         <spotLight position={[5, 10, 5]} intensity={1.5} color="#ffffff" />
         <pointLight position={[-5, -5, 5]} intensity={1} color="#a855f7" />
 
-        {animated ? (
-          <Float speed={2} rotationIntensity={0} floatIntensity={1}>
-            <CrystalMesh animated />
-          </Float>
-        ) : (
-          /* Sem <Float> quando parado: ele roda um useFrame próprio, que
-             manteria o loop vivo mesmo com frameloop="demand". */
-          <CrystalMesh animated={false} />
-        )}
+        {/* O <Float> fica SEMPRE na arvore, mesmo parado.
+         *
+         * Antes ele so era montado quando `animated`, e alternar a prop
+         * mudava a estrutura do JSX: o mesh desmontava e remontava, obrigando
+         * o three a recompilar o material de transmissao. Isso aparecia como
+         * um frame de meio segundo exatamente quando a tela de bloqueio
+         * comecava a subir — o pior momento possivel.
+         *
+         * Com frameloop="demand" o useFrame do Float simplesmente nao roda,
+         * entao manter o componente montado custa nada e a arvore fica
+         * estavel entre os dois estados. */}
+        <Float
+          speed={animated ? 2 : 0}
+          rotationIntensity={0}
+          floatIntensity={animated ? 1 : 0}
+        >
+          <CrystalMesh animated={animated} />
+        </Float>
 
         {sparkles && (
           <Sparkles

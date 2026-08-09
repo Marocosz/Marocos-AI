@@ -77,9 +77,12 @@
   animation: boot-crystal-in 1100ms cubic-bezier(0.22, 1, 0.36, 1) 250ms forwards;
 }
 
+/* So opacidade. Escalar o container obriga o compositor a reamostrar a textura
+   do canvas WebGL a cada passo, e o cristal ja entra em movimento por conta
+   propria — a escala nao acrescentava nada que ele nao fizesse sozinho. */
 @keyframes boot-crystal-in {
-  from { opacity: 0; transform: scale(0.86); }
-  to   { opacity: 1; transform: scale(1); }
+  from { opacity: 0; }
+  to   { opacity: 1; }
 }
 
 /* Barra de progresso: torna os 4,2s legiveis como inicializacao em vez de
@@ -191,26 +194,34 @@
     radial-gradient(90% 70% at 50% 46%, rgba(124, 58, 237, 0.4) 0%, transparent 62%),
     linear-gradient(170deg, #1a0d33 0%, #12082180 38%, #0a0514 100%),
     #0a0514;
-  animation: lock-in 520ms cubic-bezier(0.22, 1, 0.36, 1);
+  /* OPACA DESDE O PRIMEIRO FRAME. Antes havia um `lock-in` animando a opacidade
+     do container de 0 a 1: quando o boot desmontava e esta tela montava, por
+     meio segundo dava para VER a area de trabalho atraves dela, e depois ela
+     era coberta de novo. Era o "sobe e volta". O fundo agora entra solido; quem
+     se anuncia sao os conteudos, cada um com seu lock-rise.
+
+     `will-change` aqui, e nao so na saida: promover a camada no instante em que
+     a animacao comeca causa um engasgo no primeiro frame. A tela vive poucos
+     segundos, entao o custo de memoria e limitado. */
+  will-change: transform;
 }
 
-@keyframes lock-in {
-  from {
-    opacity: 0;
-  }
-}
+/* Destrancar: a cortina sobe e revela a area de trabalho, que ja esta montada
+   por baixo. E a saida que todo sistema usa, e aqui ela e honesta — nao ha
+   carregamento escondido atras dela.
 
-/* Destrancar: a camada sobe e revela a área de trabalho, que já está
-   montada por baixo. É a saída que todo sistema usa, e aqui ela é honesta —
-   não há carregamento escondido atrás dela. */
+   SO TRANSFORM. A versao anterior animava tambem a opacidade, o que dobrava o
+   trabalho do compositor numa camada de tela cheia com tres gradientes
+   empilhados. Cortina nao desbota: ela sai de cena. */
 .lock-screen-leaving {
-  animation: lock-out 600ms cubic-bezier(0.65, 0, 0.35, 1) forwards;
+  animation: lock-out 620ms cubic-bezier(0.65, 0, 0.35, 1) forwards;
+  /* Nada dentro da cortina recebe clique enquanto ela sai. */
+  pointer-events: none;
 }
 
 @keyframes lock-out {
   to {
     transform: translateY(-100%);
-    opacity: 0.2;
   }
 }
 

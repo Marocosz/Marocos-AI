@@ -39,8 +39,17 @@ const TituloDaPagina = () => {
   return null
 }
 
-/** Abre "Sobre este PC" na primeira visita da sessão, para ninguém cair num
- *  desktop vazio sem saber o que clicar. */
+/**
+ * Abre "Sobre este PC" para ninguém cair num desktop vazio sem saber o que
+ * clicar.
+ *
+ * Dispara quando a CORTINA COMEÇA a subir, não quando ela termina. Montar a
+ * janela custa a árvore inteira do app mais, 450ms depois, um segundo contexto
+ * WebGL para o cristal dele — medi ~560ms de main thread travada. Feito no fim
+ * da transição, esse custo caía exatamente sobre o momento em que o desktop
+ * aparecia. Atrás da cortina, ele não é visto por ninguém, e o que a cortina
+ * revela é uma janela já pintada.
+ */
 const BoasVindas = ({ ativa }) => {
   const { open, windows } = useWindows()
   const jaAbriu = useRef(false)
@@ -69,13 +78,63 @@ const Shell = () => {
   // Desligar volta para o bloqueio, nao para o boot: religar um computador que
   // ja estava ligado nao repete a inicializacao, mostra a tela de entrada.
   const [fase, setFase] = useState('boot')
+  const [revelando, setRevelando] = useState(false)
+  // A tela de bloqueio sai da arvore DEPOIS de a fase virar 'pronto' — ver a
+  // explicacao em `destrancar`.
+  const [bloqueioNaArvore, setBloqueioNaArvore] = useState(true)
+  const jaAgendouDesmonte = useRef(false)
 
   const concluirBoot = useCallback(() => setFase('bloqueio'), [])
-  const destrancar = useCallback(() => setFase('pronto'), [])
+  /**
+   * Destrancar troca a fase na hora, mas NAO tira a tela de bloqueio da arvore.
+   *
+   * Desmontar o cristal destroi o contexto WebGL e descarta a geometria e o
+   * material do three — medi ~580ms de main thread travada. Fazer isso no
+   * mesmo instante em que o desktop aparece era exatamente o engasgo percebido
+   * como "a animacao de entrar travada".
+   *
+   * A cortina ja esta fora da tela (translateY(-100%), pointer-events: none) e
+   * o cristal ja esta congelado, entao mante-la montada por mais um momento
+   * nao custa frame nenhum. O desmonte acontece na primeira folga do
+   * navegador, quando ninguem percebe.
+   */
+  const destrancar = useCallback(() => {
+    setFase('pronto')
+
+    if (jaAgendouDesmonte.current) return
+    jaAgendouDesmonte.current = true
+
+    const agendar =
+      typeof window.requestIdleCallback === 'function'
+        ? (fn) => window.requestIdleCallback(fn, { timeout: 2500 })
+        : (fn) => setTimeout(fn, 800)
+
+    agendar(() => setBloqueioNaArvore(false))
+  }, [])
   const desligar = useCallback(() => setFase('desligado'), [])
-  const ligar = useCallback(() => setFase('bloqueio'), [])
+  const ligar = useCallback(() => {
+    jaAgendouDesmonte.current = false
+    setBloqueioNaArvore(true)
+    setRevelando(false)
+    setFase('bloqueio')
+  }, [])
 
   const desligado = fase === 'desligado'
+
+  /**
+   * O wallpaper so anima quando esta realmente visivel.
+   *
+   * Durante o boot e o bloqueio ele fica atras de uma tela OPACA: o shader
+   * gasta GPU desenhando algo que ninguem ve, e essa GPU faz falta justamente
+   * onde ela e visivel — no cristal a 60fps e na cortina deslizando. Congelar
+   * aqui nao tem custo visual nenhum, ao contrario de pausar com janela aberta,
+   * que era um remendo.
+   *
+   * `revelando` religa o shader no INSTANTE em que a cortina comeca a subir, e
+   * nao quando ela termina: assim o aquecimento do WebGL acontece escondido
+   * atras dela, em vez de dar um pico bem quando o desktop aparece.
+   */
+  const wallpaperAnimado = isAnimated && (fase === 'pronto' || revelando)
 
   return (
     <div className={isDark ? 'theme-dark' : 'theme-light'}>
@@ -86,19 +145,21 @@ const Shell = () => {
             quando a cortina sai, em vez de montar tudo no mesmo frame. */}
         {!desligado &&
           (modo === 'mobile' ? (
-            <MobileShell isAnimated={isAnimated} />
+            <MobileShell isAnimated={wallpaperAnimado} />
           ) : (
             <>
-              <Desktop isAnimated={isAnimated} />
+              <Desktop isAnimated={wallpaperAnimado} />
               <Taskbar onShutdown={desligar} />
             </>
           ))}
 
         {fase === 'boot' && <BootScreen onDone={concluirBoot} />}
-        {fase === 'bloqueio' && <LockScreen onUnlock={destrancar} />}
+        {bloqueioNaArvore && !desligado && (
+          <LockScreen onUnlock={destrancar} onUnlockStart={() => setRevelando(true)} />
+        )}
         {desligado && <ShutdownScreen onPowerOn={ligar} />}
 
-        {fase === 'pronto' && <BoasVindas ativa={modo === 'desktop'} />}
+        <BoasVindas ativa={modo === 'desktop' && (revelando || fase === 'pronto')} />
       </WindowManagerProvider>
     </div>
   )
