@@ -176,19 +176,6 @@ body {
 }
 
 /* --- ESTILOS DA SEÇÃO SOBRE MIM --- */
-.about-section {
-  position: relative;
-  width: 100%;
-  min-height: 70vh;
-  padding: 5rem 2rem;
-  background-color: transparent;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  overflow: hidden;
-  border-top: none;
-}
-
 .about-background {
   position: absolute;
   top: 0;

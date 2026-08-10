@@ -82,7 +82,7 @@ const AboutApp = () => {
       <p className="about-bio">{profile.bio_full}</p>
 
       {/* --- ESPECIFICAÇÕES: stats lidas como hardware --- */}
-      <section className="about-section">
+      <section>
         <h3 className="about-section-title">{os.about.specsLabel}</h3>
         <div className="about-specs">
           {profile.stats.map((stat, index) => (
@@ -96,7 +96,7 @@ const AboutApp = () => {
       </section>
 
       {/* --- RECURSOS INSTALADOS: skills como marquee infinito --- */}
-      <section className="about-section">
+      <section>
         <h3 className="about-section-title">{os.about.featuresLabel}</h3>
         <div className="about-features-wrapper">
           <div className="about-features-track">

@@ -88,6 +88,19 @@
 }
 
 /* --- SEÇÕES (specs / features) --- */
+/* As duas <section> deste app não têm classe, e isso é deliberado.
+ *
+ * Elas usavam `about-section`, que o AboutApp.css nunca definiu — quem definia
+ * era o index.css da landing page que deixou de existir, com
+ * `min-height: 70vh`, `padding: 5rem 2rem` e `display: flex` em direção linha.
+ * O efeito, numa janela de 620x520: as seções de especificações e de recursos
+ * ficavam duas viewports abaixo da dobra, e dentro de cada uma o título e o
+ * conteúdo apareciam lado a lado, com o grid de 3 colunas encolhido.
+ *
+ * Em fluxo normal o CSS daqui funciona sozinho: `.about-app` é a coluna flex
+ * com gap de 22px, `.about-section-title` traz a própria margem inferior, e
+ * `.about-specs` ocupa a largura como o grid de 3 colunas pede.
+ */
 .about-section-title {
   margin: 0 0 10px;
   font-family: 'Courier New', monospace;
