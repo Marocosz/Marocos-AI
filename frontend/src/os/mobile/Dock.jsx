@@ -1,5 +1,5 @@
 import React from 'react'
-import { useWindows } from '../WindowManagerContext'
+import { useWindowActions } from '../WindowManagerContext'
 import AppIconButton from '../../ui/AppIconButton'
 import { APPS } from '../registry'
 import { useLanguage } from '../../contexts/LanguageContext'
@@ -16,7 +16,7 @@ import { getOsData } from '../../data/os'
  * botão Voltar) já assume o papel de navegação — ver MobileShell.
  */
 const Dock = () => {
-  const { open } = useWindows()
+  const { open } = useWindowActions()
   const { language } = useLanguage()
   const os = getOsData(language)
   const apps = APPS.filter((a) => a.inDock)

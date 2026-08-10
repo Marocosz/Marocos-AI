@@ -1,22 +1,26 @@
-import React, { useRef, useEffect } from 'react'
+import React, { useRef, useEffect, useState } from 'react'
 import { motion, useMotionValue, useDragControls } from 'motion/react'
 import { Minus, Square, X } from 'lucide-react'
-import { useWindows } from '../WindowManagerContext'
+import { useWindowActions } from '../WindowManagerContext'
 import { getApp } from '../registry'
 import { useLanguage } from '../../contexts/LanguageContext'
 import { getOsData } from '../../data/os'
 import { JANELAS } from '../../config/system'
 import './Window.css'
 
-const Window = ({ win }) => {
-  const { focusedKey, focus, close, minimize, toggleMaximize, move } = useWindows()
+/**
+ * `isFocused` vem por prop, e não do contexto: assim uma troca de foco
+ * re-renderiza apenas as duas janelas cujo estado de foco realmente mudou, em
+ * vez de todas. Com o React.memo abaixo, as demais nem entram no render.
+ */
+const Window = ({ win, isFocused }) => {
+  const { focus, close, minimize, toggleMaximize, move } = useWindowActions()
   const { language } = useLanguage()
   const os = getOsData(language)
   const app = getApp(win.appId)
   const ref = useRef(null)
   const dragControls = useDragControls()
 
-  const isFocused = focusedKey === win.key
   const title = app?.titleKey ? os.windows[app.titleKey] : win.params?.slug || ''
   const AppComponent = app?.component
 
@@ -40,6 +44,23 @@ const Window = ({ win }) => {
   // onde estava e a janela nova é invisível para leitor de tela.
   useEffect(() => {
     ref.current?.focus()
+  }, [])
+
+  /**
+   * O limite de arrasto acompanha a janela do navegador. Lendo `window.innerWidth`
+   * direto no render, o valor congelava no primeiro render e redimensionar
+   * deixava arrastar a janela para fora do quadro.
+   */
+  const [viewport, setViewport] = useState(() => ({
+    w: typeof window === 'undefined' ? 0 : window.innerWidth,
+    h: typeof window === 'undefined' ? 0 : window.innerHeight,
+  }))
+
+  useEffect(() => {
+    const aoRedimensionar = () =>
+      setViewport({ w: window.innerWidth, h: window.innerHeight })
+    window.addEventListener('resize', aoRedimensionar)
+    return () => window.removeEventListener('resize', aoRedimensionar)
   }, [])
 
   const onKeyDown = (e) => {
@@ -81,8 +102,8 @@ const Window = ({ win }) => {
       dragConstraints={{
         left: 0,
         top: 0,
-        right: Math.max(0, window.innerWidth - 160),
-        bottom: Math.max(0, window.innerHeight - 120),
+        right: Math.max(0, viewport.w - JANELAS.folgaArrastoX),
+        bottom: Math.max(0, viewport.h - JANELAS.folgaArrastoY),
       }}
       // MOVE só no fim do gesto: despachar a cada pointermove re-renderizaria
       // a árvore inteira de janelas a 60fps.
@@ -139,4 +160,4 @@ const TitleBar = ({
   </div>
 )
 
-export default Window
+export default React.memo(Window)

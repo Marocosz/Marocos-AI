@@ -1,7 +1,7 @@
 import React, { useEffect, useRef } from 'react'
 import { motion, useReducedMotion } from 'motion/react'
 import { ChevronLeft } from 'lucide-react'
-import { useWindows } from '../WindowManagerContext'
+import { useWindowActions } from '../WindowManagerContext'
 import { getApp } from '../registry'
 import { useLanguage } from '../../contexts/LanguageContext'
 import { getOsData } from '../../data/os'
@@ -19,7 +19,7 @@ import { MOVIMENTO } from '../../config/system'
  * é o MobileShell, este componente só recebe e desenha.
  */
 const MobileApp = ({ win }) => {
-  const { close } = useWindows()
+  const { close } = useWindowActions()
   const { language } = useLanguage()
   const os = getOsData(language)
   const app = getApp(win.appId)

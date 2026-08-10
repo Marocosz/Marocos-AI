@@ -2,7 +2,7 @@ import React from 'react'
 import { FileText } from 'lucide-react'
 import { useLanguage } from '../contexts/LanguageContext'
 import { getProjectsData } from '../data/projects'
-import { useWindows } from '../os/WindowManagerContext'
+import { useWindowActions } from '../os/WindowManagerContext'
 import { projectSlug } from './projectSlug'
 import './ProjectsApp.css'
 
@@ -12,11 +12,13 @@ import './ProjectsApp.css'
  * carrossel, que só deixava um projeto legível por vez.
  *
  * Única exceção à regra de apps não conhecerem o sistema de janelas: para
- * abrir o detalhe de um projeto como janela filha, precisa de `useWindows`.
+ * abrir o detalhe de um projeto como janela filha, precisa de `open`. Só usa
+ * ação, então `useWindowActions` — não re-renderiza quando outra janela se
+ * move ou ganha foco.
  */
 const ProjectsApp = () => {
   const { language } = useLanguage()
-  const { open } = useWindows()
+  const { open } = useWindowActions()
   const content = getProjectsData(language)
 
   return (

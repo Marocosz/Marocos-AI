@@ -1,7 +1,7 @@
 import React from 'react'
 import { motion } from 'motion/react'
 import { Signal, BatteryFull } from 'lucide-react'
-import { useWindows } from '../WindowManagerContext'
+import { useWindowActions } from '../WindowManagerContext'
 import AppIconButton from '../../ui/AppIconButton'
 import Clock from '../../ui/Clock'
 import { APPS } from '../registry'
@@ -22,7 +22,7 @@ import { MOVIMENTO } from '../../config/system'
  * o MobileShell via `onOpenQuickSettings`).
  */
 const HomeScreen = ({ onOpenQuickSettings }) => {
-  const { open } = useWindows()
+  const { open } = useWindowActions()
   const { language } = useLanguage()
   const os = getOsData(language)
   const icons = APPS.filter((a) => a.onDesktop)

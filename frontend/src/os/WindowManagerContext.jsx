@@ -5,7 +5,8 @@ import { windowReducer, initialState } from './windowManager'
 import { getApp } from './registry'
 import { resolveRoute, buildRoute } from './routes'
 
-const WindowContext = createContext(null)
+const WindowStateContext = createContext(null)
+const WindowActionsContext = createContext(null)
 
 /**
  * Deriva estado inicial E rota canônica a partir da URL, sincronamente.
@@ -104,17 +105,52 @@ export const WindowManagerProvider = ({ children }) => {
     }
   }, [state.focusedKey, state.windows])
 
-  const value = {
-    windows: state.windows,
-    focusedKey: state.focusedKey,
-    open, close, focus, minimize, toggleMaximize, move, minimizeAll, closeAll,
-  }
+  /**
+   * DOIS CONTEXTOS, NÃO UM.
+   *
+   * O `value` era montado inline a cada render, então qualquer mudança de estado
+   * — focar, arrastar, minimizar — criava um objeto novo e re-renderizava TODOS
+   * os consumidores: o Desktop, a Taskbar, cada Window e, por dentro delas, cada
+   * app montado. Abrir uma janela re-renderizava todos os apps já abertos.
+   *
+   * As ações são `useCallback` sem dependências, portanto estáveis para sempre.
+   * Separadas, os consumidores que só disparam ações (ProjectsApp, TerminalApp,
+   * Dock, HomeScreen, MobileApp) param de re-renderizar por completo quando uma
+   * janela se mexe.
+   */
+  const acoes = useMemo(
+    () => ({ open, close, focus, minimize, toggleMaximize, move, minimizeAll, closeAll }),
+    [open, close, focus, minimize, toggleMaximize, move, minimizeAll, closeAll],
+  )
 
-  return <WindowContext.Provider value={value}>{children}</WindowContext.Provider>
+  const estado = useMemo(
+    () => ({ windows: state.windows, focusedKey: state.focusedKey }),
+    [state.windows, state.focusedKey],
+  )
+
+  return (
+    <WindowActionsContext.Provider value={acoes}>
+      <WindowStateContext.Provider value={estado}>
+        {children}
+      </WindowStateContext.Provider>
+    </WindowActionsContext.Provider>
+  )
 }
 
-export function useWindows() {
-  const ctx = useContext(WindowContext)
-  if (!ctx) throw new Error('useWindows precisa estar dentro de WindowManagerProvider')
+export function useWindowActions() {
+  const ctx = useContext(WindowActionsContext)
+  if (!ctx) throw new Error('useWindowActions precisa estar dentro de WindowManagerProvider')
   return ctx
+}
+
+export function useWindowState() {
+  const ctx = useContext(WindowStateContext)
+  if (!ctx) throw new Error('useWindowState precisa estar dentro de WindowManagerProvider')
+  return ctx
+}
+
+/** Compatibilidade: quem precisa dos dois. Re-renderiza com o estado, como
+ *  antes — use os hooks específicos quando só um lado for necessário. */
+export function useWindows() {
+  return { ...useWindowState(), ...useWindowActions() }
 }

@@ -15,7 +15,7 @@ import { MOVIMENTO, CERIMONIA } from '../../config/system'
 import './Desktop.css'
 
 const Desktop = ({ isAnimated = true }) => {
-  const { windows, open, minimizeAll } = useWindows()
+  const { windows, focusedKey, open, minimizeAll } = useWindows()
   const { language } = useLanguage()
   const isDesktop = useDeviceMode() === 'desktop'
   const os = getOsData(language)
@@ -93,7 +93,7 @@ const Desktop = ({ isAnimated = true }) => {
       </ul>
 
       {windows.map((win) => (
-        <Window key={win.key} win={win} />
+        <Window key={win.key} win={win} isFocused={win.key === focusedKey} />
       ))}
     </div>
   )

@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react'
 import { useLanguage } from '../contexts/LanguageContext'
-import { useWindows } from '../os/WindowManagerContext'
+import { useWindowActions } from '../os/WindowManagerContext'
 import { getContactData } from '../data/contact'
 import { getProfileData } from '../data/content'
 import { getOsData } from '../data/os'
@@ -15,9 +15,9 @@ import './TerminalApp.css'
  * "digitar" de um comando fixo). Aqui o mesmo visual vira de verdade
  * interativo: quem abre a janela digita os comandos.
  *
- * A única dependência de `os/` é `useWindows`, usada só por dois comandos
- * (`projetos` e `stack`) para abrir outras janelas — o resto do app continua
- * cego a janelas.
+ * A única dependência de `os/` é `useWindowActions`, usada só por dois
+ * comandos (`projetos` e `stack`) para abrir outras janelas — o resto do app
+ * continua cego a janelas.
  */
 
 // Contador simples para chaves React estáveis das linhas de saída. Vive no
@@ -234,7 +234,7 @@ const renderEntry = (entry) => {
 
 const TerminalApp = () => {
   const { language } = useLanguage()
-  const { open } = useWindows()
+  const { open } = useWindowActions()
   const content = getContactData(language)
   const profile = getProfileData(language)
   const os = getOsData(language)
