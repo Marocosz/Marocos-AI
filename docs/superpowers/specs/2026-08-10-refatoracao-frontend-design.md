@@ -590,9 +590,9 @@ de criar uma. A verificação é:
   comparado com a linha de base da seção 1.1.
 - **`npm run lint`** limpo.
 - **`npm test`** — os testes puros existentes (`routes.test.js`,
-  `windowManager.test.js`) continuam passando. As etapas 4 e 7 ganham teste novo
-  onde a lógica é pura: `cascadePosition` lendo do `system.js`, e o reducer
-  inalterado.
+  `windowManager.test.js`) continuam passando. As etapas **5** (config) e **8**
+  (divisão do contexto) ganham teste novo onde a lógica é pura: `cascadePosition`
+  lendo do `system.js`, e o reducer inalterado.
 - **Comparação visual manual**, nos dois temas e nos dois modos (desktop/mobile),
   cobrindo: boot → bloqueio → desktop, abertura/arrasto/maximização de janela,
   troca de tema (crossfade), menu iniciar, menu de contexto, e cada um dos 9 apps.
