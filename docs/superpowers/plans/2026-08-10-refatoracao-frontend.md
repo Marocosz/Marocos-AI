@@ -55,10 +55,38 @@ Valem para **todas** as tarefas, sem exceção.
   relativos a ele salvo indicação contrária.
 - **Comandos de verificação:** `npm run build`, `npm run lint`, `npm test`.
 
+### Como a verificação visual acontece nesta execução
+
+**Não há automação de navegador disponível.** Nenhum implementador e nenhum
+revisor consegue olhar uma tela — e "o design não mudou" é o critério de aceite
+central de 13 destas 19 tarefas. Sem isso reconhecido, os subagentes marcariam
+como aprovado exatamente aquilo que não conseguem verificar.
+
+Portanto, **decidido pelo dono do projeto antes da execução**:
+
+- A **Tarefa 0 é executada por ele**, não por subagente.
+- Os subagentes verificam o que dá para verificar sem olhos: `npm run build`
+  com os tamanhos medidos, `npm run lint`, `npm test`, e a leitura do próprio
+  diff.
+- Onde uma tarefa mandar "comparar com a linha de base", o implementador
+  **registra no relatório o que precisa ser olhado** e segue. Não invente
+  aprovação visual.
+- A conferência acontece em **quatro paradas**, uma por fase:
+
+| parada | depois da tarefa | o que foi mexido |
+|---|---|---|
+| 1 | 4 | faxina de CSS morto, `.about-block`, pesos de fonte |
+| 2 | 11B | config, ponte CSS, hooks, os componentes de `ui/` |
+| 3 | 14 | contexto de janelas, **Silk → ogl**, apps sob demanda |
+| 4 | 16 | acessibilidade e reorganização de pastas |
+
+Nenhuma fase começa antes de a parada anterior ter sido aprovada.
+
 ### Protocolo de verificação visual
 
-Usado por toda tarefa marcada **[VISUAL]**. Executar `npm run dev` e comparar
-contra a linha de base da Tarefa 0, **nos dois temas** (claro e escuro):
+O que o dono do projeto percorre em cada parada. Executar `npm run dev` e
+comparar contra a linha de base da Tarefa 0, **nos dois temas** (claro e
+escuro):
 
 1. Boot → tela de bloqueio → desktop
 2. Área de trabalho: ícones, assinatura, wallpaper em movimento
@@ -501,40 +529,58 @@ grep -rn "font-weight: *\(200\|300\|500\|600\|800\)" --include=*.css .
 
 Esperado: 34 linhas em até 14 arquivos.
 
-- [ ] **Step 2: Medir cada uma no navegador — NÃO deduzir**
+- [ ] **Step 2: Classificar cada declaração pela família efetiva**
 
-Para **cada** linha do Step 1: rodar `npm run dev`, localizar o elemento,
-e no DevTools ler a aba **Computed → Rendered Fonts**, que mostra a família e o
-peso realmente usados.
+Para cada linha do Step 1, determinar a `font-family` **efetiva** do seletor:
+a que ele declara, ou — se não declarar — a herdada, que é o Poppins do `:root`.
 
-A correção **não pode ser find-replace**, porque a disponibilidade depende da
-`font-family` efetiva do elemento:
-
-| família efetiva | pesos disponíveis | o que fazer |
+| família efetiva | pesos disponíveis | ação |
 |---|---|---|
-| Poppins (herdada, sem `font-family` própria) | 400, 700, 900 | trocar pelo peso renderizado |
-| `system-ui` (Windows: Segoe UI Variable, eixo contínuo) | todos | **não tocar** — já renderiza certo |
-| `'Courier New'` | 400, 700 | trocar pelo peso renderizado |
-| `ui-monospace` / Consolas / Cascadia Mono | varia por SO | medir; na dúvida, não tocar |
+| Poppins (herdada, sem `font-family` própria) | 400, 700, 900 | **trocar** pela tabela do Step 3 |
+| `system-ui` (Windows: Segoe UI Variable, eixo de peso contínuo) | todos | **NÃO TOCAR** — já renderiza o peso declarado |
+| `'Courier New'` | 400, 700 | **trocar** pela tabela do Step 3 |
+| `ui-monospace` / Consolas / Cascadia Mono | varia por SO | **NÃO TOCAR** — o resultado depende da máquina, e mexer trocaria um comportamento correto em alguns sistemas por outro |
 
-Elementos com família própria estão em: `AboutApp.css` (Courier New),
-`DevicesApp.css`, `HistoryApp.css`, `SettingsApp.css` (system-ui),
-`TerminalApp.css` (ui-monospace), `boot.css` (system-ui).
+Onde procurar família própria: `AboutApp.css` (Courier New),
+`HistoryApp.css` (Courier New), `DevicesApp.css` (Courier New),
+`SettingsApp.css` (system-ui), `TerminalApp.css` (ui-monospace),
+`boot.css` (system-ui).
 
-Anotar numa tabela: arquivo, linha, seletor, família efetiva, peso declarado,
-peso renderizado, ação.
+**Atenção à herança:** um seletor sem `font-family` pode ainda assim estar
+dentro de um elemento que declara uma. Conferir o ancestral no JSX antes de
+classificar — por exemplo, `.terminal-kv-label` herda o `ui-monospace` do
+`.terminal-app`.
 
-- [ ] **Step 3: Aplicar as trocas**
+- [ ] **Step 3: Aplicar o mapeamento determinístico**
 
-Para cada linha marcada "trocar", editar o valor **e** acrescentar comentário
-curto na primeira ocorrência de cada arquivo, por exemplo:
+O algoritmo de font-matching do CSS é fechado, então o peso resultante **não
+precisa ser medido** — é derivável. Para uma família com 400, 700 e 900
+(Poppins) ou com 400 e 700 (Courier New):
+
+| declarado | resolve para | regra do CSS Fonts |
+|---|---|---|
+| 200 | **400** | abaixo de 400: procura ≤ desejado em ordem decrescente; não achando, > desejado em ordem crescente |
+| 300 | **400** | idem |
+| 500 | **400** | entre 400 e 500: procura ≥ desejado e ≤ 500; não achando, < desejado decrescente |
+| 600 | **700** | acima de 500: procura ≥ desejado em ordem crescente |
+| 800 | **900** (Poppins) / **700** (Courier New) | idem — 900 não existe no Courier New |
+
+Aplicar a troca e acrescentar, na primeira ocorrência de cada arquivo, o
+comentário:
 
 ```css
 /* Poppins e carregado em 400/700/900 e o index.css tem font-synthesis: none.
-   Este valor e o peso que o navegador ja estava pintando; a declaracao antiga
-   (800) nao existia e caia aqui silenciosamente. */
-font-weight: 700;
+   Este valor e o peso que o navegador ja resolvia sozinho; a declaracao antiga
+   (800) nao existia e caia aqui em silencio. */
+font-weight: 900;
 ```
+
+- [ ] **Step 3B: Registrar a tabela da migração**
+
+Escrever em `docs/superpowers/plans/pesos-de-fonte.md` a tabela completa:
+arquivo, linha, seletor, família efetiva, peso declarado, peso resolvido, ação
+(trocado / mantido). É a prova de que a decisão foi por regra e não por chute, e
+o que permite conferir depois se alguma classificação de família estava errada.
 
 - [ ] **Step 4: Verificar que a auditoria ficou limpa**
 
@@ -547,14 +593,16 @@ Esperado: restam **apenas** as declarações sob `system-ui` / `ui-monospace`
 que o Step 2 marcou como corretas. Toda linha remanescente deve ter o
 comentário justificando.
 
-- [ ] **Step 5: Verificação visual — o critério é "nada mudou"**
+- [ ] **Step 5: Marcar para a conferência de fase**
 
-Percorrer os 7 itens do **Protocolo de verificação visual**. Atenção especial a
-títulos e subtítulos de `DevicesApp` e `HistoryApp`, e aos números de
-especificação do `AboutApp`.
+Esta tarefa fecha a Fase 1. Anotar no relatório os pontos que o dono do projeto
+deve olhar na **Parada 1**: títulos e subtítulos de `DevicesApp` e `HistoryApp`,
+os números de especificação do `AboutApp`, e qualquer seletor cuja classificação
+de família tenha ficado em dúvida no Step 2.
 
-Qualquer diferença de espessura de texto significa que uma medição do Step 2
-estava errada. Reverter a linha e remedir.
+Qualquer diferença de espessura de texto que ele encontrar significa que uma
+classificação do Step 2 estava errada — a linha volta ao valor original e a
+família é reclassificada.
 
 - [ ] **Step 6: Verificar build**
 
@@ -1923,8 +1971,53 @@ import './ToggleRow.css'
  * props que valeria menos que a duplicação removida. A bandeja consome só o
  * hook.
  */
-const ToggleRow = ({ linha, mostrarHint = false, className = '' }) => {
+/* O corpo do componente está logo abaixo, na nota sobre estrutura de
+   elemento — ele tem duas formas, e a nota explica por quê. */
+```
+
+**Estrutura de elemento — DECIDIDO ANTES DA EXECUÇÃO, não reabrir.**
+
+Hoje o `SettingsApp` tem `<li>` com `<span>`s e um `<button>` só na etiqueta de
+valor, enquanto o `QuickSettings` tem o `<button>` envolvendo a linha inteira.
+Unificar num `<button>` externo faria o **alvo de clique do Settings crescer**
+da etiqueta para a linha toda — mudança de comportamento, ainda que não de
+aparência, e a seção 0 deste plano proíbe.
+
+Portanto o `ToggleRow` recebe uma prop `alvo`:
+
+```jsx
+const ToggleRow = ({ linha, alvo = 'linha', mostrarHint = false, className = '' }) => {
   const Icon = linha.icon
+  const conteudo = (
+    <>
+      <span className="toggle-row-icone">
+        <Icon size={mostrarHint ? 18 : 20} strokeWidth={1.8} />
+      </span>
+      <span className="toggle-row-texto">
+        <span className="toggle-row-label">
+          {mostrarHint ? linha.label : linha.labelCurto}
+        </span>
+        {mostrarHint && <span className="toggle-row-hint">{linha.hint}</span>}
+      </span>
+    </>
+  )
+
+  const valor = mostrarHint ? linha.valor : linha.valorCurto
+
+  // alvo="valor": só a etiqueta é clicável, como no app Configurações hoje.
+  // alvo="linha": a linha inteira, como nos ajustes rápidos hoje.
+  // Os dois existem porque os dois comportamentos existem hoje, e mudar
+  // qualquer um deles seria mudança de comportamento sem pedido.
+  if (alvo === 'valor') {
+    return (
+      <li className={`toggle-row ${className}`.trim()}>
+        {conteudo}
+        <button type="button" className="toggle-row-valor" onClick={linha.alternar}>
+          {valor}
+        </button>
+      </li>
+    )
+  }
 
   return (
     <button
@@ -1932,35 +2025,19 @@ const ToggleRow = ({ linha, mostrarHint = false, className = '' }) => {
       className={`toggle-row ${className}`.trim()}
       onClick={linha.alternar}
     >
-      <span className="toggle-row-icone">
-        <Icon size={mostrarHint ? 18 : 20} strokeWidth={1.8} />
-      </span>
-
-      <span className="toggle-row-texto">
-        <span className="toggle-row-label">
-          {mostrarHint ? linha.label : linha.labelCurto}
-        </span>
-        {mostrarHint && <span className="toggle-row-hint">{linha.hint}</span>}
-      </span>
-
-      <span className="toggle-row-valor">
-        {mostrarHint ? linha.valor : linha.valorCurto}
-      </span>
+      {conteudo}
+      <span className="toggle-row-valor">{valor}</span>
     </button>
   )
 }
-
-export default ToggleRow
 ```
 
-**Atenção à estrutura de elemento:** hoje o `SettingsApp` tem `<li>` com
-`<span>`s e um `<button>` só no valor, enquanto o `QuickSettings` tem o
-`<button>` envolvendo a linha inteira. Ao unificar num `<button>` externo, o
-**alvo de clique do Settings cresce** — a área clicável passa da etiqueta de
-valor para a linha toda. Isso é mudança de comportamento, ainda que não de
-aparência. **Conferir com o dono do projeto se incomoda; se incomodar, manter o
-`<button>` interno no Settings via prop `alvo="valor"`.** Registrar a decisão em
-comentário.
+`SettingsApp` usa `alvo="valor" mostrarHint`; `QuickSettings` usa o padrão.
+**Conferir também o elemento externo:** o Settings renderiza uma `<ul>` de
+`<li>`, e o QuickSettings uma `<ul>` de `<li>` com o `<button>` dentro — por
+isso a variante `alvo="valor"` devolve `<li>` e a outra devolve `<button>`, que
+o consumidor envolve em `<li>`. Conferir no CSS de origem qual estrutura cada um
+espera antes de escrever.
 
 - [ ] **Step 3: CSS**
 
@@ -3130,9 +3207,9 @@ O `<div onClick={minimizeAll}>` ganha `role="button"`, `tabIndex={0}`,
 Não virar `<button>`: é uma faixa decorativa de 1px e o reset mudaria a
 aparência.
 
-- [ ] **Step 3: Substituir o seletor amplo do index.css**
+- [ ] **Step 3: NÃO mexer no seletor amplo do index.css — cortado do plano**
 
-Trocar:
+O plano previa trocar
 
 ```css
 .theme-light h1, .theme-light h2, .theme-light h3, .theme-light h4,
@@ -3141,58 +3218,55 @@ Trocar:
 }
 ```
 
-por herança a partir do container de tema:
+por `.theme-light { color: var(--text-primary); }`, deixando a cor descer por
+herança.
+
+**Cortado por decisão do dono do projeto, antes da execução.** O seletor é caro
+e feio, mas funciona e não quebra nada hoje; o ganho é de elegância. O risco é
+o oposto: o seletor antigo **vence a herança** em qualquer elemento cujo
+ancestral declare outra cor, então a troca pode espalhar texto com cor errada
+pelo tema claro inteiro — e, sem automação de navegador nesta execução, não há
+como verificar isso de forma confiável.
+
+Fica registrado como dívida técnica conhecida. Acrescentar ao `index.css`, sobre
+a regra:
 
 ```css
-/* Antes isto era uma lista de oito seletores de elemento sob .theme-light, que
-   casava com praticamente toda a árvore e reaplicava cor em cada nó. A cor
-   final é a mesma: o container declara, e os elementos herdam. Quem precisa de
-   cor própria já a declara e continua ganhando por especificidade. */
-.theme-light {
-  color: var(--text-primary);
-}
+/* DÍVIDA CONHECIDA: esta lista de oito seletores casa com quase toda a árvore
+   e reaplica cor em cada nó. O certo seria declarar a cor no container e deixar
+   herdar -- mas esta regra vence a herança onde um ancestral declara outra cor,
+   entao a troca precisa de uma varredura visual do tema claro inteiro para nao
+   espalhar texto com a cor errada. Trocar so com essa verificacao em maos. */
 ```
 
-**Este é o item de maior risco de regressão visual do plano**, porque o seletor
-antigo vencia a herança em elementos cujo ancestral declarava outra cor.
+Os Steps 1 e 2 (acessibilidade de teclado) continuam valendo — são ganho real e
+verificável sem navegador.
 
-- [ ] **Step 4: Verificação visual exaustiva do TEMA CLARO**
-
-Percorrer os 7 itens do **Protocolo de verificação visual** inteiramente no
-**tema claro**, com atenção a: os 9 apps, o menu Iniciar, o popup da bandeja, a
-tela de bloqueio, a assinatura da área de trabalho e os labels dos ícones.
-
-Procurar texto que tenha ficado com a cor errada — tipicamente texto que era
-`--text-primary` e passou a herdar outra coisa.
-
-Se aparecer regressão em poucos pontos, declarar a cor explicitamente **nesses
-pontos** e registrar o motivo em comentário. Se aparecer em muitos, reverter só
-o Step 3 e manter os Steps 1–2.
-
-- [ ] **Step 5: Verificação por teclado**
+- [ ] **Step 4: Verificação por teclado**
 
 Com `Tab` e `Enter`, sem mouse: alcançar e acionar os três itens do popup da
 bandeja (em tela estreita) e o "mostrar área de trabalho".
 
-- [ ] **Step 6: Verificar build**
+- [ ] **Step 5: Verificar build**
 
 ```bash
 cd frontend && npm run lint && npm test && npm run build
 ```
 
-- [ ] **Step 7: Commit**
+- [ ] **Step 6: Commit**
 
 ```bash
 git add frontend/src
-git commit -m "fix: tornar o popup da bandeja alcancavel por teclado e enxugar o seletor de tema claro
+git commit -m "fix: tornar o popup da bandeja alcancavel por teclado
 
 Os tres itens do popup eram <div onClick> sem role nem tabIndex -- invisiveis
-para quem navega por teclado. Viraram <button> com reset para a aparencia nao
-mudar. O mesmo para o 'mostrar area de trabalho', que continua <div> por ser
-uma faixa de 1px, mas ganhou role e handler.
+para quem navega por teclado. Viraram <button> com reset de estilo para a
+aparencia nao mudar. O mesmo para o 'mostrar area de trabalho', que continua
+<div> por ser uma faixa de 1px, mas ganhou role, tabIndex e handler.
 
-O seletor .theme-light h1,h2,h3,h4,p,span,li,div casava com quase toda a
-arvore; a mesma cor final vem por heranca do container."
+O seletor amplo .theme-light h1,...,div fica como esta, com um comentario
+registrando a divida: troca-lo por heranca precisa de varredura visual do tema
+claro inteiro, que esta execucao nao tem como fazer."
 ```
 
 ---
