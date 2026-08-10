@@ -92,52 +92,6 @@
   list-style: none;
 }
 
-.marocos-mobile-grid button {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 6px;
-  width: 100%;
-  /* Botão inteiro (tile + label) folga bem acima dos 44px mínimos de alvo de
-     toque; só o tile já tem 60px. */
-  padding: 4px 0 8px;
-  border: none;
-  background: transparent;
-  cursor: pointer;
-}
-
-.marocos-mobile-tile {
-  display: grid;
-  place-items: center;
-  width: 60px;
-  height: 60px;
-  border: var(--win-border);
-  border-radius: 16px;
-  background: linear-gradient(160deg, rgba(168, 85, 247, 0.5), rgba(88, 28, 135, 0.6));
-  box-shadow: var(--win-highlight);
-  color: #fff;
-  transition: transform 0.1s ease;
-}
-
-.marocos-mobile-grid button:active .marocos-mobile-tile {
-  transform: scale(0.94);
-}
-
-.marocos-mobile-label {
-  font-family: system-ui, sans-serif;
-  font-size: 0.72rem;
-  line-height: 1.25;
-  text-align: center;
-  color: #fff;
-  text-shadow: var(--icon-label-shadow);
-}
-
-/* Wallpaper claro é lilás pálido: texto branco desapareceria. */
-.theme-light .marocos-mobile-label {
-  color: #2e1065;
-  text-shadow: 0 1px 2px rgba(255, 255, 255, 0.85);
-}
-
 /* --------------------------------------------------
    APP EM TELA CHEIA
    -------------------------------------------------- */
@@ -237,36 +191,9 @@
   backdrop-filter: var(--cfg-blur-taskbar, blur(12px));
 }
 
-.marocos-mobile-dock-btn {
-  display: grid;
-  place-items: center;
-  width: 48px;
-  height: 48px;
-  border: none;
-  border-radius: 12px;
-  background: transparent;
-  color: #ddd;
-  cursor: pointer;
-  transition: background 0.15s ease, color 0.15s ease;
-}
-
-.marocos-mobile-dock-btn:active {
-  background: rgba(255, 255, 255, 0.1);
-  color: #fff;
-}
-
 .theme-light .marocos-mobile-dock {
   background: rgba(245, 245, 245, 0.85);
   border-top: 1px solid rgba(0, 0, 0, 0.08);
-}
-
-.theme-light .marocos-mobile-dock-btn {
-  color: #555;
-}
-
-.theme-light .marocos-mobile-dock-btn:active {
-  background: rgba(0, 0, 0, 0.06);
-  color: #000;
 }
 
 /* --------------------------------------------------

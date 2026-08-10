@@ -121,41 +121,6 @@
   gap: 2px;
 }
 
-.start-menu-app-btn {
-  width: 100%;
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  padding: 8px 12px;
-  background: transparent;
-  border: none;
-  border-radius: var(--win-control-radius, 8px);
-  color: #ddd;
-  font-family: inherit;
-  font-size: 0.85rem;
-  text-align: left;
-  cursor: pointer;
-  /* Dual Speed Transition, igual .taskbar-btn */
-  transition: background 1.5s ease, color 1.5s ease, transform 0.1s ease;
-}
-
-.start-menu-app-btn:hover,
-.start-menu-app-btn:focus-visible {
-  background: rgba(255, 255, 255, 0.08);
-  color: #fff;
-  transition: background 0.1s ease, color 0.1s ease;
-}
-
-.start-menu-app-btn:focus-visible {
-  outline: 2px solid rgba(168, 85, 247, 0.6);
-  outline-offset: -2px;
-}
-
-.start-menu-app-btn:active {
-  background: rgba(255, 255, 255, 0.04);
-  transform: scale(0.99);
-}
-
 /* --- RODAPÉ: VISITANTE + ENERGIA --- */
 .start-menu-footer {
   flex-shrink: 0;
@@ -261,20 +226,6 @@
 
 .theme-light .start-menu-apps-heading {
   color: rgba(0, 0, 0, 0.45);
-}
-
-.theme-light .start-menu-app-btn {
-  color: #333;
-}
-
-.theme-light .start-menu-app-btn:hover,
-.theme-light .start-menu-app-btn:focus-visible {
-  background: rgba(0, 0, 0, 0.05);
-  color: #000;
-}
-
-.theme-light .start-menu-app-btn:active {
-  background: rgba(0, 0, 0, 0.08);
 }
 
 .theme-light .start-menu-footer {

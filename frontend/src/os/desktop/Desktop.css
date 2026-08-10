@@ -28,50 +28,6 @@
   list-style: none;
 }
 
-.marocos-icons button {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 6px;
-  width: var(--cfg-icone-largura, 88px);
-  padding: 8px 4px;
-  border: 1px solid transparent;
-  border-radius: var(--win-control-radius);
-  background: transparent;
-  cursor: pointer;
-}
-
-.marocos-icons button:hover { background: rgba(255, 255, 255, 0.12); }
-.marocos-icons button:focus-visible { outline: 2px solid var(--accent-color); }
-
-.marocos-icon-tile {
-  display: grid;
-  place-items: center;
-  width: var(--cfg-icone-tile, 56px);
-  height: var(--cfg-icone-tile, 56px);
-  border: var(--win-border);
-  border-radius: var(--cfg-icone-raio, 14px);
-  background: linear-gradient(160deg, rgba(168, 85, 247, 0.5), rgba(88, 28, 135, 0.6));
-  box-shadow: var(--win-highlight);
-  color: #fff;
-}
-
-.marocos-icon-label {
-  font-family: system-ui, sans-serif;
-  font-size: 0.72rem;
-  line-height: 1.25;
-  text-align: center;
-  color: #fff;
-  text-shadow: var(--icon-label-shadow);
-}
-
-/* No tema claro o wallpaper fica lilás pálido: texto branco com sombra escura
-   viraria um borrão. Inverte para texto escuro com halo claro. */
-.theme-light .marocos-icon-label {
-  color: #2e1065;
-  text-shadow: 0 1px 2px rgba(255, 255, 255, 0.85);
-}
-
 /* Assinatura tratada como marca d'agua: integrada ao wallpaper, sem card.
    Baixo contraste no tratamento, mas o h1 continua grande de proposito.
    ANCORADA NO CANTO SUPERIOR DIREITO: as janelas nascem em (96,64) no canto

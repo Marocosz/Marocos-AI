@@ -1,5 +1,6 @@
 import React from 'react'
 import { useWindows } from '../WindowManagerContext'
+import AppIconButton from '../../ui/AppIconButton'
 import { APPS } from '../registry'
 import { useLanguage } from '../../contexts/LanguageContext'
 import { getOsData } from '../../data/os'
@@ -23,20 +24,19 @@ const Dock = () => {
   return (
     <nav className="marocos-mobile-dock" aria-label={os.mobile.dock.label}>
       {apps.map((app) => {
-        const Icon = app.icon
         const title = app.titleKey ? os.windows[app.titleKey] : ''
 
         return (
-          <button
+          <AppIconButton
             key={app.id}
-            type="button"
-            className="marocos-mobile-dock-btn"
+            app={app}
+            titulo={title}
+            variante="plana"
+            tamanho="dock"
             onClick={() => open(app.id)}
             aria-label={title}
             title={title}
-          >
-            <Icon size={22} strokeWidth={1.9} />
-          </button>
+          />
         )
       })}
     </nav>

@@ -1,6 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react'
 import { motion, AnimatePresence } from 'motion/react'
 import { Search, Power } from 'lucide-react'
+import AppIconButton from '../../ui/AppIconButton'
 import { APPS } from '../registry'
 import { useLanguage } from '../../contexts/LanguageContext'
 import { getOsData } from '../../data/os'
@@ -135,21 +136,19 @@ export default function StartMenu({
 
               <ul role="listbox" aria-label={os.startMenu.appsHeading}>
                 {apps.map((app, index) => {
-                  const Icon = app.icon
                   const title = app.titleKey ? os.windows[app.titleKey] : ''
 
                   return (
                     <li key={app.id} role="none">
-                      <button
-                        type="button"
-                        role="option"
+                      <AppIconButton
                         ref={(el) => { itemRefs.current[index] = el }}
-                        className="start-menu-app-btn"
+                        app={app}
+                        titulo={title}
+                        variante="plana"
+                        tamanho="lista"
                         onClick={() => handleLaunch(app.id)}
-                      >
-                        {Icon ? <Icon size={20} strokeWidth={1.75} /> : null}
-                        <span>{title}</span>
-                      </button>
+                        role="option"
+                      />
                     </li>
                   )
                 })}

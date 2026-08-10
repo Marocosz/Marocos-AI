@@ -1,0 +1,200 @@
+/* --------------------------------------------------
+   BOTÃO DE APP
+   Valores migrados sem alteração de Desktop.css (.marocos-icons button,
+   .marocos-icon-tile, .marocos-icon-label), MobileShell.css
+   (.marocos-mobile-grid button, .marocos-mobile-tile, .marocos-mobile-label,
+   .marocos-mobile-dock-btn) e StartMenu.css (.start-menu-app-btn). Organização:
+   o que é idêntico entre os usos de uma variante vai no seletor da variante
+   (--tile / --plana); o que diverge vai no modificador de tamanho
+   (--desktop / --mobile / --dock / --lista).
+   -------------------------------------------------- */
+
+.app-icon-btn {
+  background: transparent;
+  cursor: pointer;
+}
+
+/* ==========================================================================
+   VARIANTE "tile" — moldura roxa quadrada + label embaixo
+   (área de trabalho, tela inicial do mobile)
+   ========================================================================== */
+
+.app-icon-btn--tile {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+}
+
+.app-icon-btn--desktop {
+  width: var(--cfg-icone-largura, 88px);
+  padding: 8px 4px;
+  border: 1px solid transparent;
+  border-radius: var(--win-control-radius);
+}
+
+.app-icon-btn--desktop:hover {
+  background: rgba(255, 255, 255, 0.12);
+}
+
+.app-icon-btn--desktop:focus-visible {
+  outline: 2px solid var(--accent-color);
+}
+
+.app-icon-btn--mobile {
+  width: 100%;
+  padding: 4px 0 8px;
+  border: none;
+}
+
+/* Glifo (moldura roxa). Gradiente, borda, sombra e cor são idênticos entre a
+   área de trabalho e a tela inicial — só tamanho e raio mudam, carregados
+   pelos modificadores de tamanho abaixo.
+
+   :where() em volta do seletor de variante ZERA a especificidade dele, para
+   que este seletor valha o mesmo que o antigo `.marocos-icon-tile` (uma
+   classe só). Isso importa porque index.css tem um hack global --
+   `.theme-light span, li, div { color: var(--text-primary) }` -- que hoje
+   vence exatamente esse `color: #fff` no tema claro (é ele, não uma regra
+   deste arquivo, quem deixa o ícone do tile escuro no tema claro). Um
+   seletor composto (duas classes) vence esse hack por especificidade e
+   pintaria o ícone de branco também no claro -- regressão visual real,
+   pega na comparação de capturas antes desta correção. */
+:where(.app-icon-btn--tile) .app-icon-btn-glifo {
+  display: grid;
+  place-items: center;
+  border: var(--win-border);
+  background: linear-gradient(160deg, rgba(168, 85, 247, 0.5), rgba(88, 28, 135, 0.6));
+  box-shadow: var(--win-highlight);
+  color: #fff;
+}
+
+.app-icon-btn--desktop .app-icon-btn-glifo {
+  width: var(--cfg-icone-tile, 56px);
+  height: var(--cfg-icone-tile, 56px);
+  border-radius: var(--cfg-icone-raio, 14px);
+}
+
+.app-icon-btn--mobile .app-icon-btn-glifo {
+  width: 60px;
+  height: 60px;
+  border-radius: 16px;
+  transition: transform 0.1s ease;
+}
+
+/* Só o mobile tem resposta ao toque — preservado como estava. */
+.app-icon-btn--mobile:active .app-icon-btn-glifo {
+  transform: scale(0.94);
+}
+
+.app-icon-btn-label {
+  font-family: system-ui, sans-serif;
+  font-size: 0.72rem;
+  line-height: 1.25;
+  text-align: center;
+  color: #fff;
+  text-shadow: var(--icon-label-shadow);
+}
+
+/* No tema claro o wallpaper fica lilás pálido: texto branco com sombra escura
+   viraria um borrão. Inverte para texto escuro com halo claro — igual nas
+   duas superfícies. */
+.theme-light .app-icon-btn-label {
+  color: #2e1065;
+  text-shadow: 0 1px 2px rgba(255, 255, 255, 0.85);
+}
+
+/* ==========================================================================
+   VARIANTE "plana" — ícone solto, sem moldura (dock, menu Iniciar)
+   ========================================================================== */
+
+.app-icon-btn--plana {
+  border: none;
+  color: #ddd;
+}
+
+/* Sem caixa própria: se o glifo gerasse um box aqui, o ícone deixaria de ser
+   filho direto do flex/grid do botão e o gap e a centralização mudariam.
+   display:contents remove a caixa do span e mantém o SVG como item direto,
+   igual ao markup antigo (ícone solto dentro do botão).
+
+   color:inherit é necessário, não decorativo: antes o ícone era filho direto
+   do <button> e herdava a cor dele sem intermediário. Agora existe o <span>
+   do glifo entre os dois -- e index.css tem um hack global
+   (`.theme-light span, li, div { color: var(--text-primary) }`, duas
+   classes de especificidade) que, sem este `color: inherit` (especificidade
+   maior, duas classes reais), sequestraria a cor do ícone no tema claro em
+   vez de deixá-lo herdar a cor que o botão já define (`--dock`/`--lista` +
+   seus overrides de tema claro). */
+.app-icon-btn--plana .app-icon-btn-glifo {
+  display: contents;
+  color: inherit;
+}
+
+.app-icon-btn--dock {
+  display: grid;
+  place-items: center;
+  width: 48px;
+  height: 48px;
+  border-radius: 12px;
+  transition: background 0.15s ease, color 0.15s ease;
+}
+
+.app-icon-btn--dock:active {
+  background: rgba(255, 255, 255, 0.1);
+  color: #fff;
+}
+
+.theme-light .app-icon-btn--dock {
+  color: #555;
+}
+
+.theme-light .app-icon-btn--dock:active {
+  background: rgba(0, 0, 0, 0.06);
+  color: #000;
+}
+
+.app-icon-btn--lista {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 8px 12px;
+  border-radius: var(--win-control-radius, 8px);
+  font-family: inherit;
+  font-size: 0.85rem;
+  text-align: left;
+  /* Dual Speed Transition, igual .taskbar-btn */
+  transition: background 1.5s ease, color 1.5s ease, transform 0.1s ease;
+}
+
+.app-icon-btn--lista:hover,
+.app-icon-btn--lista:focus-visible {
+  background: rgba(255, 255, 255, 0.08);
+  color: #fff;
+  transition: background 0.1s ease, color 0.1s ease;
+}
+
+.app-icon-btn--lista:focus-visible {
+  outline: 2px solid rgba(168, 85, 247, 0.6);
+  outline-offset: -2px;
+}
+
+.app-icon-btn--lista:active {
+  background: rgba(255, 255, 255, 0.04);
+  transform: scale(0.99);
+}
+
+.theme-light .app-icon-btn--lista {
+  color: #333;
+}
+
+.theme-light .app-icon-btn--lista:hover,
+.theme-light .app-icon-btn--lista:focus-visible {
+  background: rgba(0, 0, 0, 0.05);
+  color: #000;
+}
+
+.theme-light .app-icon-btn--lista:active {
+  background: rgba(0, 0, 0, 0.08);
+}

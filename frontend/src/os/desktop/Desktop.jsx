@@ -3,6 +3,7 @@ import { motion } from 'motion/react'
 import Hills from '../../wallpapers/Hills'
 import Window from './Window'
 import ContextMenu from './ContextMenu'
+import AppIconButton from '../../ui/AppIconButton'
 import { APPS } from '../registry'
 import { useWindows } from '../WindowManagerContext'
 import { useDeviceMode } from '../useDeviceMode'
@@ -68,29 +69,27 @@ const Desktop = ({ isAnimated = true }) => {
       </div>
 
       <ul className="marocos-icons">
-        {icons.map((app, i) => {
-          const Icon = app.icon
-          return (
-            <motion.li
-              key={app.id}
-              initial={{ opacity: 0, y: MOVIMENTO.iconesDesktop.deslocamentoY }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{
-                delay: MOVIMENTO.iconesDesktop.delayPorItem * i,
-                duration: MOVIMENTO.iconesDesktop.duration,
-              }}
-            >
-              {/* Clique único abre: desvio deliberado da metáfora, porque
-                  estes ícones são a navegação principal do site. */}
-              <button type="button" onClick={() => open(app.id)}>
-                <span className="marocos-icon-tile">
-                  <Icon size={26} strokeWidth={1.75} />
-                </span>
-                <span className="marocos-icon-label">{os.windows[app.titleKey]}</span>
-              </button>
-            </motion.li>
-          )
-        })}
+        {icons.map((app, i) => (
+          <motion.li
+            key={app.id}
+            initial={{ opacity: 0, y: MOVIMENTO.iconesDesktop.deslocamentoY }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{
+              delay: MOVIMENTO.iconesDesktop.delayPorItem * i,
+              duration: MOVIMENTO.iconesDesktop.duration,
+            }}
+          >
+            {/* Clique único abre: desvio deliberado da metáfora, porque
+                estes ícones são a navegação principal do site. */}
+            <AppIconButton
+              app={app}
+              titulo={os.windows[app.titleKey]}
+              variante="tile"
+              tamanho="desktop"
+              onClick={() => open(app.id)}
+            />
+          </motion.li>
+        ))}
       </ul>
 
       {windows.map((win) => (

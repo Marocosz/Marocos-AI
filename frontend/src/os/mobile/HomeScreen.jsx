@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react'
 import { motion } from 'motion/react'
 import { Signal, BatteryFull } from 'lucide-react'
 import { useWindows } from '../WindowManagerContext'
+import AppIconButton from '../../ui/AppIconButton'
 import { APPS } from '../registry'
 import { useLanguage } from '../../contexts/LanguageContext'
 import { getOsData } from '../../data/os'
@@ -60,27 +61,25 @@ const HomeScreen = ({ onOpenQuickSettings }) => {
       </motion.div>
 
       <ul className="marocos-mobile-grid">
-        {icons.map((app, i) => {
-          const Icon = app.icon
-          return (
-            <motion.li
-              key={app.id}
-              initial={{ opacity: 0, y: MOVIMENTO.iconesMobile.deslocamentoY }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{
-                delay: MOVIMENTO.iconesMobile.delayPorItem * i,
-                duration: MOVIMENTO.iconesMobile.duration,
-              }}
-            >
-              <button type="button" onClick={() => open(app.id)}>
-                <span className="marocos-mobile-tile">
-                  <Icon size={26} strokeWidth={1.75} />
-                </span>
-                <span className="marocos-mobile-label">{os.windows[app.titleKey]}</span>
-              </button>
-            </motion.li>
-          )
-        })}
+        {icons.map((app, i) => (
+          <motion.li
+            key={app.id}
+            initial={{ opacity: 0, y: MOVIMENTO.iconesMobile.deslocamentoY }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{
+              delay: MOVIMENTO.iconesMobile.delayPorItem * i,
+              duration: MOVIMENTO.iconesMobile.duration,
+            }}
+          >
+            <AppIconButton
+              app={app}
+              titulo={os.windows[app.titleKey]}
+              variante="tile"
+              tamanho="mobile"
+              onClick={() => open(app.id)}
+            />
+          </motion.li>
+        ))}
       </ul>
     </div>
   )
