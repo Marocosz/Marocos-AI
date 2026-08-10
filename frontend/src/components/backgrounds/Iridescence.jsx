@@ -1,6 +1,7 @@
 // src/components/backgrounds/Iridescence.jsx
 import { Renderer, Program, Mesh, Color, Triangle } from 'ogl';
 import { useEffect, useRef } from 'react';
+import { WALLPAPER } from '../../config/system';
 import './Iridescence.css';
 
 const vertexShader = `
@@ -85,13 +86,13 @@ export default function Iridescence({ color = [1, 1, 1], speed = 1.0, amplitude 
     let rect = ctn.getBoundingClientRect();
 
     function resize() {
-      // PERFORMANCE FIX: Renderiza a 60% da resolução para reduzir carga na GPU
-      // em telas 4k/Retina. O efeito "blur" natural disfarça a baixa resolução.
-      const scale = 0.6; 
+      // Renderiza a uma fração da resolução para reduzir carga na GPU em telas
+      // 4k/Retina. O efeito "blur" natural disfarça a baixa resolução.
+      const scale = WALLPAPER.iridescence.escalaResolucao;
       renderer.setSize(ctn.offsetWidth * scale, ctn.offsetHeight * scale);
       
-      // FIX CRÍTICO: Força o canvas a esticar 100% via CSS inline, 
-      // independente da resolução interna baixa (0.6).
+      // FIX CRÍTICO: Força o canvas a esticar 100% via CSS inline,
+      // independente da resolução interna baixa (WALLPAPER.iridescence.escalaResolucao).
       // Isso resolve o bug do fundo ficar "pequenininho" no canto.
       gl.canvas.style.width = '100%';
       gl.canvas.style.height = '100%';
@@ -139,7 +140,7 @@ export default function Iridescence({ color = [1, 1, 1], speed = 1.0, amplitude 
     // segundo do fundo): sempre que este canvas redesenha, o navegador refaz o
     // blur de tudo que estiver por cima. Como isto e um gradiente lento, 20fps
     // e visualmente indistinguivel de 60 e custa um terco.
-    const INTERVALO_MS = 1000 / 20;
+    const INTERVALO_MS = 1000 / WALLPAPER.iridescence.fps;
     let ultimoDesenho = 0;
 
     function update(t) {

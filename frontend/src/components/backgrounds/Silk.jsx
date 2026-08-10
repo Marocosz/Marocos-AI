@@ -1,26 +1,60 @@
-import { Canvas, useFrame, useThree } from '@react-three/fiber';
-import { forwardRef, useRef, useMemo, useEffect } from 'react';
-import { Color } from 'three';
+import { Renderer, Program, Mesh, Color, Triangle } from 'ogl'
+import { useEffect, useRef } from 'react'
+import { WALLPAPER } from '../../config/system'
 
-const hexToNormalizedRGB = hex => {
-  hex = hex.replace('#', '');
+/**
+ * SILK — o wallpaper do tema escuro.
+ *
+ * PORTADO DE @react-three/fiber PARA ogl. O shader é o mesmo, byte a byte; o
+ * que mudou foi o runtime. Motivo: este componente é importado estaticamente
+ * pela cadeia App -> Desktop -> Hills, então o `three` inteiro entrava no
+ * caminho crítico e anulava o React.lazy do Crystal — o `three` estava no
+ * bundle principal, e o chunk "lazy" só carregava a cola do drei.
+ *
+ * O Silk não usa câmera, cena, luz nem material: é um quad de tela cheia com um
+ * fragment shader. O ogl faz exatamente isso, já era dependência do projeto (o
+ * Iridescence usa) e é uma fração do tamanho.
+ *
+ * MESMA ESTRUTURA DO Iridescence.jsx, de propósito — inclusive a pausa por ref,
+ * que existe porque pôr `isAnimated` nas dependências do efeito destruía e
+ * reconstruía o contexto WebGL a cada alternância, bem no instante em que a
+ * cortina da tela de bloqueio começa a subir.
+ */
+
+const hexParaRgbNormalizado = (hex) => {
+  const h = hex.replace('#', '')
   return [
-    parseInt(hex.slice(0, 2), 16) / 255,
-    parseInt(hex.slice(2, 4), 16) / 255,
-    parseInt(hex.slice(4, 6), 16) / 255
-  ];
-};
+    parseInt(h.slice(0, 2), 16) / 255,
+    parseInt(h.slice(2, 4), 16) / 255,
+    parseInt(h.slice(4, 6), 16) / 255,
+  ]
+}
 
+/**
+ * O vertex shader mudou de forma, não de efeito. No three, `position` era vec3
+ * (vindo de um planeGeometry 2x2); no ogl, o Triangle fornece `position` e `uv`
+ * como vec2. O Triangle é um triângulo de tela cheia cujo uv vai de 0 a 1 ao
+ * longo da região visível — exatamente o que o plano 2x2 dava.
+ */
 const vertexShader = `
+attribute vec2 uv;
+attribute vec2 position;
+
 varying vec2 vUv;
+
 void main() {
   vUv = uv;
-  // Truque: Ignora a câmera e desenha um quadrado que cobre 100% da tela (Clip Space)
-  gl_Position = vec4(position, 1.0);
+  gl_Position = vec4(position, 0.0, 1.0);
 }
-`;
+`
 
+/**
+ * Fragment shader IDÊNTICO ao da versão three. A única linha acrescentada é a
+ * de precisão, que o three injetava sozinho e o ogl exige explícita.
+ */
 const fragmentShader = `
+precision highp float;
+
 varying vec2 vUv;
 uniform float uTime;
 uniform vec3  uColor;
@@ -63,93 +97,145 @@ void main() {
   col.a = 1.0;
   gl_FragColor = col;
 }
-`;
+`
 
-/**
- * TETO DE FPS
- *
- * O custo do backdrop-filter das janelas e (custo do blur) x (frames por
- * segundo do fundo): sempre que este canvas redesenha, o navegador refaz o
- * blur de tudo que estiver por cima dele. Como isto e um gradiente lento,
- * 20fps e visualmente indistinguivel de 60 e custa um terco.
- *
- * Com frameloop="demand" o r3f so desenha quando invalidate() e chamado —
- * entao o intervalo abaixo e quem dita a taxa real.
- */
-const TetoDeFps = ({ isAnimated, fps = 20 }) => {
-  const invalidate = useThree((estado) => estado.invalidate);
+export default function Silk({
+  speed = WALLPAPER.silk.velocidade,
+  scale = WALLPAPER.silk.escala,
+  color = WALLPAPER.silk.cor,
+  noiseIntensity = WALLPAPER.silk.ruido,
+  rotation = WALLPAPER.silk.rotacao,
+  isAnimated = true,
+}) {
+  const containerRef = useRef(null)
+
+  // Ver o cabeçalho: a pausa vive numa ref, não nas dependências do efeito.
+  const animandoRef = useRef(isAnimated)
+  useEffect(() => {
+    animandoRef.current = isAnimated
+  }, [isAnimated])
 
   useEffect(() => {
-    if (!isAnimated) return;
-    const id = setInterval(invalidate, 1000 / fps);
-    return () => clearInterval(id);
-  }, [isAnimated, invalidate, fps]);
+    if (!containerRef.current) return
+    const ctn = containerRef.current
 
-  return null;
-};
+    const renderer = new Renderer({
+      alpha: true,
+      antialias: false,
+      powerPreference: 'high-performance',
+      stencil: false,
+      depth: false,
+    })
+    const gl = renderer.gl
+    gl.clearColor(0, 0, 0, 0)
 
-const SilkPlane = forwardRef(function SilkPlane({ uniforms, isAnimated }, ref) {
-  useFrame((_, delta) => {
-    if (ref.current?.material?.uniforms && isAnimated) {
-       ref.current.material.uniforms.uTime.value += 0.1 * delta;
+    let program
+    let mesh
+
+    function redimensionar() {
+      // Renderiza a uma fração da resolução e estica por CSS. Como o efeito é
+      // de fumaça, a perda de nitidez é imperceptível — e derruba muito o custo
+      // em monitor 4K ou de alta taxa de atualização.
+      const f = WALLPAPER.silk.dpr
+      renderer.setSize(ctn.offsetWidth * f, ctn.offsetHeight * f)
+      gl.canvas.style.width = '100%'
+      gl.canvas.style.height = '100%'
+      // Explícito, não por acidente: o canvas é inline por padrão, e o vão de
+      // descender de um inline só não aparece aqui porque `.marocos-wallpaper`
+      // tem `overflow: hidden`. O Iridescence.css faz o mesmo no irmão.
+      gl.canvas.style.display = 'block'
+      if (mesh) renderer.render({ scene: mesh })
     }
-  });
 
-  return (
-    <mesh ref={ref}>
-      {/* PlaneGeometry 2x2 cobre o clip space de -1 a 1 */}
-      <planeGeometry args={[2, 2]} />
-      <shaderMaterial 
-        uniforms={uniforms} 
-        vertexShader={vertexShader} 
-        fragmentShader={fragmentShader} 
-        depthWrite={false}
-        depthTest={false}
-      />
-    </mesh>
-  );
-});
+    window.addEventListener('resize', redimensionar, false)
+    redimensionar()
 
-const Silk = ({ speed = 1, scale = 2, color = '#121212', noiseIntensity = 0.5, rotation = 0, isAnimated = true }) => {
-  const meshRef = useRef();
-  const uniforms = useMemo(
-    () => ({
-      uSpeed: { value: speed },
-      uScale: { value: scale },
-      uNoiseIntensity: { value: noiseIntensity },
-      uColor: { value: new Color(...hexToNormalizedRGB(color)) },
-      uRotation: { value: rotation },
-      uTime: { value: 0 }
-    }),
-    [speed, scale, noiseIntensity, color, rotation]
-  );
+    const geometry = new Triangle(gl)
+    program = new Program(gl, {
+      vertex: vertexShader,
+      fragment: fragmentShader,
+      depthTest: false,
+      depthWrite: false,
+      uniforms: {
+        uSpeed: { value: speed },
+        uScale: { value: scale },
+        uNoiseIntensity: { value: noiseIntensity },
+        uColor: { value: new Color(...hexParaRgbNormalizado(color)) },
+        uRotation: { value: rotation },
+        uTime: { value: 0 },
+      },
+    })
 
-  return (
-    <div style={{ width: '100%', height: '100%' }}>
-      <Canvas 
-        /* PERFORMANCE FIX: 
-           dpr={0.6} renderiza o shader com 60% da resolução e estica.
-           Reduz drasticamente o uso de GPU em monitores High-Refresh (166Hz) e Full HD/4K.
-           Como o efeito é de "fumaça", a perda de nitidez é imperceptível e até desejável.
-        */
-        dpr={0.6} 
-        // Sempre sob demanda: o TetoDeFps controla a taxa, e com a animacao
-        // desligada ninguem invalida, entao o custo vai a zero.
-        frameloop="demand"
-        resize={{ scroll: false }} 
-        gl={{ 
-          alpha: true, 
-          antialias: false, 
-          powerPreference: "high-performance",
-          stencil: false,
-          depth: false
-        }} 
-      >
-        <TetoDeFps isAnimated={isAnimated} />
-        <SilkPlane ref={meshRef} uniforms={uniforms} isAnimated={isAnimated} />
-      </Canvas>
-    </div>
-  );
-};
+    mesh = new Mesh(gl, { geometry, program })
 
-export default Silk;
+    /**
+     * TETO DE FPS. O custo do backdrop-filter das janelas é (custo do blur) ×
+     * (quadros por segundo do fundo): toda vez que este canvas redesenha, o
+     * navegador refaz o blur de tudo que estiver por cima. Como isto é um
+     * gradiente lento, 20fps é indistinguível de 60 e custa um terço.
+     */
+    const intervaloMs = 1000 / WALLPAPER.silk.fps
+
+    /**
+     * Válvula de segurança para quando a aba volta de segundo plano: o rAF
+     * para, `ultimoTempo` fica velho, e sem teto o primeiro quadro receberia
+     * um delta gigante e o padrão daria um salto.
+     *
+     * TEM de ficar bem acima de `intervaloMs`. Um teto igual ao intervalo
+     * morde TODO quadro — o portão de fps abaixo garante que o delta nunca é
+     * menor que ele — e aí o incremento vira fixo por quadro em vez de
+     * proporcional ao tempo real, fazendo a velocidade do padrão variar com a
+     * taxa de atualização do monitor e acoplando a arte ao botão de
+     * performance (`WALLPAPER.silk.fps` deixaria de ser só sobre custo).
+     */
+    const dtMaximoS = (intervaloMs * 5) / 1000
+    let ultimoDesenho = 0
+    let ultimoTempo = 0
+    let idAnimacao
+
+    function atualizar(t) {
+      idAnimacao = requestAnimationFrame(atualizar)
+      if (!animandoRef.current) {
+        // Pausado: não desenha nada, 0% de GPU. E zera a referência de tempo,
+        // senão o primeiro quadro após despausar receberia um delta enorme e o
+        // padrão daria um salto.
+        ultimoTempo = t
+        return
+      }
+
+      if (t - ultimoDesenho < intervaloMs) return
+      ultimoDesenho = t
+
+      /**
+       * O TEMPO É ACUMULADO, NÃO LIDO DO RELÓGIO ABSOLUTO. A versão r3f fazia
+       * `uTime += 0.1 * delta` dentro do useFrame, e a soma dos deltas ao
+       * longo do tempo é o tempo decorrido — a 20fps isso dava 0.1 unidade por
+       * segundo real, e o mesmo vale aqui: `dtMaximoS` é folgado o bastante
+       * (5× o intervalo do teto de fps) para nunca morder em regime, então
+       * `Σdt` continua igual ao tempo decorrido. Reproduzir com
+       * `uTime = t * 0.0001` daria a mesma velocidade em regime, mas o padrão
+       * saltaria ao despausar — porque o relógio andou enquanto o shader
+       * estava parado. Acumulando, pausar congela de verdade.
+       */
+      const dt = Math.min((t - ultimoTempo) / 1000, dtMaximoS)
+      ultimoTempo = t
+      program.uniforms.uTime.value += 0.1 * dt
+
+      renderer.render({ scene: mesh })
+    }
+
+    ultimoTempo = performance.now()
+    idAnimacao = requestAnimationFrame(atualizar)
+    renderer.render({ scene: mesh })
+    ctn.appendChild(gl.canvas)
+
+    return () => {
+      cancelAnimationFrame(idAnimacao)
+      window.removeEventListener('resize', redimensionar)
+      if (ctn.contains(gl.canvas)) ctn.removeChild(gl.canvas)
+      gl.getExtension('WEBGL_lose_context')?.loseContext()
+    }
+  }, [color, speed, scale, noiseIntensity, rotation])
+
+  return <div ref={containerRef} style={{ width: '100%', height: '100%' }} />
+}

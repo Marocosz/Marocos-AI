@@ -3,6 +3,7 @@ import Silk from '../components/backgrounds/Silk'
 import Iridescence from '../components/backgrounds/Iridescence'
 import { useDeviceMode } from '../os/useDeviceMode'
 import { useTheme } from '../contexts/ThemeContext'
+import { WALLPAPER } from '../config/system'
 
 /**
  * WALLPAPER
@@ -11,7 +12,7 @@ import { useTheme } from '../contexts/ThemeContext'
  * claro. Sem as cristas SVG que existiam antes — elas competiam com o fundo
  * em vez de compor com ele.
  *
- * Os dois shaders rodam com teto de 20fps (ver TetoDeFps em Silk.jsx e o
+ * Os dois shaders rodam com teto de 20fps (ver o teto de fps em Silk.jsx e o
  * intervalo em Iridescence.jsx). Isso não é sobre o shader em si, que é
  * barato: é sobre o backdrop-filter das janelas, que refaz o blur toda vez
  * que o fundo redesenha. Menos frames no fundo, menos re-blur por cima.
@@ -20,24 +21,23 @@ import { useTheme } from '../contexts/ThemeContext'
  * WebGL de tela cheia não vale o custo de bateria num celular.
  */
 
-// Cor do Silk no tema escuro. O tema claro usa o Iridescence, que era o shader
-// que o projeto já aplicava no modo claro — manter esse par preserva a
-// identidade dos dois temas em vez de forçar o mesmo shader nos dois.
-const SILK_DARK = '#4c1d95'
-
 /**
- * Rede de segurança do crossfade. Quem manda no caso normal é o `animationend`
- * da camada que entra — medido em 816ms no Chrome real; isto só existe para o
- * caso de o evento não chegar (aba em segundo plano, animação cancelada).
+ * Cor e demais parâmetros dos dois shaders vêm de `WALLPAPER.silk` /
+ * `WALLPAPER.iridescence` (config/system.js) — nenhum número literal aqui. O
+ * Silk é o tema escuro e o Iridescence o claro: manter esse par preserva a
+ * identidade dos dois temas em vez de forçar o mesmo shader nos dois.
  *
- * FOLGADO DE PROPÓSITO. O timer é armado quando o estado muda, não quando a
- * animação começa, e os dois podem estar longe um do outro: montar o shader novo
- * ocupa a main thread, e numa máquina lenta a camada só pinta segundos depois.
- * Com um limite curto o cronômetro vencia a corrida e cortava o crossfade pela
- * metade — vi isso acontecer num renderizador de software, onde a camada nova era
- * revelada em 4% de opacidade. Aqui ele só age quando algo deu errado de fato.
+ * A rede de segurança do crossfade (ver `WALLPAPER.crossfade.limiteSegurancaMs`)
+ * é folgada de propósito. Quem manda no caso normal é o `animationend` da
+ * camada que entra — medido em 816ms no Chrome real; isto só existe para o
+ * caso de o evento não chegar (aba em segundo plano, animação cancelada). O
+ * timer é armado quando o estado muda, não quando a animação começa, e os dois
+ * podem estar longe um do outro: montar o shader novo ocupa a main thread, e
+ * numa máquina lenta a camada só pinta segundos depois. Com um limite curto o
+ * cronômetro vencia a corrida e cortava o crossfade pela metade — vi isso
+ * acontecer num renderizador de software, onde a camada nova era revelada em
+ * 4% de opacidade. Aqui ele só age quando algo deu errado de fato.
  */
-const CROSSFADE_LIMITE_MS = 4000
 
 /** Uma camada de céu, para o tema pedido. */
 const Ceu = ({ tema, isMobile, isAnimated }) => {
@@ -49,19 +49,19 @@ const Ceu = ({ tema, isMobile, isAnimated }) => {
 
   return tema === 'dark' ? (
     <Silk
-      color={SILK_DARK}
-      speed={12}
-      scale={1.4}
-      rotation={2.6}
-      noiseIntensity={1.2}
+      color={WALLPAPER.silk.cor}
+      speed={WALLPAPER.silk.velocidade}
+      scale={WALLPAPER.silk.escala}
+      rotation={WALLPAPER.silk.rotacao}
+      noiseIntensity={WALLPAPER.silk.ruido}
       isAnimated={isAnimated}
     />
   ) : (
     <Iridescence
-      color={[0.9, 0.9, 0.95]}
-      mouseReact={false}
-      amplitude={0.1}
-      speed={1}
+      color={WALLPAPER.iridescence.cor}
+      mouseReact={WALLPAPER.iridescence.reagirAoMouse}
+      amplitude={WALLPAPER.iridescence.amplitude}
+      speed={WALLPAPER.iridescence.velocidade}
       isAnimated={isAnimated}
     />
   )
@@ -121,7 +121,7 @@ const Hills = ({ isAnimated = true }) => {
 
   useEffect(() => {
     if (!saindo) return
-    const id = setTimeout(() => setSaindo(null), CROSSFADE_LIMITE_MS)
+    const id = setTimeout(() => setSaindo(null), WALLPAPER.crossfade.limiteSegurancaMs)
     return () => clearTimeout(id)
   }, [saindo])
 
