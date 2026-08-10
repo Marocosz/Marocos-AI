@@ -108,9 +108,33 @@ Outros pontos:
 
 ### 1.5 Achados soltos
 
-- `.about-spec-number` usa `font-weight: 800`. O `index.html` importa Poppins em
-  `wght@400;700;900` e o `index.css` declara `font-synthesis: none`. O peso 800
-  não existe e não pode ser sintetizado — cai silenciosamente em outro peso.
+- **Pesos de fonte não carregados — 34 declarações em 14 arquivos.**
+  O `index.html` importa Poppins em `wght@400;700;900` e o `index.css` declara
+  `font-synthesis: none`. Contagem dos pesos usados no CSS:
+
+  | peso | declarações | existe no Poppins? |
+  |---|---|---|
+  | 600 | 20 | **não** |
+  | 700 | 16 | sim |
+  | 500 | 7 | **não** |
+  | 300 | 4 | **não** |
+  | 900 | 3 | sim |
+  | 800 | 3 | **não** |
+  | 400 | 3 | sim |
+  | 200 | 1 | **não** |
+
+  Atinge título e subtítulo de quase todo app (`.devices-title` 800,
+  `.history-title` 800, `.devices-subtitle` 300, `.history-subtitle` 300),
+  além de `AssistantApp`, `ProjectsApp`, `ProjectDetailApp`, `SettingsApp`,
+  `TerminalApp`, `StartMenu`, `Taskbar`, `Window`, `MobileShell`, `boot.css` e
+  `index.css`.
+
+  **Ressalva que muda o tratamento:** nem toda declaração está errada. Elementos
+  que declaram a própria `font-family` — `system-ui` (fonte variável no Windows,
+  eixo de peso contínuo), `Courier New` (só 400/700), `ui-monospace` — têm
+  disponibilidade diferente da do Poppins. Um `600` sob `system-ui` renderiza
+  certo; sob Poppins herdado, não. Por isso a correção **não pode ser um
+  find-replace**: ver 5.3.
 - Itens do popup de tray (`Taskbar.jsx`, linhas ~74–88) são `<div onClick>` sem
   `role`, `tabIndex` nem handler de teclado. Mesma coisa em `.show-desktop-line`.
 - `index.css` tem `.theme-light h1, h2, h3, h4, p, span, li, div { color: ... }` —
@@ -247,10 +271,36 @@ Criados apenas onde há duplicação real hoje — nada especulativo.
 
 ### `src/ui/`
 
-- **`AppIconButton.jsx`** — recebe um item do `registry` e uma variante
-  (`tile` | `grade` | `lista` | `dock`). Substitui os 4 markups de
-  `Desktop`, `HomeScreen`, `Dock` e `StartMenu`. O CSS de cada variante fica
-  junto; a diferença visual atual entre os quatro é preservada exatamente.
+- **`AppIconButton.jsx`** — recebe um item do `registry` e uma variante.
+  **É a peça de identidade visual do sistema, e hoje está copiada em 4 lugares.**
+
+  Comparação declaração por declaração entre `.marocos-icon-tile` (Desktop) e
+  `.marocos-mobile-tile` (HomeScreen):
+
+  | propriedade | Desktop | HomeScreen |
+  |---|---|---|
+  | `background` | `linear-gradient(160deg, rgba(168,85,247,.5), rgba(88,28,135,.6))` | **idêntico** |
+  | `border` | `var(--win-border)` | **idêntico** |
+  | `box-shadow` | `var(--win-highlight)` | **idêntico** |
+  | `color` | `#fff` | **idêntico** |
+  | `display` / `place-items` | `grid` / `center` | **idêntico** |
+  | `width` / `height` | 56px | 60px |
+  | `border-radius` | 14px | 16px |
+
+  E as regras de label (`.marocos-icon-label` e `.marocos-mobile-label`) são
+  **iguais em todas as declarações**: `system-ui, sans-serif`, `0.72rem`,
+  `line-height 1.25`, `text-align: center`, `#fff`, `var(--icon-label-shadow)`.
+
+  Duas variantes, portanto:
+  - **`tile`** — Desktop e HomeScreen. Tamanho e raio entram por prop/CSS var;
+    o resto é uma declaração só. O `:active { transform: scale(0.94) }` que só o
+    mobile tem continua exclusivo dele.
+  - **`plana`** — Dock (48px, sem tile, `background: transparent`) e StartMenu
+    (linha horizontal com ícone + texto). São o mesmo padrão "ícone do registry
+    num botão sem moldura", com paddings próprios.
+
+  Ganho concreto: mudar a aparência do ícone do sistema passa de 4 arquivos
+  para 1.
 - **`Clock.jsx`** — prop `formato` (`'hm'` | `'hm-data'` | `'extenso'`) e
   `locale`. O intervalo é derivado do formato: formato sem segundos alinha o
   primeiro tique à virada do minuto (comportamento que hoje só o relógio da
@@ -266,7 +316,18 @@ Criados apenas onde há duplicação real hoje — nada especulativo.
   próprio**, consumindo apenas o hook. Forçar os três no mesmo componente exigiria
   um leque de props que valeria menos que a duplicação que remove.
 - **`AppHeader.jsx`** — eyebrow + título + subtítulo, usado por `DevicesApp` e
-  `HistoryApp`.
+  `HistoryApp`. A **receita** é compartilhada e os **valores são preservados**:
+
+  | | eyebrow | título | subtítulo |
+  |---|---|---|---|
+  | receita comum | `Courier New`, `--accent-color`, 600, `letter-spacing: 2px`, uppercase | `--text-primary`, `letter-spacing: -0.5px`, `margin: 0` | `--text-secondary`, `margin: 0` |
+  | `DevicesApp` (`escala="sm"`) | 0.68rem | 1.3rem | 0.82rem / lh 1.5 |
+  | `HistoryApp` (`escala="md"`) | 0.72rem | 1.4rem | 0.85rem / lh 1.55 |
+
+  As diferenças de 0.02–0.1rem quase certamente são ruído de copiar-e-ajustar,
+  não decisão — mas **não são unificadas**, porque unificar é mudança visual e
+  a regra da seção 0 vale também para frações de rem. A escala entra como
+  variante; o dono do projeto pode colapsá-las depois, por decisão explícita.
 - **`Chip.jsx`** — a pílula. **Caso mais fraco da lista, e com um critério de
   corte:** os 5 usos atuais têm valores visuais diferentes entre si (fonte,
   padding, raio, cor). A unificação só acontece para os que compartilham a *mesma*
@@ -443,11 +504,28 @@ posição direto, sem reiniciar uma animação de scroll a cada evento SSE.
 
 ### 5.3 Correções pontuais
 
-- **Peso da fonte:** `.about-spec-number` usa `font-weight: 800`, que não existe
-  no import do Poppins e não pode ser sintetizado (`font-synthesis: none`).
-  Correção **sem mudança visual**: trocar a declaração para o peso que o
-  navegador já está pintando hoje. Confirmar qual é, medindo no navegador, antes
-  de escrever o valor.
+- **Pesos de fonte (34 declarações, 14 arquivos — ver 1.5).**
+
+  **Decisão: normalizar o CSS para o peso que já está sendo pintado.** Zero
+  mudança visual, zero byte de fonte a mais, e o CSS passa a descrever o que o
+  site realmente é. *Não* carregar os pesos faltantes: isso renderizaria a
+  tipografia que o CSS pede, o que é uma mudança visual em quase todo texto do
+  site, e custaria ~4 arquivos de fonte no carregamento.
+
+  **Procedimento obrigatório — medir, não deduzir.** Para cada uma das 34
+  declarações, ler no DevTools a fonte e o peso *renderizados* (aba Computed →
+  Rendered Fonts) e escrever esse valor. Não vale find-replace, porque a
+  disponibilidade depende da `font-family` efetiva do elemento:
+
+  | família efetiva | pesos disponíveis | consequência |
+  |---|---|---|
+  | Poppins (herdada) | 400, 700, 900 | 200/300/500/600/800 caem no vizinho |
+  | `system-ui` (Windows: Segoe UI Variable) | eixo contínuo | 300/500/600 renderizam **certo** — não tocar |
+  | `Courier New` | 400, 700 | 600 cai em 700 |
+  | `ui-monospace` / Consolas / Cascadia | varia por SO | medir caso a caso |
+
+  Critério de aceite: captura de tela antes/depois de cada arquivo tocado,
+  idênticas.
 - **Teclado no popup de tray:** os `<div onClick>` de `Taskbar.jsx` viram
   `<button>` com o mesmo CSS. `.show-desktop-line` ganha `role="button"`,
   `tabIndex` e handler de teclado. Aparência inalterada.
@@ -467,32 +545,39 @@ uma etapa futura.
 2. **Colisão `.about-section`** (4.3) — isolada, porque é a única com risco visual
    real e precisa de verificação dedicada.
 3. **Resto do `index.css` morto** — só depois de 2.
-4. **`config/system.js` + `cssBridge.js`** — criar e migrar os consumidores. Sem
+4. **Normalização dos pesos de fonte** (5.3) — **antes** da extração de
+   componentes, não depois. Se os pesos forem corrigidos só no fim, o
+   `AppHeader` e o `primitives.css` nascem carregando um valor que não é o que
+   renderiza, e a correção teria de ser aplicada duas vezes, em dois lugares.
+   Aqui ainda existe uma declaração por app, que é onde medir é mais barato.
+5. **`config/system.js` + `cssBridge.js`** — criar e migrar os consumidores. Sem
    mudança de valor: cada literal vira uma referência ao mesmo número.
-5. **Hooks (`useIdleTask`, `useMediaQuery`)** — pré-requisito dos componentes.
-6. **Componentes de `ui/`** — um por vez, com comparação visual de cada
-   consumidor.
-7. **Divisão do contexto de janelas + `memo`** — mudança de comportamento de
+6. **Hooks (`useIdleTask`, `useMediaQuery`)** — pré-requisito dos componentes.
+7. **Componentes de `ui/`** — um por vez, com comparação visual de cada
+   consumidor. Começar pelo `AppIconButton`, que é o de maior retorno e o de
+   evidência mais forte (seção 3).
+8. **Divisão do contexto de janelas + `memo`** — mudança de comportamento de
    render, verificada com abertura/arrasto/foco de várias janelas.
-8. **`Silk` → `ogl`** — a de maior ganho e maior risco visual; isolada.
-9. **`React.lazy` por app + prefetch** — depois de 8, para a medição do ganho ser
-   atribuível.
-10. **`react-markdown` lazy + `manualChunks`.**
-11. **Movimentação de pastas** — por último, de propósito: é churn de diff puro e
+9. **`Silk` → `ogl`** — a de maior ganho e maior risco visual; isolada.
+10. **`React.lazy` por app + prefetch** — depois de 9, para a medição do ganho ser
+    atribuível.
+11. **`react-markdown` lazy + `manualChunks`.**
+12. **Correções pontuais restantes** (5.3: teclado no tray, seletor `.theme-light div`).
+13. **Movimentação de pastas** — por último, de propósito: é churn de diff puro e
     não deve se misturar com mudança de comportamento no histórico.
-12. **Correções pontuais** (5.3).
 
-**Regra de posicionamento, para a etapa 11 não contradizer as anteriores:**
+**Regra de posicionamento, para a etapa 13 não contradizer as anteriores:**
 arquivo **novo** (`config/`, `os/hooks/`, `ui/`) nasce direto no destino final da
-seção 4.1, nas etapas 4–6. A etapa 11 move apenas arquivos que **já existem**:
+seção 4.1, nas etapas 5–7. A etapa 13 move apenas arquivos que **já existem**:
 `wallpapers/Hills.jsx` → `wallpaper/Wallpaper.jsx`, `components/backgrounds/*` →
 `wallpaper/`, `components/Crystal.jsx` → `brand/`,
 `components/effects/` → `effects/`, `data/` → `content/` + `i18n/`, e a quebra de
 `App.jsx` em `os/shell/`.
 
-**Faseamento.** As etapas 1–3 são faxina e podem ir juntas. 4–7 são a refatoração
-estrutural. 8–10 são performance de bundle. 11–12 são acabamento. Cada bloco é
-mergeável sozinho; nenhum deles precisa do seguinte para o site funcionar.
+**Faseamento.** 1–4 é faxina (inclui a normalização de pesos, que é pré-requisito
+técnico da fase seguinte). 5–8 é a refatoração estrutural. 9–11 é performance de
+bundle. 12–13 é acabamento. Cada bloco é mergeável sozinho; nenhum precisa do
+seguinte para o site funcionar.
 
 ---
 
