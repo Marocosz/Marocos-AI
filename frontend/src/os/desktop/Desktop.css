@@ -14,7 +14,15 @@
   flex-wrap: wrap;
   align-content: flex-start;
   gap: 4px;
-  max-height: calc(100vh - 120px);
+  /* O CORTE DA COLUNA, CONTADO E NÃO ESTIMADO.
+     A coluna começa em top: 20px e não pode invadir a barra de tarefas, então o
+     que sobra é 100vh - 20 - altura da barra, menos uma folga de 12px para os
+     ícones não encostarem nela. Os 120px chumbados de antes reservavam 48px a
+     mais do que o necessário: com sete ícones de 94px e 4px de intervalo a
+     coluna pede 682px, e o teto caía em 680px numa tela de 800 — quebrava para
+     a segunda fileira por DOIS pixels, deixando 127px vazios embaixo. Usando o
+     token da barra a conta passa a ser verdadeira em qualquer altura. */
+  max-height: calc(100vh - var(--taskbar-h) - 32px);
   margin: 0;
   padding: 0;
   list-style: none;

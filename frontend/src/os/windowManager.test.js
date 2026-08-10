@@ -28,6 +28,38 @@ describe('cascadePosition', () => {
   it('dá a volta depois de 240px para não sair da tela', () => {
     expect(cascadePosition(10)).toEqual({ x: 96, y: 64 })
   })
+
+  it('nasce no meio do caminho entre a lateral e o centro', () => {
+    const { x } = cascadePosition(0, { width: 1440, height: 900 }, { w: 620, h: 520 })
+    const lateral = 96
+    const centro = (1440 - 620) / 2
+    expect(x).toBe(Math.round((lateral + centro) / 2))
+    // e continua sendo mais à esquerda que o centro, que é o ponto
+    expect(x).toBeLessThan(centro)
+    expect(x).toBeGreaterThan(lateral)
+  })
+
+  it('nasce acima do meio geométrico, descontando a barra de tarefas', () => {
+    const { y } = cascadePosition(0, { width: 1440, height: 900 }, { w: 620, h: 520 })
+    const meioGeometrico = (900 - 520) / 2
+    expect(y).toBeLessThan(meioGeometrico)
+    expect(y).toBeGreaterThan(0)
+  })
+
+  it('mantém a cascata a partir da base centrada', () => {
+    const tela = { width: 1440, height: 900 }
+    const tam = { w: 620, h: 520 }
+    expect(cascadePosition(1, tela, tam).x - cascadePosition(0, tela, tam).x).toBe(24)
+  })
+
+  it('não deixa a janela sair do quadro numa tela apertada', () => {
+    const tela = { width: 700, height: 560 }
+    const tam = { w: 620, h: 520 }
+    const { x, y } = cascadePosition(9, tela, tam)
+    expect(x).toBeGreaterThanOrEqual(16)
+    expect(x + tam.w).toBeLessThanOrEqual(tela.width)
+    expect(y).toBeGreaterThanOrEqual(16)
+  })
 })
 
 describe('OPEN', () => {

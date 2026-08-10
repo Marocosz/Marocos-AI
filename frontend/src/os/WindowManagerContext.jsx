@@ -48,7 +48,20 @@ export const WindowManagerProvider = ({ children }) => {
   const open = useCallback((appId, params = null) => {
     const app = getApp(appId)
     if (!app) return
-    dispatch({ type: 'OPEN', appId, params, parent: app.parent })
+    // O reducer é puro e não olha o DOM: quem conhece o tamanho da tela e o
+    // tamanho padrão do app é esta camada, então os dois viajam na ação. É o que
+    // permite a janela nascer centrada sem o reducer perder a testabilidade.
+    dispatch({
+      type: 'OPEN',
+      appId,
+      params,
+      parent: app.parent,
+      size: app.defaultSize,
+      viewport:
+        typeof window !== 'undefined'
+          ? { width: window.innerWidth, height: window.innerHeight }
+          : null,
+    })
   }, [])
 
   const close = useCallback((key) => dispatch({ type: 'CLOSE', key }), [])

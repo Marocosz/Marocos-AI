@@ -274,10 +274,41 @@
   inset: 0;
 }
 
-/* Mobile e fallback: sem WebGL, só o gradiente do container aparece. */
+/* A camada que está entrando sobe de opacidade sobre a que está saindo. A
+   duração tem de bater com CROSSFADE_MS em Hills.jsx, que é quem decide quando a
+   camada antiga sai da árvore — se esta animação fosse a mais longa das duas, a
+   antiga desapareceria antes de a nova estar opaca e a cor de base do wallpaper
+   apareceria no meio da troca. */
+.marocos-sky--entrando {
+  animation: sky-entra 700ms ease-out both;
+}
+
+@keyframes sky-entra {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+/* Mobile e fallback: sem WebGL, só o gradiente aparece. */
 .marocos-sky-fallback {
   width: 100%;
   height: 100%;
+}
+
+/* Cada camada de mobile precisa da paleta do SEU tema em vez de herdar a que
+   está valendo — senão as duas pintariam igual e o crossfade não teria o que
+   revelar. São os mesmos valores de --sky-* dos dois temas, escritos aqui porque
+   uma camada tem de continuar pintando a paleta antiga depois que os tokens já
+   mudaram. */
+.marocos-sky-fallback.tema-dark {
+  background: linear-gradient(to bottom, #1e1b4b 0%, #2e1065 55%, #4c1d95 100%);
+}
+
+.marocos-sky-fallback.tema-light {
+  background: linear-gradient(to bottom, #6d28d9 0%, #a78bfa 55%, #ddd6fe 100%);
 }
 
 /* --------------------------------------------------

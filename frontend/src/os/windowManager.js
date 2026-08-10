@@ -12,11 +12,33 @@
  * render, então mudar um defaultSize não invalida estado salvo.
  */
 
-// Posição da primeira janela e passo da cascata.
+// Passo da cascata, e a posição de partida usada quando não se sabe o tamanho da
+// tela (ver cascadePosition).
 const BASE_X = 96
 const BASE_Y = 64
 const CASCADE_STEP = 24
 const CASCADE_WRAP = 240
+
+// Faixa que a barra de tarefas ocupa no rodapé, e folga mínima até as bordas.
+const TASKBAR_H = 52
+const MARGEM = 16
+
+/**
+ * Fração da altura livre em que a janela nasce. Centro exato (0.5) deixa a
+ * composição baixa demais: a barra de tarefas já pesa embaixo, então o meio
+ * ótico da área de trabalho fica acima do meio geométrico.
+ */
+const VIES_VERTICAL = 0.42
+
+/**
+ * Quanto a janela caminha da lateral para o centro. Em 0 ela nasce encostada em
+ * BASE_X, como antes; em 1 nasce centrada. Meio termo de propósito: centrada ela
+ * cobre os ícones e tira o ar da área de trabalho, e encostada na esquerda ela
+ * parece ter escorregado para o canto.
+ */
+const VIES_HORIZONTAL = 0.5
+
+const limitar = (v, min, max) => Math.min(Math.max(v, min), max)
 
 // Janelas começam em 101 (a escala reserva 100+ para elas).
 export const initialState = {
@@ -35,10 +57,36 @@ export function makeKey(appId, params) {
   return appId
 }
 
-/** Desloca cada janela nova para que a anterior não fique escondida. */
-export function cascadePosition(n) {
+/**
+ * Onde uma janela nova nasce. Cada uma se desloca em cascata para não cobrir a
+ * anterior.
+ *
+ * `viewport` e `size` são OPCIONAIS, e é isso que mantém esta função pura: quem
+ * sabe o tamanho da tela e o tamanho padrão de cada app é a camada React, que
+ * manda os dois na ação. Sem eles a função cai na posição fixa de antes — o que
+ * também é o que os testes exercitam quando querem a cascata isolada.
+ *
+ * Com eles, a primeira janela nasce centrada horizontalmente em vez de encostada
+ * na esquerda, e o clamp garante que nem a cascata nem uma tela pequena joguem
+ * uma janela para fora do quadro.
+ */
+export function cascadePosition(n, viewport = null, size = null) {
   const offset = (CASCADE_STEP * n) % CASCADE_WRAP
-  return { x: BASE_X + offset, y: BASE_Y + offset }
+  if (!viewport || !size) return { x: BASE_X + offset, y: BASE_Y + offset }
+
+  const alturaLivre = viewport.height - TASKBAR_H
+  const centroX = (viewport.width - size.w) / 2
+  const baseX = BASE_X + (centroX - BASE_X) * VIES_HORIZONTAL
+  const baseY = (alturaLivre - size.h) * VIES_VERTICAL
+
+  return {
+    x: Math.round(
+      limitar(baseX + offset, MARGEM, Math.max(MARGEM, viewport.width - size.w - MARGEM)),
+    ),
+    y: Math.round(
+      limitar(baseY + offset, MARGEM, Math.max(MARGEM, alturaLivre - size.h - MARGEM)),
+    ),
+  }
 }
 
 /** Janela visível de maior z — quem herda o foco. */
@@ -61,7 +109,7 @@ function raise(state, key) {
 export function windowReducer(state, action) {
   switch (action.type) {
     case 'OPEN': {
-      const { appId, params = null, parent = null } = action
+      const { appId, params = null, parent = null, viewport = null, size = null } = action
       const key = makeKey(appId, params)
 
       // Já aberto: foca em vez de duplicar.
@@ -75,7 +123,7 @@ export function windowReducer(state, action) {
       }
 
       const z = base.zTop + 1
-      const { x, y } = cascadePosition(base.windows.length)
+      const { x, y } = cascadePosition(base.windows.length, viewport, size)
 
       return {
         ...base,
