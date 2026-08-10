@@ -1,3 +1,0 @@
-/* src/components/ui/StartMenu.js */
-/* This file is actually redundant if we are using the jsx file, but I will ensure clean up if needed or just focus on the JSX */
-/* I will assume the user meant to just fix the behavior */

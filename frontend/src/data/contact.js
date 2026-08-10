@@ -89,4 +89,3 @@ const contactPageContentPt = {
 };
 
 export const getContactData = (lang) => (lang === 'pt' ? contactPageContentPt : contactPageContentEn);
-export const contactData = contactDataItems; // Backwards compatibility for raw list if needed

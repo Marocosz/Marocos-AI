@@ -127,4 +127,3 @@ const journeyPageContentPt = {
 };
 
 export const getJourneyData = (lang) => (lang === 'pt' ? journeyPageContentPt : journeyPageContentEn);
-export const journeyData = journeyDataEn;

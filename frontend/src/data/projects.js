@@ -111,4 +111,3 @@ const projectsPageContentPt = {
 };
 
 export const getProjectsData = (lang) => (lang === 'pt' ? projectsPageContentPt : projectsPageContentEn);
-export const projectsData = projectsDataEn;

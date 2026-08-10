@@ -127,4 +127,3 @@ const techPageContentPt = {
 };
 
 export const getTechData = (lang) => (lang === 'pt' ? techPageContentPt : techPageContentEn);
-export const techData = techDataItemsEn;

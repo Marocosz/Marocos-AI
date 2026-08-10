@@ -60,6 +60,4 @@ const profileDataPt = {
   ]
 };
 
-export const getProfileData = (lang) => (lang === 'pt' ? profileDataPt : profileDataStart);
-// Backwards compatibility if needed, though we should update consumers
-export const profileData = profileDataStart; 
+export const getProfileData = (lang) => (lang === 'pt' ? profileDataPt : profileDataStart); 
