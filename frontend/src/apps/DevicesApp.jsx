@@ -4,6 +4,7 @@ import { motion, AnimatePresence } from 'motion/react'
 import { useLanguage } from '../contexts/LanguageContext'
 import { getTechData } from '../data/tech'
 import { getOsData } from '../data/os'
+import { MOVIMENTO } from '../config/system'
 import './DevicesApp.css'
 
 /**
@@ -97,7 +98,7 @@ const DevicesApp = () => {
                     initial={{ height: 0, opacity: 0 }}
                     animate={{ height: 'auto', opacity: 1 }}
                     exit={{ height: 0, opacity: 0 }}
-                    transition={{ duration: 0.2, ease: 'easeInOut' }}
+                    transition={MOVIMENTO.acordeaoDispositivos}
                   >
                     <p className="devices-category-desc">{category.description}</p>
 

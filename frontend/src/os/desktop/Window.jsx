@@ -5,6 +5,7 @@ import { useWindows } from '../WindowManagerContext'
 import { getApp } from '../registry'
 import { useLanguage } from '../../contexts/LanguageContext'
 import { getOsData } from '../../data/os'
+import { JANELAS } from '../../config/system'
 import './Window.css'
 
 const Window = ({ win }) => {
@@ -71,7 +72,7 @@ const Window = ({ win }) => {
          refazer o blur inteiro), o que travava a abertura. Fade é barato. */
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
-      transition={{ duration: 0.12, ease: 'linear' }}
+      transition={{ duration: JANELAS.aberturaMs / 1000, ease: 'linear' }}
       drag={!win.maximized}
       dragListener={false}
       dragControls={dragControls}

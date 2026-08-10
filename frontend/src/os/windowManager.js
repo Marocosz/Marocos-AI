@@ -12,38 +12,27 @@
  * render, então mudar um defaultSize não invalida estado salvo.
  */
 
-// Passo da cascata, e a posição de partida usada quando não se sabe o tamanho da
-// tela (ver cascadePosition).
-const BASE_X = 96
-const BASE_Y = 64
-const CASCADE_STEP = 24
-const CASCADE_WRAP = 240
+import { JANELAS } from '../config/system'
 
-// Faixa que a barra de tarefas ocupa no rodapé, e folga mínima até as bordas.
-const TASKBAR_H = 52
-const MARGEM = 16
-
-/**
- * Fração da altura livre em que a janela nasce. Centro exato (0.5) deixa a
- * composição baixa demais: a barra de tarefas já pesa embaixo, então o meio
- * ótico da área de trabalho fica acima do meio geométrico.
- */
-const VIES_VERTICAL = 0.42
-
-/**
- * Quanto a janela caminha da lateral para o centro. Em 0 ela nasce encostada em
- * BASE_X, como antes; em 1 nasce centrada. Meio termo de propósito: centrada ela
- * cobre os ícones e tira o ar da área de trabalho, e encostada na esquerda ela
- * parece ter escorregado para o canto.
- */
-const VIES_HORIZONTAL = 0.5
+// Passo da cascata, faixa da barra de tarefas, folga de borda e viés de
+// nascimento vêm do config (system.js) — os valores e o porquê de cada um
+// estão documentados lá. Nomes locais preservados para o resto do arquivo
+// não mudar.
+const BASE_X = JANELAS.baseX
+const BASE_Y = JANELAS.baseY
+const CASCADE_STEP = JANELAS.passoCascata
+const CASCADE_WRAP = JANELAS.voltaCascata
+const TASKBAR_H = JANELAS.alturaTaskbar
+const MARGEM = JANELAS.margem
+const VIES_VERTICAL = JANELAS.viesVertical
+const VIES_HORIZONTAL = JANELAS.viesHorizontal
 
 const limitar = (v, min, max) => Math.min(Math.max(v, min), max)
 
 // Janelas começam em 101 (a escala reserva 100+ para elas).
 export const initialState = {
   windows: [],
-  zTop: 100,
+  zTop: JANELAS.zInicial,
   focusedKey: null,
 }
 

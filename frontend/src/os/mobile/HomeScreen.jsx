@@ -5,6 +5,7 @@ import { useWindows } from '../WindowManagerContext'
 import { APPS } from '../registry'
 import { useLanguage } from '../../contexts/LanguageContext'
 import { getOsData } from '../../data/os'
+import { MOVIMENTO } from '../../config/system'
 
 /**
  * TELA INICIAL (springboard)
@@ -64,9 +65,12 @@ const HomeScreen = ({ onOpenQuickSettings }) => {
           return (
             <motion.li
               key={app.id}
-              initial={{ opacity: 0, y: 8 }}
+              initial={{ opacity: 0, y: MOVIMENTO.iconesMobile.deslocamentoY }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.03 * i, duration: 0.25 }}
+              transition={{
+                delay: MOVIMENTO.iconesMobile.delayPorItem * i,
+                duration: MOVIMENTO.iconesMobile.duration,
+              }}
             >
               <button type="button" onClick={() => open(app.id)}>
                 <span className="marocos-mobile-tile">

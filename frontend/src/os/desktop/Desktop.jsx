@@ -9,6 +9,7 @@ import { useDeviceMode } from '../useDeviceMode'
 import { useLanguage } from '../../contexts/LanguageContext'
 import { getOsData } from '../../data/os'
 import { getProfileData } from '../../data/content'
+import { MOVIMENTO } from '../../config/system'
 import './Desktop.css'
 
 const Desktop = ({ isAnimated = true }) => {
@@ -89,9 +90,12 @@ const Desktop = ({ isAnimated = true }) => {
           return (
             <motion.li
               key={app.id}
-              initial={{ opacity: 0, y: 8 }}
+              initial={{ opacity: 0, y: MOVIMENTO.iconesDesktop.deslocamentoY }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.05 * i, duration: 0.3 }}
+              transition={{
+                delay: MOVIMENTO.iconesDesktop.delayPorItem * i,
+                duration: MOVIMENTO.iconesDesktop.duration,
+              }}
             >
               {/* Clique único abre: desvio deliberado da metáfora, porque
                   estes ícones são a navegação principal do site. */}

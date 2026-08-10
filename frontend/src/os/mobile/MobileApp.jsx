@@ -5,6 +5,7 @@ import { useWindows } from '../WindowManagerContext'
 import { getApp } from '../registry'
 import { useLanguage } from '../../contexts/LanguageContext'
 import { getOsData } from '../../data/os'
+import { MOVIMENTO } from '../../config/system'
 
 /**
  * APP EM TELA CHEIA
@@ -42,7 +43,10 @@ const MobileApp = ({ win }) => {
       className="marocos-mobile-app"
       initial={prefersReducedMotion ? false : { x: '100%' }}
       animate={{ x: 0 }}
-      transition={{ duration: prefersReducedMotion ? 0 : 0.28, ease: 'easeOut' }}
+      transition={{
+        duration: prefersReducedMotion ? 0 : MOVIMENTO.pushMobile.duration,
+        ease: MOVIMENTO.pushMobile.ease,
+      }}
     >
       <header className="marocos-mobile-app-header">
         <button type="button" className="marocos-mobile-back" onClick={() => close(win.key)}>

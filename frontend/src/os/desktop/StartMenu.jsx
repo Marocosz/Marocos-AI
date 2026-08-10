@@ -5,6 +5,7 @@ import { APPS } from '../registry'
 import { useLanguage } from '../../contexts/LanguageContext'
 import { getOsData } from '../../data/os'
 import { getStartMenuData } from '../../data/startMenu'
+import { MOVIMENTO } from '../../config/system'
 import './StartMenu.css'
 
 /**
@@ -114,7 +115,7 @@ export default function StartMenu({
             initial={{ opacity: 0, y: 12, scale: 0.98 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: 12, scale: 0.98 }}
-            transition={{ duration: 0.16, ease: 'easeOut' }}
+            transition={MOVIMENTO.menuIniciar}
           >
             <div className="start-menu-search">
               <Search size={16} strokeWidth={2} />

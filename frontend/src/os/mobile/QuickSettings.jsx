@@ -4,6 +4,7 @@ import { Sun, Moon, Play, Pause, Languages, X } from 'lucide-react'
 import { useTheme } from '../../contexts/ThemeContext'
 import { useLanguage } from '../../contexts/LanguageContext'
 import { getOsData } from '../../data/os'
+import { MOVIMENTO } from '../../config/system'
 
 /**
  * PAINEL DE AJUSTES RÁPIDOS
@@ -55,7 +56,7 @@ const QuickSettings = ({ open, onClose }) => {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            transition={{ duration: prefersReducedMotion ? 0 : 0.2 }}
+            transition={{ duration: prefersReducedMotion ? 0 : MOVIMENTO.quickSettingsFundo.duration }}
             onClick={onClose}
           />
 
@@ -66,7 +67,12 @@ const QuickSettings = ({ open, onClose }) => {
             initial={prefersReducedMotion ? { opacity: 0 } : { y: '-100%' }}
             animate={{ y: 0, opacity: 1 }}
             exit={prefersReducedMotion ? { opacity: 0 } : { y: '-100%' }}
-            transition={{ duration: prefersReducedMotion ? 0.15 : 0.24, ease: 'easeOut' }}
+            transition={{
+              duration: prefersReducedMotion
+                ? MOVIMENTO.quickSettings.duracaoReduzida
+                : MOVIMENTO.quickSettings.duration,
+              ease: MOVIMENTO.quickSettings.ease,
+            }}
             // Arrastar o painel para cima fecha, espelhando o gesto que o abre
             // na barra de status.
             onPanEnd={(_e, info) => {

@@ -11,6 +11,7 @@ import { useDeviceMode } from '../useDeviceMode'
 import { useLanguage } from '../../contexts/LanguageContext'
 import { useTheme } from '../../contexts/ThemeContext'
 import { getOsData } from '../../data/os'
+import { MOVIMENTO } from '../../config/system'
 import StartMenu from './StartMenu'
 import './Taskbar.css'
 
@@ -69,7 +70,7 @@ const Taskbar = ({ onShutdown }) => {
               initial={{ opacity: 0, y: 10, scale: 0.95 }}
               animate={{ opacity: 1, y: 0, scale: 1 }}
               exit={{ opacity: 0, y: 10, scale: 0.95 }}
-              transition={{ duration: 0.2 }}
+              transition={MOVIMENTO.popupTray}
             >
               <div className="tray-menu-item" onClick={toggleTheme}>
                 <span className="tray-menu-label">{os.tray.theme}</span>
@@ -94,7 +95,7 @@ const Taskbar = ({ onShutdown }) => {
         className="taskbar-container"
         initial={{ y: 100 }}
         animate={{ y: 0 }}
-        transition={{ delay: 0.4, duration: 0.5 }}
+        transition={MOVIMENTO.taskbarEntrada}
       >
         {/* --- ESQUERDA: Iniciar + janelas abertas --- */}
         <div className="taskbar-center">
@@ -134,7 +135,7 @@ const Taskbar = ({ onShutdown }) => {
                       <motion.div
                         layoutId="taskbar-indicator"
                         className="app-indicator"
-                        transition={{ type: 'spring', stiffness: 300, damping: 30 }}
+                        transition={MOVIMENTO.indicadorTaskbar}
                       />
                     )}
                   </button>
