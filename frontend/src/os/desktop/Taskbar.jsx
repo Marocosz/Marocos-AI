@@ -1,17 +1,13 @@
 import React, { useState, useEffect } from 'react'
 import { motion, AnimatePresence } from 'motion/react'
-import {
-  LayoutGrid, MoreVertical,
-  Wifi, Volume2, BatteryMedium,
-  Sun, Moon, Play, Pause,
-} from 'lucide-react'
+import { LayoutGrid, MoreVertical, Wifi, Volume2, BatteryMedium } from 'lucide-react'
 import { useWindows } from '../WindowManagerContext'
 import { getApp } from '../registry'
 import { useDeviceMode } from '../useDeviceMode'
 import { useLanguage } from '../../contexts/LanguageContext'
-import { useTheme } from '../../contexts/ThemeContext'
 import { getOsData } from '../../data/os'
 import { MOVIMENTO } from '../../config/system'
+import { useSystemToggles } from '../../ui/useSystemToggles'
 import StartMenu from './StartMenu'
 import './Taskbar.css'
 
@@ -31,10 +27,17 @@ import './Taskbar.css'
  */
 const Taskbar = ({ onShutdown }) => {
   const { windows, focusedKey, focus, minimize, minimizeAll, open } = useWindows()
-  const { language, toggleLanguage } = useLanguage()
-  const { isDark, isAnimated, toggleTheme, toggleAnimation } = useTheme()
+  const { language } = useLanguage()
   const isCompact = useDeviceMode() === 'mobile'
   const os = getOsData(language)
+  const [temaToggle, idiomaToggle, animacaoToggle] = useSystemToggles()
+  const TemaIcon = temaToggle.icon
+  const AnimacaoIcon = animacaoToggle.icon
+  // O botão de idioma do desktop mostra o idioma que SERÁ ativado ao clicar
+  // (o oposto do atual) -- diferente do popup mobile e do QuickSettings, que
+  // mostram o idioma atual (`idiomaToggle.valorCurto`). É a UX que já existia,
+  // não unificar.
+  const idiomaAlvo = idiomaToggle.valorCurto === 'PT' ? 'EN' : 'BR'
 
   const [isTrayMenuOpen, setIsTrayMenuOpen] = useState(false)
   const [isStartOpen, setIsStartOpen] = useState(false)
@@ -72,19 +75,19 @@ const Taskbar = ({ onShutdown }) => {
               exit={{ opacity: 0, y: 10, scale: 0.95 }}
               transition={MOVIMENTO.popupTray}
             >
-              <div className="tray-menu-item" onClick={toggleTheme}>
-                <span className="tray-menu-label">{os.tray.theme}</span>
-                {isDark ? <Moon size={18} /> : <Sun size={18} />}
+              <div className="tray-menu-item" onClick={temaToggle.alternar}>
+                <span className="tray-menu-label">{temaToggle.labelCurto}</span>
+                <TemaIcon size={18} />
               </div>
-              <div className="tray-menu-item" onClick={toggleLanguage}>
-                <span className="tray-menu-label">{os.tray.language}</span>
+              <div className="tray-menu-item" onClick={idiomaToggle.alternar}>
+                <span className="tray-menu-label">{idiomaToggle.labelCurto}</span>
                 <span style={{ fontSize: '0.8rem', fontWeight: 'bold' }}>
-                  {language === 'en' ? 'EN' : 'PT'}
+                  {idiomaToggle.valorCurto}
                 </span>
               </div>
-              <div className="tray-menu-item" onClick={toggleAnimation}>
-                <span className="tray-menu-label">{os.tray.animation}</span>
-                {isAnimated ? <Pause size={18} /> : <Play size={18} />}
+              <div className="tray-menu-item" onClick={animacaoToggle.alternar}>
+                <span className="tray-menu-label">{animacaoToggle.labelCurto}</span>
+                <AnimacaoIcon size={18} />
               </div>
             </motion.div>
           </>
@@ -157,17 +160,17 @@ const Taskbar = ({ onShutdown }) => {
             </button>
           ) : (
             <>
-              <button onClick={toggleTheme} className="theme-toggle-btn" aria-label={os.tray.theme}>
-                {isDark ? <Moon size={18} /> : <Sun size={18} />}
+              <button onClick={temaToggle.alternar} className="theme-toggle-btn" aria-label={temaToggle.labelCurto}>
+                <TemaIcon size={18} />
               </button>
 
-              <button onClick={toggleAnimation} className="theme-toggle-btn" aria-label={os.tray.animation}>
-                {isAnimated ? <Pause size={18} /> : <Play size={18} />}
+              <button onClick={animacaoToggle.alternar} className="theme-toggle-btn" aria-label={animacaoToggle.labelCurto}>
+                <AnimacaoIcon size={18} />
               </button>
 
-              <button onClick={toggleLanguage} className="theme-toggle-btn" aria-label={os.tray.language}>
+              <button onClick={idiomaToggle.alternar} className="theme-toggle-btn" aria-label={idiomaToggle.labelCurto}>
                 <span style={{ fontSize: '0.8rem', fontWeight: 'bold' }}>
-                  {language === 'en' ? 'BR' : 'EN'}
+                  {idiomaAlvo}
                 </span>
               </button>
 

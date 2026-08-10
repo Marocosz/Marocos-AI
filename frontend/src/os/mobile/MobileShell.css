@@ -266,41 +266,6 @@
   list-style: none;
 }
 
-.marocos-mobile-qs-row {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  width: 100%;
-  min-height: 48px;
-  padding: 8px 10px;
-  border: none;
-  border-radius: 10px;
-  background: transparent;
-  color: var(--text-primary);
-  cursor: pointer;
-  text-align: left;
-}
-
-.marocos-mobile-qs-row:active {
-  background: rgba(255, 255, 255, 0.08);
-}
-
-.theme-light .marocos-mobile-qs-row:active {
-  background: rgba(0, 0, 0, 0.05);
-}
-
-.marocos-mobile-qs-label {
-  flex: 1 1 auto;
-  font-family: system-ui, sans-serif;
-  font-size: 0.88rem;
-}
-
-.marocos-mobile-qs-value {
-  font-family: system-ui, sans-serif;
-  font-size: 0.8rem;
-  /* font-family: system-ui e desta mesma regra -- Segoe UI Variable no
-     Windows, eixo de peso continuo: o peso declarado ja e o que renderiza.
-     Mantido. */
-  font-weight: 600;
-  color: var(--accent-color);
-}
+/* .marocos-mobile-qs-row, -label, -value saíram para ToggleRow.css --
+   migradas sem alteração para .toggle-row--quick, junto do modificador
+   equivalente do app Configurações. */

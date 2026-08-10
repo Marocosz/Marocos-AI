@@ -4,6 +4,10 @@
  * sem módulos, então nome genérico vazaria estilo entre apps.
  * Sem backdrop-filter aqui — o chrome da janela já tem blur, e empilhar
  * derruba o Safari do iOS.
+ *
+ * As linhas da lista (ícone + texto + valor) saíram para ToggleRow.css —
+ * migradas sem alteração para .toggle-row--settings. Aqui fica só a moldura
+ * do app: intro, a lista em si e o rodapé.
  */
 
 .settings-app {
@@ -24,77 +28,6 @@
   display: flex;
   flex-direction: column;
   gap: 8px;
-}
-
-.settings-row {
-  display: grid;
-  grid-template-columns: auto 1fr auto;
-  align-items: center;
-  gap: 14px;
-  padding: 12px 14px;
-  border: var(--win-border);
-  border-radius: var(--win-control-radius);
-  background: var(--card-bg);
-}
-
-.settings-icon {
-  display: grid;
-  place-items: center;
-  width: 34px;
-  height: 34px;
-  border-radius: 9px;
-  background: linear-gradient(160deg, rgba(168, 85, 247, 0.42), rgba(88, 28, 135, 0.5));
-  color: #fff;
-  flex: 0 0 auto;
-}
-
-.settings-text {
-  display: flex;
-  flex-direction: column;
-  gap: 3px;
-  min-width: 0;
-}
-
-.settings-label {
-  font-size: 0.88rem;
-  /* Herda font-family: system-ui de .settings-app (linha 10) -- no Windows
-     isso e Segoe UI Variable, fonte de eixo de peso continuo, entao 600
-     ja renderiza 600 de verdade. Nao e o bug que esta tarefa remove: mantido. */
-  font-weight: 600;
-  color: var(--text-primary);
-}
-
-.settings-hint {
-  font-size: 0.76rem;
-  line-height: 1.45;
-  color: var(--text-secondary);
-}
-
-.settings-value {
-  padding: 7px 13px;
-  border: var(--win-border);
-  border-radius: var(--win-control-radius);
-  background: rgba(168, 85, 247, 0.16);
-  color: var(--text-primary);
-  font-family: inherit;
-  font-size: 0.78rem;
-  /* font-family: inherit aqui resolve para o system-ui de .settings-app --
-     Segoe UI Variable no Windows, eixo de peso continuo: 600 ja e o que
-     renderiza. Mantido. */
-  font-weight: 600;
-  white-space: nowrap;
-  cursor: pointer;
-  transition: background 0.15s ease, border-color 0.15s ease;
-}
-
-.settings-value:hover {
-  background: rgba(168, 85, 247, 0.3);
-  border-color: var(--accent-color);
-}
-
-.settings-value:focus-visible {
-  outline: 2px solid var(--accent-color);
-  outline-offset: 2px;
 }
 
 .settings-footer {
