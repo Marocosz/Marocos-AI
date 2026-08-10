@@ -3,6 +3,7 @@ import { useLanguage } from '../../contexts/LanguageContext'
 import { getOsData } from '../../data/os'
 import { getStartMenuData } from '../../data/startMenu'
 import { lerMovimentoReduzido } from '../hooks/useMediaQuery'
+import Clock from '../../ui/Clock'
 import './boot.css'
 
 // O App dispara este mesmo import no escopo do módulo, então quando a cerimônia
@@ -333,45 +334,21 @@ const CenaBoot = ({ strings, ativa, reduceMotion, onDone }) => {
  */
 const CenaBloqueio = ({ strings, language, ativa }) => (
   <div className="cena cena--lock" aria-hidden={!ativa}>
-    <Relogio language={language} />
+    {/* Locale explícito (diferente da taskbar e da barra de status mobile,
+        que usam o padrão do navegador): aqui a data sai por extenso, e o
+        idioma da interface -- não o do sistema do visitante -- decide se o
+        texto vem em português ou inglês. .lock-clock é flex, então o <div>
+        que o Clock emite no lugar do <span> anterior não muda nada visual. */}
+    <div className="lock-clock">
+      <Clock
+        formato="extenso"
+        locale={language === 'pt' ? 'pt-BR' : 'en-US'}
+        classePrincipal="lock-time"
+        classeSecundaria="lock-date"
+      />
+    </div>
     <p className="lock-hint">{strings.hint}</p>
   </div>
 )
-
-/**
- * Relógio da tela de bloqueio. Atualiza por minuto, não por segundo: nada aqui
- * mostra segundos, então um tique por segundo seria repintura à toa.
- */
-const Relogio = ({ language }) => {
-  const [agora, setAgora] = useState(() => new Date())
-  const locale = language === 'pt' ? 'pt-BR' : 'en-US'
-
-  useEffect(() => {
-    // Alinha o primeiro tique à virada do minuto, em vez de 60s após a
-    // montagem — senão o relógio erra o minuto pela metade do intervalo.
-    const msAteVirar = (60 - new Date().getSeconds()) * 1000
-    let intervalo
-    const inicio = setTimeout(() => {
-      setAgora(new Date())
-      intervalo = setInterval(() => setAgora(new Date()), 60_000)
-    }, msAteVirar)
-
-    return () => {
-      clearTimeout(inicio)
-      clearInterval(intervalo)
-    }
-  }, [])
-
-  return (
-    <div className="lock-clock">
-      <span className="lock-time">
-        {agora.toLocaleTimeString(locale, { hour: '2-digit', minute: '2-digit' })}
-      </span>
-      <span className="lock-date">
-        {agora.toLocaleDateString(locale, { weekday: 'long', day: 'numeric', month: 'long' })}
-      </span>
-    </div>
-  )
-}
 
 export default Ceremony

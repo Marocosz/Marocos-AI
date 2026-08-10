@@ -8,6 +8,7 @@ import { useLanguage } from '../../contexts/LanguageContext'
 import { getOsData } from '../../data/os'
 import { MOVIMENTO } from '../../config/system'
 import { useSystemToggles } from '../../ui/useSystemToggles'
+import Clock from '../../ui/Clock'
 import StartMenu from './StartMenu'
 import './Taskbar.css'
 
@@ -183,7 +184,12 @@ const Taskbar = ({ onShutdown }) => {
               </div>
 
               <div className="tray-clock">
-                <Clock />
+                {/* MUDANÇA DE COMPORTAMENTO CONSCIENTE: antes tiquetaqueava a
+                    cada 1s (setInterval na montagem, sem alinhamento). Nunca
+                    mostrou segundos, então a tela é idêntica — o que muda é
+                    que agora acerta a virada do minuto, que antes errava por
+                    até 59s. Ver comentário em src/ui/Clock.jsx. */}
+                <Clock formato="hm-data" classePrincipal="time" classeSecundaria="date" />
               </div>
 
               <div
@@ -198,26 +204,5 @@ const Taskbar = ({ onShutdown }) => {
     </>
   )
 }
-
-/** Isolado em memo para o tick de 1s não re-renderizar a taskbar inteira. */
-const Clock = React.memo(function Clock() {
-  const [time, setTime] = useState(() => new Date())
-
-  useEffect(() => {
-    const timer = setInterval(() => setTime(new Date()), 1000)
-    return () => clearInterval(timer)
-  }, [])
-
-  return (
-    <>
-      <div className="time">
-        {time.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
-      </div>
-      <div className="date">
-        {time.toLocaleDateString([], { day: '2-digit', month: '2-digit', year: 'numeric' })}
-      </div>
-    </>
-  )
-})
 
 export default Taskbar

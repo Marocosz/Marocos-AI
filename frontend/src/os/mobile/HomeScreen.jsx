@@ -1,8 +1,9 @@
-import React, { useState, useEffect } from 'react'
+import React from 'react'
 import { motion } from 'motion/react'
 import { Signal, BatteryFull } from 'lucide-react'
 import { useWindows } from '../WindowManagerContext'
 import AppIconButton from '../../ui/AppIconButton'
+import Clock from '../../ui/Clock'
 import { APPS } from '../registry'
 import { useLanguage } from '../../contexts/LanguageContext'
 import { getOsData } from '../../data/os'
@@ -26,14 +27,6 @@ const HomeScreen = ({ onOpenQuickSettings }) => {
   const os = getOsData(language)
   const icons = APPS.filter((a) => a.onDesktop)
 
-  // Minuto a minuto basta: é só um relógio de status bar, não uma contagem
-  // de segundos como o relógio da taskbar do desktop.
-  const [now, setNow] = useState(() => new Date())
-  useEffect(() => {
-    const timer = setInterval(() => setNow(new Date()), 30_000)
-    return () => clearInterval(timer)
-  }, [])
-
   return (
     <div className="marocos-mobile-home">
       <motion.div
@@ -51,9 +44,10 @@ const HomeScreen = ({ onOpenQuickSettings }) => {
           if (info.offset.y > 20) onOpenQuickSettings()
         }}
       >
-        <span className="marocos-mobile-clock">
-          {now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
-        </span>
+        {/* Clock emite <div>, não <span> como antes: seguro porque o pai
+            (.marocos-mobile-statusbar) é flex, que blockifica o filho
+            independente do display declarado -- sem CSS novo a escrever. */}
+        <Clock formato="hm" classePrincipal="marocos-mobile-clock" />
         <span className="marocos-mobile-statusicons" aria-hidden="true">
           <Signal size={14} strokeWidth={2.2} />
           <BatteryFull size={17} strokeWidth={2.2} />
