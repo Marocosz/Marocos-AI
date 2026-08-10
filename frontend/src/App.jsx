@@ -4,7 +4,9 @@ import { ThemeProvider, useTheme } from './contexts/ThemeContext'
 import { WindowManagerProvider, useWindows } from './os/WindowManagerContext'
 import { useDeviceMode } from './os/useDeviceMode'
 import { useDocumentHead } from './os/useDocumentHead'
+import { useIdleTask } from './os/hooks/useIdleTask'
 import { aplicarConfigNoCss } from './config/cssBridge'
+import { CERIMONIA } from './config/system'
 import Desktop from './os/desktop/Desktop'
 import Taskbar from './os/desktop/Taskbar'
 import MobileShell from './os/mobile/MobileShell'
@@ -72,23 +74,20 @@ const TituloDaPagina = () => {
 const BoasVindas = ({ ativa }) => {
   const { open, windows } = useWindows()
   const jaDecidiu = useRef(false)
+  const [ativo, setAtivo] = useState(false)
 
   useEffect(() => {
     if (!ativa || jaDecidiu.current) return
     jaDecidiu.current = true
     // Só recebe as boas-vindas quem chegou sem rota; deep link manda.
     if (windows.length > 0) return
+    setAtivo(true)
+  }, [ativa, windows.length])
 
-    // Na primeira folga: a tela de bloqueio acabou de entrar e ainda está
-    // animando os próprios elementos, então montar a janela no mesmo frame só
-    // trocaria um engasgo de lugar.
-    const agendar =
-      typeof window.requestIdleCallback === 'function'
-        ? (fn) => window.requestIdleCallback(fn, { timeout: 1500 })
-        : (fn) => setTimeout(fn, 400)
-
-    agendar(() => open('about'))
-  }, [ativa, open, windows.length])
+  // Na primeira folga: a tela de bloqueio acabou de entrar e ainda está
+  // animando os próprios elementos, então montar a janela no mesmo frame só
+  // trocaria um engasgo de lugar.
+  useIdleTask(() => open('about'), { ...CERIMONIA.idle.boasVindas, ativo })
 
   return null
 }
@@ -142,8 +141,8 @@ const Shell = () => {
 
     const agendar =
       typeof window.requestIdleCallback === 'function'
-        ? (fn) => window.requestIdleCallback(fn, { timeout: 2500 })
-        : (fn) => setTimeout(fn, 800)
+        ? (fn) => window.requestIdleCallback(fn, { timeout: CERIMONIA.idle.desmonteBloqueio.timeout })
+        : (fn) => setTimeout(fn, CERIMONIA.idle.desmonteBloqueio.fallback)
 
     agendar(() => setBloqueioNaArvore(false))
   }, [])

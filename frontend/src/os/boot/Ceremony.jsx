@@ -2,6 +2,7 @@ import { useEffect, useState, useRef, Suspense, lazy } from 'react'
 import { useLanguage } from '../../contexts/LanguageContext'
 import { getOsData } from '../../data/os'
 import { getStartMenuData } from '../../data/startMenu'
+import { lerMovimentoReduzido } from '../hooks/useMediaQuery'
 import './boot.css'
 
 // O App dispara este mesmo import no escopo do módulo, então quando a cerimônia
@@ -78,11 +79,10 @@ const Ceremony = ({ fase, onBootDone, onUnlock, onUnlockStart }) => {
   const bloqueio = os.lock || {}
   const visitante = getStartMenuData(language).visitor
 
-  const [reduceMotion] = useState(
-    () =>
-      typeof window !== 'undefined' &&
-      window.matchMedia('(prefers-reduced-motion: reduce)').matches,
-  )
+  // Congelada na montagem, de propósito: a tela de bloqueio pode ficar
+  // minutos esperando um clique, e a preferência mudando nesse meio faria o
+  // cristal parar sozinho ou os timers do boot reiniciarem com outra duração.
+  const [reduceMotion] = useState(lerMovimentoReduzido)
 
   // Tamanho do cristal, lido uma vez. A cerimônia dura segundos; redimensionar
   // a janela no meio dela não é um caso que valha um listener.

@@ -1,4 +1,5 @@
 import React, { createContext, useContext, useState, useCallback, useEffect } from 'react'
+import { useMovimentoReduzido } from '../os/hooks/useMediaQuery'
 
 const ThemeContext = createContext(null)
 
@@ -14,12 +15,17 @@ function readBool(key, fallback) {
 export const ThemeProvider = ({ children }) => {
   const [isDark, setIsDark] = useState(() => readBool('isDarkMode', true))
   const [isAnimated, setIsAnimated] = useState(() => readBool('isAnimationEnabled', true))
+  const movimentoReduzido = useMovimentoReduzido()
 
   // Respeitar a preferência do sistema não existia no projeto e é
   // requisito do spec: sem isto o wallpaper e o boot animam à força.
+  //
+  // Só na montagem, de propósito: religar a animação se a preferência mudar
+  // no meio do uso seria comportamento novo, não pedido. Por isso o efeito
+  // roda uma única vez e ignora mudanças posteriores de `movimentoReduzido`.
   useEffect(() => {
-    const mq = window.matchMedia('(prefers-reduced-motion: reduce)')
-    if (mq.matches) setIsAnimated(false)
+    if (movimentoReduzido) setIsAnimated(false)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
   const toggleTheme = useCallback(() => {

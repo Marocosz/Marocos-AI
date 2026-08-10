@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useMemo } from 'react'
+import React, { useRef, useMemo } from 'react'
 import { motion } from 'motion/react'
 import Hills from '../../wallpapers/Hills'
 import Window from './Window'
@@ -6,10 +6,11 @@ import ContextMenu from './ContextMenu'
 import { APPS } from '../registry'
 import { useWindows } from '../WindowManagerContext'
 import { useDeviceMode } from '../useDeviceMode'
+import { useIdleTask } from '../hooks/useIdleTask'
 import { useLanguage } from '../../contexts/LanguageContext'
 import { getOsData } from '../../data/os'
 import { getProfileData } from '../../data/content'
-import { MOVIMENTO } from '../../config/system'
+import { MOVIMENTO, CERIMONIA } from '../../config/system'
 import './Desktop.css'
 
 const Desktop = ({ isAnimated = true }) => {
@@ -48,28 +49,10 @@ const Desktop = ({ isAnimated = true }) => {
    *
    * Só no desktop: o cristal 3D não é montado no mobile.
    */
-  useEffect(() => {
-    if (!isDesktop) return
-
-    let cancelado = false
-    const buscar = () => {
-      if (!cancelado) import('../../components/Crystal')
-    }
-
-    if ('requestIdleCallback' in window) {
-      const id = window.requestIdleCallback(buscar, { timeout: 4000 })
-      return () => {
-        cancelado = true
-        window.cancelIdleCallback(id)
-      }
-    }
-
-    const id = setTimeout(buscar, 2500)
-    return () => {
-      cancelado = true
-      clearTimeout(id)
-    }
-  }, [isDesktop])
+  useIdleTask(() => import('../../components/Crystal'), {
+    ...CERIMONIA.idle.prefetchCristal,
+    ativo: isDesktop,
+  })
 
   return (
     <div className="marocos-desktop" ref={desktopRef}>

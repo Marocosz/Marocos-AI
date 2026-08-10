@@ -3,6 +3,7 @@ import { useLanguage } from '../contexts/LanguageContext'
 import { getProfileData } from '../data/content'
 import { getOsData } from '../data/os'
 import { useDeviceMode } from '../os/useDeviceMode'
+import { CERIMONIA } from '../config/system'
 import DecryptedText from '../components/effects/DecryptedText'
 import './AboutApp.css'
 
@@ -40,7 +41,7 @@ const AboutApp = () => {
 
   useEffect(() => {
     if (deviceMode !== 'desktop') return
-    const id = setTimeout(() => setMontarCristal(true), 450)
+    const id = setTimeout(() => setMontarCristal(true), CERIMONIA.montarCristalAboutMs)
     return () => clearTimeout(id)
   }, [deviceMode])
 
