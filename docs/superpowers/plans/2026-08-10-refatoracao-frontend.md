@@ -57,21 +57,54 @@ Valem para **todas** as tarefas, sem exceção.
 
 ### Como a verificação visual acontece nesta execução
 
-**Não há automação de navegador disponível.** Nenhum implementador e nenhum
-revisor consegue olhar uma tela — e "o design não mudou" é o critério de aceite
-central de 13 destas 19 tarefas. Sem isso reconhecido, os subagentes marcariam
-como aprovado exatamente aquilo que não conseguem verificar.
+**Duas camadas: captura automática por tarefa, e conferência humana por fase.**
 
-Portanto, **decidido pelo dono do projeto antes da execução**:
+#### Camada 1 — comparação pixel a pixel, em toda tarefa [VISUAL]
 
-- A **Tarefa 0 é executada por ele**, não por subagente.
-- Os subagentes verificam o que dá para verificar sem olhos: `npm run build`
-  com os tamanhos medidos, `npm run lint`, `npm test`, e a leitura do próprio
-  diff.
-- Onde uma tarefa mandar "comparar com a linha de base", o implementador
-  **registra no relatório o que precisa ser olhado** e segue. Não invente
-  aprovação visual.
-- A conferência acontece em **quatro paradas**, uma por fase:
+Existe um harness em `.superpowers/sdd/2026-08-10-refatoracao-frontend/captura/`
+(fora do versionamento). Ele sobe o build de produção num Chromium headless e
+fotografa **17 cenas fixas**: o wallpaper sozinho nos dois temas, a área de
+trabalho com janela, os 9 apps, a tela de bloqueio, e o shell mobile.
+
+```bash
+cd .superpowers/sdd/2026-08-10-refatoracao-frontend/captura
+node capturar.mjs ./nova            # depois de `npm run build` no frontend
+node comparar.mjs ./base-94ab1c0 ./nova
+```
+
+**O que torna isso confiável — e por que não é só "tirar print":**
+
+- **Congelamento.** O wallpaper é shader animado e o cristal é 3D. A captura
+  desliga a animação pelo próprio controle do sistema (`isAnimationEnabled`),
+  o que faz o Silk parar de invalidar o canvas e o cristal cair em
+  `frameloop="demand"` — os dois desenham um frame e dormem.
+- **Máscara nos relógios.** A taskbar e a tela de bloqueio mostram a hora. As
+  regiões são cobertas antes de salvar, senão toda captura difere da anterior.
+- **Limiar medido, e por cena.** Rodando a captura duas vezes no mesmo commit,
+  as cenas com WebGL variam de 610 a 1099 px por arredondamento do
+  rasterizador; **as cenas que são só UI variam ZERO px**. Por isso a
+  tolerância é 3000 px nas primeiras e **zero** nas demais — nas telas de
+  interface, um único pixel diferente num rótulo, num peso de fonte ou num
+  espaçamento já é alarme.
+
+A referência de máquina é `base-94ab1c0`, capturada no commit `94ab1c0`, cujo
+estado foi verificado pelas revisões das tarefas 1 a 6.
+
+**Isto NÃO substitui a conferência humana.** Comparação automática pega
+regressão; não pega "ficou pior". E a referência de máquina não é a mesma coisa
+que o navegador real do dono — resolução, fontes e GPU diferem.
+
+#### Camada 2 — quatro paradas, uma por fase
+
+- A **Tarefa 0 foi executada pelo dono do projeto**: três capturas do Chrome
+  real dele, em `docs/superpowers/plans/baseline/`. São a verdade humana, e
+  **não** servem para comparação automática justamente por virem de outra
+  máquina.
+- Onde uma tarefa mandar "comparar com a linha de base", o implementador roda o
+  harness e **reporta o resultado numérico**. Se uma cena divergir, a imagem de
+  diferença fica em `_diff/` e o implementador precisa explicar a causa — não
+  basta declarar que era esperado.
+- A conferência humana acontece nas quatro paradas:
 
 | parada | depois da tarefa | o que foi mexido |
 |---|---|---|
