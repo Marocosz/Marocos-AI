@@ -1,6 +1,7 @@
 import React from 'react'
 import { useLanguage } from '../contexts/LanguageContext'
 import { getJourneyData } from '../data/journey'
+import AppHeader from '../ui/AppHeader'
 import './HistoryApp.css'
 
 /**
@@ -22,11 +23,12 @@ const HistoryApp = () => {
 
   return (
     <div className="history-app">
-      <header className="history-header">
-        <span className="history-label">{content.sectionLabel}</span>
-        <h2 className="history-title">{content.title}</h2>
-        <p className="history-subtitle">{content.subtitle}</p>
-      </header>
+      <AppHeader
+        eyebrow={content.sectionLabel}
+        titulo={content.title}
+        subtitulo={content.subtitle}
+        escala="md"
+      />
 
       <ul className="history-list">
         {content.items.map((item) => (

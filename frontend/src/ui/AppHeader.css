@@ -1,0 +1,60 @@
+/* --------------------------------------------------
+   CABEÇALHO DE APP
+   Valores migrados sem alteração de DevicesApp.css (.devices-header,
+   .devices-eyebrow, .devices-title, .devices-subtitle) e HistoryApp.css
+   (.history-header, .history-label, .history-title, .history-subtitle).
+   A receita tipográfica é idêntica nos dois; o que diverge (tamanho de
+   fonte, entrelinha, gap do cabeçalho) vira variante de escala — sm
+   (DevicesApp) / md (HistoryApp) — com os valores exatos que cada app já
+   tinha.
+   -------------------------------------------------- */
+
+.app-header {
+  display: flex;
+  flex-direction: column;
+}
+
+.app-header-eyebrow {
+  font-family: 'Courier New', monospace;
+  color: var(--accent-color);
+  /* 'Courier New' só tem os pesos 400 e 700 (fonte de sistema, sem
+     @font-face) e o index.css tem font-synthesis: none — 700 é o peso que o
+     navegador já resolvia sozinho nos dois apps de origem. */
+  font-weight: 700;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+}
+
+.app-header-titulo {
+  color: var(--text-primary);
+  margin: 0;
+  letter-spacing: -0.5px;
+  /* Poppins é carregado em 400/700/900 e o index.css tem font-synthesis:
+     none — 900 é o peso que o navegador já resolvia sozinho nos dois apps
+     de origem. */
+  font-weight: 900;
+}
+
+.app-header-subtitulo {
+  color: var(--text-secondary);
+  margin: 0;
+  font-weight: 400;
+}
+
+/* sm — DevicesApp */
+.app-header--sm {
+  gap: 0.3rem;
+}
+
+.app-header--sm .app-header-eyebrow { font-size: 0.68rem; }
+.app-header--sm .app-header-titulo { font-size: 1.3rem; }
+.app-header--sm .app-header-subtitulo { font-size: 0.82rem; line-height: 1.5; }
+
+/* md — HistoryApp */
+.app-header--md {
+  gap: 0.6rem;
+}
+
+.app-header--md .app-header-eyebrow { font-size: 0.72rem; }
+.app-header--md .app-header-titulo { font-size: 1.4rem; line-height: 1.15; }
+.app-header--md .app-header-subtitulo { font-size: 0.85rem; line-height: 1.55; }

@@ -5,6 +5,7 @@ import { useLanguage } from '../contexts/LanguageContext'
 import { getTechData } from '../data/tech'
 import { getOsData } from '../data/os'
 import { MOVIMENTO } from '../config/system'
+import AppHeader from '../ui/AppHeader'
 import './DevicesApp.css'
 
 /**
@@ -54,11 +55,12 @@ const DevicesApp = () => {
 
   return (
     <div className="devices-app">
-      <header className="devices-header">
-        <span className="devices-eyebrow">{content.sectionLabel}</span>
-        <h2 className="devices-title">{content.title}</h2>
-        <p className="devices-subtitle">{content.subtitle}</p>
-      </header>
+      <AppHeader
+        eyebrow={content.sectionLabel}
+        titulo={content.title}
+        subtitulo={content.subtitle}
+        escala="sm"
+      />
 
       <div className="devices-tree">
         {content.items.map((category) => {

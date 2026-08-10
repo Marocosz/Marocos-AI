@@ -20,43 +20,8 @@
 }
 
 /* --- HEADER --- */
-.devices-header {
-  display: flex;
-  flex-direction: column;
-  gap: 0.3rem;
-}
-
-.devices-eyebrow {
-  font-family: 'Courier New', monospace;
-  color: var(--accent-color);
-  font-size: 0.68rem;
-  /* 'Courier New' so tem os pesos 400 e 700 (fonte de sistema, sem @font-face)
-     e o index.css tem font-synthesis: none. Este valor e o peso que o
-     navegador ja resolvia sozinho; a declaracao antiga (600) nao existia e
-     caia aqui em silencio. */
-  font-weight: 700;
-  letter-spacing: 2px;
-  text-transform: uppercase;
-}
-
-.devices-title {
-  font-size: 1.3rem;
-  /* Poppins e carregado em 400/700/900 e o index.css tem font-synthesis: none.
-     Este valor e o peso que o navegador ja resolvia sozinho; a declaracao antiga
-     (800) nao existia e caia aqui em silencio. */
-  font-weight: 900;
-  color: var(--text-primary);
-  margin: 0;
-  letter-spacing: -0.5px;
-}
-
-.devices-subtitle {
-  font-size: 0.82rem;
-  color: var(--text-secondary);
-  line-height: 1.5;
-  margin: 0;
-  font-weight: 400;
-}
+/* Cabeçalho (eyebrow + título + subtítulo) extraído para AppHeader — ver
+   src/ui/AppHeader.jsx (escala="sm"). */
 
 /* --- ÁRVORE DE CATEGORIAS --- */
 .devices-tree {

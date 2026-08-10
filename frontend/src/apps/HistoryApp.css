@@ -17,44 +17,8 @@
    HEADER
    ======================================== */
 
-.history-header {
-  display: flex;
-  flex-direction: column;
-  gap: 0.6rem;
-}
-
-.history-label {
-  font-family: 'Courier New', monospace;
-  color: var(--accent-color, #a855f7);
-  font-size: 0.72rem;
-  /* 'Courier New' so tem os pesos 400 e 700 (fonte de sistema, sem @font-face)
-     e o index.css tem font-synthesis: none. Este valor e o peso que o
-     navegador ja resolvia sozinho; a declaracao antiga (600) nao existia e
-     caia aqui em silencio. */
-  font-weight: 700;
-  letter-spacing: 2px;
-  text-transform: uppercase;
-}
-
-.history-title {
-  font-size: 1.4rem;
-  /* Poppins e carregado em 400/700/900 e o index.css tem font-synthesis: none.
-     Este valor e o peso que o navegador ja resolvia sozinho; a declaracao antiga
-     (800) nao existia e caia aqui em silencio. */
-  font-weight: 900;
-  color: var(--text-primary);
-  margin: 0;
-  line-height: 1.15;
-  letter-spacing: -0.5px;
-}
-
-.history-subtitle {
-  font-size: 0.85rem;
-  color: var(--text-secondary);
-  line-height: 1.55;
-  margin: 0;
-  font-weight: 400;
-}
+/* Cabeçalho (eyebrow + título + subtítulo) extraído para AppHeader — ver
+   src/ui/AppHeader.jsx (escala="md"). */
 
 /* ========================================
    LISTA VERTICAL (substitui o carrossel + ConnectionArrow)
