@@ -175,7 +175,7 @@
   display: flex;
   width: max-content;
   gap: 8px;
-  animation: aboutFeaturesScroll 18s linear infinite;
+  animation: aboutFeaturesScroll var(--cfg-marquee-skills, 18s) linear infinite;
   will-change: transform;
 }
 

@@ -1,9 +1,10 @@
-import React, { useState, useCallback, useEffect, useRef } from 'react'
+import React, { useState, useCallback, useEffect, useLayoutEffect, useRef } from 'react'
 import { LanguageProvider } from './contexts/LanguageContext'
 import { ThemeProvider, useTheme } from './contexts/ThemeContext'
 import { WindowManagerProvider, useWindows } from './os/WindowManagerContext'
 import { useDeviceMode } from './os/useDeviceMode'
 import { useDocumentHead } from './os/useDocumentHead'
+import { aplicarConfigNoCss } from './config/cssBridge'
 import Desktop from './os/desktop/Desktop'
 import Taskbar from './os/desktop/Taskbar'
 import MobileShell from './os/mobile/MobileShell'
@@ -95,6 +96,13 @@ const BoasVindas = ({ ativa }) => {
 const Shell = () => {
   const { isDark, isAnimated } = useTheme()
   const modo = useDeviceMode()
+
+  // A ponte roda antes da pintura: com useEffect haveria um frame com os
+  // fallbacks do CSS em vez dos valores do config. Roda no boot e de novo a
+  // cada troca de tema, porque as cores do céu (--cfg-ceu-*) dependem dela.
+  useLayoutEffect(() => {
+    aplicarConfigNoCss(isDark ? 'dark' : 'light')
+  }, [isDark])
 
   // 'boot' -> 'bloqueio' -> 'pronto' -> ('desligado' -> 'bloqueio')
   //

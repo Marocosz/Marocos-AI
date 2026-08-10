@@ -231,9 +231,10 @@
   background: rgba(20, 20, 20, 0.8);
   border-top: 1px solid rgba(255, 255, 255, 0.08);
   /* Barra fina no rodapé: mesmo custo de blur que a taskbar do desktop já
-     paga, então é seguro repetir aqui. */
-  -webkit-backdrop-filter: blur(12px);
-  backdrop-filter: blur(12px);
+     paga, então é seguro repetir aqui — por isso a mesma --cfg-blur-taskbar,
+     e não um literal separado que pudesse desviar do desktop com o tempo. */
+  -webkit-backdrop-filter: var(--cfg-blur-taskbar, blur(12px));
+  backdrop-filter: var(--cfg-blur-taskbar, blur(12px));
 }
 
 .marocos-mobile-dock-btn {

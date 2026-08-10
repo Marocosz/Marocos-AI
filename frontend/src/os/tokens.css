@@ -5,17 +5,19 @@
    -------------------------------------------------- */
 
 :root {
-  /* Chrome de janela */
-  --win-glass-blur: blur(6px) saturate(125%);
+  /* Chrome de janela — os valores vêm do config (system.js -> cssBridge.js) via
+     as custom properties --cfg-*; o segundo argumento de cada var() é o
+     literal de hoje, usado só até a ponte rodar (ou se ela falhar). */
+  --win-glass-blur: var(--cfg-blur-janela, blur(6px) saturate(125%));
   --win-border: 1px solid rgba(255, 255, 255, 0.18);
   --win-highlight: inset 0 1px 0 rgba(255, 255, 255, 0.25);
   --win-shadow: 0 10px 24px rgba(0, 0, 0, 0.5);
-  --win-radius: 10px;
-  --win-control-radius: 8px;
-  --win-titlebar-h: 40px;
+  --win-radius: var(--cfg-raio, 10px);
+  --win-control-radius: var(--cfg-raio-controle, 8px);
+  --win-titlebar-h: var(--cfg-altura-titulo, 40px);
   /* Altura da barra de tarefas. A janela maximizada precisa deste valor, nao
      do da barra de titulo, para nao terminar por baixo dela. */
-  --taskbar-h: 52px;
+  --taskbar-h: var(--cfg-altura-taskbar, 52px);
   --win-titlebar-bg: rgba(88, 28, 135, 0.42);
   --win-body-bg: rgba(22, 14, 34, 0.62);
   /* Sem transparencia: usada pela janela maximizada, que nao tem fundo visivel. */
@@ -35,11 +37,6 @@
      pela ordem do DOM — o bloqueio vinha depois, era opaco, e cobria a
      inicialização inteira. Hoje elas são cenas do mesmo palco. */
   --z-boot: 2000;
-
-  /* Wallpaper — dia */
-  --sky-top: #6d28d9;
-  --sky-mid: #a78bfa;
-  --sky-low: #ddd6fe;
 
   /* --------------------------------------------------
      CERIMÔNIA (inicialização + tela de bloqueio)
@@ -166,10 +163,6 @@
 
 /* Wallpaper — noite */
 .theme-dark {
-  --sky-top: #1e1b4b;
-  --sky-mid: #2e1065;
-  --sky-low: #4c1d95;
-
   --win-titlebar-bg: rgba(76, 29, 149, 0.4);
   --win-body-bg: rgba(14, 9, 22, 0.6);
   --win-body-solid: #100a18;
@@ -260,12 +253,15 @@
   pointer-events: none;
   overflow: hidden;
   /* Cor de base atrás do shader, para não haver flash preto antes do WebGL
-     inicializar nem faixa vazia se ele falhar. */
+     inicializar nem faixa vazia se ele falhar. Vem do config (WALLPAPER.ceu)
+     via cssBridge.js — a ponte reescreve --cfg-ceu-* a cada troca de tema, e
+     esta camada só precisa da cor ATUAL, nunca de duas ao mesmo tempo. Os
+     literais no fallback são os da noite, o tema padrão do sistema. */
   background: linear-gradient(
     to bottom,
-    var(--sky-top) 0%,
-    var(--sky-mid) 55%,
-    var(--sky-low) 100%
+    var(--cfg-ceu-topo, #1e1b4b) 0%,
+    var(--cfg-ceu-meio, #2e1065) 55%,
+    var(--cfg-ceu-baixo, #4c1d95) 100%
   );
 }
 
@@ -275,12 +271,13 @@
 }
 
 /* A camada que está entrando sobe de opacidade sobre a que está saindo. A
-   duração tem de bater com CROSSFADE_MS em Hills.jsx, que é quem decide quando a
-   camada antiga sai da árvore — se esta animação fosse a mais longa das duas, a
-   antiga desapareceria antes de a nova estar opaca e a cor de base do wallpaper
-   apareceria no meio da troca. */
+   duração vem de WALLPAPER.crossfade.duracaoMs (system.js) e tem de ficar BEM
+   abaixo de limiteSegurancaMs — é o `animationend` desta animação que decide
+   quando a camada antiga sai da árvore em Hills.jsx; se esta animação fosse
+   mais longa que o previsto, a antiga desapareceria antes de a nova estar
+   opaca e a cor de base do wallpaper apareceria no meio da troca. */
 .marocos-sky--entrando {
-  animation: sky-entra 700ms ease-out both;
+  animation: sky-entra var(--cfg-crossfade, 700ms) ease-out both;
 }
 
 @keyframes sky-entra {
@@ -300,9 +297,25 @@
 
 /* Cada camada de mobile precisa da paleta do SEU tema em vez de herdar a que
    está valendo — senão as duas pintariam igual e o crossfade não teria o que
-   revelar. São os mesmos valores de --sky-* dos dois temas, escritos aqui porque
-   uma camada tem de continuar pintando a paleta antiga depois que os tokens já
-   mudaram. */
+   revelar. São os mesmos valores de --sky-* dos dois temas, escritos aqui
+   como HEXES LITERAIS, DE PROPÓSITO — e não var(--cfg-ceu-*).
+
+   TENTATIVA FEITA E REVERTIDA (Tarefa 6 do refactor, ver task-6-report.md):
+   --cfg-ceu-* é escrito pela ponte (cssBridge.js) como UM valor global por
+   vez, para o tema ATUAL. Testei a unificação de verdade — Chromium headless,
+   viewport de 400px, boot acelerado, clique real no toggle de tema do painel
+   de ajustes rápidos — e confirmei que ela quebra o crossfade: no instante da
+   troca, a camada que deveria estar SAINDO (.tema-dark, por exemplo) e a que
+   está ENTRANDO (.tema-light) leem a mesma variável e pintam a MESMA cor (a
+   nova), porque a ponte já reescreveu --cfg-ceu-* antes do primeiro frame
+   (useLayoutEffect roda no mesmo commit da troca de tema). O resultado não é
+   um corte abrupto — é peor: um fade sobre uma cópia idêntica de si mesma,
+   sem nenhuma cor revelada por baixo. Confirmado com getComputedStyle nas
+   duas camadas simultâneas: backgroundImage idêntico nas duas.
+
+   Por isso a duplicação aqui é a decisão certa, não uma sobra: uma camada tem
+   de continuar pintando a paleta antiga depois que os tokens (e o --cfg-ceu-*
+   global) já mudaram, e só um literal fixo por classe garante isso. */
 .marocos-sky-fallback.tema-dark {
   background: linear-gradient(to bottom, #1e1b4b 0%, #2e1065 55%, #4c1d95 100%);
 }

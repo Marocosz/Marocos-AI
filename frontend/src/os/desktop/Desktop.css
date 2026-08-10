@@ -6,14 +6,14 @@
 
 .marocos-icons {
   position: absolute;
-  top: 20px;
-  left: 20px;
+  top: var(--cfg-icone-origem-y, 20px);
+  left: var(--cfg-icone-origem-x, 20px);
   z-index: var(--z-icons);
   display: flex;
   flex-direction: column;
   flex-wrap: wrap;
   align-content: flex-start;
-  gap: 4px;
+  gap: var(--cfg-icone-intervalo, 4px);
   /* O CORTE DA COLUNA, CONTADO E NÃO ESTIMADO.
      A coluna começa em top: 20px e não pode invadir a barra de tarefas, então o
      que sobra é 100vh - 20 - altura da barra, menos uma folga de 12px para os
@@ -22,7 +22,7 @@
      coluna pede 682px, e o teto caía em 680px numa tela de 800 — quebrava para
      a segunda fileira por DOIS pixels, deixando 127px vazios embaixo. Usando o
      token da barra a conta passa a ser verdadeira em qualquer altura. */
-  max-height: calc(100vh - var(--taskbar-h) - 32px);
+  max-height: calc(100vh - var(--taskbar-h) - var(--cfg-icone-folga, 32px));
   margin: 0;
   padding: 0;
   list-style: none;
@@ -33,7 +33,7 @@
   flex-direction: column;
   align-items: center;
   gap: 6px;
-  width: 88px;
+  width: var(--cfg-icone-largura, 88px);
   padding: 8px 4px;
   border: 1px solid transparent;
   border-radius: var(--win-control-radius);
@@ -47,10 +47,10 @@
 .marocos-icon-tile {
   display: grid;
   place-items: center;
-  width: 56px;
-  height: 56px;
+  width: var(--cfg-icone-tile, 56px);
+  height: var(--cfg-icone-tile, 56px);
   border: var(--win-border);
-  border-radius: 14px;
+  border-radius: var(--cfg-icone-raio, 14px);
   background: linear-gradient(160deg, rgba(168, 85, 247, 0.5), rgba(88, 28, 135, 0.6));
   box-shadow: var(--win-highlight);
   color: #fff;
@@ -79,10 +79,10 @@
    este e o canto que a cascata leva mais tempo para cobrir. */
 .marocos-signature {
   position: absolute;
-  top: 40px;
-  right: 40px;
+  top: var(--cfg-assinatura-topo, 40px);
+  right: var(--cfg-assinatura-direita, 40px);
   z-index: var(--z-icons);
-  max-width: 460px;
+  max-width: var(--cfg-assinatura-largura, 460px);
   text-align: right;
   pointer-events: none;
 }
