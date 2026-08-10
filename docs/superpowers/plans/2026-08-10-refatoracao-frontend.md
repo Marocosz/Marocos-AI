@@ -273,15 +273,44 @@ git commit -m "chore: remover App.css do boilerplate, txt de sobra e exports mor
 
 ---
 
-### Task 2: Colisão `.about-section` — preservar pixel a pixel [VISUAL]
+### Task 2: Colisão `.about-section` — corrigir [VISUAL]
 
-A tarefa de maior risco visual da faxina, isolada de propósito.
+**Esta tarefa MUDA o visual da janela "Sobre", de propósito e com aprovação
+explícita do dono do projeto.** É a única exceção à seção 0 deste plano.
 
 **Contexto:** `AboutApp.jsx` usa `className="about-section"` em duas
 `<section>`. O `AboutApp.css` **não define** essa classe — só
 `.about-section-title`. Quem a define é o bloco legado da landing page em
-`index.css`. Ou seja, as duas seções da janela "Sobre" são estilizadas hoje por
-CSS morto, e apagar esse CSS sem cuidado mudaria a janela.
+`index.css`:
+
+```css
+.about-section {
+  position: relative;  width: 100%;  min-height: 70vh;
+  padding: 5rem 2rem;  background-color: transparent;
+  display: flex;  align-items: center;  justify-content: center;
+  overflow: hidden;  border-top: none;
+}
+```
+
+**As duas consequências, ambas confirmadas na captura da linha de base**
+(`docs/superpowers/plans/baseline/01-area-de-trabalho-escuro.png`):
+
+1. **`min-height: 70vh` + `padding: 5rem`, duas vezes.** Numa janela de 620×520
+   isso empurra as seções "ESPECIFICAÇÕES" e "RECURSOS INSTALADOS" para o
+   equivalente a duas viewports abaixo da dobra. Na captura elas **não
+   aparecem** — só a barra de rolagem denuncia que existem.
+2. **`display: flex` em direção LINHA.** Os filhos de cada seção são o
+   `<h3 class="about-section-title">` e o bloco de conteúdo. Hoje eles ficam
+   **lado a lado**, centralizados — e o `.about-specs`, que é
+   `grid-template-columns: repeat(3, 1fr)`, vira item flex e encolhe para o
+   conteúdo em vez de ocupar a largura.
+
+**Por que isto é correção e não redesenho.** O `AboutApp.css` foi escrito para
+fluxo em bloco e diz isso sozinho: `.about-app` já é uma coluna flex com
+`gap: 22px` entre as seções; `.about-section-title` traz `margin: 0 0 10px`,
+ou seja espera algo **abaixo** de si; e `.about-specs` é um grid de 3 colunas,
+que só faz sentido ocupando a largura. Remover o override legado não inventa um
+layout novo — deixa aparecer o que o CSS do próprio app já pedia.
 
 **Files:**
 - Modify: `src/apps/AboutApp.jsx:85`, `src/apps/AboutApp.jsx:99`
@@ -290,62 +319,66 @@ CSS morto, e apagar esse CSS sem cuidado mudaria a janela.
 
 **Interfaces:**
 - Consumes: nada.
-- Produces: a classe `.about-block`, que substitui `.about-section` no
-  `AboutApp`. A Tarefa 3 depende desta ter passado para poder apagar o resto do
-  `index.css` com segurança.
+- Produces: `AboutApp.jsx` sem a classe `about-section`. A Tarefa 3 depende
+  desta ter passado para poder apagar o resto do `index.css` com segurança.
 
-- [ ] **Step 1: Registrar o estado atual medido**
+- [ ] **Step 1: Confirmar a premissa no código**
 
-Rodar `npm run dev`, abrir a janela "Sobre", inspecionar uma das duas
-`<section class="about-section">` no DevTools e anotar na aba **Computed**:
-`min-height`, `padding`, `display`, `align-items`, `justify-content`,
-`overflow`, `position`, `width`.
-
-Salvar como captura em `docs/superpowers/plans/baseline/about-computed.png`.
-
-Valores esperados, vindos de `index.css`:
-
-```css
-position: relative;  width: 100%;  min-height: 70vh;
-padding: 5rem 2rem;  background-color: transparent;
-display: flex;  align-items: center;  justify-content: center;
-overflow: hidden;  border-top: none;
+```bash
+cd frontend/src
+grep -n "about-section" apps/AboutApp.jsx apps/AboutApp.css index.css
 ```
 
-- [ ] **Step 2: Criar `.about-block` no AboutApp.css**
+Esperado, e a tarefa depende disso:
+- `apps/AboutApp.jsx` — duas ocorrências de `className="about-section"`
+- `apps/AboutApp.css` — **só** `.about-section-title` (e o `::before` dela);
+  **nenhuma** regra `.about-section`
+- `index.css` — a regra `.about-section` com as 10 declarações citadas acima
 
-Acrescentar ao **fim** de `src/apps/AboutApp.css`:
+Se `AboutApp.css` definir `.about-section`, a premissa da tarefa está errada:
+**PARE e reporte**, porque então a janela não está sendo estilizada por código
+morto e a correção seria outra.
 
-```css
-/* --- BLOCO DE SEÇÃO ---
-   Estas regras vinham do `.about-section` do index.css — o CSS da landing page
-   que não existe mais. O AboutApp usava aquela classe por coincidência de nome,
-   então as duas seções desta janela eram estilizadas por código morto.
-   Copiadas para cá SEM ALTERAÇÃO, para o index.css poder ser limpo sem mexer
-   no visual. Se algum dia estes valores parecerem grandes demais para uma
-   janela de 620x520, a mudança é uma decisão de design própria — não uma
-   faxina. */
-.about-block {
-  position: relative;
-  width: 100%;
-  min-height: 70vh;
-  padding: 5rem 2rem;
-  background-color: transparent;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  overflow: hidden;
-  border-top: none;
-}
+- [ ] **Step 2: Tirar a classe do JSX**
+
+Em `src/apps/AboutApp.jsx`, linhas 85 e 99, trocar
+
+```jsx
+<section className="about-section">
 ```
 
-- [ ] **Step 3: Trocar a classe no JSX**
+por
 
-Em `src/apps/AboutApp.jsx`, nas linhas 85 e 99, trocar
-`<section className="about-section">` por `<section className="about-block">`.
+```jsx
+<section>
+```
 
 São exatamente duas ocorrências. **Não** tocar em `.about-section-title`, que é
-outra classe e continua como está.
+outra classe, tem regra própria no `AboutApp.css` e continua como está.
+
+Um `<section>` sem classe é `display: block` em fluxo normal — que é o que o
+`AboutApp.css` já espera. Nenhuma classe nova é necessária, e criar uma vazia
+só para ter onde pendurar um nome seria peso morto.
+
+- [ ] **Step 3: Documentar a remoção no AboutApp.css**
+
+Acrescentar, logo acima de `.about-section-title` em `src/apps/AboutApp.css`:
+
+```css
+/* As duas <section> deste app não têm classe, e isso é deliberado.
+ *
+ * Elas usavam `about-section`, que o AboutApp.css nunca definiu — quem definia
+ * era o index.css da landing page que deixou de existir, com
+ * `min-height: 70vh`, `padding: 5rem 2rem` e `display: flex` em direção linha.
+ * O efeito, numa janela de 620x520: as seções de especificações e de recursos
+ * ficavam duas viewports abaixo da dobra, e dentro de cada uma o título e o
+ * conteúdo apareciam lado a lado, com o grid de 3 colunas encolhido.
+ *
+ * Em fluxo normal o CSS daqui funciona sozinho: `.about-app` é a coluna flex
+ * com gap de 22px, `.about-section-title` traz a própria margem inferior, e
+ * `.about-specs` ocupa a largura como o grid de 3 colunas pede.
+ */
+```
 
 - [ ] **Step 4: Remover o bloco `.about-section` do index.css**
 
@@ -358,15 +391,15 @@ Apagar **somente** esta regra de `src/index.css` (fica logo abaixo do comentári
 
 Deixar o resto do `index.css` intacto nesta tarefa — é a Tarefa 3 que o limpa.
 
-- [ ] **Step 5: Verificar que o computed não mudou**
+- [ ] **Step 5: Verificar que nada mais usa a classe**
 
-Rodar `npm run dev`, abrir "Sobre", inspecionar
-`<section class="about-block">` e conferir que as 9 propriedades do Step 1
-têm **exatamente** os mesmos valores computados.
+```bash
+cd frontend/src
+grep -rn "about-section\b" --include=*.jsx --include=*.css .
+```
 
-Comparar a janela inteira contra `baseline/`, nos dois temas.
-
-**Se houver qualquer diferença, reverter e reportar.**
+Esperado: **apenas** ocorrências de `about-section-title`. Nenhuma de
+`about-section` sozinha.
 
 - [ ] **Step 6: Verificar build**
 
@@ -374,17 +407,41 @@ Comparar a janela inteira contra `baseline/`, nos dois temas.
 cd frontend && npm run lint && npm test && npm run build
 ```
 
-- [ ] **Step 7: Commit**
+- [ ] **Step 7: Registrar para a Parada 1**
+
+Esta é a **única tarefa do plano que muda o visual de propósito**. Anotar no
+relatório, para a conferência do dono do projeto na Parada 1, que a janela
+"Sobre este PC" deve agora mostrar, sem rolagem longa:
+
+1. o bloco de identidade (cristal + destaque) — inalterado
+2. a bio — inalterada
+3. **"// ESPECIFICAÇÕES"** com os cards de stat em **3 colunas ocupando a
+   largura** da janela
+4. **"// RECURSOS INSTALADOS"** com o marquee de skills correndo
+
+Comparar com `docs/superpowers/plans/baseline/01-area-de-trabalho-escuro.png`,
+onde os itens 3 e 4 **não aparecem**. Se depois da mudança eles continuarem
+sem aparecer, ou aparecerem lado a lado com o título, a correção não pegou.
+
+- [ ] **Step 8: Commit**
 
 ```bash
 git add frontend/src/apps/AboutApp.jsx frontend/src/apps/AboutApp.css frontend/src/index.css
-git commit -m "refactor: mover regras de .about-section para .about-block no AboutApp
+git commit -m "fix: mostrar as secoes de especificacoes e skills na janela Sobre
 
-O AboutApp usava a classe .about-section, definida no index.css legado da
-landing page que nao existe mais -- as duas secoes da janela Sobre estavam
-sendo estilizadas por codigo morto. Regras copiadas sem alteracao para o
-AboutApp.css sob nome proprio, para o index.css poder ser limpo sem mexer
-no visual. Computed style verificado identico antes e depois."
+O AboutApp usava a classe .about-section, que ele proprio nunca definiu -- quem
+definia era o index.css da landing page que deixou de existir. As duas secoes
+da janela herdavam min-height 70vh, padding 5rem e display:flex em direcao
+linha.
+
+Numa janela de 620x520 isso empurrava 'especificacoes' e 'recursos instalados'
+para duas viewports abaixo da dobra, e dentro de cada secao punha o titulo e o
+conteudo lado a lado, com o grid de 3 colunas encolhido. Na captura da linha de
+base as duas secoes simplesmente nao aparecem.
+
+Em fluxo normal o CSS do proprio app funciona sozinho: .about-app ja e a coluna
+flex com gap, .about-section-title tem margem inferior, e .about-specs ocupa a
+largura. Mudanca visual deliberada, aprovada pelo dono do projeto."
 ```
 
 ---
