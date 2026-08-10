@@ -517,6 +517,23 @@ Remover de `src/index.css`:
   inteiro — apagar o `@media` junto. No bloco `max-width: 768px`, **preservar
   apenas** `body { font-size: 0.95rem; }`.
 
+- **As duas `.about-section` órfãs dentro dos `@media`** — achadas na revisão da
+  Tarefa 2, que corretamente as deixou para cá:
+
+  ```css
+  @media (max-width: 1024px) {
+    .about-section { min-height: auto; padding: 4rem 2rem; }   /* ~linha 376 */
+  }
+  @media (max-width: 768px) {
+    .about-section { padding: 3rem 1.5rem; }                   /* ~linha 428 */
+  }
+  ```
+
+  A regra base `.about-section` saiu na Tarefa 2 e o `AboutApp.jsx` não usa mais
+  a classe, então estes dois overrides não casam com elemento nenhum. **Remover
+  os dois.** Conferir com `grep -n "about-section" frontend/src/index.css` antes
+  e depois: depois não pode sobrar nenhuma ocorrência neste arquivo.
+
 **FICAM, obrigatoriamente:** o `:root` inteiro (tipografia e as variáveis
 `--bg-color`, `--text-primary`, `--text-secondary`, `--accent-color`,
 `--card-bg`, `--card-border`, `--scrollbar-*`), o `.theme-light` com os
