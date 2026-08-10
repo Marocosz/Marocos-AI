@@ -587,7 +587,7 @@ a correção teria de ser feita duas vezes.
 200/300/500/600/800, que não existem e não podem ser sintetizados.
 
 **Files:**
-- Modify: os arquivos `.css` que a auditoria do Step 2 apontar (até 14)
+- Modify: os arquivos `.css` que a auditoria do Step 2 apontar (dos 13 abaixo)
 
 **Interfaces:**
 - Consumes: nada.
@@ -601,7 +601,39 @@ cd frontend/src
 grep -rn "font-weight: *\(200\|300\|500\|600\|800\)" --include=*.css .
 ```
 
-Esperado: 34 linhas em até 14 arquivos.
+**Esperado, medido logo após a Tarefa 3: exatamente 34 linhas em 13 arquivos.**
+
+Distribuição por valor — confira que bate, é a porta de segurança desta tarefa:
+
+| peso | ocorrências |
+|---|---|
+| 600 | 20 |
+| 500 | 7 |
+| 300 | 3 |
+| 800 | 3 |
+| 200 | 1 |
+
+Por arquivo:
+
+| arquivo | ocorrências |
+|---|---|
+| `apps/DevicesApp.css` | 6 |
+| `apps/HistoryApp.css` | 5 |
+| `os/mobile/MobileShell.css` | 4 |
+| `os/boot/boot.css` | 3 |
+| `apps/AssistantApp.css` | 3 |
+| `apps/AboutApp.css` | 3 |
+| `apps/SettingsApp.css` | 2 |
+| `apps/ProjectsApp.css` | 2 |
+| `apps/ProjectDetailApp.css` | 2 |
+| `os/desktop/Window.css` | 1 |
+| `os/desktop/Taskbar.css` | 1 |
+| `os/desktop/StartMenu.css` | 1 |
+| `apps/TerminalApp.css` | 1 |
+
+O `index.css` **não** está mais nesta lista: as declarações dele saíram junto
+com o CSS da landing page na Tarefa 3. Se a contagem não bater com a tabela,
+alguma tarefa anterior mexeu no que não devia — **pare e reporte**.
 
 - [ ] **Step 2: Classificar cada declaração pela família efetiva**
 
