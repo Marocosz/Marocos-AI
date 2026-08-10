@@ -69,7 +69,7 @@ trabalho com janela, os 9 apps, a tela de bloqueio, e o shell mobile.
 ```bash
 cd .superpowers/sdd/2026-08-10-refatoracao-frontend/captura
 node capturar.mjs ./nova            # depois de `npm run build` no frontend
-node comparar.mjs ./base-94ab1c0 ./nova
+node comparar.mjs ./base-v2 ./nova
 ```
 
 **O que torna isso confiável — e por que não é só "tirar print":**
@@ -87,7 +87,7 @@ node comparar.mjs ./base-94ab1c0 ./nova
   interface, um único pixel diferente num rótulo, num peso de fonte ou num
   espaçamento já é alarme.
 
-A referência de máquina é `base-94ab1c0`, capturada no commit `94ab1c0`, cujo
+A referência de máquina é `base-v2`, capturada no commit `94ab1c0`, cujo
 estado foi verificado pelas revisões das tarefas 1 a 6.
 
 **Isto NÃO substitui a conferência humana.** Comparação automática pega
