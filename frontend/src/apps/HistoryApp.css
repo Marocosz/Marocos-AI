@@ -27,14 +27,21 @@
   font-family: 'Courier New', monospace;
   color: var(--accent-color, #a855f7);
   font-size: 0.72rem;
-  font-weight: 600;
+  /* 'Courier New' so tem os pesos 400 e 700 (fonte de sistema, sem @font-face)
+     e o index.css tem font-synthesis: none. Este valor e o peso que o
+     navegador ja resolvia sozinho; a declaracao antiga (600) nao existia e
+     caia aqui em silencio. */
+  font-weight: 700;
   letter-spacing: 2px;
   text-transform: uppercase;
 }
 
 .history-title {
   font-size: 1.4rem;
-  font-weight: 800;
+  /* Poppins e carregado em 400/700/900 e o index.css tem font-synthesis: none.
+     Este valor e o peso que o navegador ja resolvia sozinho; a declaracao antiga
+     (800) nao existia e caia aqui em silencio. */
+  font-weight: 900;
   color: var(--text-primary);
   margin: 0;
   line-height: 1.15;
@@ -46,7 +53,7 @@
   color: var(--text-secondary);
   line-height: 1.55;
   margin: 0;
-  font-weight: 300;
+  font-weight: 400;
 }
 
 /* ========================================
@@ -116,7 +123,7 @@
 
 .history-badge {
   font-size: 0.72rem;
-  font-weight: 600;
+  font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.5px;
   color: var(--history-accent);
@@ -170,7 +177,7 @@
 
 .history-tag {
   font-size: 0.68rem;
-  font-weight: 500;
+  font-weight: 400;
   padding: 0.3rem 0.65rem;
   background: rgba(255, 255, 255, 0.05);
   border: 1px solid rgba(255, 255, 255, 0.1);

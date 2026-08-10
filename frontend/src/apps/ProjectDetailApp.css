@@ -48,7 +48,10 @@
 
 .project-detail-label {
   font-size: 0.7rem;
-  font-weight: 600;
+  /* Poppins e carregado em 400/700/900 e o index.css tem font-synthesis: none.
+     Este valor e o peso que o navegador ja resolvia sozinho; a declaracao antiga
+     (600) nao existia e caia aqui em silencio. */
+  font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 1.5px;
   color: var(--text-secondary);
@@ -87,7 +90,7 @@
   padding: 10px 18px;
   background: #fff;
   color: #000;
-  font-weight: 600;
+  font-weight: 700;
   font-size: 0.9rem;
   border-radius: 8px;
   text-decoration: none;

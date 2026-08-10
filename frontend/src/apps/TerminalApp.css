@@ -166,6 +166,9 @@
   align-items: center;
   gap: 6px;
   color: #fff;
+  /* Herda font-family: ui-monospace de .terminal-app (linha 24) -- o peso
+     resolvido depende do SO (Cascadia Mono/Consolas/etc.); mexer aqui
+     troca um comportamento correto em algumas maquinas por outro. Mantido. */
   font-weight: 600;
   font-size: 0.8rem;
 }

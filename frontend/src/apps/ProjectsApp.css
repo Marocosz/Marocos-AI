@@ -64,7 +64,10 @@
 
 .projects-app-item-title {
   font-size: 0.95rem;
-  font-weight: 600;
+  /* Poppins e carregado em 400/700/900 e o index.css tem font-synthesis: none.
+     Este valor e o peso que o navegador ja resolvia sozinho; a declaracao antiga
+     (600) nao existia e caia aqui em silencio. */
+  font-weight: 700;
   color: var(--text-primary);
   white-space: nowrap;
   overflow: hidden;
@@ -73,7 +76,7 @@
 
 .projects-app-item-category {
   font-size: 0.72rem;
-  font-weight: 600;
+  font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 1.2px;
   color: var(--accent-color);

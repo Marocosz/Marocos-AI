@@ -137,7 +137,10 @@
 
 .about-spec-number {
   font-size: 1.6rem;
-  font-weight: 800;
+  /* Poppins e carregado em 400/700/900 e o index.css tem font-synthesis: none.
+     Este valor e o peso que o navegador ja resolvia sozinho; a declaracao antiga
+     (800) nao existia e caia aqui em silencio. */
+  font-weight: 900;
   line-height: 1.1;
   background: linear-gradient(135deg, var(--text-primary) 30%, var(--accent-color) 100%);
   -webkit-background-clip: text;
@@ -156,7 +159,7 @@
 
 .about-spec-sublabel {
   font-size: 0.65rem;
-  font-weight: 300;
+  font-weight: 400;
   color: var(--text-secondary);
 }
 
@@ -179,7 +182,7 @@
 .about-feature-chip {
   white-space: nowrap;
   font-size: 0.75rem;
-  font-weight: 600;
+  font-weight: 700;
   letter-spacing: 0.03em;
   text-transform: uppercase;
   color: var(--text-primary);

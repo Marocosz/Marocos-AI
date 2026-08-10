@@ -57,6 +57,9 @@
 .marocos-mobile-clock {
   font-family: system-ui, sans-serif;
   font-size: 0.82rem;
+  /* font-family: system-ui e desta mesma regra -- no Windows isso e Segoe UI
+     Variable, fonte de eixo de peso continuo: o peso declarado ja e o que
+     renderiza. Nao e o bug que esta tarefa remove: mantido. */
   font-weight: 600;
   color: #fff;
   text-shadow: var(--icon-label-shadow);
@@ -187,6 +190,9 @@
   text-align: center;
   font-family: system-ui, sans-serif;
   font-size: 0.94rem;
+  /* font-family: system-ui e desta mesma regra -- Segoe UI Variable no
+     Windows, eixo de peso continuo: o peso declarado ja e o que renderiza.
+     Mantido. */
   font-weight: 600;
   color: var(--text-primary);
   white-space: nowrap;
@@ -300,6 +306,9 @@
 .marocos-mobile-qs-title {
   font-family: system-ui, sans-serif;
   font-size: 0.98rem;
+  /* font-family: system-ui e desta mesma regra -- Segoe UI Variable no
+     Windows, eixo de peso continuo: o peso declarado ja e o que renderiza.
+     Mantido. */
   font-weight: 600;
   color: var(--text-primary);
 }
@@ -361,6 +370,9 @@
 .marocos-mobile-qs-value {
   font-family: system-ui, sans-serif;
   font-size: 0.8rem;
+  /* font-family: system-ui e desta mesma regra -- Segoe UI Variable no
+     Windows, eixo de peso continuo: o peso declarado ja e o que renderiza.
+     Mantido. */
   font-weight: 600;
   color: var(--accent-color);
 }

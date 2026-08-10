@@ -294,7 +294,10 @@
 
 .tray-menu-label {
   font-size: 0.9rem;
-  font-weight: 500;
+  /* Poppins e carregado em 400/700/900 e o index.css tem font-synthesis: none.
+     Este valor e o peso que o navegador ja resolvia sozinho; a declaracao antiga
+     (500) nao existia e caia aqui em silencio. */
+  font-weight: 400;
 }
 
 .theme-toggle-btn {

@@ -81,6 +81,9 @@
   gap: 8px;
   font-family: system-ui, sans-serif;
   font-size: 0.82rem;
+  /* font-family: system-ui e desta mesma regra -- no Windows isso e Segoe UI
+     Variable, fonte de eixo de peso continuo: o peso declarado ja e o que
+     renderiza. Nao e o bug que esta tarefa remove: mantido. */
   font-weight: 500;
   color: var(--text-primary);
   overflow: hidden;

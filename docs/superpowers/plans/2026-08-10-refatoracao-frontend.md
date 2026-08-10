@@ -646,6 +646,20 @@ a que ele declara, ou — se não declarar — a herdada, que é o Poppins do `:
 | `system-ui` (Windows: Segoe UI Variable, eixo de peso contínuo) | todos | **NÃO TOCAR** — já renderiza o peso declarado |
 | `'Courier New'` | 400, 700 | **trocar** pela tabela do Step 3 |
 | `ui-monospace` / Consolas / Cascadia Mono | varia por SO | **NÃO TOCAR** — o resultado depende da máquina, e mexer trocaria um comportamento correto em alguns sistemas por outro |
+| **fonte de controle do UA** — `<button>`, `<input>`, `<select>` **sem** `font-family` nem `font: inherit` na própria regra | varia por navegador e SO | **NÃO TOCAR** — mesma razão do `system-ui` |
+
+**A armadilha dos controles de formulário.** `<button>` e `<input>` **não
+herdam** `font-family` por padrão: o navegador aplica a própria fonte de
+controle, que no Windows costuma ser a fonte de sistema. Então um `<button>`
+sem `font-family` na regra **não está sob Poppins**, por mais que todos os seus
+ancestrais estejam — e cai na mesma categoria de "depende da máquina" do
+`system-ui`.
+
+Repare que vários botões deste projeto **declaram** `font: inherit` ou
+`font-family: inherit` justamente para escapar disso (`DevicesApp.css`,
+`ProjectsApp.css`, `SettingsApp.css`). Esses **voltam** a herdar do ancestral, e
+aí a classificação é a do ancestral. A diferença entre os dois casos é uma
+linha de CSS — confira a regra de cada `<button>`, não presuma.
 
 Onde procurar família própria: `AboutApp.css` (Courier New),
 `HistoryApp.css` (Courier New), `DevicesApp.css` (Courier New),
@@ -724,10 +738,15 @@ git commit -m "fix: declarar os pesos de fonte que realmente renderizam
 
 34 declaracoes usavam pesos 200/300/500/600/800 que o Poppins nao carrega
 (importado em 400/700/900) com font-synthesis: none -- caiam silenciosamente
-no vizinho mais proximo. Cada uma foi medida no DevTools e trocada pelo peso
-renderizado, entao a renderizacao nao muda: o CSS passa a dizer a verdade.
-Elementos com font-family propria (system-ui, que e variavel no Windows)
-ficaram intactos, porque neles o peso declarado ja era o pintado."
+no vizinho mais proximo. O algoritmo de font-matching do CSS e fechado, entao
+o peso resultante foi DERIVADO por regra, nao medido: 200/300/500 caem em 400,
+600 sobe para 700, 800 sobe para 900. A renderizacao nao muda; o CSS passa a
+dizer a verdade.
+
+Ficaram intactas as declaracoes cuja familia efetiva nao e o Poppins --
+system-ui, ui-monospace, e a fonte de controle do UA em <button> sem
+font-family. Nelas a disponibilidade de pesos depende da maquina, entao
+trocar seria justamente introduzir a mudanca visual que esta tarefa evita."
 ```
 
 ---

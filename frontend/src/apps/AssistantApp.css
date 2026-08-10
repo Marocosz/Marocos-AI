@@ -118,7 +118,10 @@
 
 .assistant-empty-title {
   font-size: 1.1rem;
-  font-weight: 500;
+  /* Poppins e carregado em 400/700/900 e o index.css tem font-synthesis: none.
+     Este valor e o peso que o navegador ja resolvia sozinho; a declaracao antiga
+     (500) nao existia e caia aqui em silencio. */
+  font-weight: 400;
   margin-bottom: 8px;
   color: var(--text-primary);
 }
@@ -146,6 +149,11 @@
   padding: 8px 16px;
   border-radius: 20px;
   font-size: 0.85rem;
+  /* E um <button> sem font-family/font: inherit proprio: controles de
+     formulario nao herdam a familia dos ancestrais, o navegador aplica a
+     fonte de controle do UA, que no Windows costuma ser a fonte de sistema.
+     Mesma categoria de system-ui/ui-monospace -- a disponibilidade de pesos
+     depende da maquina, entao NAO e trocado. */
   font-weight: 500;
   cursor: pointer;
   transition: all 0.2s cubic-bezier(0.2, 0, 0, 1);
@@ -242,7 +250,7 @@
   margin-bottom: 4px;
 }
 .assistant-bubble strong {
-  font-weight: 600;
+  font-weight: 700;
   color: var(--accent-color);
 }
 .assistant-bubble a {
