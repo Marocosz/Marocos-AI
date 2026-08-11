@@ -59,6 +59,7 @@ describe('config do sistema', () => {
     expect(CERIMONIA.tamanhoCristal).toBe(300)
     expect(CERIMONIA.tamanhoCristalPequeno).toBe(200)
     expect(CERIMONIA.larguraCristalPequeno).toBe(620)
+    expect(CERIMONIA.seguraSaidaMs).toBe(1200)
   })
 
   it('o boot reduzido e mais curto que o normal, mas nao zero', () => {
@@ -78,7 +79,6 @@ describe('config do sistema', () => {
       delayPorItem: 0.03, duration: 0.25, deslocamentoY: 8,
     })
     expect(MOVIMENTO.menuIniciar).toEqual({ duration: 0.16, ease: 'easeOut' })
-    expect(MOVIMENTO.popupTray).toEqual({ duration: 0.2 })
     expect(MOVIMENTO.quickSettings).toEqual({
       duration: 0.24, duracaoReduzida: 0.15, ease: 'easeOut',
     })

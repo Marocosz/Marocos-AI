@@ -3,6 +3,7 @@ import { useLanguage } from '../../contexts/LanguageContext'
 import { getOsData } from '../../i18n/os'
 import { getStartMenuData } from '../../i18n/startMenu'
 import { lerMovimentoReduzido } from '../hooks/useMediaQuery'
+import { CERIMONIA } from '../../config/system'
 import Clock from '../../ui/Clock'
 import './boot.css'
 
@@ -38,33 +39,10 @@ const Crystal = lazy(() => import('../../brand/Crystal'))
  */
 
 /**
- * Duração da inicialização.
- *
- * Longa de propósito: o cristal gira e flutua, e a graça é ter tempo de ver
- * isso acontecer. Pulável a qualquer momento, então quem tem pressa não paga o
- * preço.
- *
- * Duração não é o mesmo que movimento percebido: uma versão anterior durava
- * 4,2s e mesmo assim lia como "não aconteceu animação nenhuma", porque a última
- * entrada era aos 2,6s e a barra usava uma curva ease-out que chegava a ~94% no
- * primeiro terço. Sobravam quase dois segundos de tela parada, e tela parada
- * durante um boot lê como travamento. O que consertou foi ocupar esse tempo
- * (etapas + barra linear), não esticá-lo.
+ * Todo número desta cena — durações, velocidades de rotação, tamanho do cristal
+ * e a rede de segurança da saída — vem de `CERIMONIA` em `config/system.js`. É
+ * lá que cada valor está justificado, e é lá que se muda um.
  */
-const BOOT_DURATION_MS = 4800
-
-/**
- * Duração com movimento reduzido. Mais curta, mas NÃO zero: quem tem "efeitos
- * de animação" desligado no sistema — comum em máquina ajustada para
- * performance — chegava direto na tela de bloqueio e concluía, com razão, que a
- * inicialização não existia. Movimento reduzido pede menos movimento, não menos
- * conteúdo.
- */
-const BOOT_DURATION_REDUZIDA_MS = 2600
-
-/** Velocidade de rotação em cada cena. A queda é o sistema assentando. */
-const SPIN_BOOT = 3.2
-const SPIN_BLOQUEIO = 1.6
 
 /**
  * Palco da cerimônia.
@@ -88,7 +66,9 @@ const Ceremony = ({ fase, onBootDone, onUnlock, onUnlockStart }) => {
   // Tamanho do cristal, lido uma vez. A cerimônia dura segundos; redimensionar
   // a janela no meio dela não é um caso que valha um listener.
   const [tamanhoCristal] = useState(() =>
-    typeof window !== 'undefined' && window.innerWidth < 620 ? 200 : 300,
+    typeof window !== 'undefined' && window.innerWidth < CERIMONIA.larguraCristalPequeno
+      ? CERIMONIA.tamanhoCristalPequeno
+      : CERIMONIA.tamanhoCristal,
   )
 
   // Ligar a máquina de novo (depois de desligar) entra direto no bloqueio. Nesse
@@ -170,12 +150,11 @@ const Ceremony = ({ fase, onBootDone, onUnlock, onUnlockStart }) => {
     onUnlockStart?.()
   }
 
-  // Rede de segurança: se `animationend` não disparar (aba em segundo plano,
-  // animação cancelada), o desmonte ainda acontece. Quem manda no caso normal é
-  // o animationend.
+  // Rede de segurança da saída (ver CERIMONIA.seguraSaidaMs): quem encerra a
+  // cerimônia no caso normal é o `animationend` da cortina, logo abaixo.
   useEffect(() => {
     if (!saindo) return
-    const id = setTimeout(onUnlock, 1200)
+    const id = setTimeout(onUnlock, CERIMONIA.seguraSaidaMs)
     return () => clearTimeout(id)
   }, [saindo, onUnlock])
 
@@ -233,7 +212,7 @@ const Ceremony = ({ fase, onBootDone, onUnlock, onUnlockStart }) => {
               <Crystal
                 size={tamanhoCristal}
                 animated={!saindo && !reduceMotion}
-                spin={noBoot ? SPIN_BOOT : SPIN_BLOQUEIO}
+                spin={noBoot ? CERIMONIA.spinBoot : CERIMONIA.spinBloqueio}
               />
             </Suspense>
           </span>
@@ -265,7 +244,9 @@ const Ceremony = ({ fase, onBootDone, onUnlock, onUnlockStart }) => {
  * um pixel do cristal.
  */
 const CenaBoot = ({ strings, ativa, reduceMotion, onDone }) => {
-  const duracao = reduceMotion ? BOOT_DURATION_REDUZIDA_MS : BOOT_DURATION_MS
+  const duracao = reduceMotion
+    ? CERIMONIA.duracaoBootReduzidaMs
+    : CERIMONIA.duracaoBootMs
   const etapas = strings.stages || []
   const [etapa, setEtapa] = useState(0)
 

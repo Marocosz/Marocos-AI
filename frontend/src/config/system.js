@@ -155,17 +155,19 @@ export const CERIMONIA = {
    * graça é ter tempo de ver. Pulável a qualquer momento.
    *
    * CUIDADO AO AUMENTAR: duração não é movimento percebido. Uma versão de 4.2s
-   * lia como "não animou nada" porque a última entrada era aos 2.6s — sobravam
+   * lia como "não animou nada" porque a última entrada era aos 2.6s e a barra
+   * usava uma curva ease-out que chegava a ~94% já no primeiro terço — sobravam
    * dois segundos de tela parada, e tela parada durante boot lê como travamento.
-   * Se aumentar aqui, tem de haver conteúdo ocupando o tempo novo.
+   * O que consertou foi OCUPAR esse tempo (etapas de texto + barra linear), não
+   * esticá-lo. Se aumentar aqui, tem de haver conteúdo ocupando o tempo novo.
    */
   duracaoBootMs: 4800,
 
   /**
-   * Com movimento reduzido. Mais curta, mas NÃO zero: quem tem efeitos
-   * desligados no sistema chegava direto no bloqueio e concluía, com razão, que
-   * a inicialização não existia. Movimento reduzido pede menos movimento, não
-   * menos conteúdo.
+   * Com movimento reduzido. Mais curta, mas NÃO zero: quem tem efeitos de
+   * animação desligados no sistema — comum em máquina ajustada para performance
+   * — chegava direto no bloqueio e concluía, com razão, que a inicialização não
+   * existia. Movimento reduzido pede menos movimento, não menos conteúdo.
    */
   duracaoBootReduzidaMs: 2600,
 
@@ -218,7 +220,6 @@ export const MOVIMENTO = {
   iconesDesktop: { delayPorItem: 0.05, duration: 0.3, deslocamentoY: 8 },
   iconesMobile: { delayPorItem: 0.03, duration: 0.25, deslocamentoY: 8 },
   menuIniciar: { duration: 0.16, ease: 'easeOut' },
-  popupTray: { duration: 0.2 },
   quickSettings: { duration: 0.24, duracaoReduzida: 0.15, ease: 'easeOut' },
   quickSettingsFundo: { duration: 0.2 },
   pushMobile: { duration: 0.28, ease: 'easeOut' },
