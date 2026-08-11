@@ -206,8 +206,11 @@ export const APPS = [
     route: '/config',
     titleKey: 'settings',
     icon: Settings,
+    // Cresceu com o seletor de papel de parede: seis amostras em grade não
+    // cabiam nos 440px de antes e nasciam abaixo da dobra, o que fazia a
+    // feature parecer inexistente para quem não rolasse.
     component: SettingsApp,
-    defaultSize: { w: 520, h: 440 },
+    defaultSize: { w: 560, h: 660 },
     singleton: true,
     dynamic: false,
     explorer: false,

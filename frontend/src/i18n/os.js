@@ -237,6 +237,31 @@ const osContentEn = {
       off: 'Paused',
     },
     persistNote: 'Your system preference for reduced motion is respected automatically.',
+    /**
+     * Os nomes são chaveados pelo `id` do preset, e não pela posição na lista:
+     * é o id que vai para o localStorage, então reordenar as listas em
+     * config/system.js não pode trocar o rótulo de ninguém.
+     */
+    wallpaper: {
+      label: 'Wallpaper',
+      hintNight: 'Palettes for the night shader. Only the look changes — the rendering cost is the same in all of them.',
+      hintDay: 'Palettes for the day shader. Only the look changes — the rendering cost is the same in all of them.',
+      current: 'In use',
+      presets: {
+        ametista: 'Amethyst',
+        'meia-noite': 'Midnight',
+        brasa: 'Ember',
+        esmeralda: 'Emerald',
+        grafite: 'Graphite',
+        magenta: 'Magenta',
+        perola: 'Pearl',
+        aurora: 'Aurora',
+        'algodao-doce': 'Cotton candy',
+        'ceu-claro': 'Clear sky',
+        citrino: 'Citrine',
+        neblina: 'Mist',
+      },
+    },
   },
   controls: {
     minimize: 'Minimize',
@@ -460,6 +485,27 @@ const osContentPt = {
       off: 'Pausado',
     },
     persistNote: 'Sua preferência de sistema por menos movimento é respeitada automaticamente.',
+    /** Ver a nota no bloco em inglês: chaveado pelo id do preset. */
+    wallpaper: {
+      label: 'Papel de parede',
+      hintNight: 'Paletas do shader da noite. Só a aparência muda — o custo de renderização é o mesmo em todas.',
+      hintDay: 'Paletas do shader do dia. Só a aparência muda — o custo de renderização é o mesmo em todas.',
+      current: 'Em uso',
+      presets: {
+        ametista: 'Ametista',
+        'meia-noite': 'Meia-noite',
+        brasa: 'Brasa',
+        esmeralda: 'Esmeralda',
+        grafite: 'Grafite',
+        magenta: 'Magenta',
+        perola: 'Pérola',
+        aurora: 'Aurora',
+        'algodao-doce': 'Algodão-doce',
+        'ceu-claro': 'Céu claro',
+        citrino: 'Citrino',
+        neblina: 'Neblina',
+      },
+    },
   },
   controls: {
     minimize: 'Minimizar',

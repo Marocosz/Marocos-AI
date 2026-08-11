@@ -35,6 +35,42 @@
   box-shadow: var(--win-shadow), 0 0 0 1px var(--accent-color);
 }
 
+/* JANELA SEM FOCO ESCURECE — menos a barra de título.
+ *
+ * Com várias janelas abertas, o z-order sozinho não diz onde está a atenção: a
+ * de cima só cobre parte das outras, e o resto continua competindo por olhar.
+ * Aqui o corpo inteiro das que não têm foco recua para trás de um véu, e só a
+ * janela ativa fica em plena luz. A barra de título NÃO entra no véu de
+ * propósito: é ela que identifica a janela, e escurecer o título transformaria
+ * uma pilha legível numa pilha de retângulos iguais.
+ *
+ * VÉU E NÃO `filter: brightness()`: filtro numa janela grande cria contexto de
+ * empilhamento novo e força render fora de tela a cada repintura — e essas
+ * janelas têm backdrop-filter por baixo, que é o custo que Window.css inteiro
+ * existe para conter. Uma camada sólida é composição pura.
+ *
+ * `pointer-events: none` porque o véu é aparência, não bloqueio: clicar numa
+ * janela apagada continua focando ela, que é o gesto esperado.
+ */
+.marocos-window:not(.focused)::after {
+  content: '';
+  position: absolute;
+  inset: var(--win-titlebar-h) 0 0 0;
+  z-index: 2;
+  background: var(--cfg-veu-sem-foco, rgba(0, 0, 0, 0.78));
+  pointer-events: none;
+  transition: background 0.18s ease;
+}
+
+/* Maximizada não tem barra de título flutuando sobre o corpo? Tem — o inset
+   acima já a preserva nos dois estados, porque --win-titlebar-h é a altura
+   dela em ambos. Nada a fazer aqui além de não esquecer que é assim. */
+
+/* De dia a dose é outra e a cor também — ver a justificativa em JANELAS.veuSemFoco. */
+.theme-light .marocos-window:not(.focused)::after {
+  background: var(--cfg-veu-sem-foco-claro, rgba(46, 16, 101, 0.55));
+}
+
 /* MAXIMIZADA — sem vidro, de propósito.
  *
  * A janela cobre a viewport inteira, então não há nada visível atrás para o

@@ -10,6 +10,107 @@
  * do app: intro, a lista em si e o rodapé.
  */
 
+/* --------------------------------------------------
+   SELETOR DE PAPEL DE PAREDE
+
+   Grade de amostras, cada uma pintada com o `ceu` do próprio preset (ver a nota
+   em SettingsApp.jsx). Sem cor nova aqui: o acento é --accent-color e as
+   superfícies são --card-bg/--card-border, como manda a linguagem visual.
+   -------------------------------------------------- */
+
+.settings-wallpaper {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-top: 4px;
+}
+
+.settings-wallpaper-titulo {
+  margin: 0;
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.settings-wallpaper-hint {
+  margin: 0 0 6px;
+  font-size: 0.78rem;
+  line-height: 1.5;
+  color: var(--text-secondary);
+}
+
+/* auto-fill com minmax: a grade se reorganiza sozinha conforme a janela, e
+   continua legível tanto na largura padrão do app quanto maximizado. */
+.settings-presets {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(132px, 1fr));
+  gap: 8px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.settings-preset {
+  position: relative;
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  padding: 7px 9px;
+  border: 1px solid var(--card-border);
+  border-radius: var(--win-control-radius);
+  background: var(--card-bg);
+  color: var(--text-secondary);
+  font-family: inherit;
+  font-size: 0.8rem;
+  text-align: left;
+  cursor: pointer;
+  transition: border-color 0.15s ease, background 0.15s ease, color 0.15s ease;
+}
+
+.settings-preset:hover {
+  border-color: rgba(168, 85, 247, 0.5);
+  color: var(--text-primary);
+}
+
+.settings-preset:focus-visible {
+  outline: 2px solid var(--accent-color);
+  outline-offset: -2px;
+}
+
+/* O selecionado usa a MESMA marca do item ativo do explorador e do indicador da
+   taskbar — acento e presença, não um estilo terceiro. */
+.settings-preset--ativo {
+  border-color: var(--accent-color);
+  background: rgba(168, 85, 247, 0.14);
+  color: var(--text-primary);
+  font-weight: 600;
+}
+
+.settings-preset-amostra {
+  flex: 0 0 auto;
+  width: 26px;
+  height: 26px;
+  border-radius: 7px;
+  border: 1px solid rgba(255, 255, 255, 0.22);
+  /* A sombra interna evita que a amostra clara suma sobre o card claro. */
+  box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.12);
+}
+
+.settings-preset-nome {
+  flex: 1 1 auto;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.settings-preset-check {
+  flex: 0 0 auto;
+  display: grid;
+  place-items: center;
+  color: var(--accent-color);
+}
+
 .settings-app {
   font-family: system-ui, sans-serif;
 }

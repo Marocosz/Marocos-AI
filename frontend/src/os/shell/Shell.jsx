@@ -31,15 +31,17 @@ import('../../brand/Crystal')
  * que evita manter dois frontends.
  */
 const Shell = () => {
-  const { isDark, isAnimated } = useTheme()
+  const { isDark, isAnimated, preset } = useTheme()
   const modo = useDeviceMode()
 
   // A ponte roda antes da pintura: com useEffect haveria um frame com os
   // fallbacks do CSS em vez dos valores do config. Roda no boot e de novo a
   // cada troca de tema, porque as cores do céu (--cfg-ceu-*) dependem dela.
+  // Depende também do preset: as cores do céu (--cfg-ceu-*) saem dele desde
+  // que o visitante pode escolher a paleta do wallpaper.
   useLayoutEffect(() => {
-    aplicarConfigNoCss(isDark ? 'dark' : 'light')
-  }, [isDark])
+    aplicarConfigNoCss(isDark ? 'dark' : 'light', preset)
+  }, [isDark, preset])
 
   // 'boot' -> 'bloqueio' -> 'pronto' -> ('desligado' -> 'bloqueio')
   //

@@ -1,5 +1,7 @@
 import { describe, it, expect } from 'vitest'
-import { WALLPAPER, JANELAS, CERIMONIA, MOVIMENTO, VIDRO, LAYOUT, REDE } from './system'
+import {
+  WALLPAPER, JANELAS, CERIMONIA, MOVIMENTO, VIDRO, LAYOUT, REDE, PRESETS, getPreset,
+} from './system'
 // O registry entra aqui porque o contrato do chrome de explorador é ENTRE os
 // dois arquivos: o config diz o tamanho do chrome, o registry diz o tamanho das
 // janelas, e a soma é a asserção. Testar só um lado não pega a deriva.
@@ -24,19 +26,77 @@ describe('config do sistema', () => {
   it('preserva os contratos de custo do Silk, não os ajustes esteticos', () => {
     expect(WALLPAPER.silk.dpr).toBe(0.6)
     expect(WALLPAPER.silk.fps).toBe(20)
+  })
 
-    expect(WALLPAPER.silk.cor).toMatch(/^#[0-9a-f]{6}$/i)
-    // Velocidade 0 e escala 0 nao sao "mais sutil": sao fundo parado e fundo
-    // sem padrao. Ruido pode ser 0, que e o liso chapado descrito no config.
-    expect(WALLPAPER.silk.velocidade).toBeGreaterThan(0)
-    expect(WALLPAPER.silk.escala).toBeGreaterThan(0)
-    expect(WALLPAPER.silk.ruido).toBeGreaterThanOrEqual(0)
+  /**
+   * A REGRA QUE SUSTENTA OS PRESETS: preset é gosto, custo não entra.
+   *
+   * Se um preset carregasse `dpr`, `escalaResolucao` ou `fps`, escolher uma
+   * paleta viraria escolher — às cegas — quanto o site pesa na máquina de quem
+   * visita. Este teste é o que impede alguém de acrescentar uma dessas chaves
+   * "só neste preset aqui" um dia.
+   */
+  it('nenhum preset carrega valor de custo', () => {
+    const proibidas = ['dpr', 'fps', 'escalaResolucao']
+    for (const [tema, lista] of Object.entries(PRESETS)) {
+      for (const p of lista) {
+        for (const chave of proibidas) {
+          expect(p[chave], `${tema}/${p.id} não pode definir ${chave}`).toBeUndefined()
+        }
+      }
+    }
+  })
+
+  it('cada preset tem id único e um céu completo', () => {
+    for (const [tema, lista] of Object.entries(PRESETS)) {
+      expect(lista.length, `${tema} precisa de pelo menos 5 presets`).toBeGreaterThanOrEqual(5)
+
+      const ids = lista.map((p) => p.id)
+      // Id repetido faz getPreset devolver sempre o primeiro, e a escolha do
+      // visitante pelo segundo nunca "pegaria" — falha silenciosa.
+      expect(new Set(ids).size, `${tema} tem id repetido`).toBe(ids.length)
+
+      for (const p of lista) {
+        // O céu tem dois consumidores (base atrás do shader no desktop,
+        // wallpaper inteiro no mobile): faltar uma parada quebra os dois.
+        for (const parada of ['topo', 'meio', 'baixo']) {
+          expect(p.ceu?.[parada], `${tema}/${p.id}.ceu.${parada}`).toMatch(/^#[0-9a-f]{6}$/i)
+        }
+      }
+    }
+  })
+
+  it('getPreset cai no padrão quando o id salvo não existe mais', () => {
+    // É o caso real de um localStorage antigo depois de um preset ser removido.
+    expect(getPreset('dark', 'preset-que-nao-existe')).toBe(PRESETS.noite[0])
+    expect(getPreset('light', null)).toBe(PRESETS.dia[0])
+    expect(getPreset('dark', 'brasa').id).toBe('brasa')
+  })
+
+  it('os presets de noite e de dia têm as formas que cada shader consome', () => {
+    for (const p of PRESETS.noite) {
+      expect(p.cor, `noite/${p.id}.cor`).toMatch(/^#[0-9a-f]{6}$/i)
+      // Velocidade 0 e escala 0 nao sao "mais sutil": sao fundo parado e fundo
+      // sem padrao. Ruido pode ser 0, que e o liso chapado descrito no config.
+      expect(p.velocidade).toBeGreaterThan(0)
+      expect(p.escala).toBeGreaterThan(0)
+      expect(p.ruido).toBeGreaterThanOrEqual(0)
+    }
+
+    for (const p of PRESETS.dia) {
+      // O Iridescence recebe multiplicador RGB normalizado, nao hex — trocar a
+      // forma aqui pinta preto sem erro nenhum no console.
+      expect(Array.isArray(p.cor), `dia/${p.id}.cor precisa ser [r,g,b]`).toBe(true)
+      expect(p.cor).toHaveLength(3)
+      for (const canal of p.cor) {
+        expect(canal).toBeGreaterThanOrEqual(0)
+        expect(canal).toBeLessThanOrEqual(1)
+      }
+      expect(p.velocidade).toBeGreaterThan(0)
+    }
   })
 
   it('preserva os valores do Iridescence', () => {
-    expect(WALLPAPER.iridescence.cor).toEqual([0.9, 0.9, 0.95])
-    expect(WALLPAPER.iridescence.amplitude).toBe(0.1)
-    expect(WALLPAPER.iridescence.velocidade).toBe(1)
     expect(WALLPAPER.iridescence.reagirAoMouse).toBe(false)
     /**
      * ESTE É UM VALOR DE CUSTO, e por isso continua fixado em literal mesmo
@@ -233,7 +293,7 @@ describe('config do sistema', () => {
     // E quem NÃO tem chrome não pode ter crescido.
     expect(APPS.find((a) => a.id === 'terminal').defaultSize).toEqual({ w: 680, h: 440 })
     expect(APPS.find((a) => a.id === 'assistant').defaultSize).toEqual({ w: 460, h: 620 })
-    expect(APPS.find((a) => a.id === 'settings').defaultSize).toEqual({ w: 520, h: 440 })
+    expect(APPS.find((a) => a.id === 'settings').defaultSize).toEqual({ w: 560, h: 660 })
   })
 
   it('Terminal e Marcos Virtual ficam fora do chrome de explorador', () => {

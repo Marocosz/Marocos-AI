@@ -39,12 +39,16 @@ export const WALLPAPER = {
    *               redesenha o navegador refaz o blur de tudo que está por cima.
    *               20 é indistinguível de 60 aqui e custa um terço.
    */
+  /**
+   * SÓ OS VALORES DE CUSTO MORAM AQUI.
+   *
+   * Cor, velocidade, escala, rotação e ruído saíram para `PRESETS.noite`, porque
+   * viraram escolha do visitante. `dpr` e `fps` ficaram, e a separação é a regra
+   * inteira desta feature: **preset é gosto, isto é conta de performance.**
+   * Trocar de preset não pode mudar quanto o site custa para rodar — senão o
+   * visitante escolheria, sem saber, uma versão que engasga na máquina dele.
+   */
   silk: {
-    cor: '#4c1d95',
-    velocidade: 20,
-    escala: 1,
-    rotacao: 10,
-    ruido: 3,
     dpr: 0.6,
     fps: 20,
   },
@@ -59,10 +63,8 @@ export const WALLPAPER = {
    *                    a área de trabalho inteira não se paga num fundo.
    *   escalaResolucao  o mesmo papel do `dpr` do Silk.
    */
+  /** Idem: cor, amplitude e velocidade saíram para `PRESETS.dia`. */
   iridescence: {
-    cor: [0.9, 0.9, 0.95],
-    amplitude: 0.1,
-    velocidade: 1,
     reagirAoMouse: false,
     escalaResolucao: 1,
     fps: 20,
@@ -108,6 +110,151 @@ export const WALLPAPER = {
     dark: { topo: '#1e1b4b', meio: '#2e1065', baixo: '#4c1d95' },
     light: { topo: '#f5f3ff', meio: '#ebe5ff', baixo: '#d9ccfb' },
   },
+}
+
+/* --------------------------------------------------
+   PRESETS DE WALLPAPER — as variações que o visitante escolhe
+   -------------------------------------------------- */
+
+/**
+ * PRESET É GOSTO; CUSTO NÃO ENTRA AQUI.
+ *
+ * Cada preset carrega só o que muda a APARÊNCIA do shader, mais o `ceu` que
+ * combina com ele. Os dois valores de custo — `dpr`/`escalaResolucao` e `fps` —
+ * continuam em WALLPAPER, iguais para todos. Sem essa separação, escolher um
+ * tema seria escolher, às cegas, quanto o site pesa na máquina de quem visita.
+ *
+ * O `ceu` de cada preset tem DOIS consumidores: a cor de base atrás do shader
+ * no desktop (evita o flash antes do WebGL pintar) e o wallpaper INTEIRO no
+ * mobile, onde não há WebGL. É por isso que ele acompanha o preset em vez de
+ * ser fixo por tema — senão trocar de preset no celular não mudaria nada.
+ *
+ * `id` é o que vai para o localStorage: nome legível mudaria com o idioma e
+ * quebraria a preferência salva de quem trocasse de língua. O rótulo vem de
+ * `i18n/os.js`, chaveado por este id.
+ *
+ * O PRIMEIRO DE CADA LISTA É O PADRÃO — e é o visual que o projeto já tinha,
+ * para quem nunca abrir as configurações não ver nada mudar.
+ */
+export const PRESETS = {
+  /** Noite: shader Silk. Padrão de seda em movimento. */
+  noite: [
+    {
+      id: 'ametista',
+      cor: '#4c1d95',
+      velocidade: 20,
+      escala: 1,
+      rotacao: 10,
+      ruido: 3,
+      ceu: { topo: '#1e1b4b', meio: '#2e1065', baixo: '#4c1d95' },
+    },
+    {
+      // Frio e lento: as dobras ficam largas e quase paradas.
+      id: 'meia-noite',
+      cor: '#1e3a8a',
+      velocidade: 6,
+      escala: 1.7,
+      rotacao: 2.2,
+      ruido: 1.4,
+      ceu: { topo: '#0f172a', meio: '#152449', baixo: '#1e3a8a' },
+    },
+    {
+      // Quente e agitado: dobras finas correndo, granulado alto.
+      id: 'brasa',
+      cor: '#7c2d12',
+      velocidade: 26,
+      escala: 0.7,
+      rotacao: 4.6,
+      ruido: 3.4,
+      ceu: { topo: '#1c0a05', meio: '#3f1508', baixo: '#7c2d12' },
+    },
+    {
+      id: 'esmeralda',
+      cor: '#065f46',
+      velocidade: 12,
+      escala: 1.35,
+      rotacao: 5.8,
+      ruido: 1.9,
+      ceu: { topo: '#022c22', meio: '#04382c', baixo: '#065f46' },
+    },
+    {
+      // Quase sem cor e muito granulado: lê como filme, não como seda.
+      id: 'grafite',
+      cor: '#3f3f46',
+      velocidade: 5,
+      escala: 2.3,
+      rotacao: 1.1,
+      ruido: 4.6,
+      ceu: { topo: '#111113', meio: '#232326', baixo: '#3f3f46' },
+    },
+    {
+      id: 'magenta',
+      cor: '#831843',
+      velocidade: 16,
+      escala: 1.1,
+      rotacao: 8.4,
+      ruido: 2.4,
+      ceu: { topo: '#240a17', meio: '#4a0f2a', baixo: '#831843' },
+    },
+  ],
+
+  /**
+   * Dia: shader Iridescence. `cor` aqui é multiplicador RGB normalizado (0–1),
+   * não hex — ele TINGE a interferência, então valores baixos num canal puxam a
+   * paleta inteira para o complemento dele.
+   */
+  dia: [
+    {
+      id: 'perola',
+      cor: [0.9, 0.9, 0.95],
+      amplitude: 0.1,
+      velocidade: 1,
+      ceu: { topo: '#f5f3ff', meio: '#ebe5ff', baixo: '#d9ccfb' },
+    },
+    {
+      id: 'aurora',
+      cor: [0.68, 0.96, 0.88],
+      amplitude: 0.14,
+      velocidade: 1.6,
+      ceu: { topo: '#f0fdfa', meio: '#dcf7f1', baixo: '#bfead9' },
+    },
+    {
+      id: 'algodao-doce',
+      cor: [1, 0.78, 0.92],
+      amplitude: 0.08,
+      velocidade: 0.7,
+      ceu: { topo: '#fff5fa', meio: '#fde6f1', baixo: '#f8cfe2' },
+    },
+    {
+      id: 'ceu-claro',
+      cor: [0.72, 0.86, 1],
+      amplitude: 0.12,
+      velocidade: 1.2,
+      ceu: { topo: '#f2f8ff', meio: '#e2eeff', baixo: '#c7dcf7' },
+    },
+    {
+      id: 'citrino',
+      cor: [1, 0.95, 0.7],
+      amplitude: 0.1,
+      velocidade: 0.9,
+      ceu: { topo: '#fffdf0', meio: '#fdf6d9', baixo: '#f5e6ae' },
+    },
+    {
+      // O mais sóbrio: quase acromático, quase parado. Para quem quer o
+      // conteúdo em primeiro plano e o fundo calado.
+      id: 'neblina',
+      cor: [0.86, 0.86, 0.89],
+      amplitude: 0.05,
+      velocidade: 0.45,
+      ceu: { topo: '#f8fafc', meio: '#eef1f5', baixo: '#dbe0e8' },
+    },
+  ],
+}
+
+/** O preset salvo, ou o primeiro da lista. Usado pela ponte e pelo wallpaper. */
+export function getPreset(tema, id) {
+  const lista = tema === 'dark' ? PRESETS.noite : PRESETS.dia
+  return lista.find((p) => p.id === id) || lista[0]
 }
 
 /* --------------------------------------------------
@@ -159,6 +306,25 @@ export const JANELAS = {
    * refazer o blur inteiro), o que trava a abertura.
    */
   aberturaMs: 120,
+
+  /**
+   * O VÉU DAS JANELAS SEM FOCO.
+   *
+   * Com várias janelas abertas, o z-order sozinho não diz onde está a atenção.
+   * O corpo das que não têm foco recua para trás desta camada; a barra de
+   * título fica de fora, porque é ela que identifica a janela e apagá-la
+   * transformaria a pilha em retângulos iguais.
+   *
+   * Forte de propósito, a pedido do dono do projeto: o ponto é a janela ativa
+   * ficar sozinha em plena luz, não um sombreado educado. Em 0.45 as janelas de
+   * trás ainda competiam por olhar.
+   *
+   * De dia o valor é MENOR e violeta, não preto: sobre superfície clara, o
+   * mesmo 0.78 de preto não recua, ele suja — vira fuligem em cima do conteúdo.
+   * O que se quer nos dois casos é distância, e cada fundo pede uma dose.
+   */
+  veuSemFoco: 'rgba(0, 0, 0, 0.78)',
+  veuSemFocoClaro: 'rgba(46, 16, 101, 0.55)',
 }
 
 /* --------------------------------------------------

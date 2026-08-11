@@ -39,29 +39,57 @@ import { WALLPAPER } from '../config/system'
  * 4% de opacidade. Aqui ele só age quando algo deu errado de fato.
  */
 
-/** Uma camada de céu, para o tema pedido. */
-const Ceu = ({ tema, isMobile, isAnimated }) => {
-  // Celular não paga o custo de WebGL de tela cheia: só o gradiente. O tema vira
-  // uma classe porque as cores do gradiente vêm de tokens que o tema troca — e
-  // `background-image` não interpola em `transition`, então suavizar a troca no
-  // mobile exige a mesma técnica de duas camadas usada aqui.
-  if (isMobile) return <div className={`marocos-sky-fallback tema-${tema}`} />
+/**
+ * Uma camada de céu, para o tema pedido.
+ *
+ * `preset` chega por prop, e não de `useTheme()` aqui dentro, porque a camada
+ * que está SAINDO durante o crossfade precisa dos valores do tema ANTIGO — ler o
+ * contexto daqui entregaria os do tema novo às duas camadas.
+ */
+const Ceu = ({ tema, preset, isMobile, isAnimated }) => {
+  /**
+   * Celular não paga o custo de WebGL de tela cheia: só o gradiente.
+   *
+   * As cores vêm por ESTILO INLINE, e não mais só da classe `tema-*`. A classe
+   * continua (ela carrega a composição em camadas do tema claro), mas as três
+   * paradas do gradiente base agora acompanham o preset — senão trocar de preset
+   * no celular, onde não há shader nenhum, não mudaria absolutamente nada.
+   *
+   * Isto NÃO reintroduz o bug que tokens.css documenta. Lá o problema era
+   * `var(--cfg-ceu-*)`: uma variável GLOBAL, reescrita pela ponte antes do
+   * primeiro quadro, que as duas camadas liam ao mesmo tempo e pintavam igual.
+   * Aqui cada camada recebe o seu próprio literal, calculado do seu próprio
+   * preset — a que sai continua com a paleta antiga, que é o que o crossfade
+   * precisa revelar.
+   */
+  if (isMobile) {
+    return (
+      <div
+        className={`marocos-sky-fallback tema-${tema}`}
+        style={{
+          '--ceu-topo': preset.ceu.topo,
+          '--ceu-meio': preset.ceu.meio,
+          '--ceu-baixo': preset.ceu.baixo,
+        }}
+      />
+    )
+  }
 
   return tema === 'dark' ? (
     <Silk
-      color={WALLPAPER.silk.cor}
-      speed={WALLPAPER.silk.velocidade}
-      scale={WALLPAPER.silk.escala}
-      rotation={WALLPAPER.silk.rotacao}
-      noiseIntensity={WALLPAPER.silk.ruido}
+      color={preset.cor}
+      speed={preset.velocidade}
+      scale={preset.escala}
+      rotation={preset.rotacao}
+      noiseIntensity={preset.ruido}
       isAnimated={isAnimated}
     />
   ) : (
     <Iridescence
-      color={WALLPAPER.iridescence.cor}
+      color={preset.cor}
       mouseReact={WALLPAPER.iridescence.reagirAoMouse}
-      amplitude={WALLPAPER.iridescence.amplitude}
-      speed={WALLPAPER.iridescence.velocidade}
+      amplitude={preset.amplitude}
+      speed={preset.velocidade}
       isAnimated={isAnimated}
     />
   )
@@ -83,7 +111,9 @@ const Ceu = ({ tema, isMobile, isAnimated }) => {
  */
 const Wallpaper = ({ isAnimated = true }) => {
   const isMobile = useDeviceMode() === 'mobile'
-  const { isDark } = useTheme()
+  // `presets` (os dois), e não `preset` (o ativo): a camada que sai durante o
+  // crossfade precisa dos valores do tema antigo. Ver a nota no ThemeContext.
+  const { isDark, presets } = useTheme()
   const atual = isDark ? 'dark' : 'light'
 
   /**
@@ -147,7 +177,12 @@ const Wallpaper = ({ isAnimated = true }) => {
           className={`marocos-sky${tema === atual ? ' marocos-sky--entrando' : ''}`}
           onAnimationEnd={tema === atual ? encerrar : undefined}
         >
-          <Ceu tema={tema} isMobile={isMobile} isAnimated={tema === atual && isAnimated} />
+          <Ceu
+            tema={tema}
+            preset={presets[tema]}
+            isMobile={isMobile}
+            isAnimated={tema === atual && isAnimated}
+          />
         </div>
       ))}
     </div>

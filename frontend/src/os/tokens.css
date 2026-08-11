@@ -382,8 +382,18 @@
    Por isso a duplicação aqui é a decisão certa, não uma sobra: uma camada tem
    de continuar pintando a paleta antiga depois que os tokens (e o --cfg-ceu-*
    global) já mudaram, e só um literal fixo por classe garante isso. */
+/* As três paradas vêm do PRESET, por estilo inline em cada camada
+   (Wallpaper.jsx). Continua sendo um literal por camada — que é o que o
+   crossfade exige, e o que a nota acima explica —, só que agora o literal é
+   calculado do preset em vez de estar escrito aqui. Os fallbacks são o preset
+   padrão de cada tema. */
 .marocos-sky-fallback.tema-dark {
-  background: linear-gradient(to bottom, #1e1b4b 0%, #2e1065 55%, #4c1d95 100%);
+  background: linear-gradient(
+    to bottom,
+    var(--ceu-topo, #1e1b4b) 0%,
+    var(--ceu-meio, #2e1065) 55%,
+    var(--ceu-baixo, #4c1d95) 100%
+  );
 }
 
 /* O DIA DO MOBILE, ECOANDO O IRIDESCENCE.
@@ -407,7 +417,12 @@
     radial-gradient(78% 42% at 12% 8%, rgba(186, 240, 235, 0.5) 0%, transparent 68%),
     radial-gradient(64% 38% at 92% 26%, rgba(252, 210, 236, 0.45) 0%, transparent 70%),
     radial-gradient(96% 46% at 50% 100%, rgba(167, 139, 250, 0.38) 0%, transparent 74%),
-    linear-gradient(to bottom, #f5f3ff 0%, #ebe5ff 52%, #d9ccfb 100%);
+    linear-gradient(
+      to bottom,
+      var(--ceu-topo, #f5f3ff) 0%,
+      var(--ceu-meio, #ebe5ff) 52%,
+      var(--ceu-baixo, #d9ccfb) 100%
+    );
 }
 
 /* --------------------------------------------------

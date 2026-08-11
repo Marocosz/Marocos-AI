@@ -13,13 +13,16 @@
  * janela — e um `var()` sem fallback resolve para nada, não para o valor
  * anterior.
  */
-import { VIDRO, LAYOUT, WALLPAPER, MOVIMENTO } from './system'
+import { VIDRO, LAYOUT, WALLPAPER, MOVIMENTO, JANELAS } from './system'
 
-export function aplicarConfigNoCss(tema = 'dark') {
+export function aplicarConfigNoCss(tema = 'dark', preset = null) {
   if (typeof document === 'undefined') return
 
   const raiz = document.documentElement
-  const ceu = WALLPAPER.ceu[tema] || WALLPAPER.ceu.dark
+  // O céu vem do PRESET ativo, não mais de WALLPAPER.ceu fixo por tema — é ele
+  // que o visitante escolhe. O fallback cobre a chamada sem preset (nenhuma
+  // hoje, mas a assinatura antiga tinha um argumento só).
+  const ceu = preset?.ceu || WALLPAPER.ceu[tema] || WALLPAPER.ceu.dark
 
   const vars = {
     // Vidro
@@ -40,6 +43,8 @@ export function aplicarConfigNoCss(tema = 'dark') {
     '--cfg-icone-raio': LAYOUT.icones.raioTile,
     '--cfg-icone-intervalo': LAYOUT.icones.intervalo,
     '--cfg-icone-folga': LAYOUT.icones.folgaInferior,
+    '--cfg-veu-sem-foco': JANELAS.veuSemFoco,
+    '--cfg-veu-sem-foco-claro': JANELAS.veuSemFocoClaro,
     '--cfg-explorer-lateral': LAYOUT.explorador.lateralLargura,
     '--cfg-explorer-nav': LAYOUT.explorador.navAltura,
     '--cfg-explorer-comandos': LAYOUT.explorador.comandosAltura,
