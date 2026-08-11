@@ -1,0 +1,12 @@
+# Dependências deste pacote isolado — não versionadas, mesma razão do
+# frontend/: reinstala-se com `npm install` dentro de frontend/visual/.
+node_modules/
+
+# Saída de execução: screenshots obtidas na corrida atual, relatório HTML e
+# metadados de trace/vídeo (desligados no config, mas por garantia).
+test-results/
+playwright-report/
+blob-report/
+
+# As referências em __screenshots__/ NÃO entram aqui — são o marco versionado
+# que este harness compara contra. Ver README.md.

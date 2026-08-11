@@ -1,0 +1,16 @@
+{
+  "name": "marocos-visual",
+  "private": true,
+  "version": "1.0.0",
+  "description": "Regressor visual do Marocos OS — pacote isolado, ver README.md",
+  "type": "module",
+  "scripts": {
+    "build:frontend": "npm run build --prefix ..",
+    "test": "playwright test",
+    "test:update": "playwright test --update-snapshots",
+    "report": "playwright show-report"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.62.1"
+  }
+}

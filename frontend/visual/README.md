@@ -1,0 +1,262 @@
+# Regressor visual do Marocos OS
+
+Harness de regressão visual permanente, isolado em `frontend/visual/` com
+`package.json` próprio. Fotografa 21 cenas fixas do Marocos OS e compara pixel
+a pixel com referências versionadas em `__screenshots__/`.
+
+Este pacote substitui um script solto (`.superpowers/sdd/.../captura/`) que
+vivia fora de versionamento. As decisões difíceis daquele script — como
+congelar o tempo, como classificar ruído de WebGL — foram preservadas aqui;
+só a forma mudou, de dois scripts `.mjs` chamados à mão para um projeto
+`@playwright/test` padrão do ecossistema.
+
+## Por que um pacote isolado
+
+`@playwright/test` baixa um navegador (Chromium, ~130 MB) no `postinstall`.
+`frontend/package.json` tem o Vite como `devDependency`, e o build de deploy
+não pode rodar com `--omit=dev` — então colocar o Playwright ali faria
+**todo build de produção** arrastar esse navegador. Isolado em
+`frontend/visual/package.json`, a árvore de dependências da aplicação
+principal fica intocada; só quem for rodar o regressor visual paga o custo
+do navegador.
+
+## Como rodar
+
+```powershell
+cd frontend/visual
+npm install                 # só na primeira vez (ou após trocar a versão do Playwright)
+npm run build:frontend       # roda `npm run build` dentro de frontend/ — gera dist/
+npm test                     # compara contra as referências em __screenshots__/
+```
+
+`npm test` sobe `vite preview` sozinho (via a opção `webServer` do
+`playwright.config.js`) sobre o `dist/` mais recente — por isso o passo de
+build é manual e separado: o harness fotografa o que está em `dist/`, não o
+que está em `src/`. Se você mudou código e não rebuildou, está comparando
+contra uma versão velha do site.
+
+Outros comandos úteis:
+
+```powershell
+npm run test:update    # atualiza as referências (ver seção própria abaixo)
+npm run report         # abre o último relatório HTML (screenshots de diff lado a lado)
+```
+
+## As três coisas que mudam sozinhas, e como cada uma foi congelada
+
+O difícil não é fotografar, é congelar. Três fontes de não-determinismo
+existem neste projeto e destruiriam qualquer comparação sem tratamento:
+
+### 1. Shader do wallpaper e cristal 3D
+
+O wallpaper é um shader animado (Silk no tema escuro, Iridescence no claro) e
+a janela "Sobre este PC" carrega um cristal 3D que gira e flutua. Os dois são
+desligados pelo controle de animação do próprio sistema:
+`localStorage.isAnimationEnabled = 'false'`, escrito via `context.addInitScript()`
+**antes do primeiro render** (não dá para desligar depois — os componentes
+leem o valor na montagem). Com a animação desligada, o Silk para de invalidar
+o canvas e o cristal cai em `frameloop="demand"`: os dois desenham UM frame e
+dormem, o que é reprodutível.
+
+### 2. Os relógios (taskbar e tela de bloqueio)
+
+`page.clock.setFixedTime()` **antes de navegar**, não uma máscara.
+
+Uma versão anterior deste harness mascarava as regiões de relógio, e quebrou
+na virada do dia: a data mudou de "10/08" para "11/08", os glifos mudaram de
+largura (o Poppins não tem algarismos tabulares), e como a caixa do relógio
+dimensiona pelo próprio conteúdo (`display: flex`, sem largura fixa), ela
+mudou de tamanho — a máscara, derivada daquela caixa, deslocou junto e vazou
+uma fresta. Dez das 21 cenas acusaram diferença de uma vez, sem nenhuma
+mudança real de código.
+
+Máscara resolve "esta região é imprevisível"; não resolve "esta região MUDA
+DE TAMANHO", porque a própria máscara deriva da caixa do elemento. Congelar o
+relógio ataca a causa: com o `Date` do navegador fixo, os três relógios
+exibem sempre o mesmo texto, a caixa nunca muda de tamanho, e a máscara deixa
+de ser necessária — a cobertura aumenta em vez de diminuir.
+
+### 3. Preferência de movimento
+
+`reducedMotion: 'reduce'` no contexto do Playwright (equivalente a
+`prefers-reduced-motion: reduce`), somado a `locale: 'pt-BR'`,
+`timezoneId: 'America/Sao_Paulo'` e `deviceScaleFactor: 1` — tudo fixo em
+`playwright.config.js`, comum a todas as cenas.
+
+**Isto reduz mas não elimina animação.** Várias transições do sistema (o
+fade de abertura de janela, o stagger de entrada dos ícones do desktop, o
+push de navegação no mobile) são feitas com a lib `motion`, não com
+CSS puro — e não checam `useReducedMotion()` em todo lugar. A opção
+`animations: 'disabled'` do Playwright (usada em todo `toHaveScreenshot()`
+deste harness) força essas animações a terminar antes da captura, então na
+prática elas não introduziram instabilidade nos testes. Mas isso é uma
+garantia do Playwright sobre Web Animations, não do app — vale saber que ela
+existe e por que este harness depende dela.
+
+### A quarta coisa que não é "tempo", mas parecia
+
+Durante a montagem deste harness, três cenas de app (`contato`, `stack`,
+`projeto-detalhe`) falharam de forma intermitente: a captura às vezes pegava
+a janela do app **vazia**, sem ícones do desktop, sem nada — um frame de
+carregamento genuíno, não ruído de pixel.
+
+Causa: toda janela de app é `<Suspense fallback={null}>` em volta de um
+`React.lazy()`. Em produção isso é seguro porque o sistema pré-carrega os
+chunks em `requestIdleCallback` enquanto o visitante ainda está olhando a
+tela de bloqueio — mas este harness anda pelo fluxo rápido demais para
+garantir que esse prefetch já terminou, e um `waitForTimeout` fixo apostava
+em vencer essa corrida.
+
+O mesmo aconteceu com as cenas `wallpaper-escuro`/`wallpaper-claro`: elas
+deveriam mostrar o wallpaper sozinho, mas `BoasVindas.jsx` abre a janela
+"Sobre este PC" automaticamente (também via `requestIdleCallback`) sempre que
+a rota é `/` e nenhuma janela está aberta ainda — exatamente o caso dessas
+duas cenas.
+
+A correção, nos dois casos, foi a mesma lição do relógio: **atacar a causa,
+não cronometrá-la**. Em vez de um sleep maior (aposta em timing melhor, mas
+ainda timing), `visual.spec.js` espera por um seletor que só existe quando o
+conteúdo real está montado (`.marocos-window-body *`, ou o equivalente
+mobile), e para as duas cenas de wallpaper puro, espera a janela automática
+abrir de verdade e a **fecha** antes de fotografar — em vez de torcer para
+fotografar antes dela abrir. Ver os comentários em `visual.spec.js` e
+`cenas.js` (campo `fecharJanelaAutomatica`).
+
+## Limiar por cena, medido — não chutado
+
+Rodando a suíte duas vezes sobre o mesmo commit sem mudar nada (o teste de
+determinismo, descrito mais abaixo), o piso de ruído observado foi:
+
+- cenas com superfície WebGL visível (wallpaper por shader, ou o cristal 3D
+  da janela "Sobre"): ruído de rasterização entre contextos diferentes —
+  o mesmo frame congelado (`uTime = 0`) ainda passa por um GPU/driver que
+  arredonda ponto flutuante de forma levemente diferente a cada novo
+  contexto WebGL.
+- cenas que são só DOM: **exatamente 0 px**, sempre.
+
+Por isso o limiar é **por cena**, não global: `maxDiffPixels: 3000` só nas
+cenas marcadas `webgl: true` em `cenas.js` (2× o pior valor já observado,
+~0,23% de uma tela de 1440×900), e **nenhum limiar** nas demais — o
+`toHaveScreenshot()` do Playwright já falha com qualquer diferença quando
+`maxDiffPixels` não é passado, então a tolerância zero sai de graça. Um
+limiar único e folgado esconderia exatamente o tipo de regressão mais
+provável neste projeto: um pixel diferente de especificidade de CSS numa cor
+herdada (foi um bug real, pego por este harness durante o refactor que o
+originou).
+
+A classificação `webgl` vive **na própria cena**, em `cenas.js`, não numa
+lista separada por nome — a versão anterior deste harness guardava essa
+classificação num `Set` de nomes num arquivo diferente, e uma cena nova
+(`menu-iniciar`) foi adicionada às cenas mas esquecida no `Set`, transformando
+ruído legítimo do cristal 3D em alarme falso. Colocar o campo ao lado da cena
+elimina essa classe de erro.
+
+### Tabela de cenas
+
+| Cena | Rota | Tema | Viewport | Passo extra | Limiar | Por quê |
+|---|---|---|---|---|---|---|
+| `wallpaper-escuro` | `/` | dark | 1440×900 | fecha a janela "Sobre" que abre sozinha | 3000 px | wallpaper por shader visível |
+| `wallpaper-claro` | `/` | light | 1440×900 | idem | 3000 px | idem |
+| `sobre-escuro` | `/sobre` | dark | 1440×900 | — | 3000 px | cristal 3D na janela |
+| `sobre-claro` | `/sobre` | light | 1440×900 | — | 3000 px | idem |
+| `projetos` | `/projetos` | dark | 1440×900 | — | 0 px | só DOM |
+| `projeto-detalhe` | `/projetos/bussola-v2` | dark | 1440×900 | — | 0 px | só DOM |
+| `jornada` | `/jornada` | dark | 1440×900 | — | 0 px | só DOM |
+| `stack` | `/stack` | dark | 1440×900 | — | 0 px | só DOM |
+| `contato` | `/contato` | dark | 1440×900 | — | 0 px | só DOM |
+| `assistente` | `/assistente` | dark | 1440×900 | — | 0 px | só DOM |
+| `leia-me` | `/leia-me` | dark | 1440×900 | — | 0 px | só DOM |
+| `config` | `/config` | dark | 1440×900 | — | 0 px | só DOM |
+| `stack-claro` | `/stack` | light | 1440×900 | — | 0 px | tipografia densa, tema claro |
+| `jornada-claro` | `/jornada` | light | 1440×900 | — | 0 px | tipografia densa, tema claro |
+| `bloqueio` | `/` | dark | 1440×900 | fica na tela de bloqueio | 3000 px | cristal visível atrás da cortina |
+| `bloqueio-claro` | `/` | light | 1440×900 | idem | 3000 px | idem |
+| `mobile-home` | `/` | dark | 390×844 | viewport mobile | 3000 px | wallpaper por shader (mobile também usa) |
+| `mobile-sobre` | `/sobre` | dark | 390×844 | viewport mobile | 3000 px | cristal 3D |
+| `mobile-home-claro` | `/` | light | 390×844 | viewport mobile | 0 px | home claro no mobile é gradiente CSS, sem WebGL |
+| `menu-iniciar-claro` | `/` | light | 1440×900 | abre o menu Iniciar | 3000 px | desktop com wallpaper + janela "Sobre" (cristal) por baixo |
+| `menu-iniciar` | `/` | dark | 1440×900 | idem | 3000 px | idem |
+
+**10 cenas** com `webgl: true` (tolerância 3000 px), **11 cenas** com
+tolerância zero.
+
+## Desktop e mobile: opção por cena, não dois `projects`
+
+O viewport (1440×900 desktop, 390×844 mobile) é a **única** coisa que varia
+por cena — locale, timezone, `reducedMotion` e `deviceScaleFactor` são
+comuns a todas e vivem uma vez em `playwright.config.js`. `visual.spec.js`
+aplica o viewport certo por cena com `test.use({ viewport })` dentro de um
+`test.describe` por cena.
+
+A alternativa seria modelar desktop e mobile como dois `projects`. Não foi
+essa a escolha: um `project` inteiro rodaria a suíte **duas vezes** (uma por
+project) e exigiria filtrar qual cena pertence a qual project via
+`testMatch`/`grep` — mais um lugar onde uma cena nova pode ser esquecida,
+exatamente a mesma classe de bug que o campo `webgl` em `cenas.js` já
+corrigiu uma vez (ver acima). Uma opção por cena, ao lado dos outros campos
+da própria cena, é onde uma cena nova naturalmente já teria que declarar seu
+viewport de qualquer forma.
+
+## O que este harness NÃO cobre
+
+**Isto é o limite mais importante do método, não uma escolha de limiar.**
+
+A animação é desligada **antes do primeiro render** (`isAnimationEnabled`
+gravado via `addInitScript`), então o `uTime` dos shaders é **sempre 0** em
+toda cena, em toda execução. A captura compara geometria, cor e layout com
+precisão — e é **estruturalmente cega** a qualquer coisa que dependa de
+tempo:
+
+- duração de uma transição;
+- velocidade de uma animação;
+- o salto visual ao despausar o wallpaper ou o cristal;
+- qualquer regressão de performance que não mude o frame final, só o tempo
+  para chegar nele.
+
+Uma suíte verde **não autoriza concluir "nada mudou"** — autoriza
+**"nada mudou no que é fotografado"**. O que depende de tempo se verifica
+lendo o código, não olhando este harness passar.
+
+Também fora do alcance:
+
+- estados de `:hover`, `:focus-visible`, `:active`;
+- navegação por teclado;
+- qualquer coisa que só exista sob interação contínua (arrastar uma janela
+  em movimento, por exemplo — a POSIÇÃO final de uma janela arrastada é
+  fotografável; o gesto de arrastar não é).
+
+## Atualizando as referências
+
+```powershell
+npm run test:update
+```
+
+Isto sobrescreve `__screenshots__/*.png` com o que o navegador captura agora,
+e commit o novo PNG é o que promove a mudança a "esperado".
+
+**Quando é legítimo:** depois de uma mudança visual **intencional e
+conferida** — você mudou uma cor, um espaçamento, o layout de um app, olhou o
+resultado (visualmente, ou pelo relatório HTML: `npm run report`) e confirma
+que é o que queria.
+
+**Quando NÃO é legítimo:** para calar uma falha que você não entendeu. Se
+uma cena está divergindo e a razão não está clara, o `--update-snapshots`
+não é um jeito de "resolver" isso — é um jeito de committar a regressão como
+se fosse a referência nova. Investigue a causa (este README documentou duas
+já encontradas: relógio não congelado, e conteúdo fotografado antes de
+carregar) antes de atualizar.
+
+## Validação de determinismo
+
+Antes de considerar as referências prontas, a suíte foi rodada três vezes
+consecutivas sobre o mesmo commit, sem tocar em nada entre as execuções:
+**21 de 21 cenas passaram nas três vezes**, sem exceção e sem precisar subir
+nenhum limiar depois de gerado.
+
+Isso não aconteceu de primeira — duas classes de instabilidade real foram
+encontradas e corrigidas durante a montagem deste harness (documentadas nas
+seções acima): captura antes do conteúdo lazy-loaded montar, e paralelismo
+alto demais derrubando o Chromium (WebGL disputando GPU entre vários
+workers simultâneos — por isso `workers: 4` em vez do padrão, que usa um
+worker por núcleo). As duas foram resolvidas atacando a causa, não subindo
+limiar nem aumentando um sleep cego.
