@@ -41,10 +41,10 @@ export const WALLPAPER = {
    */
   silk: {
     cor: '#4c1d95',
-    velocidade: 12,
-    escala: 1.4,
-    rotacao: 2.6,
-    ruido: 1.2,
+    velocidade: 10,
+    escala: 1,
+    rotacao: 10,
+    ruido: 3,
     dpr: 0.6,
     fps: 20,
   },
@@ -86,12 +86,27 @@ export const WALLPAPER = {
 
   /**
    * Cor de base atrás do shader: evita flash preto antes do WebGL iniciar e
-   * cobre a falha caso ele não inicie. É também o wallpaper inteiro no mobile,
-   * onde WebGL de tela cheia não vale a bateria.
+   * cobre a falha caso ele não inicie.
+   *
+   * O DIA FOI CLAREADO, E O MOTIVO FOI MEDIDO. `light.topo` era `#6d28d9`, um
+   * violeta saturado — e no mobile, onde este gradiente é o wallpaper inteiro,
+   * ele caía exatamente onde ficam os ícones e o relógio. Contra o rótulo
+   * `#2e1065` do tema claro isso dá razão de contraste de **2,13:1**, e a WCAG
+   * AA pede 4,5:1 para texto de 11,5px. Não era questão de gosto: era
+   * ilegível por medida. Com `#f5f3ff` no topo a razão vai para ~13:1.
+   *
+   * No desktop a mudança é quase invisível (isto fica ATRÁS do Iridescence),
+   * mas melhora o instante antes de o WebGL pintar: o tema claro deixa de
+   * piscar violeta escuro antes de virar pastel.
+   *
+   * O gradiente do mobile NÃO é mais só estes três tons — ver
+   * `.marocos-sky-fallback.tema-light` em os/tokens.css, que virou arte em
+   * camadas para ecoar o Iridescence. Estes três seguem sendo a base linear
+   * dessa composição e a cor de base do desktop.
    */
   ceu: {
     dark: { topo: '#1e1b4b', meio: '#2e1065', baixo: '#4c1d95' },
-    light: { topo: '#6d28d9', meio: '#a78bfa', baixo: '#ddd6fe' },
+    light: { topo: '#f5f3ff', meio: '#ebe5ff', baixo: '#d9ccfb' },
   },
 }
 
@@ -219,6 +234,20 @@ export const MOVIMENTO = {
   /** `delayPorItem` é multiplicado pelo índice: os ícones entram em cascata. */
   iconesDesktop: { delayPorItem: 0.05, duration: 0.3, deslocamentoY: 8 },
   iconesMobile: { delayPorItem: 0.03, duration: 0.25, deslocamentoY: 8 },
+  /**
+   * MAXIMIZAR E RESTAURAR JANELA — a geometria interpolada, não o `scale`.
+   *
+   * Curta de propósito. Isto anima largura, altura e posição, e cada quadro
+   * refaz o layout do conteúdo da janela — é a animação mais cara do sistema
+   * depois do wallpaper. 0.22s é o suficiente para o olho seguir de onde para
+   * onde a janela foi, que é a única função dela; esticar isso multiplica o
+   * custo sem comunicar nada a mais.
+   *
+   * `duracaoReduzida` é ZERO, e diverge do 0.15 do quickSettings de propósito:
+   * ali o painel só desliza, aqui a janela varre a tela inteira. Com movimento
+   * reduzido, o certo é a troca ser instantânea, não rápida.
+   */
+  maximizarJanela: { duration: 0.22, duracaoReduzida: 0, ease: 'easeOut' },
   menuIniciar: { duration: 0.16, ease: 'easeOut' },
   quickSettings: { duration: 0.24, duracaoReduzida: 0.15, ease: 'easeOut' },
   quickSettingsFundo: { duration: 0.2 },

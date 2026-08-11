@@ -42,17 +42,43 @@
  * cheia a cada repintura (o relógio da taskbar, por exemplo, repinta a cada
  * segundo). Fundo opaco aqui é mais rápido E mais legível.
  *
- * O `bottom` usa --taskbar-h (52px) e não --win-titlebar-h (40px): com o valor
- * errado a janela terminava 12px por baixo da barra de tarefas.
+ * SÓ APARÊNCIA AQUI. A geometria saiu para Window.jsx quando a animação de
+ * maximizar entrou, e a razão é mecânica, não organizacional: esta regra tinha
+ * `inset: 0 0 var(--taskbar-h) 0`, `width: 100vw !important` e
+ * `height: auto !important`, e `!important` no CSS vence estilo inline — que é
+ * exatamente como o motion escreve cada quadro. Enquanto essas três linhas
+ * existiram, qualquer animação de largura era descartada em silêncio.
+ *
+ * Não devolva geometria para cá. O alvo (viewport menos a faixa da barra de
+ * tarefas, os mesmos 52px que o `bottom` usava) está documentado em
+ * Window.jsx, junto do efeito que anima.
  */
 .marocos-window.maximized {
-  inset: 0 0 var(--taskbar-h) 0;
-  width: 100vw !important;
-  height: auto !important;
   border: none;
   border-radius: 0;
   box-shadow: none;
   background: var(--win-body-solid);
+  -webkit-backdrop-filter: none;
+  backdrop-filter: none;
+}
+
+/* EM MOVIMENTO, SEM FOSCO.
+ *
+ * Vale para as duas direções de maximizar/restaurar (a classe é posta pelo
+ * efeito de geometria em Window.jsx). Maximizar já ganhava isso de graça, porque
+ * `.maximized` entra no primeiro quadro e desliga o blur; restaurar fazia o
+ * contrário e pagava um passe de filtro por quadro. Medido na janela leia-me.txt
+ * (texto puro, Chromium com SwiftShader): 16,7ms de mediana ao maximizar contra
+ * 50,0ms ao restaurar, mesma distância e mesma duração.
+ *
+ * O fundo segue translúcido — o que se vê é o vidro perdendo o fosco enquanto
+ * se move, e não uma troca de cor. É o que o Windows faz com acrylic ao
+ * arrastar e redimensionar janela.
+ *
+ * A regra pega o titlebar também: ele tem backdrop-filter próprio, e deixá-lo
+ * fora significava continuar pagando o filtro na faixa do topo. */
+.marocos-window.animando,
+.marocos-window.animando .marocos-titlebar {
   -webkit-backdrop-filter: none;
   backdrop-filter: none;
 }

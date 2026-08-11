@@ -2,14 +2,31 @@ import { describe, it, expect } from 'vitest'
 import { WALLPAPER, JANELAS, CERIMONIA, MOVIMENTO, VIDRO, LAYOUT, REDE } from './system'
 
 describe('config do sistema', () => {
-  it('preserva os valores do Silk que estavam em Wallpaper.jsx', () => {
-    expect(WALLPAPER.silk.cor).toBe('#4c1d95')
-    expect(WALLPAPER.silk.velocidade).toBe(12)
-    expect(WALLPAPER.silk.escala).toBe(1.4)
-    expect(WALLPAPER.silk.rotacao).toBe(2.6)
-    expect(WALLPAPER.silk.ruido).toBe(1.2)
+  /**
+   * OS AJUSTES ESTÉTICOS DO SILK DEIXARAM DE SER FIXADOS EM VALOR.
+   *
+   * Este teste nasceu para provar que trazer os números de Wallpaper.jsx para o
+   * config não mudou nenhum deles. Função cumprida — a migração acabou. Manter
+   * `velocidade`, `escala`, `rotacao` e `ruido` presos a literais passou a
+   * atrapalhar em vez de proteger: são exatamente os quatro botões que o dono do
+   * projeto gira a olho no wallpaper, e cada volta de botão derrubava um teste
+   * que não guardava contrato nenhum.
+   *
+   * Ficou o que tem consequência fora do próprio shader: os dois valores de
+   * CUSTO, que o comentário do config promete e o Silk.jsx consome. Para o
+   * resto, faixa em vez de valor — fora dela o fundo para de funcionar como
+   * fundo, e isso sim é regressão.
+   */
+  it('preserva os contratos de custo do Silk, não os ajustes esteticos', () => {
     expect(WALLPAPER.silk.dpr).toBe(0.6)
     expect(WALLPAPER.silk.fps).toBe(20)
+
+    expect(WALLPAPER.silk.cor).toMatch(/^#[0-9a-f]{6}$/i)
+    // Velocidade 0 e escala 0 nao sao "mais sutil": sao fundo parado e fundo
+    // sem padrao. Ruido pode ser 0, que e o liso chapado descrito no config.
+    expect(WALLPAPER.silk.velocidade).toBeGreaterThan(0)
+    expect(WALLPAPER.silk.escala).toBeGreaterThan(0)
+    expect(WALLPAPER.silk.ruido).toBeGreaterThanOrEqual(0)
   })
 
   it('preserva os valores do Iridescence', () => {
@@ -18,6 +35,29 @@ describe('config do sistema', () => {
     expect(WALLPAPER.iridescence.velocidade).toBe(1)
     expect(WALLPAPER.iridescence.reagirAoMouse).toBe(false)
     expect(WALLPAPER.iridescence.escalaResolucao).toBe(0.6)
+    expect(WALLPAPER.iridescence.fps).toBe(20)
+  })
+
+  /**
+   * O TETO DE FPS FALHA EM SILÊNCIO QUANDO A CHAVE NÃO EXISTE.
+   *
+   * Os dois shaders calculam `1000 / WALLPAPER.<shader>.fps` e comparam
+   * `t - ultimoDesenho < INTERVALO_MS` para decidir se pulam o frame. Com `fps`
+   * ausente isso vira `1000 / undefined` = NaN, e QUALQUER comparação com NaN é
+   * false — então o `return` antecipado nunca acontece e o shader desenha em
+   * todo requestAnimationFrame. Foi exatamente o que aconteceu com o
+   * Iridescence: o comentário no código prometia 20fps, o cap estava inerte, e
+   * o tema claro rodava a 60fps+ pagando o re-blur das janelas em cada um.
+   *
+   * Nada quebra, nada avisa, e o custo é ~3x o documentado. Por isso este teste
+   * checa a EXISTÊNCIA de um número finito, não só o valor.
+   */
+  it('os dois shaders declaram um teto de fps finito', () => {
+    for (const shader of ['silk', 'iridescence']) {
+      const fps = WALLPAPER[shader].fps
+      expect(Number.isFinite(fps), `${shader}.fps precisa ser número`).toBe(true)
+      expect(fps).toBeGreaterThan(0)
+    }
   })
 
   it('a rede de seguranca do crossfade e mais longa que a animacao', () => {
@@ -77,6 +117,9 @@ describe('config do sistema', () => {
     })
     expect(MOVIMENTO.iconesMobile).toEqual({
       delayPorItem: 0.03, duration: 0.25, deslocamentoY: 8,
+    })
+    expect(MOVIMENTO.maximizarJanela).toEqual({
+      duration: 0.22, duracaoReduzida: 0, ease: 'easeOut',
     })
     expect(MOVIMENTO.menuIniciar).toEqual({ duration: 0.16, ease: 'easeOut' })
     expect(MOVIMENTO.quickSettings).toEqual({

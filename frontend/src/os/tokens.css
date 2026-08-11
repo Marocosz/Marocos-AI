@@ -339,8 +339,16 @@
 
 /* Cada camada de mobile precisa da paleta do SEU tema em vez de herdar a que
    está valendo — senão as duas pintariam igual e o crossfade não teria o que
-   revelar. São os mesmos valores de --sky-* dos dois temas, escritos aqui
-   como HEXES LITERAIS, DE PROPÓSITO — e não var(--cfg-ceu-*).
+   revelar. Os valores vêm de WALLPAPER.ceu, escritos aqui como LITERAIS, DE
+   PROPÓSITO — e não var(--cfg-ceu-*).
+
+   A noite é os três tons de `ceu.dark` e nada mais. O DIA DIVERGIU: virou uma
+   composição em camadas sobre a base linear de `ceu.light`, porque no mobile
+   este gradiente é o wallpaper inteiro e um degradê de três paradas não tinha
+   como ecoar a interferência colorida que o Iridescence desenha no desktop —
+   o tema claro do celular e o do computador pareciam dois projetos. É o mesmo
+   precedente da arte da cerimônia mais abaixo: quando a composição deixa de ser
+   ajuste e passa a ser desenho, ela mora aqui, não no config.
 
    TENTATIVA FEITA E REVERTIDA durante o refactor (documentada só localmente
    — o relatório vivia em .superpowers/, que é gitignored e nunca chega ao
@@ -364,8 +372,28 @@
   background: linear-gradient(to bottom, #1e1b4b 0%, #2e1065 55%, #4c1d95 100%);
 }
 
+/* O DIA DO MOBILE, ECOANDO O IRIDESCENCE.
+   Três radiais pálidos sobre a base linear de `ceu.light` — menta em cima à
+   esquerda, rosa em cima à direita, lavanda fechando embaixo. São as mesmas
+   famílias que o shader do desktop produz por interferência; aqui elas são
+   desenhadas porque não há WebGL no celular.
+
+   A ORDEM DE CLARIDADE É INVERTIDA em relação ao gradiente antigo, e isso é o
+   conserto, não estilo: o antigo escurecia para cima (`#6d28d9` no topo) e é
+   justamente em cima que moram os ícones, o relógio e os ícones de status,
+   todos em `#2e1065` no tema claro. Dava 2,13:1 de contraste. Agora o ponto
+   mais claro é o topo: sob o radial de menta o fundo resolve em rgb(216,242,245)
+   e a razão vai para ~13:1.
+
+   A base NÃO chega ao branco embaixo de propósito: o dock claro é
+   rgba(245,245,245,.85), e contra um fundo branco ele desapareceria. Os
+   `#d9ccfb` do fim existem para o dock ter contra o que assentar. */
 .marocos-sky-fallback.tema-light {
-  background: linear-gradient(to bottom, #6d28d9 0%, #a78bfa 55%, #ddd6fe 100%);
+  background:
+    radial-gradient(78% 42% at 12% 8%, rgba(186, 240, 235, 0.5) 0%, transparent 68%),
+    radial-gradient(64% 38% at 92% 26%, rgba(252, 210, 236, 0.45) 0%, transparent 70%),
+    radial-gradient(96% 46% at 50% 100%, rgba(167, 139, 250, 0.38) 0%, transparent 74%),
+    linear-gradient(to bottom, #f5f3ff 0%, #ebe5ff 52%, #d9ccfb 100%);
 }
 
 /* --------------------------------------------------
