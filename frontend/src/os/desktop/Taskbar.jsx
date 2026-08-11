@@ -76,20 +76,20 @@ const Taskbar = ({ onShutdown }) => {
               exit={{ opacity: 0, y: 10, scale: 0.95 }}
               transition={MOVIMENTO.popupTray}
             >
-              <div className="tray-menu-item" onClick={temaToggle.alternar}>
+              <button type="button" className="tray-menu-item" onClick={temaToggle.alternar}>
                 <span className="tray-menu-label">{temaToggle.labelCurto}</span>
                 <TemaIcon size={18} />
-              </div>
-              <div className="tray-menu-item" onClick={idiomaToggle.alternar}>
+              </button>
+              <button type="button" className="tray-menu-item" onClick={idiomaToggle.alternar}>
                 <span className="tray-menu-label">{idiomaToggle.labelCurto}</span>
                 <span style={{ fontSize: '0.8rem', fontWeight: 'bold' }}>
                   {idiomaToggle.valorCurto}
                 </span>
-              </div>
-              <div className="tray-menu-item" onClick={animacaoToggle.alternar}>
+              </button>
+              <button type="button" className="tray-menu-item" onClick={animacaoToggle.alternar}>
                 <span className="tray-menu-label">{animacaoToggle.labelCurto}</span>
                 <AnimacaoIcon size={18} />
-              </div>
+              </button>
             </motion.div>
           </>
         )}
@@ -196,6 +196,19 @@ const Taskbar = ({ onShutdown }) => {
                 className="show-desktop-line"
                 onClick={minimizeAll}
                 title={os.taskbar.showDesktop}
+                role="button"
+                tabIndex={0}
+                aria-label={os.taskbar.showDesktop}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter') {
+                    minimizeAll()
+                  } else if (e.key === ' ') {
+                    // Sem isto o Espaço rola a página -- comportamento padrão
+                    // do navegador para elementos sem role nativo de botão.
+                    e.preventDefault()
+                    minimizeAll()
+                  }
+                }}
               />
             </>
           )}

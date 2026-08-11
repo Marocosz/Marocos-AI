@@ -285,6 +285,15 @@
   color: #ddd;
   cursor: pointer;
   transition: background 0.2s;
+  /* Reset de botão: o elemento virou <button> para ficar alcançável por
+     teclado, e sem isto o navegador aplicaria fundo, borda e fonte próprios. */
+  width: 100%;
+  background: none;
+  border: none;
+  font: inherit;
+  color: inherit;
+  text-align: left;
+  cursor: pointer;
 }
 
 .tray-menu-item:hover {

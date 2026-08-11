@@ -41,7 +41,12 @@
 }
 
 /* FORÇAR CORES NO MODO CLARO (Hack para garantir legibilidade imediata) */
-.theme-light h1, 
+/* DÍVIDA CONHECIDA: esta lista de oito seletores casa com quase toda a árvore
+   e reaplica cor em cada nó. O certo seria declarar a cor no container e deixar
+   herdar -- mas esta regra vence a herança onde um ancestral declara outra cor,
+   entao a troca precisa de uma varredura visual do tema claro inteiro para nao
+   espalhar texto com a cor errada. Trocar so com essa verificacao em maos. */
+.theme-light h1,
 .theme-light h2, 
 .theme-light h3, 
 .theme-light h4,
