@@ -34,16 +34,37 @@ export const initialState = {
   windows: [],
   zTop: JANELAS.zInicial,
   focusedKey: null,
+  /**
+   * Contador de instâncias. Contador, e não aleatório nem timestamp, porque
+   * este reducer é puro e os testes comparam estado por igualdade — `w1`, `w2`
+   * têm de sair iguais em toda execução.
+   */
+  proximaChave: 1,
 }
 
 /**
- * Identidade de uma janela. Singletons usam o próprio appId; instâncias
- * dinâmicas ganham sufixo, o que torna "já está aberto?" uma comparação
- * de string.
+ * ONDE a janela está — não QUEM ela é.
+ *
+ * Esta função era `makeKey` e devolvia a identidade da janela: singleton usava
+ * o próprio appId como chave. Funcionava enquanto trocar de conteúdo só
+ * acontecia abrindo outra janela, porque aí a janela ERA o app.
+ *
+ * Com o chrome de explorador um link da lateral troca o conteúdo da janela
+ * atual, e as duas coisas se separaram: a identidade tem de ser estável (senão
+ * o React remonta a subárvore, o z-order se perde e o botão da taskbar troca de
+ * dono) enquanto a localização muda. Identidade virou `w1`, `w2` (ver
+ * `proximaChave`); esta comparação continua sendo exatamente o que responde
+ * "alguma janela já está mostrando isto?", que é o que a deduplicação de OPEN e
+ * o popstate precisam saber.
  */
-export function makeKey(appId, params) {
+export function assinaturaLocal(appId, params) {
   if (params && params.slug) return `${appId}:${params.slug}`
   return appId
+}
+
+/** A janela `w` está mostrando esta localização? */
+export function estaEm(w, appId, params) {
+  return assinaturaLocal(w.appId, w.params) === assinaturaLocal(appId, params)
 }
 
 /**
@@ -114,32 +135,110 @@ function raise(state, key) {
 
 export function windowReducer(state, action) {
   switch (action.type) {
+    /**
+     * OPEN É A PORTA DE FORA: ícone da área de trabalho, menu Iniciar, dock,
+     * comando do terminal. Ele nunca reaproveita uma janela para outro destino —
+     * dedup só quando o destino é o MESMO. Quem troca o destino de uma janela
+     * existente é NAVIGATE, e a separação é o pedido explícito do dono do
+     * projeto: clicar no atalho abre janela, clicar no link da lateral troca.
+     *
+     * `parent` saiu daqui. Ele existia para um caso só — o deep link de
+     * `/projetos/:slug` montava a pasta atrás do detalhe — e com navegação
+     * interna o detalhe é a própria janela da pasta em outra localização, com o
+     * breadcrumb dando o caminho de volta. Não há pai para montar.
+     */
     case 'OPEN': {
-      const { appId, params = null, parent = null, viewport = null, size = null } = action
-      const key = makeKey(appId, params)
+      const { appId, params = null, viewport = null, size = null } = action
 
-      // Já aberto: foca em vez de duplicar.
-      if (state.windows.some((w) => w.key === key)) return raise(state, key)
+      // Já tem janela nesse destino: foca em vez de duplicar.
+      const existente = state.windows.find((w) => estaEm(w, appId, params))
+      if (existente) return raise(state, existente.key)
 
-      // Deep link para janela filha precisa do pai atrás dela. Recursão de
-      // um nível só — o registry não define netos.
-      let base = state
-      if (parent && !state.windows.some((w) => w.key === parent)) {
-        base = windowReducer(state, { type: 'OPEN', appId: parent })
-      }
-
-      const z = base.zTop + 1
-      const { x, y } = cascadePosition(base.windows.length, viewport, size)
+      const key = `w${state.proximaChave}`
+      const z = state.zTop + 1
+      const { x, y } = cascadePosition(state.windows.length, viewport, size)
 
       return {
-        ...base,
+        ...state,
         windows: [
-          ...base.windows,
+          ...state.windows,
           { key, appId, params, x, y, z, minimized: false, maximized: false, prevPos: null },
         ],
         zTop: z,
         focusedKey: key,
+        proximaChave: state.proximaChave + 1,
       }
+    }
+
+    /**
+     * NAVIGATE É A PORTA DE DENTRO: link da lateral, breadcrumb, card de
+     * projeto. Troca a localização no lugar e preserva tudo que é da instância —
+     * posição, tamanho maximizado, z. Levanta o foco porque navegar é sempre
+     * consequência de um clique dentro da janela.
+     *
+     * Duas janelas podem terminar na mesma localização (uma navegou para onde a
+     * outra já estava). Permitido de propósito: um explorador de verdade deixa
+     * duas janelas abertas na mesma pasta, e proibir exigiria uma regra de fusão
+     * sem resposta óbvia (qual das duas fica com a posição?).
+     */
+    case 'NAVIGATE': {
+      const { key, appId, params = null } = action
+      const alvo = state.windows.find((w) => w.key === key)
+      if (!alvo) return state
+      // Já está lá: só levanta, sem clonar a janela por nada.
+      if (estaEm(alvo, appId, params)) return raise(state, key)
+
+      const z = state.zTop + 1
+      return {
+        ...state,
+        windows: state.windows.map((w) =>
+          w.key === key ? { ...w, appId, params, z, minimized: false } : w,
+        ),
+        zTop: z,
+        focusedKey: key,
+      }
+    }
+
+    /**
+     * O VOLTAR/AVANÇAR DO NAVEGADOR — a terceira porta, e a única com três
+     * degraus.
+     *
+     * Sem histórico por janela (decisão de design: breadcrumb e subir), o voltar
+     * do navegador É o voltar. E ele não pode ser nem OPEN nem NAVIGATE puro:
+     *
+     *   1. alguma janela já está no destino  -> FOCA ela.
+     *      Este degrau é o que preserva o comportamento testado em
+     *      rotas.spec.js ("voltar/avançar troca o foco entre janelas já
+     *      abertas"): com /leia-me e /jornada abertos, voltar muda o foco e não
+     *      navega nada.
+     *   2. senão, a janela com foco é navegável e o destino também -> NAVEGA.
+     *      Sem este degrau, navegar de /projetos para /projetos/rag-api e voltar
+     *      abriria uma SEGUNDA janela de projetos, deixando a original presa no
+     *      detalhe.
+     *   3. senão -> ABRE.
+     *
+     * O degrau 2 existe só aqui, e não em OPEN, de propósito: em OPEN ele faria
+     * clicar em "Jornada" na área de trabalho reaproveitar a janela de projetos
+     * em foco, que é o oposto do que foi pedido.
+     *
+     * `idsNavegaveis` chega pela ação porque quem sabe quais apps têm chrome de
+     * explorador é o registry — e o registry importa React e ícones, coisas que
+     * este módulo não pode tocar sem perder a pureza que o cabeçalho promete.
+     */
+    case 'EXTERNAL_ROUTE': {
+      const { appId, params = null, idsNavegaveis = null, size = null, viewport = null } = action
+
+      const existente = state.windows.find((w) => estaEm(w, appId, params))
+      if (existente) return raise(state, existente.key)
+
+      const focada = state.windows.find((w) => w.key === state.focusedKey)
+      const podeNavegar =
+        !!focada && !!idsNavegaveis && idsNavegaveis.has(focada.appId) && idsNavegaveis.has(appId)
+
+      if (podeNavegar) {
+        return windowReducer(state, { type: 'NAVIGATE', key: focada.key, appId, params })
+      }
+      return windowReducer(state, { type: 'OPEN', appId, params, size, viewport })
     }
 
     case 'CLOSE': {

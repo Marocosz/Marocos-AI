@@ -5,7 +5,7 @@
  * só aqui e no componente — nem o reducer nem o shell precisam saber.
  *
  * Campos:
- *   id           identidade estável, usada como chave de janela
+ *   id           identidade estável, usada para casar localização de janela
  *   route        caminho na URL (`:slug` marca segmento dinâmico)
  *   titleKey     chave em getOsData(lang).windows; null = título vem do conteúdo
  *   icon         glifo lucide-react
@@ -13,12 +13,22 @@
  *   defaultSize  tamanho inicial da janela em px
  *   singleton    true = uma instância só
  *   dynamic      true = uma instância por params.slug
- *   parent       appId que precisa estar aberto atrás desta janela
+ *   explorer     true = a janela ganha o chrome de explorador (lateral,
+ *                breadcrumb, barra de status) e pode ser destino de navegação
+ *                DENTRO de uma janela
  *   onDesktop    aparece na grade de ícones
  *   inStartMenu  aparece no menu Iniciar
  *   inDock       aparece no dock do mobile
  *
  * A ordem do array é a ordem dos ícones no desktop e no menu Iniciar.
+ *
+ * O CAMPO `parent` NÃO EXISTE MAIS, e o motivo é a navegação interna. Ele servia
+ * a um caso só: `project` declarava `parent: 'projects'` e o reducer montava a
+ * pasta atrás do detalhe num deep link. Agora o detalhe É a janela da pasta em
+ * outra localização, e o breadcrumb dá o caminho de volta — não há pai para
+ * montar. O branch de recursão saiu do reducer junto, porque caminho
+ * inalcançável pelo app mas coberto por teste é a pior das três opções: parece
+ * vivo e não é.
  */
 
 import { lazy } from 'react'
@@ -30,7 +40,7 @@ import {
 /**
  * O COMPONENTE É LAZY; O RESTO DO REGISTRY NÃO.
  *
- * `id`, `route`, `titleKey`, `icon`, `defaultSize`, `parent` e as flags são
+ * `id`, `route`, `titleKey`, `icon`, `defaultSize`, `explorer` e as flags são
  * resolvidos SINCRONAMENTE — o deriveInitial() do WindowManagerContext lê a URL
  * e monta o estado inicial antes do primeiro render, e as rotas, os títulos e
  * os ícones aparecem na taskbar e no menu Iniciar sem que o app tenha montado.
@@ -49,6 +59,21 @@ const ReadmeApp = lazy(() => import('../apps/ReadmeApp'))
 const AssistantApp = lazy(() => import('../apps/AssistantApp'))
 const SettingsApp = lazy(() => import('../apps/SettingsApp'))
 
+/**
+ * O CHROME DE EXPLORADOR CUSTA ESPAÇO, E O `defaultSize` PAGOU.
+ *
+ * Lateral de 168px, barra de navegação de 36px e barra de status de 26px. Os
+ * seis apps com `explorer: true` cresceram exatamente isso (+168 na largura,
+ * +62 na altura) para o conteúdo continuar com a mesma área útil de antes — sem
+ * isso o chrome comeria a janela em vez de emoldurá-la.
+ *
+ * A maior fica em 868px de largura. Com os 16px de JANELAS.margem dos dois lados
+ * isso pede 900px, que cabe no breakpoint de 1024px onde o shell de desktop
+ * começa.
+ *
+ * Terminal, Marcos Virtual e Configurações não recebem o chrome — decisão do
+ * dono do projeto, "esses são diferentes" — e portanto não mudaram de tamanho.
+ */
 export const APPS = [
   {
     id: 'about',
@@ -56,10 +81,10 @@ export const APPS = [
     titleKey: 'about',
     icon: MonitorCog,
     component: AboutApp,
-    defaultSize: { w: 620, h: 520 },
+    defaultSize: { w: 788, h: 582 },
     singleton: true,
     dynamic: false,
-    parent: null,
+    explorer: true,
     onDesktop: true,
     inStartMenu: true,
     inDock: true,
@@ -70,25 +95,27 @@ export const APPS = [
     titleKey: 'projects',
     icon: FolderGit2,
     component: ProjectsApp,
-    defaultSize: { w: 640, h: 440 },
+    defaultSize: { w: 808, h: 502 },
     singleton: true,
     dynamic: false,
-    parent: null,
+    explorer: true,
     onDesktop: true,
     inStartMenu: true,
     inDock: true,
   },
   {
-    // Janela filha: só é alcançada por dentro da pasta ou por deep link.
+    // Alcançado por navegação de dentro da pasta ou por deep link. Não abre
+    // janela nova a partir do card: troca o conteúdo da janela da pasta, como
+    // entrar numa pasta num explorador de verdade.
     id: 'project',
     route: '/projetos/:slug',
     titleKey: null, // título vem do nome do projeto, em projects.js
     icon: FileText,
     component: ProjectDetailApp,
-    defaultSize: { w: 560, h: 500 },
+    defaultSize: { w: 728, h: 562 },
     singleton: false,
     dynamic: true,
-    parent: 'projects',
+    explorer: true,
     onDesktop: false,
     inStartMenu: false,
     inDock: false,
@@ -99,10 +126,10 @@ export const APPS = [
     titleKey: 'history',
     icon: GitCommitVertical,
     component: HistoryApp,
-    defaultSize: { w: 700, h: 520 },
+    defaultSize: { w: 868, h: 582 },
     singleton: true,
     dynamic: false,
-    parent: null,
+    explorer: true,
     onDesktop: true,
     inStartMenu: true,
     inDock: false,
@@ -113,15 +140,17 @@ export const APPS = [
     titleKey: 'devices',
     icon: Cpu,
     component: DevicesApp,
-    defaultSize: { w: 620, h: 520 },
+    defaultSize: { w: 788, h: 582 },
     singleton: true,
     dynamic: false,
-    parent: null,
+    explorer: true,
     onDesktop: true,
     inStartMenu: true,
     inDock: false,
   },
   {
+    // Sem chrome de explorador: um terminal com lateral de navegação de arquivos
+    // seria duas metáforas brigando na mesma janela.
     id: 'terminal',
     route: '/contato',
     titleKey: 'terminal',
@@ -130,12 +159,13 @@ export const APPS = [
     defaultSize: { w: 680, h: 440 },
     singleton: true,
     dynamic: false,
-    parent: null,
+    explorer: false,
     onDesktop: true,
     inStartMenu: true,
     inDock: false,
   },
   {
+    // Sem chrome de explorador: é uma conversa, não um lugar.
     id: 'assistant',
     route: '/assistente',
     titleKey: 'assistant',
@@ -144,7 +174,7 @@ export const APPS = [
     defaultSize: { w: 460, h: 620 },
     singleton: true,
     dynamic: false,
-    parent: null,
+    explorer: false,
     onDesktop: true,
     inStartMenu: true,
     inDock: true,
@@ -155,17 +185,19 @@ export const APPS = [
     titleKey: 'readme',
     icon: FileText,
     component: ReadmeApp,
-    defaultSize: { w: 520, h: 400 },
+    defaultSize: { w: 688, h: 462 },
     singleton: true,
     dynamic: false,
-    parent: null,
+    explorer: true,
     onDesktop: true,
     inStartMenu: true,
     inDock: false,
   },
   {
     // Fora da grade do desktop de propósito: os três controles dele já estão
-    // como atalho na bandeja da taskbar, então o ícone seria redundante.
+    // como atalho na bandeja da taskbar, então o ícone seria redundante. E sem
+    // chrome de explorador — é painel de preferências, e uma lateral de
+    // navegação para três linhas ficaria maior que o conteúdo.
     id: 'settings',
     route: '/config',
     titleKey: 'settings',
@@ -174,7 +206,7 @@ export const APPS = [
     defaultSize: { w: 520, h: 440 },
     singleton: true,
     dynamic: false,
-    parent: null,
+    explorer: false,
     onDesktop: false,
     inStartMenu: true,
     inDock: true,

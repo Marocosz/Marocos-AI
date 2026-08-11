@@ -2,8 +2,16 @@ import React, {
   createContext, useContext, useReducer, useCallback, useEffect, useRef, useMemo,
 } from 'react'
 import { windowReducer, initialState } from './windowManager'
-import { getApp } from './registry'
+import { APPS, getApp } from './registry'
 import { resolveRoute, buildRoute } from './routes'
+
+/**
+ * Quais apps podem ser destino de navegação DENTRO de uma janela — os que têm
+ * chrome de explorador. Calculado uma vez, do registry, e entregue ao reducer
+ * pela ação: `windowManager.js` promete no cabeçalho não tocar React nem DOM, e
+ * o registry importa `lazy` e ícones.
+ */
+const IDS_EXPLORER = new Set(APPS.filter((a) => a.explorer).map((a) => a.id))
 
 const WindowStateContext = createContext(null)
 const WindowActionsContext = createContext(null)
@@ -24,13 +32,14 @@ function deriveInitial() {
   const match = resolveRoute(window.location.pathname)
   if (!match) return { state: initialState, path: '/' }
 
-  const app = getApp(match.appId)
+  // Sem `parent`: o deep link de /projetos/:slug abria a pasta atrás do
+  // detalhe, e com navegação interna o detalhe É a janela da pasta em outra
+  // localização — o breadcrumb dá o caminho de volta. Uma janela, não duas.
   return {
     state: windowReducer(initialState, {
       type: 'OPEN',
       appId: match.appId,
       params: match.params,
-      parent: app?.parent,
     }),
     // Forma canônica, não a string crua: '/leia-me/' e '/leia-me' resolvem para
     // o mesmo app, e é a canônica que o efeito estado->URL vai calcular.
@@ -56,13 +65,25 @@ export const WindowManagerProvider = ({ children }) => {
       type: 'OPEN',
       appId,
       params,
-      parent: app.parent,
       size: app.defaultSize,
       viewport:
         typeof window !== 'undefined'
           ? { width: window.innerWidth, height: window.innerHeight }
           : null,
     })
+  }, [])
+
+  /**
+   * A porta de DENTRO: link da lateral, breadcrumb, card de projeto. Troca o
+   * conteúdo da janela indicada em vez de abrir outra — é a diferença pedida
+   * entre clicar num link e clicar num atalho da área de trabalho.
+   *
+   * Não manda `size` nem `viewport`: navegar não reposiciona nem redimensiona a
+   * janela, ela fica onde e como está.
+   */
+  const navigate = useCallback((key, appId, params = null) => {
+    if (!getApp(appId)) return
+    dispatch({ type: 'NAVIGATE', key, appId, params })
   }, [])
 
   const close = useCallback((key) => dispatch({ type: 'CLOSE', key }), [])
@@ -81,9 +102,21 @@ export const WindowManagerProvider = ({ children }) => {
       lastPath.current = match ? buildRoute(match.appId, match.params) : '/'
 
       if (match) {
+        // EXTERNAL_ROUTE, não OPEN: os três degraus (focar quem já está lá,
+        // senão navegar a janela em foco, senão abrir) estão documentados no
+        // reducer. Com OPEN puro, voltar de /projetos/rag-api para /projetos
+        // abriria uma segunda janela em vez de trazer a atual de volta.
         const app = getApp(match.appId)
         dispatch({
-          type: 'OPEN', appId: match.appId, params: match.params, parent: app?.parent,
+          type: 'EXTERNAL_ROUTE',
+          appId: match.appId,
+          params: match.params,
+          idsNavegaveis: IDS_EXPLORER,
+          size: app?.defaultSize,
+          viewport:
+            typeof window !== 'undefined'
+              ? { width: window.innerWidth, height: window.innerHeight }
+              : null,
         })
       } else {
         dispatch({ type: 'CLOSE_ALL' })
@@ -119,8 +152,8 @@ export const WindowManagerProvider = ({ children }) => {
    * janela se mexe.
    */
   const acoes = useMemo(
-    () => ({ open, close, focus, minimize, toggleMaximize, move, minimizeAll, closeAll }),
-    [open, close, focus, minimize, toggleMaximize, move, minimizeAll, closeAll],
+    () => ({ open, navigate, close, focus, minimize, toggleMaximize, move, minimizeAll, closeAll }),
+    [open, navigate, close, focus, minimize, toggleMaximize, move, minimizeAll, closeAll],
   )
 
   const estado = useMemo(

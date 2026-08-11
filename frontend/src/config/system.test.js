@@ -1,5 +1,9 @@
 import { describe, it, expect } from 'vitest'
 import { WALLPAPER, JANELAS, CERIMONIA, MOVIMENTO, VIDRO, LAYOUT, REDE } from './system'
+// O registry entra aqui porque o contrato do chrome de explorador é ENTRE os
+// dois arquivos: o config diz o tamanho do chrome, o registry diz o tamanho das
+// janelas, e a soma é a asserção. Testar só um lado não pega a deriva.
+import { APPS } from '../os/registry'
 
 describe('config do sistema', () => {
   /**
@@ -172,6 +176,53 @@ describe('config do sistema', () => {
       origemDireita: '40px',
       larguraMaxima: '460px',
     })
+  })
+
+  /**
+   * O CHROME DE EXPLORADOR TEM CONTRATO COM O TAMANHO DAS JANELAS.
+   *
+   * Os seis apps com `explorer: true` cresceram exatamente a largura da lateral
+   * e a soma das duas barras, para o conteúdo manter a área útil que tinha antes
+   * do chrome. Mudar o config sem mudar o registry (ou o contrário) encolhe o
+   * conteúdo de seis janelas sem nada avisar — é o tipo de deriva que só aparece
+   * meses depois, quando alguém estranha que a tabela do Stack ficou apertada.
+   */
+  it('o chrome de explorador bate com o crescimento dos tamanhos de janela', () => {
+    const px = (v) => Number.parseInt(v, 10)
+    const lateral = px(LAYOUT.explorador.lateralLargura)
+    const barras = px(LAYOUT.explorador.navAltura) + px(LAYOUT.explorador.statusAltura)
+
+    expect(lateral).toBe(168)
+    expect(barras).toBe(62)
+
+    // Tamanhos de antes do chrome, por app — a base da qual o crescimento saiu.
+    const ANTES = {
+      about: { w: 620, h: 520 },
+      projects: { w: 640, h: 440 },
+      project: { w: 560, h: 500 },
+      history: { w: 700, h: 520 },
+      devices: { w: 620, h: 520 },
+      readme: { w: 520, h: 400 },
+    }
+
+    for (const app of APPS.filter((a) => a.explorer)) {
+      const base = ANTES[app.id]
+      expect(base, `falta a base de ${app.id} neste teste`).toBeDefined()
+      expect(app.defaultSize.w, `largura de ${app.id}`).toBe(base.w + lateral)
+      expect(app.defaultSize.h, `altura de ${app.id}`).toBe(base.h + barras)
+    }
+
+    // E quem NÃO tem chrome não pode ter crescido.
+    expect(APPS.find((a) => a.id === 'terminal').defaultSize).toEqual({ w: 680, h: 440 })
+    expect(APPS.find((a) => a.id === 'assistant').defaultSize).toEqual({ w: 460, h: 620 })
+    expect(APPS.find((a) => a.id === 'settings').defaultSize).toEqual({ w: 520, h: 440 })
+  })
+
+  it('Terminal e Marcos Virtual ficam fora do chrome de explorador', () => {
+    // Decisão explícita do dono do projeto: "esses sao diferentes".
+    for (const id of ['terminal', 'assistant', 'settings']) {
+      expect(APPS.find((a) => a.id === id).explorer, id).toBe(false)
+    }
   })
 
   it('preserva o contrato de rede do chat', () => {

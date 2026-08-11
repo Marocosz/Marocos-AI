@@ -313,6 +313,21 @@ export const LAYOUT = {
     origemDireita: '40px',
     larguraMaxima: '460px',
   },
+
+  /**
+   * CHROME DE EXPLORADOR. Estes três números têm um contrato com o
+   * `defaultSize` de registry.js: os seis apps com `explorer: true` cresceram
+   * exatamente `lateralLargura` na largura e `navAltura + statusAltura` na
+   * altura, para o conteúdo manter a área útil que tinha antes do chrome.
+   *
+   * Mexer aqui sem mexer lá encolhe (ou infla) o conteúdo de seis janelas em
+   * silêncio — há teste guardando a soma.
+   */
+  explorador: {
+    lateralLargura: '168px',
+    navAltura: '36px',
+    statusAltura: '26px',
+  },
 }
 
 /* --------------------------------------------------

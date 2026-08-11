@@ -103,7 +103,12 @@ const ROTAS = [
     rota: '/projetos/bussola-v2',
     titulo: 'bussola-v2', // título dinâmico: sem titleKey, Window usa o slug
     seletorCorpo: '.project-detail-title',
-    paiSeletor: '.projects-app-list',
+    // UMA janela, com o caminho de volta no breadcrumb. Antes este caso pedia
+    // `paiSeletor: '.projects-app-list'` — a pasta montada ATRÁS do detalhe,
+    // via o campo `parent` do registry. Com navegação interna o detalhe é a
+    // própria janela da pasta em outra localização, então não há pai: o que
+    // leva de volta é o degrau clicável do breadcrumb.
+    migalhaDeVolta: 'projetos',
   },
   { rota: '/contato', titulo: 'Terminal', seletorCorpo: '.terminal-app' },
   { rota: '/assistente', titulo: 'Marcos Virtual', seletorCorpo: '.assistant-app' },
@@ -135,9 +140,12 @@ test.describe('deep link nas nove rotas', () => {
         page.locator('.taskbar-window-btn.active .taskbar-window-label'),
       ).toHaveText(rota.titulo)
 
-      // Deep link dinâmico: janela pai montada atrás, sem clique nenhum.
-      if (rota.paiSeletor) {
-        await expect(page.locator(rota.paiSeletor)).toHaveCount(1)
+      // Deep link dinâmico: UMA janela só, e o breadcrumb oferecendo a volta.
+      if (rota.migalhaDeVolta) {
+        await expect(page.locator('.marocos-window')).toHaveCount(1)
+        await expect(
+          page.locator('.explorer-crumb--link', { hasText: rota.migalhaDeVolta }),
+        ).toHaveCount(1)
       }
 
       expect(erros, `erro de página não capturado: ${erros.join('; ')}`).toHaveLength(0)

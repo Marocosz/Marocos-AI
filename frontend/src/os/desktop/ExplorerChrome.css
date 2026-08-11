@@ -1,0 +1,276 @@
+/* --------------------------------------------------
+   CHROME DE EXPLORADOR
+
+   Nenhuma cor nova e nenhuma receita de vidro nova: as superfícies são
+   --card-bg + --card-border, que é o que a linguagem visual do projeto manda
+   usar para superfície de conteúdo, e o acento é --accent-color.
+
+   AS DUAS VOZES TIPOGRÁFICAS, aplicadas de propósito (ver a skill do frontend):
+     mono + caixa alta   o sistema falando de si mesmo -> "ACESSO RÁPIDO",
+                         breadcrumb (é um caminho), barra de status (é um
+                         readout)
+     Poppins             texto que uma pessoa escreveu -> os links da lateral,
+                         que são rótulo de interface, pelo mesmo motivo que
+                         .start-menu-apps-heading é Poppins
+
+   SEM backdrop-filter em NENHUMA destas superfícies. Elas ficam DENTRO da
+   janela, que já paga um blur, e empilhar filtro sobre filtro é o custo que
+   Window.css documenta ter derrubado de 20px para 6px. Também é o que quebra o
+   Safari do iOS, conforme a nota em .marocos-window-body.
+   -------------------------------------------------- */
+
+.explorer-chrome {
+  display: flex;
+  flex-direction: column;
+  /* Ocupa a janela inteira: é ele que passa a mandar no layout interno, e o
+     corpo do app vira um dos filhos dele. */
+  flex: 1 1 auto;
+  min-height: 0;
+}
+
+/* ==========================================================================
+   BARRA DE NAVEGAÇÃO — os cantos de cima
+   ========================================================================== */
+
+.explorer-nav {
+  flex: 0 0 auto;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  height: var(--cfg-explorer-nav, 36px);
+  padding: 0 8px;
+  border-bottom: var(--card-border);
+  background: var(--card-bg);
+}
+
+.explorer-nav-btn {
+  display: grid;
+  place-items: center;
+  flex: 0 0 auto;
+  width: 26px;
+  height: 24px;
+  border: none;
+  border-radius: var(--win-control-radius);
+  background: transparent;
+  color: var(--text-secondary);
+  cursor: pointer;
+  transition: background 0.15s ease, color 0.15s ease;
+}
+
+.explorer-nav-btn:hover:not(:disabled) {
+  background: rgba(168, 85, 247, 0.16);
+  color: var(--text-primary);
+}
+
+.explorer-nav-btn:focus-visible {
+  outline: 2px solid var(--accent-color);
+  outline-offset: -2px;
+}
+
+/* Desabilitado é o estado de "subir" na raiz de um app. Continua ocupando o
+   lugar em vez de sumir: botão que aparece e desaparece faz o breadcrumb
+   pular de posição a cada navegação. */
+.explorer-nav-btn:disabled {
+  opacity: 0.32;
+  cursor: default;
+}
+
+/* --- Breadcrumb --- */
+
+.explorer-crumbs {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  flex: 1 1 auto;
+  min-width: 0;
+  overflow: hidden;
+  /* Voz da máquina: é um caminho. */
+  font-family: 'Courier New', monospace;
+  font-size: 0.72rem;
+}
+
+.explorer-crumb-raiz {
+  flex: 0 0 auto;
+  color: var(--text-secondary);
+  opacity: 0.7;
+}
+
+.explorer-crumb-sep {
+  flex: 0 0 auto;
+  color: var(--text-secondary);
+  opacity: 0.45;
+}
+
+.explorer-crumb {
+  flex: 0 1 auto;
+  min-width: 0;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  font-family: inherit;
+  font-size: inherit;
+}
+
+.explorer-crumb--link {
+  padding: 2px 4px;
+  border: none;
+  border-radius: var(--win-control-radius);
+  background: transparent;
+  color: var(--accent-color);
+  cursor: pointer;
+  transition: background 0.15s ease;
+}
+
+.explorer-crumb--link:hover {
+  background: rgba(168, 85, 247, 0.14);
+}
+
+.explorer-crumb--link:focus-visible {
+  outline: 2px solid var(--accent-color);
+  outline-offset: -2px;
+}
+
+/* O degrau atual é rótulo, não link — e o peso é o que diz isso. */
+.explorer-crumb--atual {
+  padding: 2px 4px;
+  color: var(--text-primary);
+  font-weight: 700;
+}
+
+/* ==========================================================================
+   CORPO — lateral + conteúdo
+   ========================================================================== */
+
+.explorer-corpo {
+  flex: 1 1 auto;
+  display: flex;
+  min-height: 0;
+}
+
+.explorer-lateral {
+  flex: 0 0 var(--cfg-explorer-lateral, 168px);
+  width: var(--cfg-explorer-lateral, 168px);
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 12px 8px;
+  border-right: var(--card-border);
+  background: var(--card-bg);
+  overflow-y: auto;
+}
+
+/* Micro-rótulo: mono, caixa alta, letter-spacing — o sistema nomeando a
+   própria seção. É a mesma receita de .about-spec-label. */
+.explorer-lateral-titulo {
+  margin: 0 0 2px 6px;
+  font-family: 'Courier New', monospace;
+  font-size: 0.66rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--text-secondary);
+  opacity: 0.75;
+}
+
+.explorer-lugares {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+/* Link de navegação é INTERFACE, então Poppins — mesmo critério que faz
+   .start-menu-apps-heading ser Poppins enquanto .about-section-title é mono. */
+.explorer-lugar {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  padding: 7px 8px;
+  border: none;
+  border-radius: var(--win-control-radius);
+  background: transparent;
+  color: var(--text-secondary);
+  font-family: inherit;
+  font-size: 0.85rem;
+  text-align: left;
+  cursor: pointer;
+  transition: background 0.15s ease, color 0.15s ease;
+}
+
+.explorer-lugar span {
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.explorer-lugar:hover {
+  background: rgba(168, 85, 247, 0.12);
+  color: var(--text-primary);
+}
+
+.explorer-lugar:focus-visible {
+  outline: 2px solid var(--accent-color);
+  outline-offset: -2px;
+}
+
+/* O lugar em que a janela ESTÁ. Barra de acento à esquerda em vez de fundo
+   forte: o fundo forte competiria com o hover e o estado ativo deixaria de ser
+   distinguível de "o mouse está aqui". */
+.explorer-lugar--aqui {
+  background: rgba(168, 85, 247, 0.14);
+  box-shadow: inset 2px 0 0 var(--accent-color);
+  color: var(--text-primary);
+  font-weight: 600;
+}
+
+/* O corpo do app. `min-width: 0` não é enfeite: sem ele um filho de conteúdo
+   largo (a tabela do Gerenciador de Dispositivos, o marquee do Sobre) estica o
+   flex item e empurra a lateral para fora da janela. */
+.explorer-conteudo {
+  flex: 1 1 auto;
+  min-width: 0;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+/* O corpo da janela vive aqui dentro agora e é ele quem rola — o
+   .marocos-window-body mantém seu próprio overflow, então esta regra só
+   garante que ele receba a altura para rolar DENTRO. */
+.explorer-conteudo > * {
+  flex: 1 1 auto;
+  min-height: 0;
+}
+
+/* ==========================================================================
+   BARRA DE STATUS — os cantos de baixo
+   ========================================================================== */
+
+.explorer-status {
+  flex: 0 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  height: var(--cfg-explorer-status, 26px);
+  padding: 0 10px;
+  border-top: var(--card-border);
+  background: var(--card-bg);
+  /* Readout de máquina. */
+  font-family: 'Courier New', monospace;
+  font-size: 0.68rem;
+  color: var(--text-secondary);
+  opacity: 0.85;
+  user-select: none;
+}
+
+.explorer-status-rota {
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  color: var(--accent-color);
+  opacity: 0.9;
+}

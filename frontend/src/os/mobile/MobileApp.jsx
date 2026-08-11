@@ -2,6 +2,7 @@ import React, { useEffect, useRef, Suspense } from 'react'
 import { motion, useReducedMotion } from 'motion/react'
 import { ChevronLeft } from 'lucide-react'
 import { useWindowActions } from '../WindowManagerContext'
+import { NavegacaoProvider } from '../NavegacaoContext'
 import { getApp } from '../registry'
 import { useLanguage } from '../../contexts/LanguageContext'
 import { getOsData } from '../../i18n/os'
@@ -19,7 +20,7 @@ import { MOVIMENTO } from '../../config/system'
  * é o MobileShell, este componente só recebe e desenha.
  */
 const MobileApp = ({ win }) => {
-  const { close } = useWindowActions()
+  const { close, open } = useWindowActions()
   const { language } = useLanguage()
   const os = getOsData(language)
   const app = getApp(win.appId)
@@ -62,13 +63,19 @@ const MobileApp = ({ win }) => {
       </header>
 
       <div className="marocos-mobile-app-body" ref={bodyRef}>
-        {/* fallback nulo de propósito: com o prefetch em ociosidade o chunk já
-            chegou, e um spinner que pisca por 20ms é pior que nada. */}
-        {AppComponent ? (
-          <Suspense fallback={null}>
-            <AppComponent params={win.params} />
-          </Suspense>
-        ) : null}
+        {/* No mobile, ir a um destino é EMPILHAR uma tela, não trocar o conteúdo
+            desta: a metáfora daqui é pilha com botão voltar, e o chrome de
+            explorador não existe neste shell. Por isso `open` — ver
+            os/NavegacaoContext.jsx. */}
+        <NavegacaoProvider value={open}>
+          {/* fallback nulo de propósito: com o prefetch em ociosidade o chunk já
+              chegou, e um spinner que pisca por 20ms é pior que nada. */}
+          {AppComponent ? (
+            <Suspense fallback={null}>
+              <AppComponent params={win.params} />
+            </Suspense>
+          ) : null}
+        </NavegacaoProvider>
       </div>
     </motion.div>
   )

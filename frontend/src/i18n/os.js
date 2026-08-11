@@ -31,6 +31,19 @@ const osContentEn = {
     history: 'Timeline',
     devices: 'Stack',
   },
+  /**
+   * Chrome de explorador. `root` é o primeiro degrau do breadcrumb e NÃO é
+   * traduzido de propósito: é o domínio, não uma palavra.
+   */
+  explorer: {
+    quickAccess: 'Quick access',
+    up: 'Up one level',
+    newWindow: 'Open in a new window',
+    ready: 'Ready',
+    root: 'marocos.dev',
+    sidebarLabel: 'Places',
+    breadcrumbLabel: 'Current location',
+  },
   about: {
     specsLabel: 'System Specifications',
     featuresLabel: 'Installed Features',
@@ -196,6 +209,15 @@ const osContentPt = {
   iconLabels: {
     history: 'Jornada',
     devices: 'Stack',
+  },
+  explorer: {
+    quickAccess: 'Acesso rápido',
+    up: 'Subir um nível',
+    newWindow: 'Abrir em nova janela',
+    ready: 'Pronto',
+    root: 'marocos.dev',
+    sidebarLabel: 'Lugares',
+    breadcrumbLabel: 'Localização atual',
   },
   about: {
     specsLabel: 'Especificações do Sistema',

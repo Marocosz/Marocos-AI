@@ -62,13 +62,17 @@ camada errada é o erro mais comum:
 |---|---|---|
 | ajuste | `config/system.js` → `--cfg-*` | blur, raios, alturas, durações |
 | chrome do SO | `os/tokens.css` | `--win-*`, `--icon-tile-*`, `--taskbar-h`, escala de z-index, arte da cerimônia |
+| chrome de explorador | `config/system.js` → `--cfg-explorer-*` | largura da lateral e altura das duas barras — **com contrato**: os seis apps com `explorer: true` têm `defaultSize` = tamanho antigo + lateral + barras, e há teste guardando a soma |
 | conteúdo | `styles/index.css` | `--bg-color`, `--text-primary/secondary`, `--accent-color`, `--card-bg/border` |
 
 - **Nunca invente z-index** — a escala em `tokens.css` é fonte única.
 - **Nunca invente cor.** O acento é `--accent-color`. As cores de categoria já
   existem em `HistoryApp.css` e `content/tech.js`; um app novo reaproveita.
 - **Superfície de conteúdo** é `--card-bg` + `--card-border` — não uma receita
-  de vidro nova.
+  de vidro nova. É o que o chrome de explorador usa nas três superfícies dele, e
+  **sem `backdrop-filter`**: elas ficam dentro de uma janela que já paga um
+  blur, e filtro sobre filtro é o custo que `Window.css` documenta ter derrubado
+  de 20px para 6px.
 - **Alpha de tema escuro não se reaproveita no tema claro.** Vidro
   semitransparente conta com o que está atrás ser mais escuro que ele; sobre o
   wallpaper claro a mistura vai na direção oposta e lava a cor. O tile de ícone
@@ -135,6 +139,8 @@ uma decisão que custou medição ou depuração:
 | qualquer valor visual | o cabeçalho de `config/system.js` — inclusive o que ele diz que **não** mora lá |
 | CSS de componente novo | `ui/AppIconButton.css` — o hack global de tema claro de `index.css`, e por que a variante `--tile` precisa **vencê-lo** com seletor composto enquanto a `--plana` precisa **herdar** com `color: inherit` |
 | custom property nova | `config/cssBridge.js` — por que todo `var(--cfg-*)` precisa de fallback |
+| chrome de janela, navegação entre apps | `os/windowManager.js` — a chave é id de INSTÂNCIA, não o appId, e as três portas (`OPEN` de fora, `NAVIGATE` de dentro, `EXTERNAL_ROUTE` do voltar do navegador) |
+| um app precisar levar o visitante a outro | `os/NavegacaoContext.jsx` — quem decide se navega no lugar ou abre janela é o container, nunca o app |
 | wallpaper ou shader | `wallpaper/Silk.jsx` — teto de fps, tempo acumulado, e por que a pausa vive numa ref |
 | acrescentar um app | `os/registry.js` — por que só `component` pode ser `lazy` |
 | a cerimônia de boot | `os/shell/Shell.jsx` e `os/boot/boot.css` — os tempos medidos e os seis eixos das duas cenas |

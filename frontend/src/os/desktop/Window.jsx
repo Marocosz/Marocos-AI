@@ -1,7 +1,9 @@
-import React, { useRef, useEffect, useState, Suspense } from 'react'
+import React, { useRef, useEffect, useState, useCallback, Suspense } from 'react'
 import { motion, useMotionValue, useDragControls, useReducedMotion, animate } from 'motion/react'
 import { Minus, Square, X } from 'lucide-react'
 import { useWindowActions } from '../WindowManagerContext'
+import ExplorerChrome from './ExplorerChrome'
+import { NavegacaoProvider } from '../NavegacaoContext'
 import { useViewport } from '../hooks/useViewport'
 import { getApp } from '../registry'
 import { useLanguage } from '../../contexts/LanguageContext'
@@ -15,7 +17,7 @@ import './Window.css'
  * vez de todas. Com o React.memo abaixo, as demais nem entram no render.
  */
 const Window = ({ win, isFocused }) => {
-  const { focus, close, minimize, toggleMaximize, move } = useWindowActions()
+  const { focus, close, minimize, toggleMaximize, move, navigate, open } = useWindowActions()
   const { language } = useLanguage()
   const os = getOsData(language)
   const app = getApp(win.appId)
@@ -159,6 +161,19 @@ const Window = ({ win, isFocused }) => {
     }
   }
 
+  /**
+   * COMO O APP DENTRO DESTA JANELA NAVEGA. Com chrome de explorador, ir a um
+   * destino é trocar o conteúdo desta janela; sem chrome, é abrir outra. O app
+   * não decide — ver os/NavegacaoContext.jsx.
+   */
+  const irPara = useCallback(
+    (appId, params = null) => {
+      if (app?.explorer) navigate(win.key, appId, params)
+      else open(appId, params)
+    },
+    [app?.explorer, navigate, open, win.key],
+  )
+
   return (
     <motion.div
       ref={ref}
@@ -210,15 +225,33 @@ const Window = ({ win, isFocused }) => {
         onClose={() => close(win.key)}
       />
 
-      <div className="marocos-window-body">
-        {/* fallback nulo de propósito: com o prefetch em ociosidade o chunk já
-            chegou, e um spinner que pisca por 20ms é pior que nada. */}
-        {AppComponent ? (
-          <Suspense fallback={null}>
-            <AppComponent params={win.params} />
-          </Suspense>
-        ) : null}
-      </div>
+      {/* O CHROME DE EXPLORADOR ENVOLVE, O APP NÃO SABE.
+          A decisão de quem recebe está no `explorer` do registry, e o app segue
+          agnóstico de container — ele recebe as mesmas props com ou sem chrome.
+          Terminal, Marcos Virtual e Configurações caem no ramo de baixo. */}
+      <NavegacaoProvider value={irPara}>
+        {app?.explorer ? (
+          <ExplorerChrome win={win}>
+            <div className="marocos-window-body">
+              {AppComponent ? (
+                <Suspense fallback={null}>
+                  <AppComponent params={win.params} />
+                </Suspense>
+              ) : null}
+            </div>
+          </ExplorerChrome>
+        ) : (
+          <div className="marocos-window-body">
+            {/* fallback nulo de propósito: com o prefetch em ociosidade o chunk
+                já chegou, e um spinner que pisca por 20ms é pior que nada. */}
+            {AppComponent ? (
+              <Suspense fallback={null}>
+                <AppComponent params={win.params} />
+              </Suspense>
+            ) : null}
+          </div>
+        )}
+      </NavegacaoProvider>
     </motion.div>
   )
 }
