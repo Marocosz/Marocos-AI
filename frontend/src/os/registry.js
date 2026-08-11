@@ -21,20 +21,33 @@
  * A ordem do array é a ordem dos ícones no desktop e no menu Iniciar.
  */
 
+import { lazy } from 'react'
 import {
   MonitorCog, FolderGit2, GitCommitVertical, Cpu,
   SquareTerminal, FileText, Bot, Settings,
 } from 'lucide-react'
 
-import AboutApp from '../apps/AboutApp'
-import ProjectsApp from '../apps/ProjectsApp'
-import ProjectDetailApp from '../apps/ProjectDetailApp'
-import HistoryApp from '../apps/HistoryApp'
-import DevicesApp from '../apps/DevicesApp'
-import TerminalApp from '../apps/TerminalApp'
-import ReadmeApp from '../apps/ReadmeApp'
-import AssistantApp from '../apps/AssistantApp'
-import SettingsApp from '../apps/SettingsApp'
+/**
+ * O COMPONENTE É LAZY; O RESTO DO REGISTRY NÃO.
+ *
+ * `id`, `route`, `titleKey`, `icon`, `defaultSize`, `parent` e as flags são
+ * resolvidos SINCRONAMENTE — o deriveInitial() do WindowManagerContext lê a URL
+ * e monta o estado inicial antes do primeiro render, e as rotas, os títulos e
+ * os ícones aparecem na taskbar e no menu Iniciar sem que o app tenha montado.
+ * Só o `component` pode esperar.
+ *
+ * Antes, os 9 apps e todo o CSS deles entravam no bundle inicial, mesmo para
+ * quem abrisse um só.
+ */
+const AboutApp = lazy(() => import('../apps/AboutApp'))
+const ProjectsApp = lazy(() => import('../apps/ProjectsApp'))
+const ProjectDetailApp = lazy(() => import('../apps/ProjectDetailApp'))
+const HistoryApp = lazy(() => import('../apps/HistoryApp'))
+const DevicesApp = lazy(() => import('../apps/DevicesApp'))
+const TerminalApp = lazy(() => import('../apps/TerminalApp'))
+const ReadmeApp = lazy(() => import('../apps/ReadmeApp'))
+const AssistantApp = lazy(() => import('../apps/AssistantApp'))
+const SettingsApp = lazy(() => import('../apps/SettingsApp'))
 
 export const APPS = [
   {
@@ -170,4 +183,20 @@ export const APPS = [
 
 export function getApp(appId) {
   return APPS.find((a) => a.id === appId)
+}
+
+/**
+ * Busca em segundo plano os apps que estão a um clique de distância — os que
+ * têm ícone na área de trabalho. Sem isto, o primeiro clique pagaria o download
+ * do chunk no meio da interação, que é exatamente o engasgo que o prefetch do
+ * cristal já resolvia para o 3D.
+ */
+export function prefetchAppsDoDesktop() {
+  import('../apps/AboutApp')
+  import('../apps/ProjectsApp')
+  import('../apps/HistoryApp')
+  import('../apps/DevicesApp')
+  import('../apps/TerminalApp')
+  import('../apps/ReadmeApp')
+  import('../apps/AssistantApp')
 }

@@ -1,4 +1,4 @@
-import React, { useEffect, useRef } from 'react'
+import React, { useEffect, useRef, Suspense } from 'react'
 import { motion, useReducedMotion } from 'motion/react'
 import { ChevronLeft } from 'lucide-react'
 import { useWindowActions } from '../WindowManagerContext'
@@ -62,7 +62,13 @@ const MobileApp = ({ win }) => {
       </header>
 
       <div className="marocos-mobile-app-body" ref={bodyRef}>
-        {AppComponent ? <AppComponent params={win.params} /> : null}
+        {/* fallback nulo de propósito: com o prefetch em ociosidade o chunk já
+            chegou, e um spinner que pisca por 20ms é pior que nada. */}
+        {AppComponent ? (
+          <Suspense fallback={null}>
+            <AppComponent params={win.params} />
+          </Suspense>
+        ) : null}
       </div>
     </motion.div>
   )

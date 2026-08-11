@@ -1,4 +1,4 @@
-import React, { useRef, useEffect, useState } from 'react'
+import React, { useRef, useEffect, useState, Suspense } from 'react'
 import { motion, useMotionValue, useDragControls } from 'motion/react'
 import { Minus, Square, X } from 'lucide-react'
 import { useWindowActions } from '../WindowManagerContext'
@@ -122,7 +122,13 @@ const Window = ({ win, isFocused }) => {
       />
 
       <div className="marocos-window-body">
-        {AppComponent ? <AppComponent params={win.params} /> : null}
+        {/* fallback nulo de propósito: com o prefetch em ociosidade o chunk já
+            chegou, e um spinner que pisca por 20ms é pior que nada. */}
+        {AppComponent ? (
+          <Suspense fallback={null}>
+            <AppComponent params={win.params} />
+          </Suspense>
+        ) : null}
       </div>
     </motion.div>
   )

@@ -5,6 +5,7 @@ import { WindowManagerProvider, useWindows } from './os/WindowManagerContext'
 import { useDeviceMode } from './os/useDeviceMode'
 import { useDocumentHead } from './os/useDocumentHead'
 import { useIdleTask } from './os/hooks/useIdleTask'
+import { prefetchAppsDoDesktop } from './os/registry'
 import { aplicarConfigNoCss } from './config/cssBridge'
 import { CERIMONIA } from './config/system'
 import Desktop from './os/desktop/Desktop'
@@ -170,6 +171,22 @@ const Shell = () => {
    * atras dela, em vez de dar um pico bem quando o desktop aparece.
    */
   const wallpaperAnimado = isAnimated && (fase === 'pronto' || revelando)
+
+  /**
+   * PERFORMANCE: pré-carrega os chunks dos apps do desktop quando a máquina
+   * estiver ociosa — mesma ideia do prefetch do cristal em Desktop.jsx, para os
+   * apps em vez do 3D. `component` agora é `React.lazy()` no registry, então o
+   * primeiro clique em cada ícone pagaria o download do chunk no meio da
+   * interação sem isto.
+   *
+   * `ativo: fase !== 'boot'` começa na tela de bloqueio: é ócio de verdade (ver
+   * o comentário de `destrancar` acima), diferente do boot, que já está
+   * ocupado animando o cristal.
+   */
+  useIdleTask(prefetchAppsDoDesktop, {
+    ...CERIMONIA.idle.prefetchCristal,
+    ativo: fase !== 'boot',
+  })
 
   return (
     <div className={isDark ? 'theme-dark' : 'theme-light'}>

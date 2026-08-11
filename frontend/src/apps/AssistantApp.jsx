@@ -1,17 +1,16 @@
-import React, { useRef, useEffect, useState } from 'react'
+import React, { useRef, useEffect, useState, lazy, Suspense } from 'react'
 import { Search, Bot, Send, Loader2, X } from 'lucide-react'
-import ReactMarkdown from 'react-markdown'
-import remarkGfm from 'remark-gfm'
 import { useLanguage } from '../contexts/LanguageContext'
 import { getOsData } from '../data/os'
+import { REDE } from '../config/system'
 import './AssistantApp.css'
 
-// URL da API conforme o ambiente.
-// Dev: http://localhost:8000/api
-// Prod: https://api.marocos.dev/api
-// Portado 1:1 de StartMenu.jsx — o contrato com o backend FastAPI/LangGraph
-// não muda nesta tarefa.
-const API_BASE = import.meta.env.DEV ? 'http://localhost:8000/api' : 'https://api.marocos.dev/api'
+/**
+ * react-markdown + remark-gfm + micromark somam dezenas de KB e só servem
+ * depois da primeira resposta do agente — o estado vazio é texto puro. Isolado
+ * em módulo próprio (`AssistantMarkdown.jsx`) e carregado sob demanda.
+ */
+const AssistantMarkdown = lazy(() => import('./AssistantMarkdown'))
 
 /**
  * Marcos Virtual — chat com o agente RAG, dentro de uma janela do Marocos OS.
@@ -39,19 +38,29 @@ const AssistantApp = () => {
   const [usage, setUsage] = useState(null)
   const [showBetaBanner, setShowBetaBanner] = useState(true)
 
-  // Auto-scroll para o fim quando chega mensagem nova ou o status muda.
+  /**
+   * Mensagem nova rola suave; troca de texto de status ajusta a posição direto.
+   *
+   * Antes os dois casos caíam no mesmo `behavior: 'smooth'`, e como o status
+   * muda a cada evento SSE do agente, cada evento reiniciava uma animação de
+   * scroll que a anterior ainda não tinha terminado — numa resposta com quatro
+   * ou cinco passos de status, a área de mensagens ficava tremendo.
+   */
   useEffect(() => {
-    if (chatEndRef.current) {
-      chatEndRef.current.scrollIntoView({ behavior: 'smooth' })
-    }
-  }, [messages, isLoading, loadingStatus])
+    chatEndRef.current?.scrollIntoView({ behavior: 'smooth' })
+  }, [messages, isLoading])
+
+  useEffect(() => {
+    if (!loadingStatus) return
+    chatEndRef.current?.scrollIntoView({ behavior: 'auto' })
+  }, [loadingStatus])
 
   // Busca o contador de cota uma vez, quando a janela é montada.
   // Equivalente ao efeito de abertura de StartMenu.jsx (que rodava a cada
   // `isOpen` virar true) — aqui a montagem do componente já É a abertura,
   // então não há mais a condicional nem o cleanup de scroll-lock.
   useEffect(() => {
-    fetch(`${API_BASE}/chat/status`)
+    fetch(`${REDE.apiBase}/chat/status`)
       .then((res) => res.json())
       .then((data) => setUsage(data))
       .catch(console.error)
@@ -84,10 +93,10 @@ const AssistantApp = () => {
     setLoadingStatus(content.startingStatus)
 
     const controller = new AbortController()
-    const timeoutId = setTimeout(() => controller.abort(), 60000) // Timeout de 60s
+    const timeoutId = setTimeout(() => controller.abort(), REDE.timeoutChatMs)
 
     try {
-      const response = await fetch(`${API_BASE}/chat`, {
+      const response = await fetch(`${REDE.apiBase}/chat`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -234,14 +243,11 @@ const AssistantApp = () => {
                   </div>
                 )}
                 <div className="assistant-bubble">
-                  <ReactMarkdown
-                    remarkPlugins={[remarkGfm]}
-                    components={{
-                      a: (props) => <a {...props} target="_blank" rel="noopener noreferrer" />,
-                    }}
-                  >
-                    {msg.content}
-                  </ReactMarkdown>
+                  {/* Fallback com o texto cru: se o chunk atrasar, o visitante
+                      lê a resposta sem formatação em vez de ver um vazio. */}
+                  <Suspense fallback={<span>{msg.content}</span>}>
+                    <AssistantMarkdown>{msg.content}</AssistantMarkdown>
+                  </Suspense>
                 </div>
                 {msg.role === 'user' && (
                   <div className="assistant-avatar user">M</div>
