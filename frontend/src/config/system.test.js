@@ -1,6 +1,7 @@
 import { describe, it, expect } from 'vitest'
 import {
   WALLPAPER, JANELAS, CERIMONIA, MOVIMENTO, VIDRO, LAYOUT, REDE, PRESETS, getPreset,
+  hexParaRgb,
 } from './system'
 // O registry entra aqui porque o contrato do chrome de explorador é ENTRE os
 // dois arquivos: o config diz o tamanho do chrome, o registry diz o tamanho das
@@ -45,6 +46,35 @@ describe('config do sistema', () => {
         }
       }
     }
+  })
+
+  /**
+   * O ACENTO É O QUE FAZ O PRESET SAIR DO WALLPAPER E CHEGAR NA INTERFACE.
+   * Sem ele o preset muda o fundo e mais nada — borda, foco, indicador e realce
+   * continuariam roxos enquanto o resto da tela já mudou de cor.
+   */
+  it('todo preset declara um acento que a ponte consegue converter', () => {
+    for (const [tema, lista] of Object.entries(PRESETS)) {
+      for (const p of lista) {
+        expect(p.acento, `${tema}/${p.id}.acento`).toMatch(/^#[0-9a-f]{6}$/i)
+        // Se a conversão falhar, a ponte publica null, o CSS cai no fallback e
+        // o preset silenciosamente não pinta nada — falha sem erro nenhum.
+        expect(hexParaRgb(p.acento), `${tema}/${p.id} não converte`).toMatch(
+          /^\d{1,3} \d{1,3} \d{1,3}$/,
+        )
+      }
+    }
+  })
+
+  it('hexParaRgb devolve o trio da sintaxe rgb(... / alpha)', () => {
+    expect(hexParaRgb('#a855f7')).toBe('168 85 247')
+    expect(hexParaRgb('a855f7')).toBe('168 85 247')
+    expect(hexParaRgb('#000000')).toBe('0 0 0')
+    expect(hexParaRgb('#ffffff')).toBe('255 255 255')
+    // Malformado degrada para o fallback do CSS em vez de derrubar o boot.
+    expect(hexParaRgb('#abc')).toBeNull()
+    expect(hexParaRgb('roxo')).toBeNull()
+    expect(hexParaRgb(undefined)).toBeNull()
   })
 
   it('cada preset tem id único e um céu completo', () => {

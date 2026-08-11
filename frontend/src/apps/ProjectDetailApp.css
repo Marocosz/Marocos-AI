@@ -29,7 +29,7 @@
 }
 
 .theme-light .project-detail-category {
-  color: #9333ea;
+  color: var(--accent-color);
 }
 
 .project-detail-title {

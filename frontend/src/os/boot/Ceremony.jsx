@@ -3,7 +3,8 @@ import { useLanguage } from '../../contexts/LanguageContext'
 import { getOsData } from '../../i18n/os'
 import { getStartMenuData } from '../../i18n/startMenu'
 import { lerMovimentoReduzido } from '../hooks/useMediaQuery'
-import { CERIMONIA } from '../../config/system'
+import { CERIMONIA, acentoProfundo } from '../../config/system'
+import { useTheme } from '../../contexts/ThemeContext'
 import Clock from '../../ui/Clock'
 import './boot.css'
 
@@ -65,6 +66,9 @@ const Ceremony = ({ fase, onBootDone, onUnlock, onUnlockStart }) => {
   const boot = os.boot || {}
   const bloqueio = os.lock || {}
   const visitante = getStartMenuData(language).visitor
+  // O cristal é o único ponto da cerimônia que carrega cor de identidade — o
+  // resto das cores dela vem dos tokens --cer-*, que são arte fixa.
+  const { preset } = useTheme()
 
   // Congelada na montagem, de propósito: a tela de bloqueio pode ficar
   // minutos esperando um clique, e a preferência mudando nesse meio faria o
@@ -228,6 +232,8 @@ const Ceremony = ({ fase, onBootDone, onUnlock, onUnlockStart }) => {
                   size={tamanhoCristal}
                   animated={!saindo && !reduceMotion}
                   spin={noBoot ? CERIMONIA.spinBoot : CERIMONIA.spinBloqueio}
+                  acento={preset.acento}
+                  acentoFundo={acentoProfundo(preset)}
                 />
               </span>
             </Suspense>

@@ -41,13 +41,14 @@
    o que pintava um retângulo pálido atrás do tile E do rótulo, em volta do
    alvo em vez de em cima dele. Agora quem responde é o tile: fundo um passo
    mais claro, borda acesa no acento e um halo do mesmo matiz.
-   Nada de cor nova — é --accent-color (#a855f7) em três opacidades. */
+   Nada de cor nova — é o acento do sistema (--accent-color, e o mesmo acento
+   em --accent-rgb quando precisa de opacidade) em três opacidades. */
 .app-icon-btn--desktop:hover .app-icon-btn-glifo {
   background: var(--icon-tile-bg-hover);
   border-color: var(--accent-color);
   box-shadow:
     var(--win-highlight),
-    0 6px 16px rgba(168, 85, 247, 0.28);
+    0 6px 16px rgb(var(--accent-rgb) / 0.28);
   transform: translateY(-1px);
 }
 
@@ -229,7 +230,7 @@
 }
 
 .app-icon-btn--lista:focus-visible {
-  outline: 2px solid rgba(168, 85, 247, 0.6);
+  outline: 2px solid rgb(var(--accent-rgb) / 0.6);
   outline-offset: -2px;
 }
 

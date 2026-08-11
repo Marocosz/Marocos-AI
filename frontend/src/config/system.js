@@ -14,6 +14,29 @@
  *
  * A REGRA: número e cor simples viram configuração; forma desenhada continua
  * sendo arte no CSS.
+ *
+ * --------------------------------------------------
+ * ESTE ARQUIVO É O ÚNICO QUE DEFINE. O RESTO DO PROJETO LÊ.
+ *
+ * Nenhum componente e nenhum CSS pode escrever uma cor, uma medida ou uma
+ * duração do sistema como literal. O caminho é sempre o mesmo:
+ *
+ *     system.js  ->  cssBridge.js  ->  --cfg-*  ->  o CSS lê com var()
+ *
+ * Para a cor de acento isso vai um passo além, porque ela precisa aparecer em
+ * dezenas de opacidades diferentes: a ponte publica `--accent-rgb` como um
+ * TRIO CRU ("168 85 247"), e o CSS escreve `rgb(var(--accent-rgb) / 0.16)`.
+ * Um literal `rgba(168, 85, 247, 0.16)` perdido em qualquer arquivo é um lugar
+ * onde a troca de preset não chega — e o sintoma é sempre o mesmo: um pedaço da
+ * interface fica roxo quando todo o resto já mudou de cor.
+ *
+ * As três exceções, todas documentadas onde vivem:
+ *   1. os gradientes da cerimônia em `os/tokens.css` — arte, não ajuste;
+ *   2. as cores de CATEGORIA (tipos do histórico, status do terminal, marcas de
+ *      tecnologia em content/tech.js) — significam algo, e seguir o tema faria
+ *      "erro" e "sucesso" trocarem de cor;
+ *   3. o âmbar da tela de BIOS — máquina desligada não tem tema.
+ * --------------------------------------------------
  */
 
 /* --------------------------------------------------
@@ -141,6 +164,7 @@ export const PRESETS = {
   noite: [
     {
       id: 'ametista',
+      acento: '#a855f7',
       cor: '#4c1d95',
       velocidade: 20,
       escala: 1,
@@ -151,6 +175,7 @@ export const PRESETS = {
     {
       // Frio e lento: as dobras ficam largas e quase paradas.
       id: 'meia-noite',
+      acento: '#60a5fa',
       cor: '#1e3a8a',
       velocidade: 6,
       escala: 1.7,
@@ -161,6 +186,7 @@ export const PRESETS = {
     {
       // Quente e agitado: dobras finas correndo, granulado alto.
       id: 'brasa',
+      acento: '#fb923c',
       cor: '#7c2d12',
       velocidade: 26,
       escala: 0.7,
@@ -170,6 +196,7 @@ export const PRESETS = {
     },
     {
       id: 'esmeralda',
+      acento: '#34d399',
       cor: '#065f46',
       velocidade: 12,
       escala: 1.35,
@@ -180,6 +207,7 @@ export const PRESETS = {
     {
       // Quase sem cor e muito granulado: lê como filme, não como seda.
       id: 'grafite',
+      acento: '#a1a1aa',
       cor: '#3f3f46',
       velocidade: 5,
       escala: 2.3,
@@ -189,6 +217,7 @@ export const PRESETS = {
     },
     {
       id: 'magenta',
+      acento: '#f472b6',
       cor: '#831843',
       velocidade: 16,
       escala: 1.1,
@@ -206,6 +235,7 @@ export const PRESETS = {
   dia: [
     {
       id: 'perola',
+      acento: '#7c3aed',
       cor: [0.9, 0.9, 0.95],
       amplitude: 0.1,
       velocidade: 1,
@@ -213,6 +243,7 @@ export const PRESETS = {
     },
     {
       id: 'aurora',
+      acento: '#0d9488',
       cor: [0.68, 0.96, 0.88],
       amplitude: 0.14,
       velocidade: 1.6,
@@ -220,6 +251,7 @@ export const PRESETS = {
     },
     {
       id: 'algodao-doce',
+      acento: '#db2777',
       cor: [1, 0.78, 0.92],
       amplitude: 0.08,
       velocidade: 0.7,
@@ -227,6 +259,7 @@ export const PRESETS = {
     },
     {
       id: 'ceu-claro',
+      acento: '#2563eb',
       cor: [0.72, 0.86, 1],
       amplitude: 0.12,
       velocidade: 1.2,
@@ -234,6 +267,7 @@ export const PRESETS = {
     },
     {
       id: 'citrino',
+      acento: '#b45309',
       cor: [1, 0.95, 0.7],
       amplitude: 0.1,
       velocidade: 0.9,
@@ -243,6 +277,7 @@ export const PRESETS = {
       // O mais sóbrio: quase acromático, quase parado. Para quem quer o
       // conteúdo em primeiro plano e o fundo calado.
       id: 'neblina',
+      acento: '#475569',
       cor: [0.86, 0.86, 0.89],
       amplitude: 0.05,
       velocidade: 0.45,
@@ -255,6 +290,42 @@ export const PRESETS = {
 export function getPreset(tema, id) {
   const lista = tema === 'dark' ? PRESETS.noite : PRESETS.dia
   return lista.find((p) => p.id === id) || lista[0]
+}
+
+/**
+ * '#a855f7' -> '168 85 247'.
+ *
+ * A FORMA IMPORTA: é a sintaxe de `rgb(var(--accent-rgb) / 0.16)`, que é como
+ * o CSS inteiro passou a escrever qualquer tom do acento. Sem isso, cada
+ * opacidade do acento precisaria de um token próprio (`--accent-16`,
+ * `--accent-12`...) ou voltaria a ser literal — que é exatamente o que esta
+ * mudança existe para eliminar.
+ *
+ * Devolve null para entrada malformada em vez de lançar: um preset com hex
+ * torto deve degradar para o acento padrão do CSS, não derrubar o boot.
+ */
+/**
+ * O companheiro FUNDO do acento, para quem precisa de dois tons (o cristal 3D
+ * usa dois realces laterais).
+ *
+ * Não é um campo novo no preset: ele já carrega o tom profundo. Na noite é a
+ * `cor` do shader — que para o preset padrão é `#4c1d95`, exatamente o literal
+ * que estava chumbado no cristal antes. No dia a `cor` é multiplicador RGB e
+ * não serve como hex, então o tom fundo vem da última parada do céu.
+ *
+ * Acrescentar um `acentoFundo` a cada um dos doze presets seria doze valores a
+ * manter em sincronia com os que já existem, para nenhuma informação nova.
+ */
+export function acentoProfundo(preset) {
+  if (!preset) return '#4c1d95'
+  return typeof preset.cor === 'string' ? preset.cor : preset.ceu.baixo
+}
+
+export function hexParaRgb(hex) {
+  const m = /^#?([0-9a-f]{6})$/i.exec(String(hex || '').trim())
+  if (!m) return null
+  const n = parseInt(m[1], 16)
+  return `${(n >> 16) & 255} ${(n >> 8) & 255} ${n & 255}`
 }
 
 /* --------------------------------------------------

@@ -84,5 +84,5 @@
 
 /* Contraste maior no tema claro, mesmo tratamento do carrossel antigo. */
 .theme-light .projects-app-item-category {
-  color: #9333ea;
+  color: var(--accent-color);
 }

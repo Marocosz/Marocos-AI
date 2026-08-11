@@ -66,8 +66,25 @@ camada errada é o erro mais comum:
 | conteúdo | `styles/index.css` | `--bg-color`, `--text-primary/secondary`, `--accent-color`, `--card-bg/border` |
 
 - **Nunca invente z-index** — a escala em `tokens.css` é fonte única.
-- **Nunca invente cor.** O acento é `--accent-color`. As cores de categoria já
-  existem em `HistoryApp.css` e `content/tech.js`; um app novo reaproveita.
+- **`config/system.js` é o ÚNICO que define; o resto lê.** Nenhum componente e
+  nenhum CSS escreve cor, medida ou duração do sistema como literal. O caminho é
+  sempre `system.js → cssBridge.js → --cfg-* → var()` no CSS.
+- **O acento tem duas formas, e a segunda não é opcional:**
+
+  | quer | escreva |
+  |---|---|
+  | a cor cheia | `var(--accent-color)` |
+  | qualquer opacidade dela | `rgb(var(--accent-rgb) / 0.16)` |
+
+  `--accent-rgb` é um trio cru (`168 85 247`) publicado pela ponte a partir do
+  preset ativo. Um `rgba(168, 85, 247, X)` literal perdido em qualquer arquivo é
+  um lugar onde a troca de preset **não chega** — e o sintoma é sempre o mesmo:
+  um pedaço da interface fica roxo depois que todo o resto já mudou de cor.
+- **As três exceções que continuam literais**, cada uma documentada onde vive:
+  os gradientes da cerimônia (`os/tokens.css`, é arte), as cores de **categoria**
+  (tipos do histórico, status do terminal, marcas em `content/tech.js` — elas
+  significam algo, e seguir o tema faria "erro" e "sucesso" trocarem de cor) e o
+  âmbar da tela de BIOS (máquina desligada não tem tema).
 - **Superfície de conteúdo** é `--card-bg` + `--card-border` — não uma receita
   de vidro nova. É o que o chrome de explorador usa nas três superfícies dele, e
   **sem `backdrop-filter`**: elas ficam dentro de uma janela que já paga um

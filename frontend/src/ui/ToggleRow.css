@@ -42,7 +42,13 @@
   width: 34px;
   height: 34px;
   border-radius: 9px;
-  background: linear-gradient(160deg, rgba(168, 85, 247, 0.42), rgba(88, 28, 135, 0.5));
+  /* Mesmo acento em duas opacidades, e não dois violetas fixos: o degradê perde
+     um fio de profundidade e ganha acompanhar o preset. */
+  background: linear-gradient(
+    160deg,
+    rgb(var(--accent-rgb) / 0.42),
+    rgb(var(--accent-rgb) / 0.68)
+  );
   color: #fff;
   flex: 0 0 auto;
 }
@@ -72,7 +78,7 @@
   padding: 7px 13px;
   border: var(--win-border);
   border-radius: var(--win-control-radius);
-  background: rgba(168, 85, 247, 0.16);
+  background: rgb(var(--accent-rgb) / 0.16);
   color: var(--text-primary);
   font-family: inherit;
   font-size: 0.78rem;
@@ -86,7 +92,7 @@
 }
 
 .toggle-row--settings .toggle-row-valor:hover {
-  background: rgba(168, 85, 247, 0.3);
+  background: rgb(var(--accent-rgb) / 0.3);
   border-color: var(--accent-color);
 }
 

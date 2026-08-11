@@ -228,7 +228,7 @@
 .theme-light .terminal-kv-value { color: #333; }
 .theme-light .terminal-col-type { color: #333; }
 .theme-light .terminal-link { color: #555; }
-.theme-light .terminal-link:hover { color: #9333ea; }
+.theme-light .terminal-link:hover { color: var(--accent-color); }
 .theme-light .terminal-tag {
   background: rgba(0, 0, 0, 0.03);
   border-color: rgba(0, 0, 0, 0.08);
@@ -239,7 +239,7 @@
 .theme-light .terminal-row { border-bottom-color: rgba(0, 0, 0, 0.05); }
 .theme-light .terminal-table-header {
   border-bottom-color: rgba(0, 0, 0, 0.2);
-  color: #9333ea;
+  color: var(--accent-color);
 }
 .theme-light .terminal-rule { border-top-color: rgba(0, 0, 0, 0.15); }
 

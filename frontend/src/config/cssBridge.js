@@ -13,7 +13,7 @@
  * janela — e um `var()` sem fallback resolve para nada, não para o valor
  * anterior.
  */
-import { VIDRO, LAYOUT, WALLPAPER, MOVIMENTO, JANELAS } from './system'
+import { VIDRO, LAYOUT, WALLPAPER, MOVIMENTO, JANELAS, hexParaRgb } from './system'
 
 export function aplicarConfigNoCss(tema = 'dark', preset = null) {
   if (typeof document === 'undefined') return
@@ -43,6 +43,18 @@ export function aplicarConfigNoCss(tema = 'dark', preset = null) {
     '--cfg-icone-raio': LAYOUT.icones.raioTile,
     '--cfg-icone-intervalo': LAYOUT.icones.intervalo,
     '--cfg-icone-folga': LAYOUT.icones.folgaInferior,
+    /**
+     * O ACENTO, NAS DUAS FORMAS QUE O CSS PRECISA.
+     *
+     * `--cfg-accent` é o hex, para quem quer a cor cheia.
+     * `--cfg-accent-rgb` é o trio cru ("168 85 247"), para `rgb(var(...) / X)`
+     * — é ele que permite qualquer opacidade do acento sem um token por passo.
+     *
+     * Vem do PRESET: é isto que faz a escolha do visitante alcançar borda,
+     * ícone, foco e realce, e não só o wallpaper.
+     */
+    '--cfg-accent': preset?.acento || null,
+    '--cfg-accent-rgb': hexParaRgb(preset?.acento),
     '--cfg-veu-sem-foco': JANELAS.veuSemFoco,
     '--cfg-veu-sem-foco-claro': JANELAS.veuSemFocoClaro,
     '--cfg-explorer-lateral': LAYOUT.explorador.lateralLargura,

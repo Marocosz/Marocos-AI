@@ -86,7 +86,7 @@
 /* Active: Fundo um pouco mais claro e ícone colorido */
 .taskbar-btn.active {
   background: rgba(255, 255, 255, 0.05);
-  color: #a855f7; /* Roxo do tema */
+  color: var(--accent-color); /* Acento do sistema */
 }
 
 .taskbar-btn:active {
@@ -137,7 +137,7 @@
   transform: translateX(-50%);
   width: 16px;
   height: 3px;
-  background: #a855f7;
+  background: var(--accent-color);
   border-radius: 2px;
 }
 
@@ -263,7 +263,7 @@
 .theme-toggle-btn:hover {
   transition: all 0.2s ease;
   background: rgba(255, 255, 255, 0.1);
-  color: #a855f7;
+  color: var(--accent-color);
 }
 
 .tray-divider {
@@ -325,7 +325,7 @@
 
 .theme-light .taskbar-btn.active {
   background: rgba(0, 0, 0, 0.04);
-  color: #a855f7;
+  color: var(--accent-color);
 }
 
 .theme-light .taskbar-btn:active {

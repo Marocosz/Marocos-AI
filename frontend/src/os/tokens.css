@@ -194,18 +194,25 @@
 
 /* Chrome de janela — noite. (A paleta do wallpaper propriamente dito vem de
    WALLPAPER.* via cssBridge.js, não daqui.) */
+/* A BARRA DE TÍTULO SEGUE O ACENTO, e é o que faz a escolha do preset ser
+   visível no chrome e não só no fundo. Era um violeta fixo (#4c1d95 de noite,
+   #a855f7 de dia) — com Brasa selecionado o wallpaper virava âmbar e toda
+   janela continuava roxa, que é exatamente a incoerência que os presets
+   existem para não ter. Alpha baixo porque é tinta sobre vidro, não cor
+   sólida. */
 .theme-dark {
-  --win-titlebar-bg: rgba(76, 29, 149, 0.4);
+  --win-titlebar-bg: rgb(var(--accent-rgb) / 0.28);
   --win-body-bg: rgba(14, 9, 22, 0.6);
   --win-body-solid: #100a18;
 }
 
 .theme-light {
-  --win-titlebar-bg: rgba(168, 85, 247, 0.22);
+  /* Mais leve que a da noite: sobre vidro branco a mesma dose empastelaria. */
+  --win-titlebar-bg: rgb(var(--accent-rgb) / 0.2);
   --win-body-bg: rgba(255, 255, 255, 0.55);
   --win-body-solid: #faf8ff;
   --win-border: 1px solid rgba(255, 255, 255, 0.6);
-  --win-shadow: 0 10px 24px rgba(88, 28, 135, 0.22);
+  --win-shadow: 0 10px 24px rgb(var(--accent-rgb) / 0.22);
 
   /* Tile de app de dia: continua escuro (ver o motivo em :root), mas o matiz
      sai do quase-preto e vai para o violeta #2e1065 — o MESMO que o rótulo do
@@ -433,15 +440,19 @@
    -------------------------------------------------- */
 
 :root {
-  --scroll-thumb: rgba(168, 85, 247, 0.55);
-  --scroll-thumb-hover: rgba(168, 85, 247, 0.85);
+  --scroll-thumb: rgb(var(--accent-rgb) / 0.55);
+  --scroll-thumb-hover: rgb(var(--accent-rgb) / 0.85);
   --scroll-track: rgba(255, 255, 255, 0.06);
 }
 
 .theme-light {
-  --scroll-thumb: rgba(124, 58, 237, 0.45);
-  --scroll-thumb-hover: rgba(109, 40, 217, 0.75);
-  --scroll-track: rgba(88, 28, 135, 0.08);
+  --scroll-thumb: rgb(var(--accent-rgb) / 0.45);
+  /* O hover de dia escurece subindo a opacidade do MESMO acento, e não indo
+     para um violeta mais fundo em literal. Com preset por tema o acento do dia
+     já é próprio (o padrão é #7c3aed), então o literal antigo só faria o
+     polegar parar de acompanhar a escolha do visitante. */
+  --scroll-thumb-hover: rgb(var(--accent-rgb) / 0.75);
+  --scroll-track: rgb(var(--accent-rgb) / 0.08);
 }
 
 /* O ESCOPO É A JANELA INTEIRA, NÃO SÓ O CORPO DELA.
@@ -531,10 +542,14 @@
   position: absolute;
   inset: -18%;
   border-radius: 50%;
+  /* As duas paradas eram hues diferentes (#a855f7 e #7c3aed). Viraram o MESMO
+     acento em duas opacidades: o halo perde um fio de profundidade e ganha
+     seguir o preset — sem isso ele continuaria roxo enquanto o resto do sistema
+     já tivesse mudado de cor, que é o pior dos dois resultados. */
   background: radial-gradient(
     circle at 50% 50%,
-    rgba(168, 85, 247, 0.34) 0%,
-    rgba(124, 58, 237, 0.16) 42%,
+    rgb(var(--accent-rgb) / 0.34) 0%,
+    rgb(var(--accent-rgb) / 0.16) 42%,
     transparent 68%
   );
   pointer-events: none;

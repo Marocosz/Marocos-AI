@@ -15,8 +15,21 @@
   --bg-color: #000000;
   --text-primary: rgba(255, 255, 255, 0.87);
   --text-secondary: rgba(255, 255, 255, 0.6);
-  --accent-color: #a855f7;
-  
+  /* O ACENTO VEM DO PRESET, PELA PONTE (config/system.js -> cssBridge.js).
+     Os literais aqui são o preset padrão da noite, usados só até a ponte rodar
+     — ou se ela falhar.
+
+     DUAS FORMAS, de propósito:
+       --accent-color  a cor cheia, para quem quer o acento sólido
+       --accent-rgb    o trio cru, para `rgb(var(--accent-rgb) / 0.16)`
+
+     A segunda existe porque o acento aparece em dezenas de opacidades pelo
+     projeto. Sem ela, cada opacidade viraria um token próprio — ou voltaria a
+     ser `rgba(168, 85, 247, X)` literal, que é exatamente o que impedia a
+     escolha do visitante de chegar até a interface. */
+  --accent-color: var(--cfg-accent, #a855f7);
+  --accent-rgb: var(--cfg-accent-rgb, 168 85 247);
+
   --card-bg: rgba(10, 10, 10, 0.6);
   --card-border: rgba(255, 255, 255, 0.08);
   

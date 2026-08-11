@@ -3,7 +3,8 @@ import { useLanguage } from '../contexts/LanguageContext'
 import { getProfileData } from '../content/profile'
 import { getOsData } from '../i18n/os'
 import { useDeviceMode } from '../os/useDeviceMode'
-import { CERIMONIA } from '../config/system'
+import { CERIMONIA, acentoProfundo } from '../config/system'
+import { useTheme } from '../contexts/ThemeContext'
 import DecryptedText from '../effects/DecryptedText'
 import './AboutApp.css'
 
@@ -23,6 +24,7 @@ const Crystal = lazy(() => import('../brand/Crystal'))
 const AboutApp = () => {
   const { language } = useLanguage()
   const deviceMode = useDeviceMode()
+  const { preset } = useTheme()
   const profile = getProfileData(language)
   const os = getOsData(language)
 
@@ -63,7 +65,15 @@ const AboutApp = () => {
         {deviceMode === 'desktop' && montarCristal && (
           <div className="about-crystal" role="img" aria-label={os.about.crystalAlt}>
             <Suspense fallback={<div className="about-crystal-fallback" aria-hidden="true" />}>
-              <Crystal size={190} animated />
+              {/* O acento atravessa por prop: o cristal monta dentro de um
+                  <Canvas> do react-three-fiber, que reconcilia numa árvore
+                  própria — contexto do React de fora não chega lá sozinho. */}
+              <Crystal
+                size={190}
+                animated
+                acento={preset.acento}
+                acentoFundo={acentoProfundo(preset)}
+              />
             </Suspense>
           </div>
         )}

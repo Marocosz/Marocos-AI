@@ -84,7 +84,7 @@
 }
 
 .history-hash-prefix {
-  color: var(--accent-color, #a855f7);
+  color: var(--accent-color);
   font-weight: bold;
 }
 
@@ -125,7 +125,7 @@
 .history-divider {
   width: 100%;
   height: 1px;
-  background: linear-gradient(90deg, transparent, rgba(168, 85, 247, 0.5), transparent);
+  background: linear-gradient(90deg, transparent, rgb(var(--accent-rgb) / 0.5), transparent);
   margin: 0.9rem 0;
 }
 
@@ -155,8 +155,8 @@
 
 .history-tag:hover {
   color: var(--text-primary);
-  border-color: rgba(168, 85, 247, 0.5);
-  background: rgba(168, 85, 247, 0.1);
+  border-color: rgb(var(--accent-rgb) / 0.5);
+  background: rgb(var(--accent-rgb) / 0.1);
 }
 
 /* ========================================
@@ -165,7 +165,9 @@
    variantes mais escuras sobre fundo claro.
    ======================================== */
 
-.theme-light .history-hash-prefix { color: #9333ea; }
+/* Sem literal: este override anulava o var(--accent-color) da regra base e
+   travava o prefixo em roxo no tema claro. O acento do dia já vem do preset. */
+.theme-light .history-hash-prefix { color: var(--accent-color); }
 .theme-light .history-hash { color: #666; }
 
 .theme-light .history-entry--init { --history-accent: #16a34a; }
@@ -190,7 +192,7 @@
 }
 
 .theme-light .history-tag:hover {
-  background: rgba(168, 85, 247, 0.1);
-  border-color: rgba(168, 85, 247, 0.5);
+  background: rgb(var(--accent-rgb) / 0.1);
+  border-color: rgb(var(--accent-rgb) / 0.5);
   color: #000;
 }

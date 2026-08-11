@@ -112,6 +112,19 @@ const Crystal = ({
   spin = 1,
   sparkles = true,
   className = '',
+  /**
+   * O ACENTO DO PRESET ATIVO, e o companheiro mais fundo dele.
+   *
+   * Vêm por prop e não de `useTheme()` aqui dentro por dois motivos: este
+   * componente é montado dentro de um `<Canvas>` do react-three-fiber, que roda
+   * numa árvore de reconciliação PRÓPRIA — contexto do React da árvore de fora
+   * não atravessa sozinho. E o padrão mantém o cristal testável e renderizável
+   * fora do sistema, como já era.
+   *
+   * Os literais são o preset padrão da noite, para quem montar sem passar nada.
+   */
+  acento = '#a855f7',
+  acentoFundo = '#4c1d95',
 }) => {
   return (
     <div
@@ -148,14 +161,20 @@ const Crystal = ({
          * uma fonte ampla e clara em cima, e dois realces coloridos nas
          * laterais. */}
         <Environment resolution={128}>
+          {/* A fonte ampla continua branca — é a luz principal, não identidade.
+              Os DOIS realces laterais seguem o acento do preset: o material tem
+              transmission 1.0, então é por eles que a cor do sistema entra no
+              cristal. Sem isso ele ficaria roxo com o resto da interface já
+              âmbar ou verde, e o cristal é a marca — seria o roxo mais visível
+              que sobrou. */}
           <Lightformer intensity={2.4} position={[0, 4, -9]} scale={[12, 12, 1]} color="#ffffff" />
-          <Lightformer intensity={1.6} position={[-6, 1, 2]} scale={[10, 3, 1]} color="#a855f7" />
-          <Lightformer intensity={1.1} position={[6, -2, 2]} scale={[10, 3, 1]} color="#4c1d95" />
+          <Lightformer intensity={1.6} position={[-6, 1, 2]} scale={[10, 3, 1]} color={acento} />
+          <Lightformer intensity={1.1} position={[6, -2, 2]} scale={[10, 3, 1]} color={acentoFundo} />
         </Environment>
 
         <ambientLight intensity={0.6} />
         <spotLight position={[5, 10, 5]} intensity={1.5} color="#ffffff" />
-        <pointLight position={[-5, -5, 5]} intensity={1} color="#a855f7" />
+        <pointLight position={[-5, -5, 5]} intensity={1} color={acento} />
 
         {/* O <Float> fica SEMPRE na arvore, mesmo parado.
          *

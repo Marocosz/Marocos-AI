@@ -61,7 +61,7 @@
 
 .start-menu-search:focus-within {
   background: rgba(255, 255, 255, 0.1);
-  border-color: rgba(168, 85, 247, 0.5);
+  border-color: rgb(var(--accent-rgb) / 0.5);
   color: #fff;
 }
 
@@ -88,7 +88,7 @@
   padding: 0 8px 8px;
 
   scrollbar-width: thin;
-  scrollbar-color: var(--scroll-thumb, rgba(168, 85, 247, 0.55)) transparent;
+  scrollbar-color: var(--scroll-thumb, rgb(var(--accent-rgb) / 0.55)) transparent;
 }
 
 .start-menu-apps::-webkit-scrollbar {
@@ -96,7 +96,7 @@
 }
 
 .start-menu-apps::-webkit-scrollbar-thumb {
-  background: var(--scroll-thumb, rgba(168, 85, 247, 0.55));
+  background: var(--scroll-thumb, rgb(var(--accent-rgb) / 0.55));
   border-radius: 6px;
 }
 
@@ -144,7 +144,7 @@
   height: 28px;
   flex-shrink: 0;
   border-radius: 50%;
-  background: #a855f7;
+  background: var(--accent-color);
   color: #fff;
   display: flex;
   align-items: center;
@@ -184,7 +184,7 @@
 }
 
 .start-menu-power-btn:focus-visible {
-  outline: 2px solid rgba(168, 85, 247, 0.6);
+  outline: 2px solid rgb(var(--accent-rgb) / 0.6);
   outline-offset: -2px;
 }
 
@@ -206,7 +206,7 @@
 
 .theme-light .start-menu-search:focus-within {
   background: #fff;
-  border-color: rgba(124, 58, 237, 0.4);
+  border-color: rgb(var(--accent-rgb) / 0.4);
   color: #000;
 }
 
