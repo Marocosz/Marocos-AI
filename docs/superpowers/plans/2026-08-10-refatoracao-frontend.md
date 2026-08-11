@@ -69,7 +69,7 @@ trabalho com janela, os 9 apps, a tela de bloqueio, e o shell mobile.
 ```bash
 cd .superpowers/sdd/2026-08-10-refatoracao-frontend/captura
 node capturar.mjs ./nova            # depois de `npm run build` no frontend
-node comparar.mjs ./base-v2 ./nova
+node comparar.mjs ./base-v3 ./nova
 ```
 
 **O que torna isso confiável — e por que não é só "tirar print":**
@@ -87,7 +87,7 @@ node comparar.mjs ./base-v2 ./nova
   interface, um único pixel diferente num rótulo, num peso de fonte ou num
   espaçamento já é alarme.
 
-A referência de máquina é `base-v2`, capturada no commit `94ab1c0`, cujo
+A referência de máquina é `base-v3`, capturada no commit `94ab1c0`, cujo
 estado foi verificado pelas revisões das tarefas 1 a 6.
 
 **Isto NÃO substitui a conferência humana.** Comparação automática pega
@@ -3425,6 +3425,116 @@ aparencia nao mudar. O mesmo para o 'mostrar area de trabalho', que continua
 O seletor amplo .theme-light h1,...,div fica como esta, com um comentario
 registrando a divida: troca-lo por heranca precisa de varredura visual do tema
 claro inteiro, que esta execucao nao tem como fazer."
+```
+
+---
+
+### Task 15B: Remover o popup morto da bandeja
+
+Acrescentada durante a execução, depois que a Tarefa 15 descobriu que o ramo é
+inalcançável. Decisão de remover tomada pelo dono do projeto.
+
+**O achado.** `App.jsx:199` monta a `Taskbar` **apenas** quando
+`modo !== 'mobile'`. `Taskbar.jsx:32` deriva `isCompact = useDeviceMode() ===
+'mobile'` — o mesmo hook, o mesmo breakpoint de 1024px. Logo, sempre que a
+`Taskbar` existe, `isCompact` é `false`. O popup nunca renderiza, em largura
+nenhuma.
+
+Provavelmente foi vivo antes desta branch, quando a taskbar aparecia em
+qualquer largura. O `MobileShell` assumiu o papel e traz o `QuickSettings`, que
+oferece os mesmos três controles abaixo de 1024px — então **nada se perde para
+o visitante**.
+
+**Files:**
+- Modify: `src/os/desktop/Taskbar.jsx`, `src/os/desktop/Taskbar.css`
+
+**Interfaces:**
+- Consumes: `useSystemToggles()` continua sendo usado pela bandeja do desktop.
+- Produces: nada. Remoção pura.
+
+- [ ] **Step 1: Confirmar a inalcançabilidade antes de apagar**
+
+```bash
+cd frontend/src
+grep -n "modo === 'mobile'" App.jsx
+grep -n "isCompact" os/desktop/Taskbar.jsx
+grep -n "breakpointDesktop" config/system.js os/useDeviceMode.js
+```
+
+Esperado: a `Taskbar` renderizada só no ramo `else` de `modo === 'mobile'`, e
+`isCompact` derivado do mesmo `useDeviceMode()`. **Se a premissa não se
+confirmar — por exemplo se a `Taskbar` também for montada no shell mobile —
+pare e reporte.** Apagar código alcançável seria regressão.
+
+- [ ] **Step 2: Remover do `Taskbar.jsx`**
+
+- o estado `isTrayMenuOpen` e seu `setIsTrayMenuOpen`
+- o `useEffect` que fecha o popup quando a tela deixa de ser compacta
+- a linha que zera `isTrayMenuOpen` dentro de `alternarIniciar`
+- o bloco `<AnimatePresence>` inteiro do popup, incluindo o `.tray-backdrop`
+- o ternário `isCompact ? … : …` em `.taskbar-right`, **preservando o conteúdo
+  do ramo `else`** (os três botões de toggle, o divisor, os ícones de bandeja,
+  o relógio e a faixa "mostrar área de trabalho")
+- a variável `isCompact`
+- os imports que ficarem sem uso: `MoreVertical`, e `useDeviceMode` **se** não
+  houver outro consumo no arquivo
+
+**Não remova** o `useSystemToggles()` nem os três toggles do desktop — eles são
+a superfície viva.
+
+- [ ] **Step 3: Remover do `Taskbar.css`**
+
+`.tray-menu-popup`, `.tray-menu-item` (e o reset de botão que a Tarefa 15
+acrescentou nela), `.tray-menu-label`, `.tray-backdrop`, e qualquer
+`.theme-light` desses seletores.
+
+**Confira antes de apagar cada um** que o seletor não é usado em outro lugar:
+
+```bash
+grep -rn "tray-menu\|tray-backdrop" frontend/src
+```
+
+Depois da remoção, esse grep deve retornar vazio.
+
+- [ ] **Step 4: Verificar**
+
+```bash
+cd frontend && npm run lint && npm test && npm run build
+```
+
+O `index.js` deve **encolher** — sai código de componente e de animação.
+Registre quanto.
+
+- [ ] **Step 5: Captura**
+
+```bash
+cd ../.superpowers/sdd/2026-08-10-refatoracao-frontend/captura
+node capturar.mjs ./task-15B
+node comparar.mjs ./base-v3 ./task-15B
+```
+
+Esperado `TODAS IGUAIS`: como o ramo nunca renderizava, remover não pode mudar
+pixel nenhum. **Se alguma cena divergir, a premissa da tarefa está errada** —
+pare e reporte em vez de ajustar.
+
+- [ ] **Step 6: Commit**
+
+```bash
+git add frontend/src/os/desktop/Taskbar.jsx frontend/src/os/desktop/Taskbar.css
+git commit -m "chore: remover o popup da bandeja, que nunca renderizava
+
+A Taskbar so e montada quando o modo NAO e mobile (App.jsx), e o popup so
+apareceria quando isCompact fosse verdadeiro -- derivado do mesmo
+useDeviceMode() e do mesmo breakpoint de 1024px. Logo isCompact era sempre
+falso onde a Taskbar existe, e o ramo era inalcancavel em qualquer largura.
+
+Provavelmente foi vivo antes do shell mobile, quando a taskbar aparecia em
+qualquer largura. O MobileShell assumiu o papel e traz o QuickSettings com os
+mesmos tres controles abaixo de 1024px, entao nada se perde para o visitante.
+
+Sai o estado isTrayMenuOpen, o bloco do popup, o backdrop, o botao de tres
+pontos e o CSS .tray-menu-*. A bandeja do desktop e o useSystemToggles
+continuam intactos."
 ```
 
 ---
