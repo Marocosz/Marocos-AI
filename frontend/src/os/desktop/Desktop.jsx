@@ -1,6 +1,6 @@
 import React, { useRef, useMemo } from 'react'
 import { motion } from 'motion/react'
-import Hills from '../../wallpapers/Hills'
+import Wallpaper from '../../wallpaper/Wallpaper'
 import Window from './Window'
 import ContextMenu from './ContextMenu'
 import AppIconButton from '../../ui/AppIconButton'
@@ -9,8 +9,8 @@ import { useWindows } from '../WindowManagerContext'
 import { useDeviceMode } from '../useDeviceMode'
 import { useIdleTask } from '../hooks/useIdleTask'
 import { useLanguage } from '../../contexts/LanguageContext'
-import { getOsData } from '../../data/os'
-import { getProfileData } from '../../data/content'
+import { getOsData } from '../../i18n/os'
+import { getProfileData } from '../../content/profile'
 import { MOVIMENTO, CERIMONIA } from '../../config/system'
 import './Desktop.css'
 
@@ -50,7 +50,7 @@ const Desktop = ({ isAnimated = true }) => {
    *
    * Só no desktop: o cristal 3D não é montado no mobile.
    */
-  useIdleTask(() => import('../../components/Crystal'), {
+  useIdleTask(() => import('../../brand/Crystal'), {
     ...CERIMONIA.idle.prefetchCristal,
     ativo: isDesktop,
   })
@@ -58,7 +58,7 @@ const Desktop = ({ isAnimated = true }) => {
   return (
     <div className="marocos-desktop" ref={desktopRef}>
       <ContextMenu targetRef={desktopRef} items={itensDoMenu} />
-      <Hills isAnimated={isAnimated} />
+      <Wallpaper isAnimated={isAnimated} />
 
       {/* Assinatura: é aqui que vive o <h1> da página. A Hero deixou de
           existir, e sem isto o site perde o cabeçalho principal. */}

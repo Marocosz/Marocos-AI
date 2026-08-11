@@ -3,7 +3,7 @@ import { useWindowActions } from '../WindowManagerContext'
 import AppIconButton from '../../ui/AppIconButton'
 import { APPS } from '../registry'
 import { useLanguage } from '../../contexts/LanguageContext'
-import { getOsData } from '../../data/os'
+import { getOsData } from '../../i18n/os'
 
 /**
  * DOCK

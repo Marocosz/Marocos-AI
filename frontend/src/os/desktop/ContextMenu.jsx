@@ -2,7 +2,7 @@ import React, {
   useCallback, useEffect, useLayoutEffect, useRef, useState,
 } from 'react'
 import { useLanguage } from '../../contexts/LanguageContext'
-import { getOsData } from '../../data/os'
+import { getOsData } from '../../i18n/os'
 import './ContextMenu.css'
 
 /**

@@ -1,13 +1,13 @@
 import { Renderer, Program, Mesh, Color, Triangle } from 'ogl'
 import { useEffect, useRef } from 'react'
-import { WALLPAPER } from '../../config/system'
+import { WALLPAPER } from '../config/system'
 
 /**
  * SILK — o wallpaper do tema escuro.
  *
  * PORTADO DE @react-three/fiber PARA ogl. O shader é o mesmo, byte a byte; o
  * que mudou foi o runtime. Motivo: este componente é importado estaticamente
- * pela cadeia App -> Desktop -> Hills, então o `three` inteiro entrava no
+ * pela cadeia App -> Desktop -> Wallpaper, então o `three` inteiro entrava no
  * caminho crítico e anulava o React.lazy do Crystal — o `three` estava no
  * bundle principal, e o chunk "lazy" só carregava a cola do drei.
  *

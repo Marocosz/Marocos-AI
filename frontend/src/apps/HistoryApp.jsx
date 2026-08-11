@@ -1,6 +1,6 @@
 import React from 'react'
 import { useLanguage } from '../contexts/LanguageContext'
-import { getJourneyData } from '../data/journey'
+import { getJourneyData } from '../content/journey'
 import AppHeader from '../ui/AppHeader'
 import './HistoryApp.css'
 

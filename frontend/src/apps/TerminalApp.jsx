@@ -1,9 +1,9 @@
 import React, { useEffect, useRef, useState } from 'react'
 import { useLanguage } from '../contexts/LanguageContext'
 import { useWindowActions } from '../os/WindowManagerContext'
-import { getContactData } from '../data/contact'
-import { getProfileData } from '../data/content'
-import { getOsData } from '../data/os'
+import { getContactData } from '../content/contact'
+import { getProfileData } from '../content/profile'
+import { getOsData } from '../i18n/os'
 import './TerminalApp.css'
 
 /**

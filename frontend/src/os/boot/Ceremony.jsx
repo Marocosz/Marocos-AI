@@ -1,14 +1,14 @@
 import { useEffect, useState, useRef, Suspense, lazy } from 'react'
 import { useLanguage } from '../../contexts/LanguageContext'
-import { getOsData } from '../../data/os'
-import { getStartMenuData } from '../../data/startMenu'
+import { getOsData } from '../../i18n/os'
+import { getStartMenuData } from '../../i18n/startMenu'
 import { lerMovimentoReduzido } from '../hooks/useMediaQuery'
 import Clock from '../../ui/Clock'
 import './boot.css'
 
 // O App dispara este mesmo import no escopo do módulo, então quando a cerimônia
 // monta o chunk já costuma estar a caminho.
-const Crystal = lazy(() => import('../../components/Crystal'))
+const Crystal = lazy(() => import('../../brand/Crystal'))
 
 /**
  * CERIMÔNIA — inicialização e tela de bloqueio, num palco só.

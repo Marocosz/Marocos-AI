@@ -1,7 +1,7 @@
 import React from 'react'
 import { FileText } from 'lucide-react'
 import { useLanguage } from '../contexts/LanguageContext'
-import { getProjectsData } from '../data/projects'
+import { getProjectsData } from '../content/projects'
 import { useWindowActions } from '../os/WindowManagerContext'
 import { projectSlug } from './projectSlug'
 import './ProjectsApp.css'

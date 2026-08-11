@@ -1,6 +1,6 @@
 import React, { useCallback, useEffect, useState } from 'react'
-import Silk from '../components/backgrounds/Silk'
-import Iridescence from '../components/backgrounds/Iridescence'
+import Silk from './Silk'
+import Iridescence from './Iridescence'
 import { useDeviceMode } from '../os/useDeviceMode'
 import { useTheme } from '../contexts/ThemeContext'
 import { WALLPAPER } from '../config/system'
@@ -81,7 +81,7 @@ const Ceu = ({ tema, isMobile, isAnimated }) => {
  * camada que sai é CONGELADA — ela já está sendo coberta, e desenhar frames que
  * ninguém vai ver seria pagar duas vezes pelo mesmo momento.
  */
-const Hills = ({ isAnimated = true }) => {
+const Wallpaper = ({ isAnimated = true }) => {
   const isMobile = useDeviceMode() === 'mobile'
   const { isDark } = useTheme()
   const atual = isDark ? 'dark' : 'light'
@@ -154,4 +154,4 @@ const Hills = ({ isAnimated = true }) => {
   )
 }
 
-export default Hills
+export default Wallpaper

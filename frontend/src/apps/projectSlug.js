@@ -3,7 +3,7 @@
  * --------------------------------------------------
  * Deriva um identificador estável em texto a partir do título do projeto.
  *
- * Os itens de `data/projects.js` não têm campo de slug, e as rotas do sistema
+ * Os itens de `content/projects.js` não têm campo de slug, e as rotas do sistema
  * (`/projetos/:slug`) precisam de um. Esta é a ÚNICA regra de conversão
  * título -> slug do projeto: mora num módulo próprio para que `ProjectsApp`
  * (que gera o link) e `ProjectDetailApp` (que resolve o link) apliquem

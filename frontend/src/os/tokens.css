@@ -273,7 +273,7 @@
 /* A camada que está entrando sobe de opacidade sobre a que está saindo. A
    duração vem de WALLPAPER.crossfade.duracaoMs (system.js) e tem de ficar BEM
    abaixo de limiteSegurancaMs — é o `animationend` desta animação que decide
-   quando a camada antiga sai da árvore em Hills.jsx; se esta animação fosse
+   quando a camada antiga sai da árvore em Wallpaper.jsx; se esta animação fosse
    mais longa que o previsto, a antiga desapareceria antes de a nova estar
    opaca e a cor de base do wallpaper apareceria no meio da troca. */
 .marocos-sky--entrando {

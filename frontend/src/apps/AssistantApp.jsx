@@ -1,7 +1,7 @@
 import React, { useRef, useEffect, useState, lazy, Suspense } from 'react'
 import { Search, Bot, Send, Loader2, X } from 'lucide-react'
 import { useLanguage } from '../contexts/LanguageContext'
-import { getOsData } from '../data/os'
+import { getOsData } from '../i18n/os'
 import { REDE } from '../config/system'
 import './AssistantApp.css'
 

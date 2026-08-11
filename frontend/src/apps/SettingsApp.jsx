@@ -1,7 +1,7 @@
 import React from 'react'
 import { Sparkles } from 'lucide-react'
 import { useLanguage } from '../contexts/LanguageContext'
-import { getOsData } from '../data/os'
+import { getOsData } from '../i18n/os'
 import { useSystemToggles } from '../ui/useSystemToggles'
 import ToggleRow from '../ui/ToggleRow'
 import './SettingsApp.css'

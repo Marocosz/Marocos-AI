@@ -1,5 +1,5 @@
 import { useLanguage } from '../../contexts/LanguageContext'
-import { getOsData } from '../../data/os'
+import { getOsData } from '../../i18n/os'
 import './boot.css'
 
 /**

@@ -1,13 +1,13 @@
 import React from 'react'
 import { Github } from 'lucide-react'
 import { useLanguage } from '../contexts/LanguageContext'
-import { getProjectsData } from '../data/projects'
-import { getOsData } from '../data/os'
+import { getProjectsData } from '../content/projects'
+import { getOsData } from '../i18n/os'
 import { projectSlug } from './projectSlug'
 import './ProjectDetailApp.css'
 
 // Mensagem de fallback caso `os.errors.projectNotFound` ainda não exista em
-// data/os.js (ver relatório da tarefa: chave de sistema pendente de adição).
+// i18n/os.js (ver relatório da tarefa: chave de sistema pendente de adição).
 // Mantém o app funcional e sem tela branca enquanto a chave não chega.
 const FALLBACK_NOT_FOUND = {
   pt: 'Projeto não encontrado.',

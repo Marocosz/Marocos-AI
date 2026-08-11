@@ -18,8 +18,8 @@
  */
 import { useEffect } from 'react'
 import { useLanguage } from '../contexts/LanguageContext'
-import { getOsData } from '../data/os'
-import { getProjectsData } from '../data/projects'
+import { getOsData } from '../i18n/os'
+import { getProjectsData } from '../content/projects'
 import { projectSlug } from '../apps/projectSlug'
 import { buildRoute } from './routes'
 

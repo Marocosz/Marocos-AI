@@ -1,16 +1,16 @@
 import React, { Suspense, lazy, useState, useEffect } from 'react'
 import { useLanguage } from '../contexts/LanguageContext'
-import { getProfileData } from '../data/content'
-import { getOsData } from '../data/os'
+import { getProfileData } from '../content/profile'
+import { getOsData } from '../i18n/os'
 import { useDeviceMode } from '../os/useDeviceMode'
 import { CERIMONIA } from '../config/system'
-import DecryptedText from '../components/effects/DecryptedText'
+import DecryptedText from '../effects/DecryptedText'
 import './AboutApp.css'
 
 // three + @react-three/fiber + @react-three/drei são pesados demais pra
 // entrar no bundle principal só por causa de um diálogo "Sobre". Carrega sob
 // demanda e só em desktop (ver useDeviceMode mais abaixo).
-const Crystal = lazy(() => import('../components/Crystal'))
+const Crystal = lazy(() => import('../brand/Crystal'))
 
 /**
  * "Sobre este PC" — o winver do Marocos OS: identidade + especificações.

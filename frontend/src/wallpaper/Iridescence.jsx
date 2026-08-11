@@ -1,7 +1,7 @@
-// src/components/backgrounds/Iridescence.jsx
+// src/wallpaper/Iridescence.jsx
 import { Renderer, Program, Mesh, Color, Triangle } from 'ogl';
 import { useEffect, useRef } from 'react';
-import { WALLPAPER } from '../../config/system';
+import { WALLPAPER } from '../config/system';
 import './Iridescence.css';
 
 const vertexShader = `

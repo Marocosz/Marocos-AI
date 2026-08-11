@@ -2,7 +2,7 @@ import { describe, it, expect } from 'vitest'
 import { WALLPAPER, JANELAS, CERIMONIA, MOVIMENTO, VIDRO, LAYOUT, REDE } from './system'
 
 describe('config do sistema', () => {
-  it('preserva os valores do Silk que estavam em Hills.jsx', () => {
+  it('preserva os valores do Silk que estavam em Wallpaper.jsx', () => {
     expect(WALLPAPER.silk.cor).toBe('#4c1d95')
     expect(WALLPAPER.silk.velocidade).toBe(12)
     expect(WALLPAPER.silk.escala).toBe(1.4)

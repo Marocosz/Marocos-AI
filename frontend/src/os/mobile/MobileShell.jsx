@@ -1,5 +1,5 @@
 import React, { useState } from 'react'
-import Hills from '../../wallpapers/Hills'
+import Wallpaper from '../../wallpaper/Wallpaper'
 import { useWindows } from '../WindowManagerContext'
 import HomeScreen from './HomeScreen'
 import MobileApp from './MobileApp'
@@ -34,7 +34,7 @@ const MobileShell = ({ isAnimated = true }) => {
 
   return (
     <div className="marocos-mobile-shell">
-      <Hills isAnimated={wallpaperAnimado} />
+      <Wallpaper isAnimated={wallpaperAnimado} />
 
       {topWindow ? (
         // key=win.key força remontagem ao trocar de app no topo da pilha,

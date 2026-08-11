@@ -6,7 +6,7 @@ import AppIconButton from '../../ui/AppIconButton'
 import Clock from '../../ui/Clock'
 import { APPS } from '../registry'
 import { useLanguage } from '../../contexts/LanguageContext'
-import { getOsData } from '../../data/os'
+import { getOsData } from '../../i18n/os'
 import { MOVIMENTO } from '../../config/system'
 
 /**

@@ -1,7 +1,7 @@
 import { Sun, Moon, Play, Pause, Languages } from 'lucide-react'
 import { useLanguage } from '../contexts/LanguageContext'
 import { useTheme } from '../contexts/ThemeContext'
-import { getOsData } from '../data/os'
+import { getOsData } from '../i18n/os'
 
 /**
  * OS TRÊS CONTROLES DO SISTEMA, NUM LUGAR SÓ
