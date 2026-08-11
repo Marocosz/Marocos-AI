@@ -118,7 +118,10 @@ describe('config do sistema', () => {
       larguraBotao: '88px',
       tamanhoTile: '56px',
       raioTile: '14px',
-      intervalo: '4px',
+      // 3px desde que todo rótulo de ícone passou a ocupar uma linha só: o item
+      // ficou fixo em 94,4px e 7 × 94,4 + 6 × 4 estouraria por 0,8px o espaço de
+      // uma viewport de 768px. A justificativa está em config/system.js.
+      intervalo: '3px',
       folgaInferior: '32px',
     })
     expect(LAYOUT.assinatura).toEqual({

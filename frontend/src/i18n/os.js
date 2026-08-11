@@ -9,6 +9,28 @@ const osContentEn = {
     assistant: 'Virtual Marcos',
     settings: 'Settings',
   },
+  /**
+   * LEGENDA DO ÍCONE NA ÁREA DE TRABALHO — mapa PARCIAL, de propósito.
+   *
+   * `windows` acima é compartilhado com a barra de título e a taskbar, onde
+   * "Device Manager" está certo. Mas como legenda de ícone ele quebra em duas
+   * linhas, o item cresce de 94,4px para 108,8px, e uma coluna com alturas
+   * diferentes e `gap` uniforme deixa de ser grade (ver o clamp em
+   * AppIconButton.css).
+   *
+   * Então aqui só entram os títulos longos demais para uma linha. Os outros
+   * cinco caem no fallback `os.iconLabels[k] ?? os.windows[k]` dos call sites
+   * — Desktop.jsx e HomeScreen.jsx —, e esse fallback é load-bearing: um app
+   * futuro na área de trabalho sem entrada aqui mostra o título da janela em
+   * vez de `undefined`.
+   *
+   * As duas escolhas seguem a rota do app (`/jornada`, `/stack`), não uma
+   * abreviação inventada.
+   */
+  iconLabels: {
+    history: 'Timeline',
+    devices: 'Stack',
+  },
   about: {
     specsLabel: 'System Specifications',
     featuresLabel: 'Installed Features',
@@ -169,6 +191,11 @@ const osContentPt = {
     terminal: 'Terminal',
     assistant: 'Marcos Virtual',
     settings: 'Configurações',
+  },
+  /** Legenda curta do ícone — ver o bloco `iconLabels` do inglês, acima. */
+  iconLabels: {
+    history: 'Jornada',
+    devices: 'Stack',
   },
   about: {
     specsLabel: 'Especificações do Sistema',

@@ -26,6 +26,27 @@
   /* Legibilidade de label sobre wallpaper */
   --icon-label-shadow: 0 1px 3px rgba(0, 0, 0, 0.8);
 
+  /* SUPERFÍCIE DO TILE DE APP (área de trabalho e tela inicial).
+     É o vidro das janelas, com uma divergência deliberada: NÃO herda
+     --win-body-bg. Aquele token inverte para vidro branco no tema claro
+     (rgba(255,255,255,.55) lá embaixo), e o wallpaper claro — o Iridescence —
+     tem regiões quase brancas, o canto inferior direito inteiro. Tile branco
+     desaparece ali, e o tile é a navegação principal do site.
+
+     Então o tile fica escuro nos DOIS temas e só o matiz acompanha o tema. O
+     preço é este bloco existir; o ganho é o glifo branco ter fundo escuro
+     sempre, sem depender de que região do wallpaper caiu atrás dele.
+
+     --win-highlight é reaproveitado de propósito: só existe em :root, o tema
+     claro não o inverte. */
+  --icon-tile-bg: rgba(14, 9, 22, 0.6); /* = --win-body-bg do .theme-dark */
+  --icon-tile-bg-hover: rgba(30, 20, 44, 0.72);
+  /* 0.22 e não os 0.18 de --win-border: o tile é pequeno e cai onde o Silk
+     mandar. Nas dobras escuras do shader o fundo do tile e o wallpaper chegam
+     os dois perto de rgb(19,9,32), e aí a única coisa que define a aresta é
+     esta borda. A janela não tem esse problema porque é grande e tem sombra. */
+  --icon-tile-border: 1px solid rgba(255, 255, 255, 0.22);
+
   /* Escala de z-index — única fonte de verdade */
   --z-wallpaper: 0;
   --z-icons: 10;
@@ -175,6 +196,26 @@
   --win-body-solid: #faf8ff;
   --win-border: 1px solid rgba(255, 255, 255, 0.6);
   --win-shadow: 0 10px 24px rgba(88, 28, 135, 0.22);
+
+  /* Tile de app de dia: continua escuro (ver o motivo em :root), mas o matiz
+     sai do quase-preto e vai para o violeta #2e1065 — o MESMO que o rótulo do
+     ícone já usa no tema claro logo abaixo, em AppIconButton.css. Não é cor
+     nova: é a cor que a legenda já tinha, agora também no tile atrás dela.
+
+     QUASE OPACO, E ISSO FOI MEDIDO. A primeira tentativa usou 0.62, o mesmo
+     alpha do tema escuro, e falhou: sobre o pastel do Iridescence
+     (~rgb(200,216,232)) o resultado é 0.62×(46,16,101) + 0.38×(200,216,232) =
+     rgb(105,92,151) — um cinza-violeta lavado, exatamente o borrão que esta
+     mudança existia para eliminar. Alpha vale de noite, quando o que está atrás
+     é mais escuro que o tile; de dia ele mistura na direção errada. Em 0.92 a
+     conta dá rgb(58,32,112), violeta fundo de verdade, e o glifo branco volta a
+     ter contraste.
+
+     Consequência aceita: de dia o tile é quase sólido, então quem carrega a
+     leitura de material é a borda + o --win-highlight, não a transparência. */
+  --icon-tile-bg: rgba(46, 16, 101, 0.92);
+  --icon-tile-bg-hover: rgba(60, 24, 120, 0.96);
+  --icon-tile-border: 1px solid rgba(255, 255, 255, 0.28);
 
   /* Cerimônia de dia.
      A leitura da cena não muda: a inicialização acontece antes de o roxo do

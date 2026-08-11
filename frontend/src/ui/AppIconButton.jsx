@@ -10,7 +10,7 @@ import './AppIconButton.css'
  * copiadas entre eles.
  *
  * Duas variantes:
- *   tile   moldura roxa quadrada + label embaixo (área de trabalho, tela inicial)
+ *   tile   quadrado de vidro + label embaixo (área de trabalho, tela inicial)
  *   plana  ícone solto, sem moldura (dock, menu Iniciar)
  *
  * O tamanho vem da variante de tamanho, não de prop numérica: os quatro usos
@@ -19,16 +19,29 @@ import './AppIconButton.css'
  *
  * Não conhece o gerenciador de janelas: quem abre é quem passa `onClick`.
  */
+/**
+ * O GLIFO CARREGA A IDENTIDADE DO APP, ENTÃO ELE PRECISA DE PRESENÇA.
+ *
+ * Os sete tiles da área de trabalho compartilham fundo, borda e raio — a única
+ * coisa que distingue "Terminal" de "Gerenciador de Dispositivos" é a silhueta
+ * do glifo. Em 26px com traço 1.75 dentro de um tile de 56px sobravam 15px de
+ * anel de cada lado e a forma ficava pequena e fina demais para ser reconhecida
+ * sem ler o rótulo. Em 32px com traço 2 sobram 12px, e o traço mais grosso
+ * sobrevive à escala do wallpaper por trás.
+ *
+ * Só `tile` muda: `dock` e `lista` são a variante plana, que nunca teve esse
+ * problema porque ali o ícone vem acompanhado de texto na mesma linha.
+ */
 const TAMANHO_ICONE = {
-  desktop: 26,
-  mobile: 26,
+  desktop: 32,
+  mobile: 32,
   dock: 22,
   lista: 20,
 }
 
 const ESPESSURA_ICONE = {
-  desktop: 1.75,
-  mobile: 1.75,
+  desktop: 2,
+  mobile: 2,
   dock: 1.9,
   lista: 1.75,
 }

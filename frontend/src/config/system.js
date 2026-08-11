@@ -268,7 +268,13 @@ export const LAYOUT = {
     larguraBotao: '88px',
     tamanhoTile: '56px',
     raioTile: '14px',
-    intervalo: '4px',
+    /**
+     * 3px, não 4: com todos os rótulos em uma linha o item tem 94,4px fixos, e
+     * 7 × 94,4 + 6 × 3 = 678,8px de coluna. Em 4px daria 684,8px, que estoura
+     * por 0,8px o espaço de uma viewport de 768px — exatamente o tipo de
+     * quebra por dois pixels que o comentário de Desktop.css descreve.
+     */
+    intervalo: '3px',
     /** Folga entre o fim da coluna de ícones e a barra de tarefas. */
     folgaInferior: '32px',
   },

@@ -16,12 +16,24 @@
   gap: var(--cfg-icone-intervalo, 4px);
   /* O CORTE DA COLUNA, CONTADO E NÃO ESTIMADO.
      A coluna começa em top: 20px e não pode invadir a barra de tarefas, então o
-     que sobra é 100vh - 20 - altura da barra, menos uma folga de 12px para os
-     ícones não encostarem nela. Os 120px chumbados de antes reservavam 48px a
-     mais do que o necessário: com sete ícones de 94px e 4px de intervalo a
-     coluna pede 682px, e o teto caía em 680px numa tela de 800 — quebrava para
-     a segunda fileira por DOIS pixels, deixando 127px vazios embaixo. Usando o
-     token da barra a conta passa a ser verdadeira em qualquer altura. */
+     que sobra é 100vh - 20 - altura da barra, menos uma folga para os ícones não
+     encostarem nela. Os 120px chumbados de antes reservavam 48px a mais do que o
+     necessário: quebrava para a segunda fileira por DOIS pixels, deixando 127px
+     vazios embaixo. Usando o token da barra a conta passa a ser verdadeira em
+     qualquer altura.
+
+     A conta de hoje: 0.72rem com line-height 1.25 dá 14,4px por linha de
+     rótulo, e todo rótulo agora ocupa UMA linha (mapa `iconLabels` em
+     i18n/os.js + o clamp em AppIconButton.css). Logo todo item mede
+     1 + 8 + 56 + 6 + 14,4 + 8 + 1 = 94,4px, e sete deles com 3px de intervalo
+     pedem 678,8px — contra 713,6px de quando dois rótulos quebravam em duas
+     linhas. A altura mínima de viewport cai de 797,6px para 762,8px.
+
+     ATENÇÃO: 100vh é VIEWPORT, não tela. Num 1366×768 real o viewport fica em
+     ~660px depois do chrome do navegador, e sete ícones de 94px não caberão
+     numa coluna ali de jeito nenhum. Não é bug: o flex-wrap manda os que
+     sobram para uma segunda coluna, e com pitch uniforme isso lê como grade de
+     verdade em vez do 6+1 torto que as alturas desiguais produziam. */
   max-height: calc(100vh - var(--taskbar-h) - var(--cfg-icone-folga, 32px));
   margin: 0;
   padding: 0;

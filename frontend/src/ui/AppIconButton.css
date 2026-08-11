@@ -36,10 +36,23 @@
   border-radius: var(--win-control-radius);
 }
 
-.app-icon-btn--desktop:hover {
-  background: rgba(255, 255, 255, 0.12);
+/* O REALCE É NO TILE, NÃO NO BOTÃO.
+   Antes isto era `background: rgba(255,255,255,.12)` aqui, no botão de 88px —
+   o que pintava um retângulo pálido atrás do tile E do rótulo, em volta do
+   alvo em vez de em cima dele. Agora quem responde é o tile: fundo um passo
+   mais claro, borda acesa no acento e um halo do mesmo matiz.
+   Nada de cor nova — é --accent-color (#a855f7) em três opacidades. */
+.app-icon-btn--desktop:hover .app-icon-btn-glifo {
+  background: var(--icon-tile-bg-hover);
+  border-color: var(--accent-color);
+  box-shadow:
+    var(--win-highlight),
+    0 6px 16px rgba(168, 85, 247, 0.28);
+  transform: translateY(-1px);
 }
 
+/* O foco fica no botão, não no tile: o anel precisa envolver o alvo de clique
+   inteiro (tile + rótulo), que é o que o teclado seleciona. */
 .app-icon-btn--desktop:focus-visible {
   outline: 2px solid var(--accent-color);
 }
@@ -50,24 +63,35 @@
   border: none;
 }
 
-/* Glifo (moldura roxa). Gradiente, borda, sombra e cor são idênticos entre a
-   área de trabalho e a tela inicial — só tamanho e raio mudam, carregados
+/* Glifo (a superfície do tile). Fundo, borda, sombra e cor são idênticos entre
+   a área de trabalho e a tela inicial — só tamanho e raio mudam, carregados
    pelos modificadores de tamanho abaixo.
 
-   :where() em volta do seletor de variante ZERA a especificidade dele, para
-   que este seletor valha o mesmo que o antigo `.marocos-icon-tile` (uma
-   classe só). Isso importa porque index.css tem um hack global --
-   `.theme-light span, li, div { color: var(--text-primary) }` -- que hoje
-   vence exatamente esse `color: #fff` no tema claro (é ele, não uma regra
-   deste arquivo, quem deixa o ícone do tile escuro no tema claro). Um
-   seletor composto (duas classes) vence esse hack por especificidade e
-   pintaria o ícone de branco também no claro -- regressão visual real,
-   pega na comparação de capturas antes desta correção. */
-:where(.app-icon-btn--tile) .app-icon-btn-glifo {
+   O tile é vidro do sistema, não um gradiente próprio: antes ele pintava
+   `linear-gradient(160deg, rgba(168,85,247,.5), rgba(88,28,135,.6))`, que é o
+   MESMO roxo do wallpaper Silk atrás dele — a moldura quase desaparecia no
+   escuro e virava um borrão acinzentado sobre o pastel do Iridescence no claro.
+   Agora usa os tokens --icon-tile-* de tokens.css, escuros nos dois temas.
+
+   SEM backdrop-filter, de propósito: são sete tiles sempre visíveis sobre um
+   canvas animado, e atrás de um quadrado de 56px o gradiente do Silk quase não
+   varia — o blur seria invisível e ainda assim recomporia sete regiões por
+   frame. Cor semitransparente + borda + highlight é o que lê como vidro, e o
+   wallpaper continua aparecendo por dentro, só sem desfoque.
+
+   O SELETOR É COMPOSTO (duas classes) DE PROPÓSITO, e isso é o oposto do que
+   este arquivo fazia antes. Aqui havia um :where() em volta da variante, que
+   zera a especificidade, justamente para PERDER do hack global de index.css
+   (`.theme-light span, li, div { color: var(--text-primary) }`) — era esse hack
+   que deixava o glifo escuro no tema claro, e ele era desejado enquanto o tile
+   era lilás pálido no claro. Com o tile escuro nos dois temas o glifo tem que
+   ser branco nos dois, então este seletor precisa VENCER o hack. Recolocar o
+   :where() aqui devolve o glifo escuro sobre fundo escuro no tema claro. */
+.app-icon-btn--tile .app-icon-btn-glifo {
   display: grid;
   place-items: center;
-  border: var(--win-border);
-  background: linear-gradient(160deg, rgba(168, 85, 247, 0.5), rgba(88, 28, 135, 0.6));
+  border: var(--icon-tile-border);
+  background: var(--icon-tile-bg);
   box-shadow: var(--win-highlight);
   color: #fff;
 }
@@ -76,6 +100,10 @@
   width: var(--cfg-icone-tile, 56px);
   height: var(--cfg-icone-tile, 56px);
   border-radius: var(--cfg-icone-raio, 14px);
+  /* Nenhuma destas três propriedades é fotografada pelo regressor visual, que
+     captura só o estado de repouso — o hover se verifica no navegador. */
+  transition: background 0.15s ease, border-color 0.15s ease, box-shadow 0.15s ease,
+    transform 0.15s ease;
 }
 
 .app-icon-btn--mobile .app-icon-btn-glifo {
@@ -97,6 +125,28 @@
   text-align: center;
   color: #fff;
   text-shadow: var(--icon-label-shadow);
+}
+
+/* UMA LINHA, SEMPRE — é o que dá pitch uniforme à coluna.
+   0.72rem com line-height 1.25 mede 14,4px por linha, então um rótulo de duas
+   linhas fazia o item pular de 94,4px para 108,8px. Com `gap` uniforme e
+   alturas diferentes a coluna não vira grade, vira uma pilha torta: era o que
+   "Histórico de Versões" e "Gerenciador de Dispositivos" faziam com os
+   vizinhos. Quem resolveu o conteúdo foi o mapa `iconLabels` em i18n/os.js
+   (legenda curta, separada do título da janela); este clamp é o que garante o
+   pitch mesmo que uma tradução futura cresça.
+
+   Só no desktop: a grade do mobile são 3 colunas sem teto de altura, então lá
+   quebrar em duas linhas não custa nada e truncar seria perda pura.
+
+   `align-self: stretch` não é enfeite — sem largura definida o rótulo encolhe
+   para o conteúdo num flex column centralizado, e aí text-overflow nunca
+   dispara. */
+.app-icon-btn--desktop .app-icon-btn-label {
+  align-self: stretch;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 /* No tema claro o wallpaper fica lilás pálido: texto branco com sombra escura

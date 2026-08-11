@@ -65,9 +65,13 @@ const HomeScreen = ({ onOpenQuickSettings }) => {
               duration: MOVIMENTO.iconesMobile.duration,
             }}
           >
+            {/* Mesma legenda curta da área de trabalho: um app tem um nome só,
+                e aqui ela também iguala a altura das fileiras da grade —
+                "Gerenciador de Dispositivos" era o único rótulo de duas linhas
+                e deixava a segunda fileira mais alta que a primeira. */}
             <AppIconButton
               app={app}
-              titulo={os.windows[app.titleKey]}
+              titulo={os.iconLabels[app.titleKey] ?? os.windows[app.titleKey]}
               variante="tile"
               tamanho="mobile"
               onClick={() => open(app.id)}

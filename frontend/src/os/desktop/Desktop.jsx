@@ -81,9 +81,11 @@ const Desktop = ({ isAnimated = true }) => {
           >
             {/* Clique único abre: desvio deliberado da metáfora, porque
                 estes ícones são a navegação principal do site. */}
+            {/* Legenda curta quando existe; título da janela quando não —
+                ver o porquê no bloco `iconLabels` de i18n/os.js. */}
             <AppIconButton
               app={app}
-              titulo={os.windows[app.titleKey]}
+              titulo={os.iconLabels[app.titleKey] ?? os.windows[app.titleKey]}
               variante="tile"
               tamanho="desktop"
               onClick={() => open(app.id)}

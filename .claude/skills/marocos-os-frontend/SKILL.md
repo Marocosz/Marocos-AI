@@ -61,7 +61,7 @@ camada errada é o erro mais comum:
 | camada | onde | dona de |
 |---|---|---|
 | ajuste | `config/system.js` → `--cfg-*` | blur, raios, alturas, durações |
-| chrome do SO | `os/tokens.css` | `--win-*`, `--taskbar-h`, escala de z-index, arte da cerimônia |
+| chrome do SO | `os/tokens.css` | `--win-*`, `--icon-tile-*`, `--taskbar-h`, escala de z-index, arte da cerimônia |
 | conteúdo | `styles/index.css` | `--bg-color`, `--text-primary/secondary`, `--accent-color`, `--card-bg/border` |
 
 - **Nunca invente z-index** — a escala em `tokens.css` é fonte única.
@@ -69,6 +69,11 @@ camada errada é o erro mais comum:
   existem em `HistoryApp.css` e `content/tech.js`; um app novo reaproveita.
 - **Superfície de conteúdo** é `--card-bg` + `--card-border` — não uma receita
   de vidro nova.
+- **Alpha de tema escuro não se reaproveita no tema claro.** Vidro
+  semitransparente conta com o que está atrás ser mais escuro que ele; sobre o
+  wallpaper claro a mistura vai na direção oposta e lava a cor. O tile de ícone
+  paga isso explicitamente: `rgba(46,16,101,.92)` de dia contra
+  `rgba(14,9,22,.6)` de noite, e a conta está no comentário de `--icon-tile-bg`.
 - **Raio**: `--win-control-radius` em qualquer coisa clicável. Pílula de 999px é
   só para elemento **não** interativo (badge, tag).
 
@@ -128,7 +133,7 @@ uma decisão que custou medição ou depuração:
 | se você for mexer em | leia primeiro |
 |---|---|
 | qualquer valor visual | o cabeçalho de `config/system.js` — inclusive o que ele diz que **não** mora lá |
-| CSS de componente novo | `ui/AppIconButton.css` — o hack global de tema claro e o uso de `:where()` |
+| CSS de componente novo | `ui/AppIconButton.css` — o hack global de tema claro de `index.css`, e por que a variante `--tile` precisa **vencê-lo** com seletor composto enquanto a `--plana` precisa **herdar** com `color: inherit` |
 | custom property nova | `config/cssBridge.js` — por que todo `var(--cfg-*)` precisa de fallback |
 | wallpaper ou shader | `wallpaper/Silk.jsx` — teto de fps, tempo acumulado, e por que a pausa vive numa ref |
 | acrescentar um app | `os/registry.js` — por que só `component` pode ser `lazy` |
