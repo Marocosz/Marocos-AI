@@ -47,6 +47,16 @@
      esta borda. A janela não tem esse problema porque é grande e tem sombra. */
   --icon-tile-border: 1px solid rgba(255, 255, 255, 0.22);
 
+  /* DIVISOR ESTRUTURAL DO CHROME DE EXPLORADOR.
+     Não usa --card-border, e a razão é medida: aquele token é
+     rgba(255,255,255,0.08) no escuro, pensado para separar CARD de fundo, onde
+     o próprio card já tem cor própria fazendo metade do trabalho. Aqui as três
+     faixas (navegação, comandos, lateral) têm o MESMO --card-bg do miolo, então
+     a linha é a única coisa separando região de região — e em 0.08 ela
+     simplesmente não aparece. O dobro disso é o que faz a lateral ler como
+     painel em vez de continuação do conteúdo. */
+  --explorer-divisor: rgba(255, 255, 255, 0.16);
+
   /* Escala de z-index — única fonte de verdade */
   --z-wallpaper: 0;
   --z-icons: 10;
@@ -216,6 +226,10 @@
   --icon-tile-bg: rgba(46, 16, 101, 0.92);
   --icon-tile-bg-hover: rgba(60, 24, 120, 0.96);
   --icon-tile-border: 1px solid rgba(255, 255, 255, 0.28);
+
+  /* De dia o divisor inverte: sobre superfície clara quem separa é sombra, não
+     luz. Branco a 16% num painel claro é invisível. */
+  --explorer-divisor: rgba(0, 0, 0, 0.16);
 
   /* Cerimônia de dia.
      A leitura da cena não muda: a inicialização acontece antes de o roxo do
@@ -415,30 +429,38 @@
   --scroll-track: rgba(88, 28, 135, 0.08);
 }
 
+/* O ESCOPO É A JANELA INTEIRA, NÃO SÓ O CORPO DELA.
+   Era `.marocos-window-body`, e isso bastou enquanto o corpo era a única coisa
+   que rolava dentro de uma janela. O chrome de explorador quebrou a premissa:
+   a lateral e o painel de detalhes são IRMÃOS do corpo, não filhos, então
+   ficavam de fora e apareciam com a barra cinza nativa do Chrome no meio do
+   chrome roxo — que é exatamente o destoar que este bloco existe para evitar.
+   `.marocos-window` cobre os três sem enumerar classe de componente aqui. */
+
 /* Firefox */
-.marocos-window-body,
-.marocos-window-body *,
+.marocos-window,
+.marocos-window *,
 .marocos-desktop [class*='-scroll'] {
   scrollbar-width: thin;
   scrollbar-color: var(--scroll-thumb) transparent;
 }
 
 /* WebKit / Blink */
-.marocos-window-body ::-webkit-scrollbar,
-.marocos-window-body::-webkit-scrollbar {
+.marocos-window ::-webkit-scrollbar,
+.marocos-window::-webkit-scrollbar {
   width: 10px;
   height: 10px;
 }
 
-.marocos-window-body ::-webkit-scrollbar-track,
-.marocos-window-body::-webkit-scrollbar-track {
+.marocos-window ::-webkit-scrollbar-track,
+.marocos-window::-webkit-scrollbar-track {
   background: var(--scroll-track);
   /* Acompanha o arredondamento da janela em vez de encostar quadrado nela. */
   border-radius: 0 var(--win-radius) var(--win-radius) 0;
 }
 
-.marocos-window-body ::-webkit-scrollbar-thumb,
-.marocos-window-body::-webkit-scrollbar-thumb {
+.marocos-window ::-webkit-scrollbar-thumb,
+.marocos-window::-webkit-scrollbar-thumb {
   background: var(--scroll-thumb);
   border-radius: 6px;
   /* A borda transparente afina o polegar sem mexer na área de clique. */
@@ -447,16 +469,24 @@
   transition: background 0.15s ease;
 }
 
-.marocos-window-body ::-webkit-scrollbar-thumb:hover,
-.marocos-window-body::-webkit-scrollbar-thumb:hover {
+.marocos-window ::-webkit-scrollbar-thumb:hover,
+.marocos-window::-webkit-scrollbar-thumb:hover {
   background: var(--scroll-thumb-hover);
   background-clip: content-box;
 }
 
 /* Cantinho onde as duas barras se encontram: sem quadrado cinza. */
-.marocos-window-body ::-webkit-scrollbar-corner,
-.marocos-window-body::-webkit-scrollbar-corner {
+.marocos-window ::-webkit-scrollbar-corner,
+.marocos-window::-webkit-scrollbar-corner {
   background: transparent;
+}
+
+/* A lateral é estreita: 10px de barra comem 6% dela. Aqui o polegar afina, e
+   como ela só rola quando os três grupos estão abertos, some quando não
+   precisa. */
+.explorer-lateral::-webkit-scrollbar,
+.explorer-detalhes::-webkit-scrollbar {
+  width: 8px;
 }
 
 /* --------------------------------------------------

@@ -190,10 +190,16 @@ describe('config do sistema', () => {
   it('o chrome de explorador bate com o crescimento dos tamanhos de janela', () => {
     const px = (v) => Number.parseInt(v, 10)
     const lateral = px(LAYOUT.explorador.lateralLargura)
-    const barras = px(LAYOUT.explorador.navAltura) + px(LAYOUT.explorador.statusAltura)
+    // As TRÊS faixas horizontais. O painel de detalhes fica de fora: nasce
+    // fechado, e somá-lo deixaria seis janelas largas por um painel que quase
+    // sempre não está lá.
+    const barras =
+      px(LAYOUT.explorador.navAltura) +
+      px(LAYOUT.explorador.comandosAltura) +
+      px(LAYOUT.explorador.statusAltura)
 
-    expect(lateral).toBe(168)
-    expect(barras).toBe(62)
+    expect(lateral).toBe(184)
+    expect(barras).toBe(106)
 
     // Tamanhos de antes do chrome, por app — a base da qual o crescimento saiu.
     const ANTES = {

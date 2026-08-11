@@ -209,6 +209,62 @@ skill manda usar para superfície de conteúdo. Acento do item ativo:
 | terminal, assistant | não | decisão do dono: "esses são diferentes" |
 | settings | não | painel de preferências, e três controles não sustentam uma lateral |
 
+### 5.3-bis Segunda rodada: fidelidade ao Explorer real
+
+Depois da primeira entrega o dono do projeto pediu mais semelhança com o
+Explorer do Windows 11, com uma referência em imagem: **mais ícones no topo,
+mesmo que inúteis**. O chrome passou de uma faixa para duas.
+
+**Linha 1 — navegação:** ← → ↑ ⟳, barra de endereço rebaixada (casinha +
+breadcrumb dentro dela), campo de busca à direita.
+**Linha 2 — comandos:** Novo · recortar copiar colar renomear compartilhar
+excluir · Classificar Visualizar Filtro · ⋯ · Detalhes.
+
+**A regra que separou enfeite de mentira.** Quase tudo na linha 2 fica
+`disabled`, e isso não é preguiça: no Explorer de verdade, com **nada
+selecionado**, esse bloco fica cinza. Como aqui nunca há seleção, cinza é ao
+mesmo tempo o mais fiel à referência e o único honesto — botão que aceita clique
+e não faz nada lê como bug, não como ornamento.
+
+O que ficou real, e foi real de graça:
+
+| controle | o que faz |
+|---|---|
+| ← → | `window.history.back()/forward()` — a URL já é a fonte de verdade da rota |
+| ↑ | sobe um nível pelo breadcrumb |
+| ⟳ | remonta a subárvore do app (troca a `key` do wrapper), sem recarregar a página |
+| casinha | vai ao primeiro lugar da lateral |
+| busca | filtra os lugares e navega para o escolhido; Enter vai no primeiro |
+| Detalhes | painel com tipo, rota e processo — tudo que o chrome já sabe |
+
+**A lateral ganhou três grupos**, espelhando a referência:
+
+| grupo | conteúdo | ação |
+|---|---|---|
+| fixados (com pin) | os 5 lugares do explorador | `navigate` — troca no lugar |
+| Este Computador | Terminal, Marcos Virtual, Configurações | `open` — janela nova, pois não têm chrome |
+| Rede | e-mail, LinkedIn, GitHub, Discord (de `content/contact.js`) | link externo |
+
+O grupo do meio é a distinção das três portas aparecendo na interface: **lugar
+navega, programa abre.**
+
+**Divisor próprio, e o motivo é medido.** As faixas usam
+`--explorer-divisor` e não `--card-border`: aquele token é
+`rgba(255,255,255,0.08)` no escuro, pensado para separar card de fundo, onde o
+card já tem cor própria fazendo metade do trabalho. Aqui as três faixas têm o
+MESMO `--card-bg` do miolo, então a linha é a única coisa separando região de
+região — e em 0.08 ela não aparece.
+
+**O escopo da barra de rolagem mudou** de `.marocos-window-body` para
+`.marocos-window`. A lateral e o painel de detalhes são IRMÃOS do corpo, não
+filhos, então ficavam de fora e apareciam com a barra cinza nativa no meio do
+chrome roxo — exatamente o destoar que aquele bloco existe para evitar.
+
+**Item ativo:** o `.app-indicator` da taskbar (3px, raio 2, no acento, movido
+por `layoutId`) girado 90° na borda esquerda, com o fundo nascendo dele num
+gradiente que se apaga para a direita. Item ativo passa a ter a mesma marca em
+qualquer canto do sistema, em vez de cada painel inventar a sua.
+
 ### 5.4 Tamanhos
 
 Lateral 168px + barra de navegação 36px + barra de status 26px.

@@ -324,9 +324,22 @@ export const LAYOUT = {
    * silêncio — há teste guardando a soma.
    */
   explorador: {
-    lateralLargura: '168px',
-    navAltura: '36px',
+    /**
+     * 184 e não 168: "Este Computador" com chevron, ícone e recuo não cabia em
+     * 168 e truncava. Encolher a fonte do cabeçalho de grupo resolvia no limite
+     * e quebrava de novo a cada 1px que qualquer borda mudasse — largura é o
+     * conserto estável. O inglês ("This Computer") já cabia; quem manda aqui é
+     * o idioma mais longo.
+     */
+    lateralLargura: '184px',
+    navAltura: '40px',
+    comandosAltura: '40px',
     statusAltura: '26px',
+    /** Campo de busca da linha de navegação. */
+    buscaLargura: '190px',
+    /** Painel de detalhes. Fechado por padrão, então não entra na conta do
+     *  `defaultSize` — quem o abre aceita o conteúdo estreitar. */
+    detalhesLargura: '176px',
   },
 }
 

@@ -62,13 +62,17 @@ const SettingsApp = lazy(() => import('../apps/SettingsApp'))
 /**
  * O CHROME DE EXPLORADOR CUSTA ESPAÇO, E O `defaultSize` PAGOU.
  *
- * Lateral de 168px, barra de navegação de 36px e barra de status de 26px. Os
- * seis apps com `explorer: true` cresceram exatamente isso (+168 na largura,
- * +62 na altura) para o conteúdo continuar com a mesma área útil de antes — sem
- * isso o chrome comeria a janela em vez de emoldurá-la.
+ * Lateral de 184px, e TRÊS faixas horizontais: navegação 40, comandos 40,
+ * status 26. Os seis apps com `explorer: true` cresceram exatamente isso (+184
+ * na largura, +106 na altura) para o conteúdo continuar com a mesma área útil
+ * de antes — sem isso o chrome comeria a janela em vez de emoldurá-la.
  *
- * A maior fica em 868px de largura. Com os 16px de JANELAS.margem dos dois lados
- * isso pede 900px, que cabe no breakpoint de 1024px onde o shell de desktop
+ * O painel de detalhes NÃO entra nesta conta: ele nasce fechado, e quem o abre
+ * aceita o conteúdo estreitar. Somá-lo aqui deixaria seis janelas largas demais
+ * para um painel que quase sempre está fechado.
+ *
+ * A maior fica em 884×626. Com os 16px de JANELAS.margem dos dois lados a
+ * largura pede 916px, que cabe no breakpoint de 1024px onde o shell de desktop
  * começa.
  *
  * Terminal, Marcos Virtual e Configurações não recebem o chrome — decisão do
@@ -81,7 +85,7 @@ export const APPS = [
     titleKey: 'about',
     icon: MonitorCog,
     component: AboutApp,
-    defaultSize: { w: 788, h: 582 },
+    defaultSize: { w: 804, h: 626 },
     singleton: true,
     dynamic: false,
     explorer: true,
@@ -95,7 +99,7 @@ export const APPS = [
     titleKey: 'projects',
     icon: FolderGit2,
     component: ProjectsApp,
-    defaultSize: { w: 808, h: 502 },
+    defaultSize: { w: 824, h: 546 },
     singleton: true,
     dynamic: false,
     explorer: true,
@@ -112,7 +116,7 @@ export const APPS = [
     titleKey: null, // título vem do nome do projeto, em projects.js
     icon: FileText,
     component: ProjectDetailApp,
-    defaultSize: { w: 728, h: 562 },
+    defaultSize: { w: 744, h: 606 },
     singleton: false,
     dynamic: true,
     explorer: true,
@@ -126,7 +130,7 @@ export const APPS = [
     titleKey: 'history',
     icon: GitCommitVertical,
     component: HistoryApp,
-    defaultSize: { w: 868, h: 582 },
+    defaultSize: { w: 884, h: 626 },
     singleton: true,
     dynamic: false,
     explorer: true,
@@ -140,7 +144,7 @@ export const APPS = [
     titleKey: 'devices',
     icon: Cpu,
     component: DevicesApp,
-    defaultSize: { w: 788, h: 582 },
+    defaultSize: { w: 804, h: 626 },
     singleton: true,
     dynamic: false,
     explorer: true,
@@ -185,7 +189,7 @@ export const APPS = [
     titleKey: 'readme',
     icon: FileText,
     component: ReadmeApp,
-    defaultSize: { w: 688, h: 462 },
+    defaultSize: { w: 704, h: 506 },
     singleton: true,
     dynamic: false,
     explorer: true,

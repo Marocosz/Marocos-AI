@@ -1,54 +1,57 @@
 /* --------------------------------------------------
    CHROME DE EXPLORADOR
 
+   Desenhado em cima do Explorer do Windows 11: duas linhas no topo (navegação
+   com barra de endereço + barra de comandos), lateral em três grupos e barra de
+   status.
+
    Nenhuma cor nova e nenhuma receita de vidro nova: as superfícies são
-   --card-bg + --card-border, que é o que a linguagem visual do projeto manda
-   usar para superfície de conteúdo, e o acento é --accent-color.
+   --card-bg + --card-border, e o acento é --accent-color.
 
-   AS DUAS VOZES TIPOGRÁFICAS, aplicadas de propósito (ver a skill do frontend):
-     mono + caixa alta   o sistema falando de si mesmo -> "ACESSO RÁPIDO",
-                         breadcrumb (é um caminho), barra de status (é um
-                         readout)
-     Poppins             texto que uma pessoa escreveu -> os links da lateral,
-                         que são rótulo de interface, pelo mesmo motivo que
-                         .start-menu-apps-heading é Poppins
+   AS DUAS VOZES TIPOGRÁFICAS (ver a skill do frontend):
+     mono + caixa alta   o sistema falando de si -> breadcrumb (é um caminho),
+                         barra de status, painel de detalhes
+     Poppins             texto que uma pessoa escreveu -> rótulos da barra de
+                         comandos, links da lateral, campo de busca
 
-   SEM backdrop-filter em NENHUMA destas superfícies. Elas ficam DENTRO da
-   janela, que já paga um blur, e empilhar filtro sobre filtro é o custo que
-   Window.css documenta ter derrubado de 20px para 6px. Também é o que quebra o
-   Safari do iOS, conforme a nota em .marocos-window-body.
+   SEM backdrop-filter em NENHUMA superfície daqui. Elas ficam DENTRO da janela,
+   que já paga um blur, e empilhar filtro sobre filtro é o custo que Window.css
+   documenta ter derrubado de 20px para 6px.
    -------------------------------------------------- */
 
 .explorer-chrome {
   display: flex;
   flex-direction: column;
-  /* Ocupa a janela inteira: é ele que passa a mandar no layout interno, e o
-     corpo do app vira um dos filhos dele. */
   flex: 1 1 auto;
   min-height: 0;
 }
 
 /* ==========================================================================
-   BARRA DE NAVEGAÇÃO — os cantos de cima
+   LINHA 1 — navegação, barra de endereço e busca
    ========================================================================== */
 
 .explorer-nav {
   flex: 0 0 auto;
   display: flex;
   align-items: center;
-  gap: 6px;
-  height: var(--cfg-explorer-nav, 36px);
+  gap: 8px;
+  height: var(--cfg-explorer-nav, 40px);
   padding: 0 8px;
-  border-bottom: var(--card-border);
   background: var(--card-bg);
+}
+
+.explorer-nav-grupo {
+  display: flex;
+  align-items: center;
+  gap: 1px;
+  flex: 0 0 auto;
 }
 
 .explorer-nav-btn {
   display: grid;
   place-items: center;
-  flex: 0 0 auto;
-  width: 26px;
-  height: 24px;
+  width: 28px;
+  height: 28px;
   border: none;
   border-radius: var(--win-control-radius);
   background: transparent;
@@ -67,20 +70,63 @@
   outline-offset: -2px;
 }
 
-/* Desabilitado é o estado de "subir" na raiz de um app. Continua ocupando o
-   lugar em vez de sumir: botão que aparece e desaparece faz o breadcrumb
-   pular de posição a cada navegação. */
+/* "Subir" na raiz de um app. Continua ocupando o lugar em vez de sumir: botão
+   que aparece e desaparece faz a barra de endereço pular a cada navegação. */
 .explorer-nav-btn:disabled {
-  opacity: 0.32;
+  opacity: 0.3;
   cursor: default;
 }
 
-/* --- Breadcrumb --- */
+/* --- Barra de endereço: campo rebaixado, com o caminho dentro --- */
+
+.explorer-endereco {
+  flex: 1 1 auto;
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  height: 28px;
+  padding: 0 6px 0 2px;
+  border: var(--card-border);
+  border-radius: var(--win-control-radius);
+  /* Rebaixado em relação à barra: é o que faz ler como campo e não como faixa.
+     Alpha baixo em preto funciona nos dois temas — escurece o vidro escuro e o
+     claro na mesma proporção, sem precisar de um token por tema. */
+  background: rgba(0, 0, 0, 0.24);
+  /* A sombra interna é o que vende "campo afundado" — só cor de fundo mais
+     escura lê como faixa, não como caixa, e era o que faltava para a barra de
+     endereço parecer a da referência. */
+  box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.3);
+}
+
+.explorer-endereco-casa {
+  display: grid;
+  place-items: center;
+  flex: 0 0 auto;
+  width: 24px;
+  height: 24px;
+  border: none;
+  border-radius: var(--win-control-radius);
+  background: transparent;
+  color: var(--text-secondary);
+  cursor: pointer;
+  transition: background 0.15s ease, color 0.15s ease;
+}
+
+.explorer-endereco-casa:hover {
+  background: rgba(168, 85, 247, 0.18);
+  color: var(--text-primary);
+}
+
+.explorer-endereco-casa:focus-visible {
+  outline: 2px solid var(--accent-color);
+  outline-offset: -2px;
+}
 
 .explorer-crumbs {
   display: flex;
   align-items: center;
-  gap: 4px;
+  gap: 1px;
   flex: 1 1 auto;
   min-width: 0;
   overflow: hidden;
@@ -91,14 +137,15 @@
 
 .explorer-crumb-raiz {
   flex: 0 0 auto;
+  padding: 2px 4px;
   color: var(--text-secondary);
-  opacity: 0.7;
+  opacity: 0.75;
 }
 
 .explorer-crumb-sep {
   flex: 0 0 auto;
   color: var(--text-secondary);
-  opacity: 0.45;
+  opacity: 0.5;
 }
 
 .explorer-crumb {
@@ -109,12 +156,12 @@
   text-overflow: ellipsis;
   font-family: inherit;
   font-size: inherit;
+  padding: 2px 5px;
+  border-radius: var(--win-control-radius);
 }
 
 .explorer-crumb--link {
-  padding: 2px 4px;
   border: none;
-  border-radius: var(--win-control-radius);
   background: transparent;
   color: var(--accent-color);
   cursor: pointer;
@@ -122,7 +169,7 @@
 }
 
 .explorer-crumb--link:hover {
-  background: rgba(168, 85, 247, 0.14);
+  background: rgba(168, 85, 247, 0.16);
 }
 
 .explorer-crumb--link:focus-visible {
@@ -132,13 +179,192 @@
 
 /* O degrau atual é rótulo, não link — e o peso é o que diz isso. */
 .explorer-crumb--atual {
-  padding: 2px 4px;
   color: var(--text-primary);
   font-weight: 700;
 }
 
+/* --- Busca --- */
+
+.explorer-busca {
+  position: relative;
+  flex: 0 0 var(--cfg-explorer-busca, 190px);
+  width: var(--cfg-explorer-busca, 190px);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  height: 28px;
+  padding: 0 8px;
+  border: var(--card-border);
+  border-radius: var(--win-control-radius);
+  background: rgba(0, 0, 0, 0.24);
+  /* A sombra interna é o que vende "campo afundado" — só cor de fundo mais
+     escura lê como faixa, não como caixa, e era o que faltava para a barra de
+     endereço parecer a da referência. */
+  box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.3);
+}
+
+/* DE DIA O CAMPO REBAIXADO INVERTE.
+   `rgba(0,0,0,.24)` afunda bem sobre vidro escuro e vira uma caixa CINZA sobre
+   painel claro — cinza neutro que não existe em nenhum outro lugar do tema
+   claro, que é todo violeta e pastel. Mesma sensação de afundado, feita com a
+   cor da casa: um véu de violeta em cima do painel, e a sombra interna também
+   violeta em vez de preta. */
+.theme-light .explorer-endereco,
+.theme-light .explorer-busca {
+  background: rgba(88, 28, 135, 0.07);
+  box-shadow: inset 0 1px 2px rgba(88, 28, 135, 0.14);
+}
+
+.explorer-busca-icone {
+  flex: 0 0 auto;
+  color: var(--text-secondary);
+  opacity: 0.8;
+}
+
+.explorer-busca-campo {
+  flex: 1 1 auto;
+  min-width: 0;
+  border: none;
+  background: transparent;
+  color: var(--text-primary);
+  font-family: inherit;
+  font-size: 0.78rem;
+  outline: none;
+}
+
+.explorer-busca-campo::placeholder {
+  color: var(--text-secondary);
+  opacity: 0.7;
+}
+
+/* A lista de achados desce DA BUSCA, e não de outro canto: o resultado tem de
+   nascer onde a pergunta foi feita. */
+.explorer-busca-lista {
+  position: absolute;
+  top: calc(100% + 4px);
+  left: 0;
+  right: 0;
+  z-index: 5;
+  margin: 0;
+  padding: 4px;
+  list-style: none;
+  border: var(--win-border);
+  border-radius: var(--win-radius);
+  background: var(--win-body-solid);
+  box-shadow: var(--win-shadow);
+}
+
+.explorer-busca-item {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 8px;
+  border: none;
+  border-radius: var(--win-control-radius);
+  background: transparent;
+  color: var(--text-primary);
+  font-family: inherit;
+  font-size: 0.8rem;
+  text-align: left;
+  cursor: pointer;
+}
+
+.explorer-busca-item:hover,
+.explorer-busca-item:focus-visible {
+  background: rgba(168, 85, 247, 0.16);
+  outline: none;
+}
+
+.explorer-busca-vazio {
+  padding: 6px 8px;
+  color: var(--text-secondary);
+  font-size: 0.78rem;
+}
+
 /* ==========================================================================
-   CORPO — lateral + conteúdo
+   LINHA 2 — barra de comandos
+
+   Quase tudo aqui é `disabled`, e é intencional: no Explorer de verdade, com
+   nada selecionado, este bloco fica cinza. Como aqui nunca há seleção, cinza é
+   ao mesmo tempo o mais fiel à referência e o único honesto. Ver a nota longa
+   no topo de ExplorerChrome.jsx.
+   ========================================================================== */
+
+.explorer-comandos {
+  flex: 0 0 auto;
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  height: var(--cfg-explorer-comandos, 40px);
+  padding: 0 8px;
+  /* Divisor forte, não --card-border: as faixas e o miolo compartilham o mesmo
+     --card-bg, então a linha é a única coisa separando região de região.
+     O porquê inteiro está no comentário de --explorer-divisor em tokens.css. */
+  border-top: 1px solid var(--explorer-divisor);
+  border-bottom: 1px solid var(--explorer-divisor);
+  background: var(--card-bg);
+  overflow: hidden;
+}
+
+.explorer-cmd {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex: 0 0 auto;
+  height: 28px;
+  padding: 0 8px;
+  border: none;
+  border-radius: var(--win-control-radius);
+  background: transparent;
+  color: var(--text-primary);
+  /* Rótulo de comando é interface, não voz de máquina: Poppins. */
+  font-family: inherit;
+  font-size: 0.78rem;
+  cursor: pointer;
+  transition: background 0.15s ease;
+}
+
+.explorer-cmd--texto {
+  padding: 0 10px;
+}
+
+.explorer-cmd:hover:not(:disabled) {
+  background: rgba(168, 85, 247, 0.16);
+}
+
+.explorer-cmd:focus-visible {
+  outline: 2px solid var(--accent-color);
+  outline-offset: -2px;
+}
+
+/* 0.38 e não 0.2: precisa ler como "existe mas está indisponível", não como
+   sujeira. É a mesma leitura que o Explorer dá ao bloco sem seleção. */
+.explorer-cmd:disabled {
+  opacity: 0.38;
+  cursor: default;
+}
+
+.explorer-cmd--ativo {
+  background: rgba(168, 85, 247, 0.2);
+  color: var(--text-primary);
+}
+
+.explorer-cmd-sep {
+  flex: 0 0 auto;
+  width: 1px;
+  height: 18px;
+  margin: 0 4px;
+  background: var(--text-secondary);
+  opacity: 0.25;
+}
+
+.explorer-cmd-espaco {
+  flex: 1 1 auto;
+}
+
+/* ==========================================================================
+   CORPO — lateral, conteúdo e detalhes
    ========================================================================== */
 
 .explorer-corpo {
@@ -152,33 +378,33 @@
   width: var(--cfg-explorer-lateral, 168px);
   display: flex;
   flex-direction: column;
-  gap: 8px;
-  padding: 12px 8px;
-  border-right: var(--card-border);
+  gap: 4px;
+  padding: 8px 6px;
+  border-right: 1px solid var(--explorer-divisor);
   background: var(--card-bg);
   overflow-y: auto;
 }
 
-/* Micro-rótulo: mono, caixa alta, letter-spacing — o sistema nomeando a
-   própria seção. É a mesma receita de .about-spec-label. */
-.explorer-lateral-titulo {
-  margin: 0 0 2px 6px;
-  font-family: 'Courier New', monospace;
-  font-size: 0.66rem;
-  font-weight: 700;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-  color: var(--text-secondary);
-  opacity: 0.75;
+.explorer-lateral-sep {
+  flex: 0 0 auto;
+  height: 1px;
+  margin: 4px 8px;
+  background: var(--text-secondary);
+  opacity: 0.2;
 }
 
 .explorer-lugares {
   display: flex;
   flex-direction: column;
-  gap: 2px;
+  gap: 1px;
   margin: 0;
   padding: 0;
   list-style: none;
+}
+
+/* Filhos de um grupo recuam para a hierarquia ficar visível sem linha guia. */
+.explorer-lugares--filho {
+  padding-left: 14px;
 }
 
 /* Link de navegação é INTERFACE, então Poppins — mesmo critério que faz
@@ -188,19 +414,21 @@
   display: flex;
   align-items: center;
   gap: 9px;
-  padding: 7px 8px;
+  padding: 6px 8px;
   border: none;
   border-radius: var(--win-control-radius);
   background: transparent;
   color: var(--text-secondary);
   font-family: inherit;
-  font-size: 0.85rem;
+  font-size: 0.82rem;
   text-align: left;
+  text-decoration: none;
   cursor: pointer;
   transition: background 0.15s ease, color 0.15s ease;
 }
 
-.explorer-lugar span {
+.explorer-lugar > span {
+  flex: 1 1 auto;
   overflow: hidden;
   white-space: nowrap;
   text-overflow: ellipsis;
@@ -216,14 +444,115 @@
   outline-offset: -2px;
 }
 
-/* O lugar em que a janela ESTÁ. Barra de acento à esquerda em vez de fundo
-   forte: o fundo forte competiria com o hover e o estado ativo deixaria de ser
-   distinguível de "o mouse está aqui". */
+/* O pin (e o ícone de link externo, que usa a mesma classe) só aparece de
+   verdade no hover ou quando o item é o atual — na referência ele é um detalhe
+   discreto, não um segundo ícone competindo com o primeiro. */
+.explorer-pin {
+  flex: 0 0 auto;
+  opacity: 0.35;
+}
+
+.explorer-lugar:hover .explorer-pin {
+  opacity: 0.7;
+}
+
+/* O LUGAR EM QUE A JANELA ESTÁ.
+ *
+ * Não é o retângulo tingido de sempre. O sistema já tem um vocabulário próprio
+ * para "isto está ativo": o `.app-indicator` da taskbar, um traço de 3px com
+ * raio 2 no acento, que o motion move entre botões por `layoutId`. Aqui esse
+ * mesmo traço é girado 90° e encostado na borda esquerda — mesma espessura,
+ * mesmo raio, mesma cor. Item ativo passa a ser reconhecível pela mesma marca
+ * em qualquer canto do sistema, em vez de cada painel inventar a sua.
+ *
+ * E o fundo NASCE do traço em vez de ser chapado: um gradiente que se apaga
+ * para a direita lê como luz entrando pela borda, que é a linguagem da
+ * cerimônia. Chapado empataria com o hover e o ativo deixaria de ser
+ * distinguível de "o mouse está aqui".
+ */
 .explorer-lugar--aqui {
-  background: rgba(168, 85, 247, 0.14);
-  box-shadow: inset 2px 0 0 var(--accent-color);
+  position: relative;
+  background: linear-gradient(
+    90deg,
+    rgba(168, 85, 247, 0.26) 0%,
+    rgba(168, 85, 247, 0.1) 42%,
+    transparent 100%
+  );
   color: var(--text-primary);
   font-weight: 600;
+}
+
+.explorer-lugar--aqui::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 50%;
+  width: 3px;
+  height: 58%;
+  transform: translateY(-50%);
+  border-radius: 2px;
+  background: var(--accent-color);
+  /* O halo é o que separa isto de um traço chapado — a mesma luz difusa que a
+     nebulosa da cerimônia usa, em escala de 10px. */
+  box-shadow: 0 0 10px 1px rgba(168, 85, 247, 0.55);
+}
+
+/* De dia o gradiente precisa de mais corpo: sobre painel claro, 26% de violeta
+   quase não muda o pixel. */
+.theme-light .explorer-lugar--aqui {
+  background: linear-gradient(
+    90deg,
+    rgba(124, 58, 237, 0.2) 0%,
+    rgba(124, 58, 237, 0.08) 42%,
+    transparent 100%
+  );
+}
+
+/* --- Cabeçalho de grupo --- */
+
+.explorer-grupo {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+}
+
+/* 0.78rem e gap de 5, um degrau abaixo dos itens: "Este Computador" com o
+   chevron e o ícone não cabia nos 156px úteis da lateral em 0.82 e truncava.
+   Encolher o cabeçalho custa menos que alargar a lateral, que arrastaria os
+   seis `defaultSize` do registry junto — e ainda deixa o cabeçalho lendo como
+   subordinado ao que ele agrupa. */
+.explorer-grupo-cab {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  padding: 6px 6px 6px 2px;
+  border: none;
+  border-radius: var(--win-control-radius);
+  background: transparent;
+  color: var(--text-secondary);
+  font-family: inherit;
+  font-size: 0.78rem;
+  text-align: left;
+  cursor: pointer;
+  transition: background 0.15s ease, color 0.15s ease;
+}
+
+.explorer-grupo-cab > span {
+  flex: 1 1 auto;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.explorer-grupo-cab:hover {
+  background: rgba(168, 85, 247, 0.12);
+  color: var(--text-primary);
+}
+
+.explorer-grupo-cab:focus-visible {
+  outline: 2px solid var(--accent-color);
+  outline-offset: -2px;
 }
 
 /* O corpo do app. `min-width: 0` não é enfeite: sem ele um filho de conteúdo
@@ -237,16 +566,79 @@
   flex-direction: column;
 }
 
-/* O corpo da janela vive aqui dentro agora e é ele quem rola — o
-   .marocos-window-body mantém seu próprio overflow, então esta regra só
-   garante que ele receba a altura para rolar DENTRO. */
 .explorer-conteudo > * {
   flex: 1 1 auto;
   min-height: 0;
 }
 
+/* --- Painel de detalhes --- */
+
+.explorer-detalhes {
+  flex: 0 0 var(--cfg-explorer-detalhes, 176px);
+  width: var(--cfg-explorer-detalhes, 176px);
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 10px;
+  border-left: 1px solid var(--explorer-divisor);
+  background: var(--card-bg);
+  overflow-y: auto;
+}
+
+.explorer-detalhes-cab {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  /* Micro-rótulo: mono, caixa alta, letter-spacing — o sistema nomeando a
+     própria seção, mesma receita de .about-spec-label. */
+  font-family: 'Courier New', monospace;
+  font-size: 0.66rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--text-secondary);
+}
+
+.explorer-detalhes-fechar {
+  display: grid;
+  place-items: center;
+  width: 20px;
+  height: 20px;
+  border: none;
+  border-radius: var(--win-control-radius);
+  background: transparent;
+  color: var(--text-secondary);
+  cursor: pointer;
+}
+
+.explorer-detalhes-fechar:hover {
+  background: rgba(168, 85, 247, 0.16);
+  color: var(--text-primary);
+}
+
+.explorer-detalhes-lista {
+  margin: 0;
+  font-family: 'Courier New', monospace;
+  font-size: 0.68rem;
+  line-height: 1.5;
+}
+
+.explorer-detalhes-lista dt {
+  margin-top: 8px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--text-secondary);
+  opacity: 0.7;
+}
+
+.explorer-detalhes-lista dd {
+  margin: 2px 0 0;
+  color: var(--text-primary);
+  overflow-wrap: anywhere;
+}
+
 /* ==========================================================================
-   BARRA DE STATUS — os cantos de baixo
+   BARRA DE STATUS
    ========================================================================== */
 
 .explorer-status {
@@ -256,8 +648,8 @@
   justify-content: space-between;
   gap: 12px;
   height: var(--cfg-explorer-status, 26px);
-  padding: 0 10px;
-  border-top: var(--card-border);
+  padding: 0 6px 0 10px;
+  border-top: 1px solid var(--explorer-divisor);
   background: var(--card-bg);
   /* Readout de máquina. */
   font-family: 'Courier New', monospace;
@@ -267,10 +659,40 @@
   user-select: none;
 }
 
+.explorer-status-dir {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  min-width: 0;
+}
+
 .explorer-status-rota {
   overflow: hidden;
   white-space: nowrap;
   text-overflow: ellipsis;
   color: var(--accent-color);
   opacity: 0.9;
+}
+
+.explorer-status-nova {
+  display: grid;
+  place-items: center;
+  flex: 0 0 auto;
+  width: 20px;
+  height: 20px;
+  border: none;
+  border-radius: var(--win-control-radius);
+  background: transparent;
+  color: var(--text-secondary);
+  cursor: pointer;
+}
+
+.explorer-status-nova:hover {
+  background: rgba(168, 85, 247, 0.16);
+  color: var(--text-primary);
+}
+
+.explorer-status-nova:focus-visible {
+  outline: 2px solid var(--accent-color);
+  outline-offset: -2px;
 }
