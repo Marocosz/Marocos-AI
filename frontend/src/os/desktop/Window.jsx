@@ -166,4 +166,12 @@ const TitleBar = ({
   </div>
 )
 
+/**
+ * O `memo` só economiza render porque o reducer coopera: os `map` de
+ * `os/windowManager.js` devolvem o MESMO objeto para as janelas não afetadas
+ * (ver o "contrato de identidade" lá), então `win` só muda de referência para
+ * quem realmente mudou. Se aquele arquivo passar a clonar todas as janelas em
+ * toda ação, esta linha continua compilando, continua verde em todo teste, e
+ * para de economizar qualquer coisa.
+ */
 export default React.memo(Window)

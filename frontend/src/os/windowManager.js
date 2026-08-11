@@ -85,6 +85,23 @@ function topmostVisible(windows) {
   return visible.reduce((top, w) => (w.z > top.z ? w : top)).key
 }
 
+/**
+ * CONTRATO DE IDENTIDADE — os `map` daqui para baixo NÃO copiam quem não mudou.
+ *
+ * Toda transição devolve o MESMO objeto (`return w`, ou o `: w` do ternário)
+ * para as janelas não afetadas, e clona só a que mudou. Não é estilo: é o que
+ * faz o `React.memo` de `desktop/Window.jsx` valer alguma coisa — ele compara as
+ * props por `Object.is`, então focar, minimizar, mover ou maximizar uma janela
+ * re-renderiza uma ou duas, e não as N abertas.
+ *
+ * Trocar isto por cópia total (`{ ...w }` em todo mundo) mataria a memoização
+ * SEM NENHUM TESTE FALHAR: o estado resultante é igual campo a campo, que é
+ * tudo o que as asserções olham. A regressão seria só de custo de render — e
+ * silenciosa. Se mudar algo aqui, o que prova a preservação é comparar
+ * referências (`expect(depois.windows[1]).toBe(antes.windows[1])`), não valores.
+ *
+ * `MINIMIZE_ALL` é a exceção legítima: lá todas as janelas mudam mesmo.
+ */
 function raise(state, key) {
   const z = state.zTop + 1
   return {

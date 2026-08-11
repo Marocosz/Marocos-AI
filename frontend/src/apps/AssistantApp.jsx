@@ -210,7 +210,24 @@ const AssistantApp = () => {
         </div>
       )}
 
-      {/* Área de mensagens: a que rola. O input fica fixo abaixo dela. */}
+      {/**
+        * Área de mensagens: a que rola. O input fica fixo abaixo dela.
+        *
+        * OS DOIS RAMOS SÃO EXCLUDENTES, E É ISSO QUE SEGURA O `AssistantMarkdown`
+        * FORA DA MONTAGEM. O único lugar onde o lazy aparece é dentro da bolha,
+        * no ramo da lista — enquanto não há mensagem, esse ramo inteiro fica fora
+        * da árvore e o `import()` do react-markdown (~157 KB, 47 KB gzip: o maior
+        * chunk depois do cristal 3D) nunca é disparado. As sugestões vivem AQUI
+        * DENTRO, no estado vazio, e não acima do condicional, justamente para que
+        * a boas-vindas do app não precise de nenhum pedaço do ramo da conversa.
+        *
+        * Portanto: nada que renderize uma mensagem — inclusive uma mensagem
+        * "de boas-vindas" fabricada, ou as sugestões promovidas a bolha — pode
+        * subir para fora deste condicional, senão o chunk volta para o caminho
+        * da primeira pintura da janela. `rotas.spec.js` ("react-markdown carrega
+        * só sob demanda") afirma exatamente isto: ZERO requisição a
+        * `AssistantMarkdown-*` enquanto `.assistant-empty-state` está no ar.
+        */}
       <div className="assistant-chat-scroll">
         {messages.length === 0 ? (
           // Estado vazio com sugestões de pergunta
@@ -219,6 +236,7 @@ const AssistantApp = () => {
             <div className="assistant-empty-title">{content.emptyTitle}</div>
             <div className="assistant-empty-subtitle">{content.emptySubtitle}</div>
 
+            {/* Fica dentro do estado vazio de propósito — ver a nota acima. */}
             <div className="assistant-suggestions">
               {content.suggestions && content.suggestions.map((suggestion, index) => (
                 <button
