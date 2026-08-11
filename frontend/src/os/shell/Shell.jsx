@@ -119,6 +119,15 @@ const Shell = () => {
    * `ativo: fase !== 'boot'` começa na tela de bloqueio: é ócio de verdade (ver
    * o comentário de `destrancar` acima), diferente do boot, que já está
    * ocupado animando o cristal.
+   *
+   * SEM GUARDA DE DISPOSITIVO, ao contrário do prefetch do cristal em
+   * Desktop.jsx — e de propósito. Aquele é guardado porque o cristal REALMENTE
+   * não existe no mobile (`AboutApp` não o monta fora do desktop). Estes sete
+   * apps existem: `mobile/HomeScreen.jsx` monta a grade a partir do mesmo
+   * `APPS.filter(onDesktop)` que o desktop usa, então no celular eles são a
+   * tela inicial inteira, todos a UM TOQUE. Guardar aqui faria cada toque pagar
+   * o download do chunk atrás do fallback nulo do `MobileApp` — que é
+   * justamente o que o comentário em `mobile/MobileApp.jsx` diz não acontecer.
    */
   useIdleTask(prefetchAppsDoDesktop, {
     ...CERIMONIA.idle.prefetchCristal,

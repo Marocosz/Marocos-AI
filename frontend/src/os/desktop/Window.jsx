@@ -1,7 +1,8 @@
-import React, { useRef, useEffect, useState, Suspense } from 'react'
+import React, { useRef, useEffect, Suspense } from 'react'
 import { motion, useMotionValue, useDragControls } from 'motion/react'
 import { Minus, Square, X } from 'lucide-react'
 import { useWindowActions } from '../WindowManagerContext'
+import { useViewport } from '../hooks/useViewport'
 import { getApp } from '../registry'
 import { useLanguage } from '../../contexts/LanguageContext'
 import { getOsData } from '../../i18n/os'
@@ -47,21 +48,14 @@ const Window = ({ win, isFocused }) => {
   }, [])
 
   /**
-   * O limite de arrasto acompanha a janela do navegador. Lendo `window.innerWidth`
-   * direto no render, o valor congelava no primeiro render e redimensionar
-   * deixava arrastar a janela para fora do quadro.
+   * O limite de arrasto ACOMPANHA a janela do navegador — sem isso, ao
+   * redimensionar o navegador dava para arrastar a janela para fora do quadro.
+   *
+   * A assinatura é compartilhada de propósito: cada janela tinha o seu listener
+   * de `resize`, e N janelas abertas viravam N listeners e N re-renders por
+   * evento. O porquê inteiro está em `hooks/useViewport.js`.
    */
-  const [viewport, setViewport] = useState(() => ({
-    w: typeof window === 'undefined' ? 0 : window.innerWidth,
-    h: typeof window === 'undefined' ? 0 : window.innerHeight,
-  }))
-
-  useEffect(() => {
-    const aoRedimensionar = () =>
-      setViewport({ w: window.innerWidth, h: window.innerHeight })
-    window.addEventListener('resize', aoRedimensionar)
-    return () => window.removeEventListener('resize', aoRedimensionar)
-  }, [])
+  const viewport = useViewport()
 
   const onKeyDown = (e) => {
     if (e.key === 'Escape') {
