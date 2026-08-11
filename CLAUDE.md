@@ -30,8 +30,22 @@ Não existe pytest nem suíte automatizada; `simulate_chat.py` é o teste de int
 `requirements.txt` está em UTF-16 (pip freeze do PowerShell) — `cat`/`grep` POSIX falham nele, use
 `Get-Content`.
 
-Frontend (cwd `frontend/`): `npm run dev` | `build` | `lint` (eslint flat config) | `preview`.
+Frontend (cwd `frontend/`): `npm run dev` | `build` | `lint` (eslint flat config) | `preview` |
+`test` (vitest, `environment: 'node'` — **só lógica pura**, sem DOM).
 Não há prettier nem TypeScript.
+
+Verificação de interface (cwd `frontend/visual/`, pacote isolado com Playwright):
+
+```powershell
+npm install            # 1a vez: baixa o Chromium, so aqui
+npm run build:frontend
+npm test               # 21 cenas visuais + 13 testes funcionais de rota
+npm run report         # relatorio com as diferencas lado a lado
+```
+
+**Rode isso antes de afirmar que uma mudança não alterou a interface.** O regressor visual é cego
+a tempo (desliga a animação para capturar), e o `npm run build` não pega `import()` dinâmico
+quebrado — quem pega é o `rotas.spec.js`.
 
 ## Arquitetura
 
@@ -41,7 +55,7 @@ Não há prettier nem TypeScript.
 `HumanMessage`/`AIMessage` → `agent_app.astream(stream_mode="updates")`. Cada nó concluído dispara um
 evento SSE `status` (texto amigável PT/EN); no fim vai um evento `result` com `{response, usage}`.
 
-O frontend parseia o SSE à mão em `StartMenu.jsx` (`fetch` + `ReadableStream`, buffer partido em
+O frontend parseia o SSE à mão em `apps/AssistantApp.jsx` (`fetch` + `ReadableStream`, buffer partido em
 `\n\n`) porque `EventSource` não faz POST. `routes.py` manda 4KB de padding e `X-Accel-Buffering: no`
 para o Traefik/Nginx não segurar o primeiro flush.
 
@@ -127,20 +141,33 @@ desenha blocos ASCII por nó; os nós chamam `observer.log_section()` e o par
 `log_start_interaction()` / `log_end_interaction()`. Quem fecha a interação é `generate_rag` quando o
 idioma é pt-br, senão o `translator_node`.
 
-### Frontend
+### Frontend — o Marocos OS
 
-Sem router: `App` (inicializa Lenis) → `LanguageProvider` → `HomePage`, que empilha as sections com
-`id`s para ancoragem da `Navbar`. `StartMenu` é o chat.
+**Ao trabalhar no `frontend/`, invoque a skill `marocos-os-frontend`** (em
+`.claude/skills/`). Ela traz as ferramentas de verificação e as convenções; o resto o próprio
+código documenta.
 
-- **i18n sem lib**: cada `src/data/*.js` exporta dois objetos (`...En`/`...Pt`) e um
-  `getXData(lang)`; componentes chamam com `useLanguage().language`. Texto novo entra nos dois.
-- **Estado**: tema e motion moram em `HomePage` e descem por props; idioma é o único context. Os três
-  persistem em localStorage (`isDarkMode`, `isAnimationEnabled`, `language`).
-- **Backgrounds WebGL** (`Silk`/`Iridescence`, via `ogl`) só renderizam em desktop — abaixo de 768px
-  é gradiente CSS. Recebem `isAnimated` para parar o RAF quando a camada está invisível ou o motion
-  toggle está off.
-- **Lenis** é global e exposto em `window.lenis`; qualquer overlay que travar o body precisa chamar
-  `window.lenis.stop()`/`start()` (ver o `useEffect` de `isOpen` em `StartMenu.jsx`).
+Sem router e sem scroll de página: `App` → providers → `os/shell/Shell`, que escolhe um de dois
+shells lendo o **mesmo** estado de janelas. `Desktop` lê `windows[]` como conjunto (z-order);
+`MobileShell` lê como pilha. É a premissa que evita manter dois frontends.
+
+- **`os/registry.js` é a fonte única de cada app**: id, rota, título, ícone, tamanho e onde ele
+  aparece. Só o campo `component` é `lazy()` — rota, título e ícone são resolvidos sincronamente
+  porque `deriveInitial()` lê a URL antes do primeiro render.
+- **`config/system.js` é a fonte única dos valores de ajuste** — parâmetros dos shaders, onde a
+  janela nasce, durações de transição, tempos do boot, blur do vidro. `config/cssBridge.js` os
+  injeta como `--cfg-*`, então ele manda no CSS também. Exceção documentada no cabeçalho dele: os
+  gradientes desenhados da cerimônia ficam em `os/tokens.css`, porque são arte e não configuração.
+- **i18n sem lib**: `content/*.js` (dados do portfólio) e `i18n/*.js` (strings de interface)
+  exportam `...En`/`...Pt` e um `getXData(lang)`. Texto novo entra nos dois idiomas.
+- **Estado**: tema e movimento em `ThemeContext`, idioma em `LanguageContext`, janelas em
+  `WindowManagerContext` — este dividido em dois provedores (estado × ações) para que arrastar uma
+  janela não re-renderize os apps abertos. Os três persistem em localStorage (`isDarkMode`,
+  `isAnimationEnabled`, `language`).
+- **Wallpaper WebGL** (`Silk` no escuro, `Iridescence` no claro, ambos via `ogl`) só em desktop;
+  abaixo de 1024px é gradiente CSS. Recebem `isAnimated` para zerar o custo quando invisíveis.
+  **Nada em `src/` pode importar `three` estaticamente** — ele só entra pelo `lazy()` do cristal,
+  e um import estático em qualquer lugar o traz de volta ao caminho crítico.
 
 ## Deploy
 
@@ -153,18 +180,19 @@ Como o compose usa `external: true` na rede `coolify`, o checklist
 healthcheck, nome de serviço ou domínio — note que o serviço se chama `api`, nome genérico numa rede
 compartilhada (item de colisão de DNS do checklist).
 
-O frontend não tem Dockerfile aqui: é build Vite servido em separado. **A URL da API é hardcoded** em
-`StartMenu.jsx` (`import.meta.env.DEV ? 'http://localhost:8000/api' : 'https://api.marocos.dev/api'`)
-— não há variável `VITE_`. E o CORS é uma lista fixa em `config.py:CORS_ORIGINS`; domínio novo de
-frontend precisa entrar lá.
+O frontend não tem Dockerfile aqui: é build Vite servido em separado. **A URL da API é resolvida em
+tempo de build**, sem variável `VITE_`: `REDE.apiBase` em `frontend/src/config/system.js` alterna
+entre `localhost:8000` e `api.marocos.dev` por `import.meta.env.DEV`. E o CORS é uma lista fixa em
+`config.py:CORS_ORIGINS`; domínio novo de frontend precisa entrar lá.
 
 ## Gotchas
 
 - O mapa de status SSE em `routes.py` ainda referencia nós que não existem mais
   (`contextualize_input`, `router_node`) e **não tem entrada para `semantic_gateway_node`** — daí a
   ausência de feedback nesse passo.
-- Timeout do cliente é 60s (`AbortController` em `StartMenu.jsx`); um pipeline completo
-  (gateway + guard + rag + translator) pode encostar nesse teto.
+- Timeout do cliente é 60s (`REDE.timeoutChatMs`, aplicado por `AbortController` no
+  `apps/AssistantApp.jsx`); um pipeline completo (gateway + guard + rag + translator) pode encostar
+  nesse teto.
 - `chroma_db/`, `logs/` e o `venvmarocos/` são locais e ficam fora do build (`.dockerignore`).
 - `testes.txt` na raiz é dump de log de uma conversa, não um teste.
 - O IP do cliente vem do primeiro valor de `X-Forwarded-For` (Traefik), com fallback para
