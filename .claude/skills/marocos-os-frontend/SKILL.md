@@ -1,6 +1,6 @@
 ---
 name: marocos-os-frontend
-description: Use when working in frontend/ of the marocos.dev portfolio (Marocos OS) — touching components, CSS, visual configuration, apps, the boot ceremony or the window manager; and before stating that a change did not alter the interface.
+description: Use when working in frontend/ of the marocos.dev portfolio (Marocos OS) — touching components, CSS, design tokens or the visual language, configuration values, apps, the boot ceremony or the window manager; and before stating that a change did not alter the interface.
 ---
 
 # Frontend do Marocos OS
@@ -52,6 +52,46 @@ duração/velocidade de animação. Isso se verifica lendo o código ou no naveg
 caminho errado e falha só em runtime. É para isso que existe o `rotas.spec.js`
 — os nove apps, o cristal e o markdown do assistente são todos carregados por
 `import()`.
+
+## A linguagem visual
+
+O sistema de design está em três camadas, com donos distintos. Escrever na
+camada errada é o erro mais comum:
+
+| camada | onde | dona de |
+|---|---|---|
+| ajuste | `config/system.js` → `--cfg-*` | blur, raios, alturas, durações |
+| chrome do SO | `os/tokens.css` | `--win-*`, `--taskbar-h`, escala de z-index, arte da cerimônia |
+| conteúdo | `styles/index.css` | `--bg-color`, `--text-primary/secondary`, `--accent-color`, `--card-bg/border` |
+
+- **Nunca invente z-index** — a escala em `tokens.css` é fonte única.
+- **Nunca invente cor.** O acento é `--accent-color`. As cores de categoria já
+  existem em `HistoryApp.css` e `content/tech.js`; um app novo reaproveita.
+- **Superfície de conteúdo** é `--card-bg` + `--card-border` — não uma receita
+  de vidro nova.
+- **Raio**: `--win-control-radius` em qualquer coisa clicável. Pílula de 999px é
+  só para elemento **não** interativo (badge, tag).
+
+### As duas vozes tipográficas
+
+A fonte do sistema é Poppins. `'Courier New', monospace` aparece em vários
+lugares e **não é decoração** — é a voz da máquina. Vale a regra, não a lista:
+
+- **mono + caixa alta + letter-spacing** = o sistema falando sobre si mesmo:
+  ficha técnica (`.about-spec-label`), metadado de timeline (`HistoryApp`),
+  terminal.
+- **Poppins** = texto que uma pessoa escreveu: título de card, descrição,
+  rótulo de interface.
+
+É por isso que `.about-section-title` (mono) e `.start-menu-apps-heading`
+(Poppins) parecem se contradizer e não se contradizem — a janela "Sobre" é uma
+ficha técnica, o menu Iniciar é interface. **Copiar o vizinho errado desalinha.**
+Decida pela voz, depois copie.
+
+Escala aproximada, para não inventar tamanho: `1,6rem` número de destaque ·
+`1,05–1,1rem` título de card · `0,9–0,95rem` corpo · `0,85rem` corpo secundário ·
+`0,72–0,8rem` meta e hint · `0,65–0,68rem` micro-rótulo (sempre caixa alta, com
+letter-spacing).
 
 ## Convenções do repositório
 
@@ -107,3 +147,33 @@ uma decisão que custou medição ou depuração:
   qualquer diferença nelas é sinal.
 - **Editar o literal no componente** em vez do `config/system.js`, deixando a
   configuração inerte — a chave passa a existir sem fazer nada.
+- **Estranhar que um app novo rebaseie ~15 capturas.** A grade de ícones do
+  desktop, o menu Iniciar e a home mobile são chrome presente em quase toda
+  cena, então um app a mais mexe em todas. É esperado — mas **confira diff por
+  diff antes de aceitar**: o único pixel diferente deve ser o ícone novo, e
+  nenhum dos existentes pode ter mudado de posição. Note também que
+  `rotas.spec.js` fala em "nove rotas" no texto e no comentário; se o número de
+  apps mudar, decida conscientemente se aquele spec muda de escopo.
+
+## Quando esta skill fica desatualizada
+
+Esta skill descreve padrões. Mudar um padrão sem mudar a skill é o mecanismo
+exato de apodrecimento que este projeto já documentou: a tarefa N escreve a
+documentação, a tarefa N+k muda o código, e ninguém relê a documentação.
+
+**Se a sua mudança fez alguma destas coisas, edite este arquivo no mesmo
+commit** — não depois, não num commit de limpeza:
+
+| você mudou | atualize |
+|---|---|
+| acrescentou, removeu ou renomeou um app | o mapa e o aviso de rebaseline |
+| a escala tipográfica, o acento, os tokens de vidro, os raios | "A linguagem visual" |
+| acrescentou um componente compartilhado em `ui/` | "Deixe o código te ensinar" |
+| como se roda a suíte, ou o que ela cobre | as duas primeiras seções |
+| qualquer coisa que torne falso um limite declarado aqui | a seção que o declara |
+
+Quando a mudança de padrão for pedida pelo dono do projeto, a atualização desta
+skill **faz parte da entrega**, e você diz o que atualizou junto com o resto.
+
+**Se você está lendo isto porque algo aqui não bate com o código: a skill está
+errada e o código está certo.** Conserte a skill.

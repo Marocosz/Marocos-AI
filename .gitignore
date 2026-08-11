@@ -115,3 +115,9 @@ $RECYCLE.BIN/
 # ==================================================
 .superpowers/
 .claude/settings.local.json
+
+# Copias isoladas que o Claude Code cria para rodar um agente sem mexer na
+# arvore principal. Sao descartaveis e podem conter um checkout inteiro do
+# projeto -- nunca devem entrar no repositorio. Note que .claude/skills/ SEGUE
+# versionado de proposito: a skill do frontend viaja com o projeto.
+.claude/worktrees/
