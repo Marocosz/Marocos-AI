@@ -5,7 +5,7 @@
  * às vezes um passo extra (ficar na tela de bloqueio, abrir o menu Iniciar,
  * viewport mobile). `visual.spec.js` transforma cada uma num teste.
  *
- * O campo `webgl` decide a tolerância de diff (ver playwright.config.js e o
+ * O campo `cristal3d` decide a tolerância de diff (ver playwright.config.js e o
  * README). Ele fica AQUI, junto da cena, e não numa lista separada por nome —
  * na versão anterior deste harness (script solto, fora de versionamento) a
  * classificação vivia num `Set` de nomes em outro arquivo, e isso mordeu: uma
@@ -13,6 +13,20 @@
  * e a tolerância zero errada transformou ruído de rasterização do cristal 3D
  * em alarme falso. Colocar o campo na própria cena elimina essa classe de bug
  * — não tem como esquecer de marcar o que está bem na frente.
+ *
+ * O CAMPO SE CHAMAVA `webgl`, E ERA LARGO DEMAIS. Quando `playwright.config.js`
+ * passou a usar `threshold: 0`, a medição do piso de ruído (duas execuções
+ * sobre o mesmo commit, sem tolerância nenhuma — ver README) mostrou que o
+ * ruído de rasterização não vem de "ter WebGL na tela": vem do CRISTAL 3D
+ * (three/R3F). As cenas que só têm o wallpaper por shader (ogl) — incluindo
+ * `wallpaper-escuro`, `wallpaper-claro`, `mobile-home` e `mobile-sobre` —
+ * repetiram EXATAMENTE 0 px nas duas execuções, iguais às cenas de puro DOM.
+ * Marcar essas quatro como tolerantes dava 2% de folga de graça justamente na
+ * cena mais importante do conjunto. O campo agora nomeia a causa real, e só as
+ * seis cenas que montam o cristal pagam tolerância.
+ *
+ * (`mobile-sobre` é `/sobre` no celular e mesmo assim fica em zero porque o
+ * AboutApp não monta o cristal fora do desktop — ver `deviceMode` lá.)
  */
 
 /** Viewports. Cenas `mobile: true` usam MOBILE; as demais, DESKTOP. */
@@ -58,45 +72,45 @@ export const CENAS = [
    * acima): o harness espera a janela abrir de verdade e a FECHA de volta,
    * em vez de tentar vencer uma corrida. Ver visual.spec.js.
    */
-  { nome: 'wallpaper-escuro', rota: '/', tema: 'dark', webgl: true, fecharJanelaAutomatica: true },
-  { nome: 'wallpaper-claro', rota: '/', tema: 'light', webgl: true, fecharJanelaAutomatica: true },
+  { nome: 'wallpaper-escuro', rota: '/', tema: 'dark', fecharJanelaAutomatica: true },
+  { nome: 'wallpaper-claro', rota: '/', tema: 'light', fecharJanelaAutomatica: true },
 
   // Área de trabalho com janela, ícones, assinatura e taskbar — a janela
-  // "Sobre" carrega o cristal 3D, então também é superfície WebGL.
-  { nome: 'sobre-escuro', rota: '/sobre', tema: 'dark', webgl: true },
-  { nome: 'sobre-claro', rota: '/sobre', tema: 'light', webgl: true },
+  // "Sobre" carrega o cristal 3D, que é a única fonte de ruído medida.
+  { nome: 'sobre-escuro', rota: '/sobre', tema: 'dark', cristal3d: true },
+  { nome: 'sobre-claro', rota: '/sobre', tema: 'light', cristal3d: true },
 
   // Os outros oito apps, no tema escuro — nenhum tem canvas, só DOM.
-  { nome: 'projetos', rota: '/projetos', tema: 'dark', webgl: false },
-  { nome: 'projeto-detalhe', rota: '/projetos/bussola-v2', tema: 'dark', webgl: false },
-  { nome: 'jornada', rota: '/jornada', tema: 'dark', webgl: false },
-  { nome: 'stack', rota: '/stack', tema: 'dark', webgl: false },
-  { nome: 'contato', rota: '/contato', tema: 'dark', webgl: false },
-  { nome: 'assistente', rota: '/assistente', tema: 'dark', webgl: false },
-  { nome: 'leia-me', rota: '/leia-me', tema: 'dark', webgl: false },
-  { nome: 'config', rota: '/config', tema: 'dark', webgl: false },
+  { nome: 'projetos', rota: '/projetos', tema: 'dark' },
+  { nome: 'projeto-detalhe', rota: '/projetos/bussola-v2', tema: 'dark' },
+  { nome: 'jornada', rota: '/jornada', tema: 'dark' },
+  { nome: 'stack', rota: '/stack', tema: 'dark' },
+  { nome: 'contato', rota: '/contato', tema: 'dark' },
+  { nome: 'assistente', rota: '/assistente', tema: 'dark' },
+  { nome: 'leia-me', rota: '/leia-me', tema: 'dark' },
+  { nome: 'config', rota: '/config', tema: 'dark' },
 
   // Tema claro nos dois apps de tipografia mais densa — é onde uma regressão
   // de peso de fonte ou de cor herdada apareceria primeiro.
-  { nome: 'stack-claro', rota: '/stack', tema: 'light', webgl: false },
-  { nome: 'jornada-claro', rota: '/jornada', tema: 'light', webgl: false },
+  { nome: 'stack-claro', rota: '/stack', tema: 'light' },
+  { nome: 'jornada-claro', rota: '/jornada', tema: 'light' },
 
   // A tela de bloqueio, sem destrancar — o cristal aparece atrás dela.
-  { nome: 'bloqueio', rota: '/', tema: 'dark', ficarNoBloqueio: true, webgl: true },
-  { nome: 'bloqueio-claro', rota: '/', tema: 'light', ficarNoBloqueio: true, webgl: true },
-
-  // Mobile: shell inteiro diferente (sem janelas, com dock). O wallpaper
-  // mobile É o shader (mesmo componente do desktop, só que em viewport menor).
-  { nome: 'mobile-home', rota: '/', tema: 'dark', mobile: true, webgl: true },
-  { nome: 'mobile-sobre', rota: '/sobre', tema: 'dark', mobile: true, webgl: true },
+  { nome: 'bloqueio', rota: '/', tema: 'dark', ficarNoBloqueio: true, cristal3d: true },
+  { nome: 'bloqueio-claro', rota: '/', tema: 'light', ficarNoBloqueio: true, cristal3d: true },
 
   /**
-   * `mobile-home-claro` fica com `webgl: false` DE PROPÓSITO: no mobile, o
-   * fundo da home no tema claro é gradiente CSS, sem WebGL — só o tema escuro
-   * (e o desktop) usam o shader Silk/Iridescence nessa superfície. Tolerância
-   * zero aqui é correta.
+   * Mobile: shell inteiro diferente (sem janelas, com dock). O wallpaper mobile
+   * É o shader (mesmo componente do desktop, só que em viewport menor) — e
+   * mesmo assim as duas ficam em tolerância ZERO, medida: shader não é cristal.
+   * `mobile-sobre` também, porque o AboutApp não monta o cristal no mobile.
+   *
+   * (No tema claro a home mobile nem shader tem: o fundo é gradiente CSS. Só o
+   * tema escuro e o desktop usam Silk/Iridescence nessa superfície.)
    */
-  { nome: 'mobile-home-claro', rota: '/', tema: 'light', mobile: true, webgl: false },
+  { nome: 'mobile-home', rota: '/', tema: 'dark', mobile: true },
+  { nome: 'mobile-sobre', rota: '/sobre', tema: 'dark', mobile: true },
+  { nome: 'mobile-home-claro', rota: '/', tema: 'light', mobile: true },
 
   /**
    * O DOCK E O MENU INICIAR NO TEMA CLARO — cenas acrescentadas depois que um
@@ -109,11 +123,11 @@ export const CENAS = [
    * Iniciar, que nenhuma cena cobria. Ele achou lendo o código; poderia não
    * ter achado. Esta cena fecha esse buraco.
    *
-   * `menu-iniciar*` são fotografadas sobre a área de trabalho, que tem o
-   * shader do wallpaper E a janela "Sobre" com o cristal — por isso também
-   * levam `webgl: true` (ver o comentário no topo do arquivo sobre o bug que
-   * isso corrigiu).
+   * `menu-iniciar*` são fotografadas sobre a área de trabalho, com a janela
+   * "Sobre" (e o cristal dentro dela) aberta por baixo — por isso levam
+   * `cristal3d: true` (ver o comentário no topo do arquivo sobre o bug que a
+   * classificação por cena corrigiu).
    */
-  { nome: 'menu-iniciar-claro', rota: '/', tema: 'light', abrirMenuIniciar: true, webgl: true },
-  { nome: 'menu-iniciar', rota: '/', tema: 'dark', abrirMenuIniciar: true, webgl: true },
+  { nome: 'menu-iniciar-claro', rota: '/', tema: 'light', abrirMenuIniciar: true, cristal3d: true },
+  { nome: 'menu-iniciar', rota: '/', tema: 'dark', abrirMenuIniciar: true, cristal3d: true },
 ]

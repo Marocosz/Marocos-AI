@@ -52,6 +52,7 @@
 import { test, expect } from '@playwright/test'
 import { setTimeout as esperar } from 'node:timers/promises'
 import { DESKTOP } from './cenas.js'
+import { mockarChat } from './mocks.js'
 
 // Nenhuma cena deste spec usa viewport mobile — as nove rotas e os quatro
 // comportamentos abaixo só foram exercitados em desktop no rascunho
@@ -245,50 +246,11 @@ test('react-markdown carrega só sob demanda (estado vazio -> resposta)', async 
     if (req.url().includes('/assets/AssistantMarkdown-')) chunksDeMarkdown.push(req.url())
   })
 
-  // Mocka os dois endpoints do backend via page.route() (inclui o preflight
-  // CORS, porque o `apiBase` de produção é cross-origin em relação ao
-  // `vite preview` local) — não depende do FastAPI estar no ar.
-  await page.route((url) => url.pathname.includes('/chat'), async (route) => {
-    const req = route.request()
-    const corsHeaders = {
-      'access-control-allow-origin': '*',
-      'access-control-allow-methods': 'GET, POST, OPTIONS',
-      'access-control-allow-headers': 'content-type',
-    }
-
-    if (req.method() === 'OPTIONS') {
-      return route.fulfill({ status: 204, headers: corsHeaders })
-    }
-
-    if (req.url().endsWith('/chat/status')) {
-      return route.fulfill({
-        status: 200,
-        contentType: 'application/json',
-        headers: corsHeaders,
-        body: JSON.stringify({ current: 1, limit: 100 }),
-      })
-    }
-
-    // POST /chat — devolve um SSE de um evento de status + um resultado com
-    // markdown de verdade (negrito + link), num corpo só (sem streaming
-    // real: a leitura via reader() funciona igual).
-    const sse = [
-      'event: status',
-      'data: {"message":"Pensando..."}',
-      '',
-      'event: result',
-      'data: {"response":"**Bússola V2** é um projeto. Veja o [repositório](https://example.com/bussola).","usage":{"current":2,"limit":100}}',
-      '',
-      '',
-    ].join('\n')
-
-    return route.fulfill({
-      status: 200,
-      contentType: 'text/event-stream',
-      headers: corsHeaders,
-      body: sse,
-    })
-  })
+  // Mocka os dois endpoints do backend — não depende do FastAPI estar no ar.
+  // O handler mora em mocks.js porque `visual.spec.js` usa o MESMO: a cena
+  // `assistente` fotografa o rodapé de cota, que só existe se `/chat/status`
+  // responder. Ver o cabeçalho de mocks.js.
+  await mockarChat(page)
 
   await page.goto('/assistente', { waitUntil: 'networkidle' })
   await passarDaCerimonia(page)

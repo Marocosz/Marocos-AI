@@ -163,63 +163,139 @@ abrir de verdade e a **fecha** antes de fotografar — em vez de torcer para
 fotografar antes dela abrir. Ver os comentários em `visual.spec.js` e
 `cenas.js` (campo `fecharJanelaAutomatica`).
 
+### Tolerância de cor por pixel: zero (e por que isso importa mais que o limiar)
+
+`playwright.config.js` fixa `expect: { toHaveScreenshot: { threshold: 0 } }`.
+
+Sem isso vale o default do pixelmatch, **`threshold: 0.2`** — e ele não é uma
+folga de quantidade, é uma folga de **cor, por pixel**, aplicada ANTES de o
+pixel ser contado. Um pixel que muda pouco nunca entra na conta, e o
+`maxDiffPixels` da cena nem chega a vê-lo. Na prática, as cenas "de piso zero"
+toleravam um número **ilimitado** de pixels mudando, desde que cada mudança
+fosse sutil — que é exatamente a regressão que este projeto tem de mais
+provável: um pixel diferente de especificidade de CSS numa cor herdada (foi um
+bug real, pego por este harness durante o refactor que o originou).
+
+Com `threshold: 0`, qualquer diferença de cor conta, e quem decide o que passa
+é só o `maxDiffPixels` da cena. **Tolerância zero passou a significar zero.**
+
 ### Limiar por cena, medido — não chutado
 
-Rodando a suíte duas vezes sobre o mesmo commit sem mudar nada (o teste de
-determinismo, descrito mais abaixo), o piso de ruído observado foi:
+A receita é: rodar a captura **duas vezes sobre o mesmo commit**, sem mudar
+nada, e tomar o pior caso observado com folga de 2×.
 
-- cenas com superfície WebGL visível (wallpaper por shader, ou o cristal 3D
-  da janela "Sobre"): ruído de rasterização entre contextos diferentes —
-  o mesmo frame congelado (`uTime = 0`) ainda passa por um GPU/driver que
-  arredonda ponto flutuante de forma levemente diferente a cada novo
-  contexto WebGL.
-- cenas que são só DOM: **exatamente 0 px**, sempre.
+Os números atuais foram **re-medidos sob `threshold: 0`**. Os anteriores tinham
+sido medidos sob 0.2, onde a maior parte da variação de rasterização nem
+chegava a ser contada — a base mudou, então os valores velhos deixaram de
+significar o que diziam. Re-medir era obrigatório; subir o número até a suíte
+calar teria sido a outra coisa.
 
-Por isso o limiar é **por cena**, não global: `maxDiffPixels: 3000` só nas
-cenas marcadas `webgl: true` em `cenas.js` (2× o pior valor já observado,
-~0,23% de uma tela de 1440×900), e **nenhum limiar** nas demais — o
-`toHaveScreenshot()` do Playwright já falha com qualquer diferença quando
-`maxDiffPixels` não é passado, então a tolerância zero sai de graça. Um
-limiar único e folgado esconderia exatamente o tipo de regressão mais
-provável neste projeto: um pixel diferente de especificidade de CSS numa cor
-herdada (foi um bug real, pego por este harness durante o refactor que o
-originou).
+Diferença entre capturas consecutivas da mesma página, nas duas execuções:
 
-A classificação `webgl` vive **na própria cena**, em `cenas.js`, não numa
-lista separada por nome — a versão anterior deste harness guardava essa
-classificação num `Set` de nomes num arquivo diferente, e uma cena nova
-(`menu-iniciar`) foi adicionada às cenas mas esquecida no `Set`, transformando
-ruído legítimo do cristal 3D em alarme falso. Colocar o campo ao lado da cena
-elimina essa classe de erro.
+| Cena | execução 1 | execução 2 |
+|---|---|---|
+| `sobre-escuro` | 9123 / 8042 | 9022 / 9199 |
+| `sobre-claro` | 8918 / 8123 | 8611 / 8247 |
+| `bloqueio` | 12809 / 13273 | 13334 / 14781 |
+| `bloqueio-claro` | 12292 / 13123 | 12017 / **15091** |
+| `menu-iniciar` | 9125 / 8868 | 9070 / 9018 |
+| `menu-iniciar-claro` | 8372 / 7979 | 8972 / 9824 |
+| **as outras 15 cenas** | **0** | **0** |
+
+Pior caso 15.091 px; 2× isso é 30.182. O valor adotado é **`0,024` da área do
+viewport** (31.104 px em 1440×900).
+
+#### O ruído é do cristal 3D, não de "ter WebGL"
+
+Aquela coluna de zeros é o achado da re-medição. Cenas com o **wallpaper por
+shader** visível (`wallpaper-escuro`, `wallpaper-claro`, `mobile-home`,
+`mobile-sobre`) repetem **pixel a pixel**, iguais às cenas de puro DOM. Quem
+não repete são as seis cenas que montam o **cristal 3D** (three/R3F).
+
+Por isso a classificação em `cenas.js` chama-se **`cristal3d`**, e não `webgl`
+como antes: sob a classificação larga, as quatro cenas de wallpaper ganhavam
+2% de folga de graça — inclusive `wallpaper-escuro`, que é a cena mais
+importante do conjunto. Hoje **6 cenas** pagam tolerância e **15** ficam em
+zero de verdade.
+
+A classificação vive **na própria cena**, não numa lista separada por nome — a
+versão anterior deste harness guardava isso num `Set` de nomes num arquivo
+diferente, e uma cena nova (`menu-iniciar`) foi adicionada às cenas mas
+esquecida no `Set`, transformando ruído legítimo do cristal em alarme falso.
+Colocar o campo ao lado da cena elimina essa classe de erro.
+
+#### O limiar é fração de área, não número absoluto
+
+O valor antigo era um `3000` fixo, justificado no texto como "~0,23% de uma
+tela de 1440×900" — mas aplicado igual às cenas mobile de 390×844, onde os
+mesmos 3000 px valem **0,91%**: quatro vezes mais frouxo do que o texto
+declarava. Guardando a **fração** e multiplicando pela área do viewport da
+cena, o número declarado e o aplicado voltam a ser o mesmo em qualquer
+viewport, sem ninguém precisar lembrar de converter.
+
+#### Como refazer a medição
+
+```powershell
+$env:MEDIR_RUIDO=1; npx playwright test visual.spec.js; Remove-Item Env:MEDIR_RUIDO
+```
+
+Isso tira **toda** tolerância e faz cada cena reprovar dizendo quantos pixels
+variaram. É necessário porque, quando uma cena passa, o Playwright não reporta
+o diff em lugar nenhum — sem esse modo não há o que medir, só o que chutar.
+Rode duas vezes, tome o pior caso, multiplique por 2, divida pela área do
+viewport.
 
 ### Tabela de cenas
 
 | Cena | Rota | Tema | Viewport | Passo extra | Limiar | Por quê |
 |---|---|---|---|---|---|---|
-| `wallpaper-escuro` | `/` | dark | 1440×900 | fecha a janela "Sobre" que abre sozinha | 3000 px | wallpaper por shader visível |
-| `wallpaper-claro` | `/` | light | 1440×900 | idem | 3000 px | idem |
-| `sobre-escuro` | `/sobre` | dark | 1440×900 | — | 3000 px | cristal 3D na janela |
-| `sobre-claro` | `/sobre` | light | 1440×900 | — | 3000 px | idem |
+| `wallpaper-escuro` | `/` | dark | 1440×900 | fecha a janela "Sobre" que abre sozinha | 0 px | shader repete pixel a pixel (medido) |
+| `wallpaper-claro` | `/` | light | 1440×900 | idem | 0 px | idem |
+| `sobre-escuro` | `/sobre` | dark | 1440×900 | — | 31.104 px | cristal 3D na janela |
+| `sobre-claro` | `/sobre` | light | 1440×900 | — | 31.104 px | idem |
 | `projetos` | `/projetos` | dark | 1440×900 | — | 0 px | só DOM |
 | `projeto-detalhe` | `/projetos/bussola-v2` | dark | 1440×900 | — | 0 px | só DOM |
 | `jornada` | `/jornada` | dark | 1440×900 | — | 0 px | só DOM |
 | `stack` | `/stack` | dark | 1440×900 | — | 0 px | só DOM |
 | `contato` | `/contato` | dark | 1440×900 | — | 0 px | só DOM |
-| `assistente` | `/assistente` | dark | 1440×900 | — | 0 px | só DOM |
+| `assistente` | `/assistente` | dark | 1440×900 | `/chat/status` mockado | 0 px | só DOM |
 | `leia-me` | `/leia-me` | dark | 1440×900 | — | 0 px | só DOM |
 | `config` | `/config` | dark | 1440×900 | — | 0 px | só DOM |
 | `stack-claro` | `/stack` | light | 1440×900 | — | 0 px | tipografia densa, tema claro |
 | `jornada-claro` | `/jornada` | light | 1440×900 | — | 0 px | tipografia densa, tema claro |
-| `bloqueio` | `/` | dark | 1440×900 | fica na tela de bloqueio | 3000 px | cristal visível atrás da cortina |
-| `bloqueio-claro` | `/` | light | 1440×900 | idem | 3000 px | idem |
-| `mobile-home` | `/` | dark | 390×844 | viewport mobile | 3000 px | wallpaper por shader (mobile também usa) |
-| `mobile-sobre` | `/sobre` | dark | 390×844 | viewport mobile | 3000 px | cristal 3D |
+| `bloqueio` | `/` | dark | 1440×900 | fica na tela de bloqueio | 31.104 px | cristal visível atrás da cortina |
+| `bloqueio-claro` | `/` | light | 1440×900 | idem | 31.104 px | idem |
+| `mobile-home` | `/` | dark | 390×844 | viewport mobile | 0 px | shader, mas sem cristal (medido em 0) |
+| `mobile-sobre` | `/sobre` | dark | 390×844 | viewport mobile | 0 px | o AboutApp não monta o cristal no mobile |
 | `mobile-home-claro` | `/` | light | 390×844 | viewport mobile | 0 px | home claro no mobile é gradiente CSS, sem WebGL |
-| `menu-iniciar-claro` | `/` | light | 1440×900 | abre o menu Iniciar | 3000 px | desktop com wallpaper + janela "Sobre" (cristal) por baixo |
-| `menu-iniciar` | `/` | dark | 1440×900 | idem | 3000 px | idem |
+| `menu-iniciar-claro` | `/` | light | 1440×900 | abre o menu Iniciar | 31.104 px | janela "Sobre" (cristal) aberta por baixo |
+| `menu-iniciar` | `/` | dark | 1440×900 | idem | 31.104 px | idem |
 
-**10 cenas** com `webgl: true` (tolerância 3000 px), **11 cenas** com
-tolerância zero.
+**6 cenas** com `cristal3d: true` (0,024 da área do viewport = 31.104 px em
+1440×900), **15 cenas** com tolerância zero — e agora zero de verdade, porque
+`threshold: 0` tirou a folga de cor por pixel que existia por baixo.
+
+### A cena `assistente` não fala com produção
+
+`AssistantApp.jsx` busca `/chat/status` na montagem e só desenha o rodapé de
+cota se a API responder — e o texto dele é a **cota diária global do projeto**,
+que sobe a cada conversa de qualquer visitante. Uma cena de tolerância zero não
+pode ter isso dentro do quadro: ou a API está fora e o rodapé não existe (era o
+caso da referência antiga, capturada sem ele), ou está no ar e o número muda
+com o movimento do dia.
+
+`visual.spec.js` mocka o endpoint, reusando o **mesmo handler** que
+`rotas.spec.js` já usava — extraído para `mocks.js`, porque duas cópias quase
+iguais divergiriam no primeiro ajuste (o preflight CORS e o formato do SSE são
+exatamente o tipo de detalhe que se corrige num arquivo e se esquece no outro).
+O mock é aplicado a **todas** as cenas, não só à do assistente: é o mesmo
+raciocínio do campo `cristal3d` viver dentro de `cenas.js` — classificação que
+alguém precisa lembrar de marcar é classificação que uma cena nova vai
+esquecer. O handler não casa com nenhuma outra rota nem asset do build.
+
+A referência de `assistente` foi regenerada uma vez por causa disso: ela agora
+inclui o rodapé com `1/100`, fixo. A cobertura **aumentou** — o rodapé passou a
+ser fotografado, em vez de depender de a API estar fora do ar.
 
 ### Desktop e mobile: opção por cena, não dois `projects`
 
@@ -233,7 +309,7 @@ A alternativa seria modelar desktop e mobile como dois `projects`. Não foi
 essa a escolha: um `project` inteiro rodaria a suíte **duas vezes** (uma por
 project) e exigiria filtrar qual cena pertence a qual project via
 `testMatch`/`grep` — mais um lugar onde uma cena nova pode ser esquecida,
-exatamente a mesma classe de bug que o campo `webgl` em `cenas.js` já
+exatamente a mesma classe de bug que o campo `cristal3d` em `cenas.js` já
 corrigiu uma vez (ver acima). Uma opção por cena, ao lado dos outros campos
 da própria cena, é onde uma cena nova naturalmente já teria que declarar seu
 viewport de qualquer forma.
@@ -361,8 +437,9 @@ intacto, nunca um erro de página, nunca uma janela ausente. Quando o chunk
 enfim resolve, o conteúdo aparece.
 
 **React-markdown só sob demanda**: mocka os dois endpoints do backend
-(`/chat/status` e `/chat`, incluindo o preflight CORS) via `page.route()` —
-não depende do FastAPI estar no ar. No estado vazio do assistente, **zero**
+(`/chat/status` e `/chat`, incluindo o preflight CORS) via `mocks.js` — o mesmo
+handler que `visual.spec.js` usa, e não depende do FastAPI estar no ar. No
+estado vazio do assistente, **zero**
 requisição ao chunk `AssistantMarkdown-*`; depois de clicar numa sugestão e
 receber a resposta mockada, a bolha renderiza markdown de verdade (negrito,
 link com `target="_blank"`) e o chunk **é** requisitado.

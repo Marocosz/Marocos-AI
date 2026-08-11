@@ -48,6 +48,26 @@ export default defineConfig({
     ['html', { open: 'never' }],
   ],
 
+  /**
+   * TOLERÂNCIA DE COR POR PIXEL: ZERO.
+   *
+   * O default do pixelmatch é `threshold: 0.2` — uma folga de COR, aplicada a
+   * cada pixel antes de ele ser contado. Com ela, um pixel que muda pouco nunca
+   * entra na conta, e o `maxDiffPixels` das cenas nem chega a vê-lo: as cenas
+   * de "piso zero" toleravam um número ILIMITADO de pixels mudando, desde que
+   * cada mudança fosse sutil. Que é exatamente a regressão que este harness diz
+   * ser a mais provável no projeto — um pixel diferente de especificidade de
+   * CSS numa cor herdada, que foi um bug real pego aqui.
+   *
+   * Com 0, qualquer diferença de cor conta, e quem decide o que passa é só o
+   * `maxDiffPixels` por cena. As tolerâncias de WebGL em visual.spec.js foram
+   * RE-MEDIDAS sob este valor — as antigas tinham sido medidas sob 0.2 e não
+   * valiam mais. Ver "Limiar por cena, medido" no README.
+   */
+  expect: {
+    toHaveScreenshot: { threshold: 0 },
+  },
+
   // Achata o caminho da referência para `__screenshots__/<nome-da-cena>.png`,
   // sem sufixo de projeto ou plataforma — é o formato que o time já revisa
   // (era assim no script antigo) e o que faz `git diff --stat` de uma cena só

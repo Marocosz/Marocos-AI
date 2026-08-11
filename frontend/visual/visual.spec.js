@@ -31,23 +31,46 @@
  */
 import { test, expect } from '@playwright/test'
 import { CENAS, DESKTOP, MOBILE, INSTANTE_FIXO } from './cenas.js'
+import { mockarChat } from './mocks.js'
 
 /**
- * Piso de ruído medido: rodando a captura duas vezes no MESMO commit, cenas
- * com superfície WebGL (wallpaper por shader, cristal 3D) variaram até
- * ~1500 px; cenas que são só DOM variaram exatamente 0 px. O rasterizador de
- * WebGL arredonda diferente entre contextos mesmo com a animação congelada;
- * o DOM pinta igual sempre.
+ * PISO DE RUÍDO, RE-MEDIDO SOB `threshold: 0`.
  *
- * 3000 dá folga de 2x sobre o pior valor observado e ainda é 0,23% de uma
- * tela de 1440x900 — bem abaixo de qualquer mudança visual que importe. Nas
- * cenas sem WebGL, `maxDiffPixels` simplesmente não é passado: o
- * `toHaveScreenshot()` do Playwright já falha com qualquer diferença nesse
- * caso, então a tolerância zero sai de graça. Um limiar único e folgado
- * esconderia exatamente o tipo de regressão mais provável neste projeto —
- * um pixel diferente de especificidade de CSS numa cor herdada.
+ * A receita é sempre a mesma: rodar a captura duas vezes sobre o MESMO commit e
+ * tomar o pior caso observado, com folga de 2x. Estes números foram REFEITOS
+ * quando `playwright.config.js` passou a usar `threshold: 0` — sob o default
+ * anterior (0.2, uma folga de COR por pixel) a maior parte da diferença de
+ * rasterização nem chegava a ser contada, então a base mudou e os valores
+ * velhos deixaram de significar o que diziam. Re-medir foi obrigatório; subir o
+ * número até a suíte calar, não.
+ *
+ * O que as duas execuções mostraram (diferença entre capturas consecutivas da
+ * MESMA página, em px):
+ *
+ *   sobre-escuro         9123 / 8042  ·  9022 / 9199
+ *   sobre-claro          8918 / 8123  ·  8611 / 8247
+ *   bloqueio            12809 / 13273 · 13334 / 14781
+ *   bloqueio-claro      12292 / 13123 · 12017 / 15091   <- pior caso
+ *   menu-iniciar         9125 / 8868  ·  9070 / 9018
+ *   menu-iniciar-claro   8372 / 7979  ·  8972 / 9824
+ *   TODAS as outras 15 cenas: exatamente 0 px, nas duas execuções
+ *
+ * Pior caso 15.091 px; 2x isso é 30.182, e 0,024 de uma tela de 1440x900 dá
+ * 31.104 — a folga de 2x, arredondada para um número declarável.
+ *
+ * SÓ O CRISTAL 3D FAZ RUÍDO. É o que a coluna de zeros acima prova: cenas com o
+ * wallpaper por shader visível (ogl) repetem pixel a pixel, e quem não repete
+ * são as seis cenas que montam o cristal (three/R3F). Por isso a classificação
+ * em `cenas.js` é `cristal3d` e não `webgl` — ver o cabeçalho de lá.
+ *
+ * TOLERÂNCIA É FRAÇÃO DE ÁREA, NÃO NÚMERO ABSOLUTO. O valor antigo era um 3000
+ * fixo, justificado como "~0,23% de uma tela de 1440x900" mas aplicado igual às
+ * cenas mobile de 390x844, onde os mesmos 3000 px valem 0,91% — quatro vezes
+ * mais frouxo do que o texto declarava. Guardando a FRAÇÃO e multiplicando pela
+ * área do viewport da cena, o número declarado e o aplicado voltam a ser o
+ * mesmo em qualquer viewport, sem ninguém precisar lembrar de converter.
  */
-const TOLERANCIA_WEBGL = 3000
+const FRACAO_RUIDO_CRISTAL = 0.024
 
 for (const cena of CENAS) {
   test.describe(cena.nome, () => {
@@ -60,9 +83,25 @@ for (const cena of CENAS) {
     // exigiria filtrar cena-por-project com testMatch/grep — mais um lugar
     // para uma cena nova ser esquecida (ver o comentário sobre o bug do
     // `Set` de classificação em cenas.js: a mesma classe de erro).
-    test.use({ viewport: cena.mobile ? MOBILE : DESKTOP })
+    const viewport = cena.mobile ? MOBILE : DESKTOP
+    test.use({ viewport })
 
     test(cena.nome, async ({ page, context }) => {
+      /**
+       * Sem isto a cena `assistente` dependeria da REDE DE PRODUÇÃO: o
+       * AssistantApp busca `/chat/status` na montagem e só desenha o rodapé de
+       * cota se a API responder — com um número que é a cota diária global e
+       * sobe a cada conversa de qualquer visitante. Uma cena de tolerância zero
+       * não pode ter isso dentro do quadro.
+       *
+       * Aplicado a TODAS as cenas, e não só à do assistente, de propósito: é o
+       * mesmo raciocínio do campo `cristal3d` viver dentro de `cenas.js` (ver o
+       * cabeçalho de lá) — classificação que alguém precisa lembrar de marcar é
+       * classificação que uma cena nova vai esquecer. O handler não casa com
+       * nenhuma outra rota nem asset do build, então aplicar sempre é de graça.
+       */
+      await mockarChat(page)
+
       // Preferências ANTES do primeiro render: é o que desliga os shaders e o
       // cristal, e o que fixa tema e idioma sem depender de clicar em nada.
       await context.addInitScript(({ tema }) => {
@@ -146,7 +185,18 @@ for (const cena of CENAS) {
       await page.waitForTimeout(500)
 
       const opcoes = { animations: 'disabled' }
-      if (cena.webgl) opcoes.maxDiffPixels = TOLERANCIA_WEBGL
+      /**
+       * `MEDIR_RUIDO=1` tira TODA tolerância e faz cada cena reprovar dizendo
+       * quantos pixels variaram — é como os números acima foram obtidos, e é
+       * como se refazem quando algo muda a base (outra GPU, outro Chromium,
+       * outro `threshold`). Sem isso a medição não existe: quando uma cena
+       * passa, o Playwright não conta o diff em lugar nenhum.
+       */
+      if (cena.cristal3d && !process.env.MEDIR_RUIDO) {
+        opcoes.maxDiffPixels = Math.round(
+          FRACAO_RUIDO_CRISTAL * viewport.width * viewport.height,
+        )
+      }
 
       await expect(page).toHaveScreenshot(`${cena.nome}.png`, opcoes)
     })
