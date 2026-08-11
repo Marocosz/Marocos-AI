@@ -131,11 +131,35 @@ const osContentEn = {
     hint: 'click MAROCOS OS to enter',
     ariaLabel: 'Lock screen',
   },
+  /**
+   * A tela de desligado é um POST de BIOS parado no meio.
+   *
+   * Escolha deliberada: uma máquina desligada não mostra o sistema operacional,
+   * mostra o firmware. Então aqui não há vidro, nem roxo, nem Poppins — é a
+   * camada de baixo do computador, e ela fala em mono âmbar sobre preto.
+   *
+   * O CONTEÚDO É VERDADEIRO. Cada linha do inventário aponta para algo que
+   * existe no portfólio (o agente, o RAG, os apps, a VPS), porque um POST que
+   * lista hardware inventado é só cenário — e o resto do sistema não faz isso.
+   */
   shutdown: {
-    message: "It's now safe to turn off your computer.",
-    subMessage: 'Marocos OS has been shut down.',
-    powerOnLabel: 'Turn on again',
-    ariaLabel: 'System off',
+    ariaLabel: 'System halted',
+    firmware: 'MAROCOS BIOS',
+    firmwareVersion: 'v3.0.1',
+    copyright: '(C) 2026 Marcos Rodrigues',
+    postLabel: 'Power-On Self-Test',
+    inventory: [
+      { chave: 'Main Processor', valor: 'Marcos Rodrigues — AI & Full-Stack' },
+      { chave: 'Memory Test', valor: '4+ years .......... OK' },
+      { chave: 'Primary Runtime', valor: 'Python / FastAPI' },
+      { chave: 'Display Adapter', valor: 'React 19 + WebGL' },
+      { chave: 'Agent Module', valor: 'LangGraph + RAG .... OK' },
+      { chave: 'Host', valor: 'Docker on self-managed VPS' },
+    ],
+    halted: 'System halted.',
+    haltedHint: 'It is now safe to turn off your computer.',
+    powerOnLabel: 'Press here to power on',
+    powerKey: 'ENTER',
   },
   startMenu: {
     title: 'Start menu',
@@ -340,11 +364,25 @@ const osContentPt = {
     hint: 'clique em MAROCOS SO para entrar',
     ariaLabel: 'Tela de bloqueio',
   },
+  /** POST de BIOS parado — ver a nota no bloco em inglês. */
   shutdown: {
-    message: 'É seguro desligar o seu computador.',
-    subMessage: 'O Marocos SO foi encerrado.',
-    powerOnLabel: 'Ligar novamente',
     ariaLabel: 'Sistema desligado',
+    firmware: 'MAROCOS BIOS',
+    firmwareVersion: 'v3.0.1',
+    copyright: '(C) 2026 Marcos Rodrigues',
+    postLabel: 'Autoteste de inicialização',
+    inventory: [
+      { chave: 'Processador', valor: 'Marcos Rodrigues — IA & Full-Stack' },
+      { chave: 'Teste de memória', valor: '4+ anos ........... OK' },
+      { chave: 'Runtime principal', valor: 'Python / FastAPI' },
+      { chave: 'Adaptador de vídeo', valor: 'React 19 + WebGL' },
+      { chave: 'Módulo de agente', valor: 'LangGraph + RAG .... OK' },
+      { chave: 'Hospedagem', valor: 'Docker em VPS própria' },
+    ],
+    halted: 'Sistema parado.',
+    haltedHint: 'É seguro desligar o seu computador.',
+    powerOnLabel: 'Pressione aqui para ligar',
+    powerKey: 'ENTER',
   },
   startMenu: {
     title: 'Menu Iniciar',

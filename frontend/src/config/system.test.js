@@ -38,7 +38,19 @@ describe('config do sistema', () => {
     expect(WALLPAPER.iridescence.amplitude).toBe(0.1)
     expect(WALLPAPER.iridescence.velocidade).toBe(1)
     expect(WALLPAPER.iridescence.reagirAoMouse).toBe(false)
-    expect(WALLPAPER.iridescence.escalaResolucao).toBe(0.6)
+    /**
+     * ESTE É UM VALOR DE CUSTO, e por isso continua fixado em literal mesmo
+     * depois de os ajustes estéticos do Silk terem virado faixa.
+     *
+     * `escalaResolucao` é a fração da tela em que o shader realmente desenha —
+     * o mesmo papel do `dpr` do Silk. Foi de 0.6 para 1 por decisão do dono do
+     * projeto: o tema claro passou a renderizar em resolução cheia, ou seja
+     * ~2.8x os pixels de antes. Como o blur de toda janela é refeito a cada
+     * quadro do wallpaper, esse número multiplica o custo de tudo que estiver
+     * por cima. Se um dia for preciso ganhar performance no tema claro, é aqui
+     * e no `fps` que se mexe primeiro.
+     */
+    expect(WALLPAPER.iridescence.escalaResolucao).toBe(1)
     expect(WALLPAPER.iridescence.fps).toBe(20)
   })
 

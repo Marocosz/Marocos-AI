@@ -41,7 +41,7 @@ export const WALLPAPER = {
    */
   silk: {
     cor: '#4c1d95',
-    velocidade: 10,
+    velocidade: 20,
     escala: 1,
     rotacao: 10,
     ruido: 3,
@@ -64,7 +64,7 @@ export const WALLPAPER = {
     amplitude: 0.1,
     velocidade: 1,
     reagirAoMouse: false,
-    escalaResolucao: 0.6,
+    escalaResolucao: 1,
     fps: 20,
   },
 

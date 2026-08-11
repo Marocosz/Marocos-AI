@@ -100,7 +100,10 @@ const ExplorerChrome = ({ win, children }) => {
   const { language } = useLanguage()
   const os = getOsData(language)
   const t = os.explorer
-  const contatos = getContactData(language)
+  // `.items`, e não o retorno inteiro: getContactData devolve a página de
+  // contato completa (rótulo, título, terminal, hospedagem) e a lista de canais
+  // é uma chave dentro dela.
+  const contatos = getContactData(language).items
 
   const trilha = useMemo(() => migalhas(win.appId, win.params), [win.appId, win.params])
   const acima = trilha.length > 1 ? trilha[trilha.length - 2] : null

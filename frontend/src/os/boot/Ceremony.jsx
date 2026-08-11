@@ -7,8 +7,16 @@ import { CERIMONIA } from '../../config/system'
 import Clock from '../../ui/Clock'
 import './boot.css'
 
-// O App dispara este mesmo import no escopo do módulo, então quando a cerimônia
-// monta o chunk já costuma estar a caminho.
+// `os/shell/Shell.jsx` dispara este mesmo import no escopo do módulo, então
+// quando a cerimônia monta o chunk já costuma estar a caminho. (O comentário
+// antigo dizia "o App"; o disparo é no Shell.)
+//
+// O QUE ISSO NÃO RESOLVE: o chunk tem ~938KB (three + fiber + drei) e, mesmo
+// baixado, montar o cristal cria um contexto WebGL e compila shaders. Nenhum
+// prefetch torna isso instantâneo — em "ligar novamente" o chunk já está no
+// registro de módulos e o atraso continua, porque o custo ali é a GPU, não a
+// rede. Por isso a entrada é amaciada com uma transição (ver
+// `.cerimonia-cristal-entra` em boot.css) em vez de prometida como imediata.
 const Crystal = lazy(() => import('../../brand/Crystal'))
 
 /**
@@ -209,11 +217,19 @@ const Ceremony = ({ fase, onBootDone, onUnlock, onUnlockStart }) => {
               {/* Um cristal para a cerimônia inteira. `animated={!saindo}`:
                   enquanto a cortina sobe ele congela, senão cada frame do canvas
                   obriga o compositor a reenviar a textura e recompor a tela. */}
-              <Crystal
-                size={tamanhoCristal}
-                animated={!saindo && !reduceMotion}
-                spin={noBoot ? CERIMONIA.spinBoot : CERIMONIA.spinBloqueio}
-              />
+              {/* O wrapper existe só para a entrada. O Suspense troca o halo
+                  pelo cristal num único frame, e sem isto a peça inteira
+                  aparecia de uma vez — o "surge do nada" que o dono do projeto
+                  apontou. Aqui ela cresce e ganha opacidade a partir do
+                  tamanho do halo, então a troca lê como o cristal SE FORMANDO
+                  no lugar onde o halo já pulsava. */}
+              <span className="cerimonia-cristal-entra">
+                <Crystal
+                  size={tamanhoCristal}
+                  animated={!saindo && !reduceMotion}
+                  spin={noBoot ? CERIMONIA.spinBoot : CERIMONIA.spinBloqueio}
+                />
+              </span>
             </Suspense>
           </span>
 

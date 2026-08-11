@@ -17,9 +17,10 @@
  * cobre quatro comportamentos que dependiam de resolução SÍNCRONA antes do
  * refactor para `React.lazy`:
  *
- *   1. Deep link dinâmico (`/projetos/:slug`): a janela PAI (`projects`) abre
- *      atrás, sem o usuário ter clicado em nada — só o reducer decidindo a
- *      partir da URL.
+ *   1. Deep link dinâmico (`/projetos/:slug`): abre UMA janela, com o caminho
+ *      de volta no breadcrumb. (Era a janela PAI montada atrás, via o campo
+ *      `parent` do registry; com navegação interna o detalhe é a própria janela
+ *      da pasta em outra localização, e `parent` deixou de existir.)
  *   2. Voltar/avançar do navegador troca o foco entre janelas já abertas.
  *   3. Clique num ícone da área de trabalho abre a janela (o caminho
  *      "clique", não só o deep link — os dois usam mecanismos diferentes).
@@ -182,6 +183,79 @@ test('voltar/avançar do navegador troca o foco entre janelas já abertas', asyn
   await expect(
     page.locator('.taskbar-window-btn.active .taskbar-window-label'),
   ).toHaveText('Histórico de Versões')
+})
+
+/**
+ * OS ESTADOS DO CHROME DE EXPLORADOR QUE NENHUMA FOTO ALCANÇA.
+ *
+ * Este teste existe por causa de um bug real: `getContactData()` devolve a
+ * página de contato inteira e a lista de canais é a chave `.items` dentro dela.
+ * O chrome fazia `contatos.map(...)` no retorno cru — TypeError, subárvore
+ * derrubada, janela preta. E ninguém viu, porque o grupo "Rede" nasce FECHADO:
+ * o regressor visual fotografa o estado de repouso, e no repouso aquele `.map`
+ * nunca roda.
+ *
+ * A lição não é sobre contato: é que grupo colapsado, painel fechado e campo de
+ * busca vazio são código que só existe depois de um clique, e o harness de fotos
+ * é estruturalmente cego a todos eles. Quem cobre é aqui.
+ */
+test('estados interativos do chrome de explorador não quebram a janela', async ({ page, context }) => {
+  await definirPreferencias(context)
+  const erros = []
+  page.on('pageerror', (e) => erros.push(e.message))
+
+  await page.goto('/projetos', { waitUntil: 'networkidle' })
+  await passarDaCerimonia(page)
+  await expect(page.locator('.projects-app-list')).toBeVisible({ timeout: 8000 })
+
+  // "Rede": expande e tem de render os canais como links externos de verdade.
+  await page.locator('.explorer-grupo-cab', { hasText: 'Rede' }).click()
+  const canais = page.locator('.explorer-grupo a.explorer-lugar')
+  await expect(canais).toHaveCount(4)
+  await expect(canais.first()).toHaveAttribute('href', /^mailto:|^https?:/)
+
+  // "Este Computador" já nasce aberto: os programas sem chrome abrem JANELA
+  // NOVA, e não navegam a atual — é a distinção das três portas do reducer.
+  await page.locator('.explorer-lugar', { hasText: 'Terminal' }).first().click()
+  await expect(page.locator('.terminal-app')).toBeVisible({ timeout: 8000 })
+  await expect(page.locator('.marocos-window')).toHaveCount(2)
+
+  // Painel de detalhes: fechado por padrão, então nunca é fotografado.
+  await page.locator('.explorer-cmd', { hasText: 'Detalhes' }).first().click()
+  await expect(page.locator('.explorer-detalhes').first()).toBeVisible()
+
+  expect(erros, `erro de página não capturado: ${erros.join('; ')}`).toHaveLength(0)
+})
+
+/**
+ * A tela de desligado também não tem cena no regressor — e o markup dela viveu
+ * um bom tempo com classes que não tinham CSS em lugar nenhum do projeto,
+ * exatamente porque nada a olhava.
+ */
+test('desligar mostra o POST de BIOS, e ligar devolve o sistema', async ({ page, context }) => {
+  await definirPreferencias(context)
+  const erros = []
+  page.on('pageerror', (e) => erros.push(e.message))
+
+  await page.goto('/leia-me', { waitUntil: 'networkidle' })
+  await passarDaCerimonia(page)
+
+  await page.click('.taskbar-btn[aria-expanded]')
+  await page.waitForSelector('.start-menu', { timeout: 5000 })
+  // O botão de desligar é só o ícone de power com aria-label — não tem texto,
+  // então `hasText` não o alcança.
+  await page.locator('.start-menu-power-btn').click()
+
+  const tela = page.locator('.shutdown-screen')
+  await expect(tela).toBeVisible({ timeout: 8000 })
+  // O inventário é conteúdo, não enfeite: se ele sumir, a tela virou casca.
+  await expect(page.locator('.shutdown-linha')).toHaveCount(6)
+  await expect(page.locator('.shutdown-halted')).not.toBeEmpty()
+
+  await page.locator('.shutdown-power-btn').click()
+  await expect(tela).toBeHidden({ timeout: 8000 })
+
+  expect(erros, `erro de página não capturado: ${erros.join('; ')}`).toHaveLength(0)
 })
 
 test('abertura por clique no ícone da área de trabalho', async ({ page, context }) => {
