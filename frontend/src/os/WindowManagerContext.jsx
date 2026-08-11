@@ -143,6 +143,14 @@ export function useWindowActions() {
   return ctx
 }
 
+// Sem importador hoje — só `useWindows()` (abaixo) o usa, no mesmo arquivo.
+// Exportado ainda assim, de propósito: é a metade "estado" da divisão
+// estado × ações que é o desenho deste módulo (ver o comentário acima, em
+// `acoes`/`estado`). Um app que só precisa ler `windows[]`/`focusedKey` sem
+// disparar ações — e portanto não precisa re-renderizar quando só ações
+// mudam — depende deste export existir para ganhar o benefício de
+// performance descrito ali. Apagá-lo tornaria essa divisão inacessível a
+// qualquer consumidor futuro que só use o hook combinado `useWindows()`.
 export function useWindowState() {
   const ctx = useContext(WindowStateContext)
   if (!ctx) throw new Error('useWindowState precisa estar dentro de WindowManagerProvider')

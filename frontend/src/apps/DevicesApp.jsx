@@ -19,9 +19,9 @@ import './DevicesApp.css'
  * (nível de domínio) alinhado à direita, igual a uma lista de detalhes
  * do Explorer.
  *
- * Reaproveita a linguagem visual de components/sections/TechStack.jsx:
- * o dot colorido com glow (currentColor + box-shadow), o chip de
- * tecnologia (chip vira linha de lista, mas mantém fundo/borda/hover) e o
+ * Reaproveita a linguagem visual da TechStack da página clássica (removida
+ * no refactor): o dot colorido com glow (currentColor + box-shadow), o chip
+ * de tecnologia (chip vira linha de lista, mas mantém fundo/borda/hover) e o
  * ícone de categoria em wrapper. O grid em bento vira lista vertical
  * porque é isso que uma árvore pede.
  *

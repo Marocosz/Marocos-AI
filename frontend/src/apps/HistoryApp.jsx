@@ -7,9 +7,10 @@ import './HistoryApp.css'
 /**
  * Histórico de Versões — a trajetória profissional como changelog de sistema.
  *
- * A versão de seção (Journey.jsx) é um carrossel horizontal arrastável com
- * setas SVG conectando os cards. Dentro de uma janela de 700x520 isso não
- * cabe: aqui os mesmos dados viram uma lista vertical de entradas de log,
+ * A versão de seção (Journey.jsx, da página clássica, removida no refactor)
+ * era um carrossel horizontal arrastável com setas SVG conectando os cards.
+ * Dentro de uma janela de 700x520 isso não cabe: aqui os mesmos dados viram
+ * uma lista vertical de entradas de log,
  * no espírito do histórico de atualizações do Windows. A metáfora de commit
  * (hash monoespaçado + badge de tipo colorido por categoria) é o que os
  * dados já trazem — só muda o layout que a carrega.

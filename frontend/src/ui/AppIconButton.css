@@ -1,9 +1,12 @@
 /* --------------------------------------------------
    BOTÃO DE APP
    Valores migrados sem alteração de Desktop.css (.marocos-icons button,
-   .marocos-icon-tile, .marocos-icon-label), MobileShell.css
+   .marocos-icon-tile, .marocos-icon-label) e MobileShell.css
    (.marocos-mobile-grid button, .marocos-mobile-tile, .marocos-mobile-label,
-   .marocos-mobile-dock-btn) e StartMenu.css (.start-menu-app-btn). Organização:
+   .marocos-mobile-dock-btn) — e do que era um botão de app dedicado no menu
+   Iniciar. Esse terceiro caso é o mais consolidado dos três: StartMenu.jsx
+   também usa este componente hoje (variante `--plana`, tamanho `--lista`),
+   então StartMenu.css não tem mais estilo próprio de botão de app. Organização:
    o que é idêntico entre os usos de uma variante vai no seletor da variante
    (--tile / --plana); o que diverge vai no modificador de tamanho
    (--desktop / --mobile / --dock / --lista).

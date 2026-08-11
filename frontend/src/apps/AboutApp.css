@@ -1,6 +1,7 @@
 /* src/apps/AboutApp.css
-   "Sobre este PC" — reaproveita a linguagem visual do Profile.jsx (faixa de
-   identidade, cards de stat, marquee de skills) dentro de uma janela pequena.
+   "Sobre este PC" — reaproveita a linguagem visual do Profile.jsx da página
+   clássica (removida no refactor; faixa de identidade, cards de stat,
+   marquee de skills) dentro de uma janela pequena.
    Sem backdrop-filter: o chrome da janela já borra o que está atrás; repetir
    o blur aqui dentro é o que derruba o Safari do iOS (ver Window.css). No
    lugar do "vidro" com blur, uso os tokens --card-bg/--card-border, que já

@@ -276,7 +276,12 @@
 
 /* --- RESPONSIVIDADE --- */
 
-/* Tablet (600px - 1024px) */
+/* Tablet (600px - 1024px). Faixa nominal, mas o alcance real é muito mais
+   estreito: a Taskbar só monta a partir de 1024px (useDeviceMode +
+   Shell.jsx), então este bloco só se aplica em exatamente 1024px — a
+   largura em que o modo ainda é desktop e a media query ainda casa. Não
+   apagar: nesse ponto exato ele muda o desenho, e a restrição de arte deste
+   commit proíbe alterar isso. */
 @media (max-width: 1024px) and (min-width: 601px) {
   .taskbar-center {
     gap: 4px;
@@ -295,43 +300,6 @@
   .taskbar-icon-wrapper {
     width: 38px;
     height: 38px;
-  }
-}
-
-/* Mobile (< 600px) */
-@media (max-width: 600px) {
-  .taskbar-center {
-    gap: 2px;
-    margin-right: 48px; /* Espaço para o botão More */
-  }
-
-  .taskbar-btn {
-    width: 36px;
-    height: 36px;
-  }
-
-  /* Sem espaço para label no celular: só o ícone. */
-  .taskbar-window-btn {
-    width: 36px;
-    padding: 0;
-    justify-content: center;
-  }
-
-  .taskbar-window-label {
-    display: none;
-  }
-
-  .taskbar-icon-wrapper {
-    width: 36px;
-    height: 36px;
-  }
-
-  .taskbar-right {
-    position: absolute;
-    right: 0;
-    width: 48px;
-    justify-content: center;
-    background: transparent;
   }
 }
 

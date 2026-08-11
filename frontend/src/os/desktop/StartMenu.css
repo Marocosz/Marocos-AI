@@ -188,16 +188,6 @@
   outline-offset: -2px;
 }
 
-/* --- RESPONSIVIDADE --- */
-@media (max-width: 600px) {
-  .start-menu {
-    left: 8px;
-    right: 8px;
-    width: auto;
-    max-height: min(70vh, calc(100vh - var(--taskbar-h) - 16px));
-  }
-}
-
 /* ========================================
    THEME LIGHT OVERRIDES — mesmos overrides da Taskbar.css
    ======================================== */

@@ -153,7 +153,6 @@ const osContentEn = {
     theme: 'Theme',
     language: 'Language',
     animation: 'Animation',
-    more: 'More options',
   },
   signature: {
     role: 'AI Developer & Full-Stack Engineer',
@@ -315,7 +314,6 @@ const osContentPt = {
     theme: 'Tema',
     language: 'Idioma',
     animation: 'Animação',
-    more: 'Mais opções',
   },
   signature: {
     role: 'Desenvolvedor de IA & Full-Stack',

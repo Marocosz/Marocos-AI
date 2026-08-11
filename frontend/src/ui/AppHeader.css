@@ -16,6 +16,10 @@
 
 .app-header-eyebrow {
   font-family: 'Courier New', monospace;
+  /* Sem fallback de propósito: --accent-color não é --cfg-* (não vem da
+     ponte do config), é definida direto no :root de styles/index.css,
+     carregado antes de qualquer app — sempre existe quando este seletor
+     roda. */
   color: var(--accent-color);
   /* 'Courier New' só tem os pesos 400 e 700 (fonte de sistema, sem
      @font-face) e o index.css tem font-synthesis: none — 700 é o peso que o

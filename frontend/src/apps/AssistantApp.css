@@ -1,12 +1,15 @@
 /* src/apps/AssistantApp.css
-   Linguagem visual reaproveitada de components/ui/StartMenu.css: bolhas de
-   mensagem, scroll do chat, input, indicador de status e banner de beta são
-   os mesmos, só renomeados para não colidir com o arquivo de referência.
+   Linguagem visual reaproveitada de um popup de chat que existia como
+   StartMenu.css antes do refactor (removido — não confundir com o
+   os/desktop/StartMenu.css de hoje, que é outro componente: busca + lista de
+   apps, não o chat): bolhas de mensagem, scroll do chat, input, indicador de
+   status e banner de beta são os mesmos, só renomeados para não colidir com
+   o nome usado pelo StartMenu.css atual.
 
    O que NÃO veio: moldura de menu Iniciar (backdrop, container flutuante,
-   animação de slide, media query de largura) e o rodapé decorativo de
-   Start Menu (perfil "Visitante", engrenagem de settings, botão de power) —
-   esse rodapé virou só o contador de uso, que é a única peça dele exigida
+   animação de slide, media query de largura) e o rodapé decorativo daquele
+   popup (perfil "Visitante", engrenagem de settings, botão de power) — esse
+   rodapé virou só o contador de uso, que é a única peça dele exigida
    pelo spec.
 
    Sem backdrop-filter aqui dentro: o blur já é do chrome da janela
@@ -14,8 +17,8 @@
 
    As variáveis de tema (--text-primary, --text-secondary, --accent-color)
    já trocam sozinhas via .theme-dark/.theme-light no elemento raiz do Shell
-   (src/App.jsx) — por isso os overrides "tema claro" abaixo continuam
-   funcionando mesmo sem a prop isDarkMode que o StartMenu.jsx recebia. */
+   (os/shell/Shell.jsx) — por isso os overrides "tema claro" abaixo continuam
+   funcionando mesmo sem a prop isDarkMode que aquele popup recebia. */
 
 .assistant-app {
   height: 100%;

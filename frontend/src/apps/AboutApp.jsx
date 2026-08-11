@@ -16,9 +16,9 @@ const Crystal = lazy(() => import('../brand/Crystal'))
  * "Sobre este PC" — o winver do Marocos OS: identidade + especificações.
  *
  * A piada é ler bio/skills como se fossem specs de hardware. Conteúdo vem
- * inteiro de getProfileData (mesma fonte do Profile.jsx da página clássica);
- * aqui só muda a moldura. Não sabe que janelas existem — sem título, sem
- * botão de fechar, sem posição.
+ * inteiro de getProfileData (mesma fonte do Profile.jsx da página clássica,
+ * removida no refactor); aqui só muda a moldura. Não sabe que janelas
+ * existem — sem título, sem botão de fechar, sem posição.
  */
 const AboutApp = () => {
   const { language } = useLanguage()
@@ -33,9 +33,10 @@ const AboutApp = () => {
    * milissegundos, e fazer isso no mesmo frame da abertura travava a janela
    * inteira. Adiando, a janela aparece na hora e o cristal preenche em seguida.
    *
-   * É a mesma solução que o Profile.jsx da página clássica já usava, com o
-   * comentário "Delay 3D Scene load to prevent startup freeze" — só que aqui o
-   * gatilho é a abertura da janela, não a carga da página.
+   * É a mesma solução que o Profile.jsx da página clássica (removida no
+   * refactor) já usava, com o comentário "Delay 3D Scene load to prevent
+   * startup freeze" — só que aqui o gatilho é a abertura da janela, não a
+   * carga da página.
    */
   const [montarCristal, setMontarCristal] = useState(false)
 
@@ -45,9 +46,10 @@ const AboutApp = () => {
     return () => clearTimeout(id)
   }, [deviceMode])
 
-  // Igual ao Profile.jsx: tripliquei a lista pra garantir que o marquee de
-  // 50% de translação nunca mostre buraco, mesmo se o container for mais
-  // largo que uma cópia só da lista de skills.
+  // Igual ao Profile.jsx da página clássica (removida no refactor):
+  // tripliquei a lista pra garantir que o marquee de 50% de translação
+  // nunca mostre buraco, mesmo se o container for mais largo que uma cópia
+  // só da lista de skills.
   const scrollingSkills = [
     ...profile.skills_highlight,
     ...profile.skills_highlight,

@@ -12,7 +12,7 @@
 import { LAYOUT } from '../config/system'
 import { useMediaQuery } from './hooks/useMediaQuery'
 
-export const DESKTOP_BREAKPOINT = LAYOUT.breakpointDesktop
+const DESKTOP_BREAKPOINT = LAYOUT.breakpointDesktop
 
 const CONSULTA_DESKTOP = `(min-width: ${DESKTOP_BREAKPOINT}px)`
 

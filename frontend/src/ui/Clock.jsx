@@ -11,9 +11,10 @@ import React, { useState, useEffect } from 'react'
  * Um `setInterval(60_000)` disparado na montagem erra o minuto exibido por até
  * meio intervalo: se a página carrega aos 40 segundos, o relógio só troca aos
  * 40 do minuto seguinte. Alinhar à virada custa um `setTimeout` a mais e
- * elimina o erro. É a mudança de comportamento consciente desta tarefa: a
- * taskbar deixa de tiquetaquear a cada segundo (nunca mostrou segundos, então
- * a tela é a mesma) e ganha o mesmo acerto de virada que só o bloqueio tinha.
+ * elimina o erro. É a mudança de comportamento consciente deste componente
+ * único: a taskbar deixa de tiquetaquear a cada segundo (nunca mostrou
+ * segundos, então a tela é a mesma) e ganha o mesmo acerto de virada que só
+ * o bloqueio tinha.
  *
  * NENHUM DOS TRÊS FORMATOS MOSTRA SEGUNDOS, então nenhum precisa de tique de
  * um segundo — repintar 60x por minuto para trocar um dígito por minuto era

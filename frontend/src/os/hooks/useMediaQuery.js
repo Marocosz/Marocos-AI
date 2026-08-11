@@ -26,8 +26,19 @@ export function useMediaQuery(query) {
   return casa
 }
 
-/** Preferência de sistema por menos movimento. Era lida de três formas
- *  diferentes no projeto; agora vem daqui. */
+/** Preferência de sistema por menos movimento.
+ *
+ *  Chegou a ser lida de três formas diferentes no projeto; duas foram
+ *  unificadas aqui — esta (`useMovimentoReduzido`, usada por
+ *  `ThemeContext.jsx`) e a leitura síncrona `lerMovimentoReduzido` abaixo
+ *  (usada pela cerimônia de boot em `Ceremony.jsx`).
+ *
+ *  A terceira continua separada por decisão, não por descuido: as duas telas
+ *  do shell mobile (`MobileApp.jsx`, `QuickSettings.jsx`) já animam com o
+ *  `useReducedMotion()` do `motion/react`, que é a fonte nativa da mesma
+ *  biblioteca que elas usam para tudo o mais. Trocá-lo por este hook exigiria
+ *  reconferir o visual das duas telas — refactor com risco real e sem ganho
+ *  de correção, fora do escopo deste commit. */
 export function useMovimentoReduzido() {
   return useMediaQuery('(prefers-reduced-motion: reduce)')
 }

@@ -9,11 +9,11 @@ import './TerminalApp.css'
 /**
  * Terminal.jsx — o app de contato do Marocos OS.
  *
- * Contact.jsx (components/sections) já simulava um terminal com boa
- * linguagem visual (janela de semáforo, prompt roxo, logs com status
- * colorido, tabela de canais) — só que era 100% encenado (motion anima o
- * "digitar" de um comando fixo). Aqui o mesmo visual vira de verdade
- * interativo: quem abre a janela digita os comandos.
+ * A seção de contato da página clássica (removida no refactor) já simulava
+ * um terminal com boa linguagem visual (janela de semáforo, prompt roxo,
+ * logs com status colorido, tabela de canais) — só que era 100% encenado
+ * (motion anima o "digitar" de um comando fixo). Aqui o mesmo visual vira de
+ * verdade interativo: quem abre a janela digita os comandos.
  *
  * A única dependência de `os/` é `useWindowActions`, usada só por dois
  * comandos (`projetos` e `stack`) para abrir outras janelas — o resto do app

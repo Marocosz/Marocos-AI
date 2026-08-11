@@ -6,16 +6,21 @@ import { getOsData } from '../i18n/os'
 /**
  * OS TRÊS CONTROLES DO SISTEMA, NUM LUGAR SÓ
  * --------------------------------------------------
- * Tema, idioma e movimento apareciam em três telas — o app Configurações, os
- * ajustes rápidos do mobile e o popup da bandeja — cada uma montando a própria
- * lista. Acrescentar um quarto controle custava três arquivos.
+ * Tema, idioma e movimento aparecem em três consumidores — o app
+ * Configurações, os ajustes rápidos do mobile e a bandeja do desktop
+ * (Taskbar.jsx) — cada um montando a própria lista. Acrescentar um quarto
+ * controle custava três arquivos.
+ *
+ * (Houve também um popup expansível da bandeja com os mesmos três toggles,
+ * pensado para telas estreitas — removido por nunca renderizar: a Taskbar só
+ * monta a partir de 1024px, largura em que o popup nunca chegava a abrir.)
  *
  * O hook devolve os dados; quem desenha é cada tela, porque os três formatos
  * são diferentes de verdade:
- *   Configurações   ícone + rótulo + dica + valor por extenso
- *   Ajustes rápidos ícone + rótulo + valor curto
- *   Bandeja         só o ícone, que já É o valor (não usa nem hook nem
- *                   ToggleRow para desenhar, só consome os campos abaixo)
+ *   Configurações   ícone + rótulo + dica + valor por extenso (via ToggleRow)
+ *   Ajustes rápidos ícone + rótulo + valor curto (via ToggleRow)
+ *   Bandeja         só o ícone, que já É o valor — consome os campos do hook
+ *                   direto, sem ToggleRow (Taskbar.jsx)
  *
  * `label`/`hint`/`valor` vêm de os.settings.*, e `labelCurto`/`valorCurto` de
  * os.tray.* (rótulo) e os.settings.*.dark|light|on|off (valor curto) — como

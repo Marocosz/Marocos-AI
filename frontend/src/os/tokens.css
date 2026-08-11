@@ -161,7 +161,8 @@
   --cer-veu: rgba(168, 85, 247, 0.08);
 }
 
-/* Wallpaper — noite */
+/* Chrome de janela — noite. (A paleta do wallpaper propriamente dito vem de
+   WALLPAPER.* via cssBridge.js, não daqui.) */
 .theme-dark {
   --win-titlebar-bg: rgba(76, 29, 149, 0.4);
   --win-body-bg: rgba(14, 9, 22, 0.6);
@@ -300,7 +301,9 @@
    revelar. São os mesmos valores de --sky-* dos dois temas, escritos aqui
    como HEXES LITERAIS, DE PROPÓSITO — e não var(--cfg-ceu-*).
 
-   TENTATIVA FEITA E REVERTIDA (Tarefa 6 do refactor, ver task-6-report.md):
+   TENTATIVA FEITA E REVERTIDA durante o refactor (documentada só localmente
+   — o relatório vivia em .superpowers/, que é gitignored e nunca chega ao
+   repositório; o conteúdo relevante está preservado aqui):
    --cfg-ceu-* é escrito pela ponte (cssBridge.js) como UM valor global por
    vez, para o tema ATUAL. Testei a unificação de verdade — Chromium headless,
    viewport de 400px, boot acelerado, clique real no toggle de tema do painel

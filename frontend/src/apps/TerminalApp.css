@@ -1,12 +1,13 @@
 /* src/apps/TerminalApp.css
  *
- * Reaproveita a linguagem visual do terminal falso de Contact.jsx (prompt
- * roxo, logs com status colorido, tabela de canais em grid) — mas com
- * classes próprias (`terminal-*`). O projeto não usa CSS Modules e
- * Contact.css continua carregado ao mesmo tempo (a página clássica em
- * HomePage.jsx ainda monta <Contact />): reusar os nomes de lá (`.cmd-line`,
- * `.log-line`, `.terminal-row`...) faria os dois estilos vazarem um no
- * outro.
+ * Reaproveita a linguagem visual do terminal falso da seção de contato da
+ * página clássica (removida no refactor) — prompt roxo, logs com status
+ * colorido, tabela de canais em grid — mas com classes próprias
+ * (`terminal-*`). O projeto não usa CSS Modules; o prefixo existe porque os
+ * nomes genéricos de origem (`.cmd-line`, `.log-line`, `.terminal-row`...)
+ * colidiam com outras classes globais da mesma época. A decisão de
+ * namespacing continua valendo hoje por higiene (import global, sem CSS
+ * Modules), ainda que a colisão original não seja mais possível.
  *
  * Fonte monoespaçada só de pilha de sistema (o projeto carrega só Poppins) —
  * zero requisição de rede, e é o que um terminal de verdade usaria.

@@ -1,4 +1,4 @@
-/* src/index.css */
+/* src/styles/index.css */
 
 /* --- VARIÁVEIS DE TEMA --- */
 :root {
@@ -58,9 +58,6 @@
 }
 
 /* --- ESTILOS GLOBAIS DE SCROLL --- */
-/* --- ESTILOS GLOBAIS DE SCROLL (LENIS / NATIVE) --- */
-/* --- ESTILOS GLOBAIS DE SCROLL --- */
-/* --- ESTILOS GLOBAIS DE SCROLL (LENIS / NATIVE) --- */
 html {
   scrollbar-width: none; /* Firefox - Hide Scrollbar */
   -ms-overflow-style: none; /* IE/Edge */
@@ -94,36 +91,9 @@ body {
   box-sizing: border-box;
 }
 
-/* --- COMPONENTES UI ADICIONAIS --- */
-
-/* Botão de Tema na Navbar */
-.theme-toggle-btn {
-  background: transparent;
-  border: none;
-  color: var(--text-primary);
-  cursor: pointer;
-  padding: 6px;
-  border-radius: 6px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transition: background 0.2s, color 0.2s;
-}
-
-.theme-toggle-btn:hover {
-  background: rgba(125, 125, 125, 0.2);
-  color: var(--accent-color);
-}
-
-.tray-divider {
-  width: 1px;
-  height: 20px;
-  background: rgba(125, 125, 125, 0.3);
-  margin: 0 8px;
-}
-
 /* ========================================
-   RESPONSIVIDADE MOBILE E TABLET
+   RESPONSIVIDADE MOBILE
+   (Restou só este breakpoint — o que cobria tablet foi removido no refactor.)
    ======================================== */
 
 /* --- MOBILE (< 768px) --- */

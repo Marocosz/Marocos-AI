@@ -1,11 +1,14 @@
 /* src/apps/HistoryApp.css */
 
 /* Todas as classes aqui usam o prefixo `history-` de propósito: este CSS é
-   um import global (sem CSS Modules), e o Journey.css da seção de scroll
-   (ainda ativa em HomePage.jsx) já é dono de nomes genéricos como
-   `.card-tag`, `.commit-hash` e `.type-init`. Reusar esses nomes literais
-   vazaria estilo nos dois sentidos. As CORES por categoria são as mesmas;
-   os seletores são novos por necessidade de isolamento, não por escolha. */
+   um import global (sem CSS Modules), e o Journey.css da seção de scroll da
+   página clássica (removida no refactor) era dono de nomes genéricos como
+   `.card-tag`, `.commit-hash` e `.type-init`. Na época os dois estilos
+   carregavam ao mesmo tempo, e reusar esses nomes literais vazaria um no
+   outro; a colisão que motivou o prefixo não existe mais, mas o namespacing
+   continua valendo por higiene (import global, sem CSS Modules). As CORES
+   por categoria são as mesmas; os seletores são novos por necessidade de
+   isolamento, não por escolha. */
 
 .history-app {
   display: flex;
@@ -157,8 +160,9 @@
 }
 
 /* ========================================
-   THEME LIGHT — mesma lógica de contraste do Journey.css: o acento e as
-   cores de categoria precisam de variantes mais escuras sobre fundo claro.
+   THEME LIGHT — mesma lógica de contraste do Journey.css da página clássica
+   (removida no refactor): o acento e as cores de categoria precisam de
+   variantes mais escuras sobre fundo claro.
    ======================================== */
 
 .theme-light .history-hash-prefix { color: #9333ea; }

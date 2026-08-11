@@ -16,12 +16,14 @@ const AssistantMarkdown = lazy(() => import('./AssistantMarkdown'))
  * Marcos Virtual — chat com o agente RAG, dentro de uma janela do Marocos OS.
  *
  * A lógica de rede (status de cota, streaming SSE manual, timeout de 60s,
- * tratamento de 429) veio de StartMenu.jsx. O invólucro mudou: sem backdrop,
- * sem isOpen/onClose, sem travar o scroll do body — quem monta e desmonta o
- * componente agora é o gerenciador de janelas, e o Lenis não existe mais
- * no projeto. Além disso, dois bugs herdados do componente antigo (histórico
- * lido de uma closure velha e uma string de erro cravada em inglês) foram
- * corrigidos nesta migração — ver comentários em `sendMessage`.
+ * tratamento de 429) veio de um popup de chat que existia como StartMenu.jsx
+ * antes do refactor (removido — não é o StartMenu.jsx atual, que é busca +
+ * lista de apps). O invólucro mudou: sem backdrop, sem isOpen/onClose, sem
+ * travar o scroll do body — quem monta e desmonta o componente agora é o
+ * gerenciador de janelas, e o Lenis não existe mais no projeto. Além disso,
+ * dois bugs herdados do componente antigo (histórico lido de uma closure
+ * velha e uma string de erro cravada em inglês) foram corrigidos nesta
+ * migração — ver comentários em `sendMessage`.
  *
  * O app não sabe que janelas existem: não importa nada de `os/`.
  */
@@ -30,7 +32,8 @@ const AssistantApp = () => {
   const content = getOsData(language).assistant
   const chatEndRef = useRef(null)
 
-  // Estados — idênticos aos de StartMenu.jsx.
+  // Estados — idênticos aos do popup de chat que precedeu este app (ver o
+  // cabeçalho do arquivo).
   const [messages, setMessages] = useState([])
   const [input, setInput] = useState('')
   const [isLoading, setIsLoading] = useState(false)
@@ -56,9 +59,10 @@ const AssistantApp = () => {
   }, [loadingStatus])
 
   // Busca o contador de cota uma vez, quando a janela é montada.
-  // Equivalente ao efeito de abertura de StartMenu.jsx (que rodava a cada
-  // `isOpen` virar true) — aqui a montagem do componente já É a abertura,
-  // então não há mais a condicional nem o cleanup de scroll-lock.
+  // Equivalente ao efeito de abertura do popup de chat que precedeu este app
+  // (que rodava a cada `isOpen` virar true) — aqui a montagem do componente
+  // já É a abertura, então não há mais a condicional nem o cleanup de
+  // scroll-lock.
   useEffect(() => {
     fetch(`${REDE.apiBase}/chat/status`)
       .then((res) => res.json())

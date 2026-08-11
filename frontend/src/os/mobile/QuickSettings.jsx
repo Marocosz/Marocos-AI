@@ -10,9 +10,9 @@ import ToggleRow from '../../ui/ToggleRow'
 /**
  * PAINEL DE AJUSTES RÁPIDOS
  * --------------------------------------------------
- * Equivalente mobile do popup de tray do desktop (Taskbar.jsx): os mesmos
- * três controles — tema, idioma, movimento — só que descendo do topo em vez
- * de subir do rodapé, porque quem o invoca é a barra de status.
+ * Equivalente mobile da bandeja do desktop (Taskbar.jsx): os mesmos três
+ * controles — tema, idioma, movimento — só que descendo do topo em vez de
+ * subir do rodapé, porque quem o invoca é a barra de status.
  *
  * Os três toggles vêm de `useSystemToggles`, que já reaproveita as chaves de
  * i18n que existiam para esses controles (`os.tray.*` para os rótulos e

@@ -7,10 +7,11 @@ import './ToggleRow.css'
  * Cobre o app Configurações e os ajustes rápidos do mobile, que têm a mesma
  * estrutura (ícone + texto + valor) alimentada pelo mesmo `useSystemToggles`.
  *
- * O popup da bandeja (Taskbar.jsx) NÃO usa este componente: lá o ícone é o
- * próprio valor, sem coluna separada, e forçar os três no mesmo componente
- * pediria um leque de props que valeria menos que a duplicação removida. A
- * bandeja consome só o hook e mantém markup próprio.
+ * A bandeja do desktop (o system tray de Taskbar.jsx) NÃO usa este
+ * componente: lá cada ícone já é o próprio valor, sem coluna separada, e
+ * forçar os três no mesmo componente pediria um leque de props que valeria
+ * menos que a duplicação removida. A bandeja consome só o hook
+ * (`useSystemToggles`) e mantém markup próprio.
  *
  * Estrutura de elemento — duas formas, de propósito:
  *   Hoje o Configurações tem <li> com <span>s e um <button> só na etiqueta de

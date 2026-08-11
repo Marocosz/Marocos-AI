@@ -4,8 +4,8 @@ import { useEffect } from 'react'
  * TRABALHO NA PRIMEIRA FOLGA DO NAVEGADOR
  * --------------------------------------------------
  * O par `requestIdleCallback` + fallback em `setTimeout` estava copiado em três
- * lugares (App.jsx duas vezes, Desktop.jsx uma), cada um com o seu
- * cancelamento. Aqui ele existe uma vez.
+ * lugares (duas vezes no que hoje é os/shell/Shell.jsx, uma em Desktop.jsx),
+ * cada um com o seu cancelamento. Aqui ele existe uma vez.
  *
  * `ativo: false` adia sem cancelar nada — é o que permite esperar uma fase do
  * sistema antes de agendar.

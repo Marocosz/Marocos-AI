@@ -6,14 +6,6 @@ import { getOsData } from '../i18n/os'
 import { projectSlug } from './projectSlug'
 import './ProjectDetailApp.css'
 
-// Mensagem de fallback caso `os.errors.projectNotFound` ainda não exista em
-// i18n/os.js (ver relatório da tarefa: chave de sistema pendente de adição).
-// Mantém o app funcional e sem tela branca enquanto a chave não chega.
-const FALLBACK_NOT_FOUND = {
-  pt: 'Projeto não encontrado.',
-  en: 'Project not found.',
-}
-
 /**
  * Detalhe de um projeto: recebe `params.slug` (a janela é dinâmica, uma
  * instância por slug — ver registry) e re-deriva a lista de projetos para
@@ -26,10 +18,9 @@ const ProjectDetailApp = ({ params }) => {
   const project = content.items.find((item) => projectSlug(item.title) === params?.slug)
 
   if (!project) {
-    const notFoundMessage = os.errors?.projectNotFound || FALLBACK_NOT_FOUND[language] || FALLBACK_NOT_FOUND.en
     return (
       <div className="project-detail-app project-detail-empty">
-        <p>{notFoundMessage}</p>
+        <p>{os.errors.projectNotFound}</p>
       </div>
     )
   }

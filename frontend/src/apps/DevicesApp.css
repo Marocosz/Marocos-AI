@@ -2,11 +2,11 @@
 
 /*
  * Usa as variáveis de tema já globais (--text-primary, --text-secondary,
- * --accent-color, --card-bg, --card-border), as mesmas que
- * TechStack.css escreve como valores fixos por tema (dark/light). Como
- * aqui viram var(), o componente ganha os dois temas de graça, sem
- * reescrever um bloco .theme-light — o container da janela (Window.css)
- * já prova que essas variáveis chegam até o conteúdo.
+ * --accent-color, --card-bg, --card-border), as mesmas que o TechStack.css
+ * da página clássica (removida no refactor) escrevia como valores fixos por
+ * tema (dark/light). Como aqui viram var(), o componente ganha os dois temas
+ * de graça, sem reescrever um bloco .theme-light — o container da janela
+ * (Window.css) já prova que essas variáveis chegam até o conteúdo.
  *
  * Sem backdrop-filter aqui dentro: o chrome da janela já borra atrás, e
  * empilhar blur derruba o Safari do iOS.
@@ -156,7 +156,8 @@
   flex: 1 1 auto;
 }
 
-/* Ponto de status colorido com glow — igual ao .tech-dot do TechStack. */
+/* Ponto de status colorido com glow — igual ao .tech-dot da TechStack da
+   página clássica (removida no refactor). */
 .devices-dot {
   flex: 0 0 auto;
   width: 8px;
