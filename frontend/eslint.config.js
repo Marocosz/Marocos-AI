@@ -41,6 +41,15 @@ export default defineConfig([
     },
   },
   {
+    // `visual/` é um pacote Node à parte (Playwright), e não código de
+    // navegador: roda em Node e lê `process.env`/`process.platform`. Acrescenta
+    // os globais de Node — os de browser continuam valendo por cima, porque os
+    // callbacks de `addInitScript`/`evaluate` são escritos aqui mas executam
+    // dentro da página (`localStorage`, `document`).
+    files: ['visual/**/*.js'],
+    languageOptions: { globals: globals.node },
+  },
+  {
     // Arquivos de contexto exportam o Provider (componente) e o hook de
     // consumo juntos — padrão que o projeto já usava no LanguageContext e que
     // o NoiseOS repete no WindowManagerContext e no ThemeContext.
