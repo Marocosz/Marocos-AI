@@ -1,7 +1,8 @@
-# Linha de base — antes da refatoração do frontend
+# Linha de base e resultado — refatoração do frontend
 
-Capturada em 2026-08-10, no commit `c703d01`, branch `feat/windowsmorphism`.
-É o critério de aceite de toda tarefa marcada **[VISUAL]** no plano.
+A linha de base foi capturada em 2026-08-10, no commit `c703d01`, branch
+`feat/windowsmorphism`. Foi o critério de aceite de toda tarefa marcada
+**[VISUAL]** no plano. O resultado final está na última seção.
 
 ## Bundle
 
@@ -77,3 +78,71 @@ A barra de rolagem à direita da janela confirma que há conteúdo abaixo.
 
 A decisão registrada é preservar pixel a pixel (Tarefa 2). Esta nota existe
 para que a decisão seja tomada com a consequência à vista.
+
+---
+
+# Resultado final
+
+Medido em 2026-08-11, no commit `db2afa9`, depois das 19 tarefas do plano, da
+rodada de correção da revisão final e do commit de limpeza.
+
+## Caminho crítico
+
+O que o navegador **precisa baixar antes de desenhar a primeira tela**. É o
+número que importa; o resto carrega sob demanda.
+
+| | linha de base (`c703d01`) | final (`db2afa9`) |
+|---|---|---|
+| `index.js` | 432,10 kB | 105,05 kB |
+| `vendor.js` | — (dentro do `index.js`) | 33,46 kB |
+| `index.css` | 13,42 kB | 8,46 kB |
+| **total gzip** | **445,52 kB** | **146,97 kB** |
+
+**−67,0%.**
+
+### Por que o `vendor.js` aparece na conta
+
+**Cuidado ao comparar estes números com qualquer medição intermediária.** A
+linha de base não tinha chunk de vendor: `react`, `react-dom` e `motion`
+estavam dentro do `index.js` medido. O `manualChunks` que os separa nasceu na
+Tarefa 14, e o `vendor.js` é `modulepreload` no `index.html` e import estático
+do `index.js` — ou seja, está no caminho crítico do primeiro desenho tanto
+quanto o resto.
+
+Comparar o `index.js` final (105 kB) direto com o da base (432 kB) dá −75,7% e
+mede coisas diferentes: a base incluía o React, o final não. A separação é boa
+por outro motivo — o vendor muda com upgrade de dependência, não com código de
+app, então editar um componente não invalida o cache dele no navegador do
+visitante. Mas ela não tira um byte do primeiro carregamento.
+
+## O que saiu do caminho crítico
+
+| chunk | gzip | quando carrega |
+|---|---|---|
+| `Crystal.js` | 258,81 kB | ao montar o cristal 3D (`three` + R3F) |
+| `AssistantMarkdown.js` | 47,50 kB | na primeira resposta do assistente |
+| 9 chunks de app | 0,22–3,53 kB cada | ao abrir cada janela |
+| 9 CSS de app | 0,24–1,82 kB cada | idem |
+
+O `Crystal.js` é o achado que a Tarefa 13 resolveu: na linha de base ele
+pesava 21,14 kB porque o `three` **não estava nele** — estava no bundle
+principal, por causa de um import estático que anulava o `lazy()`. Hoje ele
+carrega o que promete carregar.
+
+## Verificação
+
+| | linha de base | final |
+|---|---|---|
+| `npm run lint` | limpo | limpo |
+| `npm test` (vitest) | 2 arquivos | 53 testes |
+| `frontend/visual` | não existia | 34 testes (21 visuais + 13 de rota) |
+
+As 21 cenas do regressor visual são a prova de que a arte não mudou. Quinze
+delas comparam com **tolerância zero real** (`threshold: 0`); as seis que
+montam o cristal 3D pagam tolerância medida, não arbitrada — a receita e os
+números das duas execuções estão em `frontend/visual/README.md`.
+
+O limite conhecido do método, e ele importa: a captura desliga a animação antes
+do primeiro render, então `uTime` é sempre 0. Ela prova que geometria, cor e
+tipografia não mudaram; **não prova nada sobre duração ou velocidade**. Isso se
+verifica lendo o código.
