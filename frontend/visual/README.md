@@ -1,14 +1,41 @@
-# Regressor visual do Marocos OS
+# Harness de testes do Marocos OS
 
-Harness de regressão visual permanente, isolado em `frontend/visual/` com
-`package.json` próprio. Fotografa 21 cenas fixas do Marocos OS e compara pixel
-a pixel com referências versionadas em `__screenshots__/`.
+Harness de teste permanente, isolado em `frontend/visual/` com `package.json`
+próprio. Dois specs, dois tipos de regressão diferentes:
+
+- **`visual.spec.js`** — fotografa 21 cenas fixas do Marocos OS e compara
+  pixel a pixel com referências versionadas em `__screenshots__/`. Pega
+  mudança de cor, espaçamento, layout — qualquer coisa que altere o frame
+  final renderizado.
+- **`rotas.spec.js`** — entra por deep link em cada uma das nove rotas do
+  `os/registry.js` e em quatro comportamentos de carregamento sob demanda
+  (Suspense/`React.lazy`), afirmando com `expect()` que a janela certa abriu,
+  com título certo e CONTEÚDO real no corpo. Não tira screenshot nenhum.
+
+**Por que os dois, e não um só:** desde que os nove apps e o `react-markdown`
+do assistente passaram a ser carregados via `import()` dinâmico
+(`React.lazy`), um `import('./caminho/errado')` **compila sem erro** — só
+falha em runtime, quando alguém navega até aquele caminho. `npm run build`
+não pega isso. E o regressor visual, sozinho, também não pega de forma
+confiável: ele fotografa cenas, e uma janela cujo chunk não carregou aparece
+como janela vazia — o que às vezes tem silhueta parecida o bastante com o
+estado "carregando" legítimo para não divergir da referência o suficiente
+para reprovar. `rotas.spec.js` é o que fecha esse buraco: ele afirma
+CONTEÚDO real dentro do corpo do app (não só que um seletor existe), então um
+`import()` que resolve para o módulo errado — ou nunca resolve — reprova de
+forma explícita, com uma mensagem que aponta a rota exata.
 
 Este pacote substitui um script solto (`.superpowers/sdd/.../captura/`) que
 vivia fora de versionamento. As decisões difíceis daquele script — como
 congelar o tempo, como classificar ruído de WebGL — foram preservadas aqui;
 só a forma mudou, de dois scripts `.mjs` chamados à mão para um projeto
-`@playwright/test` padrão do ecossistema.
+`@playwright/test` padrão do ecossistema. `rotas.spec.js` tem a mesma origem:
+foi promovido de um roteiro Playwright avulso (`task-14-rotas.mjs`, escrito
+durante o refactor que introduziu o `React.lazy` por app) que uma tarefa
+POSTERIOR de reorganização de pastas reusou sem modificação — e ele pegou
+exatamente os imports dinâmicos que a reorganização deixou apontando para o
+caminho errado. Essa captura real foi o motivo para promovê-lo a harness
+permanente em vez de descartá-lo.
 
 ## Por que um pacote isolado
 
@@ -26,28 +53,42 @@ do navegador.
 cd frontend/visual
 npm install                 # só na primeira vez (ou após trocar a versão do Playwright)
 npm run build:frontend       # roda `npm run build` dentro de frontend/ — gera dist/
-npm test                     # compara contra as referências em __screenshots__/
+npm test                     # roda os DOIS specs: visual.spec.js e rotas.spec.js
 ```
 
 `npm test` sobe `vite preview` sozinho (via a opção `webServer` do
-`playwright.config.js`) sobre o `dist/` mais recente — por isso o passo de
-build é manual e separado: o harness fotografa o que está em `dist/`, não o
-que está em `src/`. Se você mudou código e não rebuildou, está comparando
-contra uma versão velha do site.
+`playwright.config.js`, compartilhada pelos dois specs) sobre o `dist/` mais
+recente — por isso o passo de build é manual e separado: os dois specs
+exercitam o que está em `dist/`, não o que está em `src/`. Se você mudou
+código e não rebuildou, `visual.spec.js` compara contra uma versão velha do
+site e `rotas.spec.js` pode passar mesmo com um `import()` quebrado no `src/`
+atual — o chunk errado do build anterior ainda está lá.
+
+Para rodar só um dos specs (útil ao iterar):
+
+```powershell
+npx playwright test visual.spec.js
+npx playwright test rotas.spec.js
+```
 
 Outros comandos úteis:
 
 ```powershell
-npm run test:update    # atualiza as referências (ver seção própria abaixo)
-npm run report         # abre o último relatório HTML (screenshots de diff lado a lado)
+npm run test:update    # atualiza as referências visuais (ver seção própria abaixo) — não afeta rotas.spec.js, que não tem snapshot
+npm run report         # abre o último relatório HTML (screenshots de diff do visual, e a mensagem/stack de qualquer falha do rotas.spec.js — trace e vídeo ficam `off` globalmente, ver playwright.config.js)
 ```
 
-## As três coisas que mudam sozinhas, e como cada uma foi congelada
+## Regressor visual (`visual.spec.js`)
+
+Fotografa 21 cenas fixas do Marocos OS e compara pixel a pixel com
+referências versionadas em `__screenshots__/`.
+
+### As três coisas que mudam sozinhas, e como cada uma foi congelada
 
 O difícil não é fotografar, é congelar. Três fontes de não-determinismo
 existem neste projeto e destruiriam qualquer comparação sem tratamento:
 
-### 1. Shader do wallpaper e cristal 3D
+#### 1. Shader do wallpaper e cristal 3D
 
 O wallpaper é um shader animado (Silk no tema escuro, Iridescence no claro) e
 a janela "Sobre este PC" carrega um cristal 3D que gira e flutua. Os dois são
@@ -58,7 +99,7 @@ leem o valor na montagem). Com a animação desligada, o Silk para de invalidar
 o canvas e o cristal cai em `frameloop="demand"`: os dois desenham UM frame e
 dormem, o que é reprodutível.
 
-### 2. Os relógios (taskbar e tela de bloqueio)
+#### 2. Os relógios (taskbar e tela de bloqueio)
 
 `page.clock.setFixedTime()` **antes de navegar**, não uma máscara.
 
@@ -76,7 +117,7 @@ relógio ataca a causa: com o `Date` do navegador fixo, os três relógios
 exibem sempre o mesmo texto, a caixa nunca muda de tamanho, e a máscara deixa
 de ser necessária — a cobertura aumenta em vez de diminuir.
 
-### 3. Preferência de movimento
+#### 3. Preferência de movimento
 
 `reducedMotion: 'reduce'` no contexto do Playwright (equivalente a
 `prefers-reduced-motion: reduce`), somado a `locale: 'pt-BR'`,
@@ -93,7 +134,7 @@ prática elas não introduziram instabilidade nos testes. Mas isso é uma
 garantia do Playwright sobre Web Animations, não do app — vale saber que ela
 existe e por que este harness depende dela.
 
-### A quarta coisa que não é "tempo", mas parecia
+#### A quarta coisa que não é "tempo", mas parecia
 
 Durante a montagem deste harness, três cenas de app (`contato`, `stack`,
 `projeto-detalhe`) falharam de forma intermitente: a captura às vezes pegava
@@ -122,7 +163,7 @@ abrir de verdade e a **fecha** antes de fotografar — em vez de torcer para
 fotografar antes dela abrir. Ver os comentários em `visual.spec.js` e
 `cenas.js` (campo `fecharJanelaAutomatica`).
 
-## Limiar por cena, medido — não chutado
+### Limiar por cena, medido — não chutado
 
 Rodando a suíte duas vezes sobre o mesmo commit sem mudar nada (o teste de
 determinismo, descrito mais abaixo), o piso de ruído observado foi:
@@ -180,7 +221,7 @@ elimina essa classe de erro.
 **10 cenas** com `webgl: true` (tolerância 3000 px), **11 cenas** com
 tolerância zero.
 
-## Desktop e mobile: opção por cena, não dois `projects`
+### Desktop e mobile: opção por cena, não dois `projects`
 
 O viewport (1440×900 desktop, 390×844 mobile) é a **única** coisa que varia
 por cena — locale, timezone, `reducedMotion` e `deviceScaleFactor` são
@@ -197,7 +238,7 @@ corrigiu uma vez (ver acima). Uma opção por cena, ao lado dos outros campos
 da própria cena, é onde uma cena nova naturalmente já teria que declarar seu
 viewport de qualquer forma.
 
-## O que este harness NÃO cobre
+### O que o regressor visual NÃO cobre
 
 **Isto é o limite mais importante do método, não uma escolha de limiar.**
 
@@ -223,9 +264,16 @@ Também fora do alcance:
 - navegação por teclado;
 - qualquer coisa que só exista sob interação contínua (arrastar uma janela
   em movimento, por exemplo — a POSIÇÃO final de uma janela arrastada é
-  fotografável; o gesto de arrastar não é).
+  fotografável; o gesto de arrastar não é);
+- **um `import()` dinâmico que resolve para o módulo errado ou nunca
+  resolve.** Uma janela cujo chunk falhou aparece como janela vazia — o que
+  às vezes tem silhueta parecida o bastante com o estado "carregando"
+  legítimo para não divergir da referência o suficiente para reprovar. Este
+  é justamente o buraco que `rotas.spec.js` fecha (ver seção própria abaixo)
+  — ele afirma CONTEÚDO real dentro do corpo do app, não só a existência de
+  um seletor, então essa classe de bug reprova lá de forma explícita.
 
-## Atualizando as referências
+### Atualizando as referências
 
 ```powershell
 npm run test:update
@@ -246,7 +294,7 @@ se fosse a referência nova. Investigue a causa (este README documentou duas
 já encontradas: relógio não congelado, e conteúdo fotografado antes de
 carregar) antes de atualizar.
 
-## Validação de determinismo
+### Validação de determinismo
 
 Antes de considerar as referências prontas, a suíte foi rodada três vezes
 consecutivas sobre o mesmo commit, sem tocar em nada entre as execuções:
@@ -260,3 +308,74 @@ alto demais derrubando o Chromium (WebGL disputando GPU entre vários
 workers simultâneos — por isso `workers: 4` em vez do padrão, que usa um
 worker por núcleo). As duas foram resolvidas atacando a causa, não subindo
 limiar nem aumentando um sleep cego.
+
+## Verificação funcional das rotas (`rotas.spec.js`)
+
+Entra por deep link em cada uma das nove rotas do registry (`os/registry.js`)
+e afirma, com Chromium real, que a janela certa abriu, com o título certo na
+taskbar e CONTEÚDO real no corpo — prova de que o chunk lazy resolveu e o
+`Suspense` entregou algo de verdade, não só que a casca da janela montou
+vazia. Não tira nenhum screenshot; não depende de `__screenshots__/`; não
+tem conceito de "atualizar referência".
+
+Promovido de um roteiro Playwright avulso escrito durante o próprio refactor
+que introduziu o `React.lazy` por app
+(`.superpowers/sdd/2026-08-10-refatoracao-frontend/task-14-rotas.mjs`). Uma
+tarefa posterior de reorganização de pastas reusou aquele roteiro **sem
+modificação** e ele pegou exatamente os imports dinâmicos que a
+reorganização deixou apontando para o caminho errado — a prova de que este
+teste vale a pena manter permanente, não descartar depois da tarefa que o
+motivou.
+
+### O que cada teste prova
+
+**As nove rotas** (`test.describe('deep link nas nove rotas')`), uma por
+`/sobre`, `/projetos`, `/projetos/bussola-v2`, `/contato`, `/assistente`,
+`/config`, `/leia-me`, `/jornada` e `/stack`: para cada uma,
+
+- o corpo do app (`.about-app`, `.projects-app-list`, etc.) fica visível e
+  **não vazio** — o teste lê o conteúdo, não só a existência do seletor;
+- o botão em foco na taskbar mostra o título certo
+  (`.taskbar-window-btn.active .taskbar-window-label`);
+- para a rota dinâmica (`/projetos/bussola-v2`), a janela PAI (`projects`,
+  via `.projects-app-list`) está montada atrás **sem nenhum clique** — só o
+  reducer decidindo a partir da URL no primeiro render;
+- nenhum `pageerror` foi disparado durante a navegação.
+
+**Voltar/avançar do navegador**: abre `/leia-me`, navega para `/jornada`
+(empurra no histórico), confirma o foco na taskbar, e então `goBack()` /
+`goForward()` devem trocar o foco entre as duas janelas já abertas — sem
+recarregar a página, via o listener de `popstate` do
+`WindowManagerContext`.
+
+**Abertura por clique no ícone da área de trabalho**: o caminho "clique"
+usa um mecanismo diferente do deep link (o reducer decide a partir de um
+`onClick`, não da URL na montagem) — clicar no ícone "Meus Projetos" abre a
+janela e a foca.
+
+**Fallback nulo sob rede lenta**: atrasa artificialmente o chunk do
+`HistoryApp` (`page.route('**/assets/HistoryApp-*.js', ...)`, 8s) e confirma
+que, enquanto o chunk não chega, a barra de título já existe com o título
+certo e o corpo (`.marocos-window-body`) tem **zero filhos** — chrome
+intacto, nunca um erro de página, nunca uma janela ausente. Quando o chunk
+enfim resolve, o conteúdo aparece.
+
+**React-markdown só sob demanda**: mocka os dois endpoints do backend
+(`/chat/status` e `/chat`, incluindo o preflight CORS) via `page.route()` —
+não depende do FastAPI estar no ar. No estado vazio do assistente, **zero**
+requisição ao chunk `AssistantMarkdown-*`; depois de clicar numa sugestão e
+receber a resposta mockada, a bolha renderiza markdown de verdade (negrito,
+link com `target="_blank"`) e o chunk **é** requisitado.
+
+### O que `rotas.spec.js` NÃO cobre
+
+Não é um substituto do regressor visual — os dois têm buracos diferentes:
+
+- nenhuma regressão de CSS/layout/cor é pega aqui (isso é trabalho do
+  `visual.spec.js`);
+- não testa viewport mobile (as nove rotas e os quatro comportamentos só
+  foram exercitados em desktop);
+- não testa idioma inglês (os títulos afirmados são os em PT-BR);
+- a suíte inteira roda contra o `dist/` do último `npm run build:frontend`
+  — os mesmos avisos de "build desatualizado" do regressor visual valem
+  aqui.

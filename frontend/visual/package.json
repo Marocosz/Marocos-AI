@@ -2,7 +2,7 @@
   "name": "marocos-visual",
   "private": true,
   "version": "1.0.0",
-  "description": "Regressor visual do Marocos OS — pacote isolado, ver README.md",
+  "description": "Harness de teste (visual + funcional) do Marocos OS — pacote isolado, ver README.md",
   "type": "module",
   "scripts": {
     "build:frontend": "npm run build --prefix ..",
