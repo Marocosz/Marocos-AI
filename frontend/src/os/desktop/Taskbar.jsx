@@ -1,9 +1,8 @@
-import React, { useState, useEffect } from 'react'
-import { motion, AnimatePresence } from 'motion/react'
-import { LayoutGrid, MoreVertical, Wifi, Volume2, BatteryMedium } from 'lucide-react'
+import React, { useState } from 'react'
+import { motion } from 'motion/react'
+import { LayoutGrid, Wifi, Volume2, BatteryMedium } from 'lucide-react'
 import { useWindows } from '../WindowManagerContext'
 import { getApp } from '../registry'
-import { useDeviceMode } from '../useDeviceMode'
 import { useLanguage } from '../../contexts/LanguageContext'
 import { getOsData } from '../../data/os'
 import { MOVIMENTO } from '../../config/system'
@@ -29,7 +28,6 @@ import './Taskbar.css'
 const Taskbar = ({ onShutdown }) => {
   const { windows, focusedKey, focus, minimize, minimizeAll, open } = useWindows()
   const { language } = useLanguage()
-  const isCompact = useDeviceMode() === 'mobile'
   const os = getOsData(language)
   const [temaToggle, idiomaToggle, animacaoToggle] = useSystemToggles()
   const TemaIcon = temaToggle.icon
@@ -40,19 +38,11 @@ const Taskbar = ({ onShutdown }) => {
   // não unificar.
   const idiomaAlvo = idiomaToggle.valorCurto === 'PT' ? 'EN' : 'BR'
 
-  const [isTrayMenuOpen, setIsTrayMenuOpen] = useState(false)
   const [isStartOpen, setIsStartOpen] = useState(false)
 
-  // Iniciar e bandeja sao mutuamente exclusivos: abrir um fecha o outro.
   const alternarIniciar = () => {
     setIsStartOpen((v) => !v)
-    setIsTrayMenuOpen(false)
   }
-
-  // Fecha o popup se a tela virar desktop com ele aberto.
-  useEffect(() => {
-    if (!isCompact) setIsTrayMenuOpen(false)
-  }, [isCompact])
 
   return (
     <>
@@ -63,37 +53,6 @@ const Taskbar = ({ onShutdown }) => {
         onSubmitSearch={() => open('assistant')}
         onShutdown={onShutdown}
       />
-
-      {/* Popup do tray (mobile/tablet): os três toggles que não caberiam na barra */}
-      <AnimatePresence>
-        {isTrayMenuOpen && isCompact && (
-          <>
-            <div className="tray-backdrop" onClick={() => setIsTrayMenuOpen(false)} />
-            <motion.div
-              className="tray-menu-popup"
-              initial={{ opacity: 0, y: 10, scale: 0.95 }}
-              animate={{ opacity: 1, y: 0, scale: 1 }}
-              exit={{ opacity: 0, y: 10, scale: 0.95 }}
-              transition={MOVIMENTO.popupTray}
-            >
-              <button type="button" className="tray-menu-item" onClick={temaToggle.alternar}>
-                <span className="tray-menu-label">{temaToggle.labelCurto}</span>
-                <TemaIcon size={18} />
-              </button>
-              <button type="button" className="tray-menu-item" onClick={idiomaToggle.alternar}>
-                <span className="tray-menu-label">{idiomaToggle.labelCurto}</span>
-                <span style={{ fontSize: '0.8rem', fontWeight: 'bold' }}>
-                  {idiomaToggle.valorCurto}
-                </span>
-              </button>
-              <button type="button" className="tray-menu-item" onClick={animacaoToggle.alternar}>
-                <span className="tray-menu-label">{animacaoToggle.labelCurto}</span>
-                <AnimacaoIcon size={18} />
-              </button>
-            </motion.div>
-          </>
-        )}
-      </AnimatePresence>
 
       <motion.div
         className="taskbar-container"
@@ -151,67 +110,55 @@ const Taskbar = ({ onShutdown }) => {
 
         {/* --- DIREITA: System Tray (preservado do design original) --- */}
         <div className="taskbar-right">
-          {isCompact ? (
-            <button
-              onClick={() => setIsTrayMenuOpen(!isTrayMenuOpen)}
-              className={`taskbar-btn${isTrayMenuOpen ? ' active' : ''}`}
-              aria-label={os.tray.more}
-            >
-              <MoreVertical size={20} />
-            </button>
-          ) : (
-            <>
-              <button onClick={temaToggle.alternar} className="theme-toggle-btn" aria-label={temaToggle.labelCurto}>
-                <TemaIcon size={18} />
-              </button>
+          <button onClick={temaToggle.alternar} className="theme-toggle-btn" aria-label={temaToggle.labelCurto}>
+            <TemaIcon size={18} />
+          </button>
 
-              <button onClick={animacaoToggle.alternar} className="theme-toggle-btn" aria-label={animacaoToggle.labelCurto}>
-                <AnimacaoIcon size={18} />
-              </button>
+          <button onClick={animacaoToggle.alternar} className="theme-toggle-btn" aria-label={animacaoToggle.labelCurto}>
+            <AnimacaoIcon size={18} />
+          </button>
 
-              <button onClick={idiomaToggle.alternar} className="theme-toggle-btn" aria-label={idiomaToggle.labelCurto}>
-                <span style={{ fontSize: '0.8rem', fontWeight: 'bold' }}>
-                  {idiomaAlvo}
-                </span>
-              </button>
+          <button onClick={idiomaToggle.alternar} className="theme-toggle-btn" aria-label={idiomaToggle.labelCurto}>
+            <span style={{ fontSize: '0.8rem', fontWeight: 'bold' }}>
+              {idiomaAlvo}
+            </span>
+          </button>
 
-              <div className="tray-divider" />
+          <div className="tray-divider" />
 
-              <div className="tray-icons">
-                <div className="tray-icon-hover"><Wifi size={16} /></div>
-                <div className="tray-icon-hover"><Volume2 size={16} /></div>
-                <div className="tray-icon-hover"><BatteryMedium size={16} /></div>
-              </div>
+          <div className="tray-icons">
+            <div className="tray-icon-hover"><Wifi size={16} /></div>
+            <div className="tray-icon-hover"><Volume2 size={16} /></div>
+            <div className="tray-icon-hover"><BatteryMedium size={16} /></div>
+          </div>
 
-              <div className="tray-clock">
-                {/* MUDANÇA DE COMPORTAMENTO CONSCIENTE: antes tiquetaqueava a
-                    cada 1s (setInterval na montagem, sem alinhamento). Nunca
-                    mostrou segundos, então a tela é idêntica — o que muda é
-                    que agora acerta a virada do minuto, que antes errava por
-                    até 59s. Ver comentário em src/ui/Clock.jsx. */}
-                <Clock formato="hm-data" classePrincipal="time" classeSecundaria="date" />
-              </div>
+          <div className="tray-clock">
+            {/* MUDANÇA DE COMPORTAMENTO CONSCIENTE: antes tiquetaqueava a
+                cada 1s (setInterval na montagem, sem alinhamento). Nunca
+                mostrou segundos, então a tela é idêntica — o que muda é
+                que agora acerta a virada do minuto, que antes errava por
+                até 59s. Ver comentário em src/ui/Clock.jsx. */}
+            <Clock formato="hm-data" classePrincipal="time" classeSecundaria="date" />
+          </div>
 
-              <div
-                className="show-desktop-line"
-                onClick={minimizeAll}
-                title={os.taskbar.showDesktop}
-                role="button"
-                tabIndex={0}
-                aria-label={os.taskbar.showDesktop}
-                onKeyDown={(e) => {
-                  if (e.key === 'Enter') {
-                    minimizeAll()
-                  } else if (e.key === ' ') {
-                    // Sem isto o Espaço rola a página -- comportamento padrão
-                    // do navegador para elementos sem role nativo de botão.
-                    e.preventDefault()
-                    minimizeAll()
-                  }
-                }}
-              />
-            </>
-          )}
+          <div
+            className="show-desktop-line"
+            onClick={minimizeAll}
+            title={os.taskbar.showDesktop}
+            role="button"
+            tabIndex={0}
+            aria-label={os.taskbar.showDesktop}
+            onKeyDown={(e) => {
+              if (e.key === 'Enter') {
+                minimizeAll()
+              } else if (e.key === ' ') {
+                // Sem isto o Espaço rola a página -- comportamento padrão
+                // do navegador para elementos sem role nativo de botão.
+                e.preventDefault()
+                minimizeAll()
+              }
+            }}
+          />
         </div>
       </motion.div>
     </>

@@ -346,8 +346,7 @@
 /* Firefox */
 .marocos-window-body,
 .marocos-window-body *,
-.marocos-desktop [class*='-scroll'],
-.tray-menu-popup {
+.marocos-desktop [class*='-scroll'] {
   scrollbar-width: thin;
   scrollbar-color: var(--scroll-thumb) transparent;
 }

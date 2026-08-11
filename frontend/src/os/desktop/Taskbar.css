@@ -247,68 +247,6 @@
   background: rgba(255, 255, 255, 0.1);
 }
 
-/* --- TRAY POPUP (MOBILE/TABLET) --- */
-.tray-backdrop {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100vw;
-  height: 100vh;
-  z-index: 1005;
-  background: transparent;
-}
-
-.tray-menu-popup {
-  position: fixed;
-  bottom: 60px;
-  right: 12px;
-  width: 200px;
-  background: rgba(20, 20, 20, 0.95);
-  border: 1px solid rgba(255, 255, 255, 0.15);
-  border-radius: 12px;
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
-  backdrop-filter: var(--cfg-blur-taskbar, blur(12px));
-  -webkit-backdrop-filter: var(--cfg-blur-taskbar, blur(12px));
-  padding: 8px;
-  z-index: 1010;
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-}
-
-.tray-menu-item {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 10px 12px;
-  border-radius: 8px;
-  color: #ddd;
-  cursor: pointer;
-  transition: background 0.2s;
-  /* Reset de botão: o elemento virou <button> para ficar alcançável por
-     teclado, e sem isto o navegador aplicaria fundo, borda e fonte próprios. */
-  width: 100%;
-  background: none;
-  border: none;
-  font: inherit;
-  color: inherit;
-  text-align: left;
-  cursor: pointer;
-}
-
-.tray-menu-item:hover {
-  background: rgba(255, 255, 255, 0.1);
-  color: #fff;
-}
-
-.tray-menu-label {
-  font-size: 0.9rem;
-  /* Poppins e carregado em 400/700/900 e o index.css tem font-synthesis: none.
-     Este valor e o peso que o navegador ja resolvia sozinho; a declaracao antiga
-     (500) nao existia e caia aqui em silencio. */
-  font-weight: 400;
-}
-
 .theme-toggle-btn {
   background: transparent;
   border: none;
@@ -431,22 +369,6 @@
   border: 1px solid rgba(0, 0, 0, 0.1);
   color: #333;
   box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
-}
-
-/* Tray Popover Light */
-.theme-light .tray-menu-popup {
-  background: rgba(255, 255, 255, 0.95);
-  border: 1px solid rgba(0, 0, 0, 0.1);
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.15);
-}
-
-.theme-light .tray-menu-item {
-  color: #333;
-}
-
-.theme-light .tray-menu-item:hover {
-  background: rgba(0, 0, 0, 0.05);
-  color: #000;
 }
 
 /* Tray Area Light */
