@@ -385,6 +385,12 @@ describe('config do sistema', () => {
     expect(MOVIMENTO.luzDaBordaEntradaS).toBe(0.18)
     expect(MOVIMENTO.luzDaBordaSaidaS).toBe(0.5)
     expect(MOVIMENTO.luzDaBordaSaidaS).toBeGreaterThan(MOVIMENTO.luzDaBordaEntradaS)
+
+    expect(MOVIMENTO.jornadaPasseioS).toBe(6)
+    expect(MOVIMENTO.jornadaTrocaS).toBe(0.32)
+    // O passeio tem de ser MUITO mais longo que a troca, senão a entrada nova aparece
+    // já saindo e o passeio lê como falha em vez de movimento.
+    expect(MOVIMENTO.jornadaPasseioS).toBeGreaterThan(MOVIMENTO.jornadaTrocaS * 10)
   })
 
   it('o chrome assenta ANTES do wallpaper, nunca depois', () => {

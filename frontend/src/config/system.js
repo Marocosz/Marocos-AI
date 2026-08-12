@@ -950,6 +950,19 @@ export const MOVIMENTO = {
    * se mexe, e não acha a terceira.
    */
   pulsoStatusS: 2.4,
+
+  /**
+   * O PASSEIO AUTOMÁTICO DA JORNADA — quanto cada entrada fica na tela.
+   *
+   * 6s é PASSEIO, não leitura: a descrição de cada entrada tem 50-70 palavras, e dar
+   * os ~20s que ela pede faria a volta durar dois minutos. Quem quer ler para o
+   * passeio e lê; o passeio existe para mostrar a FORMA da trajetória — os vãos entre
+   * os marcadores —, não para ser lido junto.
+   */
+  jornadaPasseioS: 6,
+
+  /** A troca entre entradas da jornada: o painel de "agora tocando" e o playhead. */
+  jornadaTrocaS: 0.32,
 }
 
 /* --------------------------------------------------

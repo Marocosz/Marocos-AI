@@ -150,6 +150,10 @@ export function aplicarConfigNoCss(tema = 'dark', preset = null) {
 
     /** O pulso do ponto de status do "Sobre" — ver `MOVIMENTO.pulsoStatusS`. */
     '--cfg-pulso-status': `${MOVIMENTO.pulsoStatusS}s`,
+
+    /** O player da Jornada: o passeio automático e a troca entre entradas. */
+    '--cfg-jornada-passeio': `${MOVIMENTO.jornadaPasseioS}s`,
+    '--cfg-jornada-troca': `${MOVIMENTO.jornadaTrocaS}s`,
   }
 
   for (const [nome, valor] of Object.entries(vars)) {
