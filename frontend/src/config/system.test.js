@@ -337,6 +337,28 @@ describe('config do sistema', () => {
     expect(MOVIMENTO.pushMobile).toEqual({ duration: 0.28, ease: 'easeOut' })
     expect(MOVIMENTO.acordeaoDispositivos).toEqual({ duration: 0.2, ease: 'easeInOut' })
     expect(MOVIMENTO.indicadorTaskbar).toEqual({ type: 'spring', stiffness: 300, damping: 30 })
+    expect(MOVIMENTO.minimizarJanela).toEqual({
+      duration: 0.26, duracaoReduzida: 0, ease: 'easeOut', escala: 0.9,
+    })
+    expect(MOVIMENTO.trocaPresetMs).toBe(420)
+  })
+
+  it('o chrome assenta ANTES do wallpaper, nunca depois', () => {
+    // Interface que ainda muda de cor depois que o fundo já parou lê como
+    // travamento. O contrário é aceitável: uma dissolução grande pode continuar
+    // atrás de uma interface que já se decidiu. Ver a nota em `trocaPresetMs`.
+    expect(MOVIMENTO.trocaPresetMs).toBeLessThanOrEqual(WALLPAPER.crossfade.duracaoMs)
+  })
+
+  it('minimizar encolhe sem parecer que fecha', () => {
+    // Escala baixa demais lê como "a janela sumiu"; alta demais não comunica
+    // nada. Este intervalo é o que separa "recuou" de "fechou".
+    expect(MOVIMENTO.minimizarJanela.escala).toBeGreaterThan(0.8)
+    expect(MOVIMENTO.minimizarJanela.escala).toBeLessThan(1)
+
+    // Movimento reduzido pede troca INSTANTÂNEA, não rápida — mesma regra da
+    // maximizada logo acima.
+    expect(MOVIMENTO.minimizarJanela.duracaoReduzida).toBe(0)
   })
 
   it('a taskbar tem a mesma altura no JS e no CSS', () => {

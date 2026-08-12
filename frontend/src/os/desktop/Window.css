@@ -116,6 +116,30 @@
   backdrop-filter: none;
 }
 
+/**
+ * EM TELA CHEIA O CONTEÚDO USA A MESMA COR DAS FAIXAS DO CHROME.
+ *
+ * As barras do explorador (navegação, comandos, status) e a lateral pintam com
+ * `--card-bg`, que é translúcido; em tela cheia isso resolve como `--card-bg`
+ * COMPOSTO sobre o `--win-body-solid` da janela. Já `.explorer-conteudo` não
+ * declara fundo nenhum, então a área do conteúdo mostrava o `--win-body-solid`
+ * puro — uma cor diferente da das faixas que a cercam por três lados.
+ *
+ * Numa janela pequena isso passa: a moldura, a sombra e o wallpaper em volta
+ * dão contexto suficiente. Maximizada, as faixas ocupam a tela inteira e a
+ * diferença vira uma emenda visível no meio da interface.
+ *
+ * A correção é repetir a MESMA receita, não escolher uma cor nova: a mesma
+ * camada translúcida sobre a mesma base opaca resolve no mesmo valor final, e
+ * continua acompanhando tema e preset sozinha.
+ *
+ * Só quando maximizada. Restaurada, o corpo precisa continuar deixando o vidro
+ * revelar o que está atrás — que é a leitura de material do sistema inteiro.
+ */
+.marocos-window.maximized .marocos-window-body {
+  background: var(--card-bg);
+}
+
 /* EM MOVIMENTO, SEM FOSCO.
  *
  * Vale para as duas direções de maximizar/restaurar (a classe é posta pelo

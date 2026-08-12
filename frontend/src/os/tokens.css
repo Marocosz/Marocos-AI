@@ -1048,6 +1048,62 @@
   text-shadow: 0 2px 6px rgba(0, 0, 0, 0.85), 0 1px 2px rgba(0, 0, 0, 0.9);
 }
 
+/* ==================================================
+   A REPINTURA AO TROCAR DE PRESET
+
+   Custom property não transiciona. Quando `cssBridge` escreve um `--accent-rgb`
+   novo, a próxima pintura já sai com a cor nova — num quadro. O papel de parede
+   tinha crossfade e todo o resto saltava junto dele, o que fazia a troca de
+   preset parecer um recarregamento em vez de uma transição.
+
+   A LISTA É FECHADA, E ISSO É A DECISÃO. A tentação é `* { transition: ... }`,
+   e este projeto já pagou por um `*` uma vez (o cursor do modo XP atropelou
+   trinta declarações de componente). Aqui um universal seria pior: obrigaria o
+   navegador a observar transição em toda a árvore para sempre, não só durante a
+   troca. Estas são as superfícies que realmente derivam do acento — as demais
+   herdam delas ou não mudam de cor.
+
+   `background-color` e não `background`: gradiente não interpola, e pedir a
+   propriedade inteira só faria o navegador desistir da transição em silêncio
+   nas superfícies que usam gradiente. Elas trocam de cor num quadro mesmo, e é
+   por isso que a barra de tarefas e a de título ficam de fora — quem carrega a
+   leitura de mudança ali é o crossfade do wallpaper por trás.
+   ================================================== */
+
+.marocos-window,
+.marocos-window-body,
+.app-icon-btn-glifo,
+.explorer-lateral,
+.explorer-lugar,
+.explorer-cmd,
+.start-menu,
+.balao,
+.dica-balao,
+.about-door,
+.readme-repo {
+  transition:
+    background-color var(--cfg-troca-preset, 420ms) ease,
+    border-color var(--cfg-troca-preset, 420ms) ease,
+    color var(--cfg-troca-preset, 420ms) ease;
+}
+
+/* Quem pede menos movimento recebe a troca inteira, sem o caminho até ela. */
+@media (prefers-reduced-motion: reduce) {
+  .marocos-window,
+  .marocos-window-body,
+  .app-icon-btn-glifo,
+  .explorer-lateral,
+  .explorer-lugar,
+  .explorer-cmd,
+  .start-menu,
+  .balao,
+  .dica-balao,
+  .about-door,
+  .readme-repo {
+    transition: none;
+  }
+}
+
 /* --------------------------------------------------
    BARRAS DE ROLAGEM
    O scroll de página foi eliminado, mas todo conteúdo de janela rola por

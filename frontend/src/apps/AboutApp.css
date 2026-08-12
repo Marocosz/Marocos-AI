@@ -21,12 +21,22 @@
   flex-wrap: wrap;
 }
 
-/* Moldura do cristal — sem recorte.
-   Antes este wrapper tinha overflow:hidden e uma caixa 150x190 para conter um
-   componente que vinha com 700x700 e position:absolute chumbados; o resultado
-   era um "chip" com um pedaco do facetado, nao a peca inteira. O <Crystal>
-   agora e um bloco quadrado do tamanho que recebe, entao a moldura so precisa
-   acompanhar esse tamanho. */
+/* O CRISTAL SEM MOLDURA.
+   Antes havia uma caixa de verdade aqui: raio de 22px, borda de acento, sombra
+   externa e um radial que terminava em quase-preto. Ela existia para dar ao
+   cristal um "vazio" de onde emergir — mas dentro de uma janela que já é uma
+   superfície, aquilo lia como um segundo cartão desenhado por cima do primeiro,
+   e o contorno quadrado brigava com a silhueta facetada da peça.
+
+   Sobrou só o halo: um radial que desaparece ANTES de encostar na borda da
+   caixa, então não existe aresta para ver. Alpha baixo de propósito — ele é
+   atmosfera, não moldura. O cristal 3D já traz o próprio brilho, e o halo só
+   impede que ele flutue recortado sobre o fundo da janela.
+
+   (Histórico que continua valendo: o wrapper já teve `overflow: hidden` e uma
+   caixa 150x190 para conter um componente com 700x700 chumbado, e o resultado
+   era um pedaço do facetado em vez da peça inteira. Hoje o <Crystal> é um bloco
+   quadrado do tamanho que recebe, então o wrapper só acompanha.) */
 .about-crystal {
   position: relative;
   flex: 0 0 auto;
@@ -34,33 +44,28 @@
   height: 190px;
   display: grid;
   place-items: center;
-  border-radius: 22px;
+/* DOIS EIXOS, E OS DOIS PARA BAIXO: o alpha e o ALCANCE.
+   O halo terminava em 68% do wrapper — quase encostando na borda de 190px —, e
+   um halo largo é indistinguível de um fundo. Fechando a última parada em 46%,
+   ele passa a ser um assentamento colado à peça: some bem antes do limite da
+   caixa, então não há mancha, e o que se vê em volta é a superfície da janela. */
   background: radial-gradient(
-    circle at 50% 45%,
-    rgba(88, 28, 135, 0.32),
-    rgba(10, 6, 18, 0.42) 72%
+    circle at 50% 46%,
+    rgb(var(--accent-rgb) / 0.045) 0%,
+    rgb(var(--accent-rgb) / 0.015) 20%,
+    transparent 34%
   );
-  border: 1px solid rgb(var(--accent-rgb) / 0.3);
-  box-shadow: 0 0 30px rgb(var(--accent-rgb) / 0.18);
 }
 
-/* DE DIA A MOLDURA INVERTE, e isto faltava.
-   O radial acima termina em rgba(10,6,18,.42) — quase preto — porque de noite
-   ele é o vazio de onde o cristal emerge. Numa janela clara aquilo vira uma
-   mancha escura sem parentesco com nada em volta: era o único bloco do app que
-   não seguia o tema.
-   Aqui a mesma ideia com o sinal trocado: o miolo é a luz e a borda recua para
-   a lavanda, então o cristal continua emergindo de algo — só que de claridade,
-   não de escuridão. Os tons são os mesmos violeta-100/200 que o resto do tema
-   claro usa. */
+/* De dia, menos ainda: sobre superfície clara o mesmo alpha vira mancha, e quem
+   sustenta a leitura passa a ser o próprio cristal. */
 .theme-light .about-crystal {
   background: radial-gradient(
-    circle at 50% 45%,
-    rgba(255, 255, 255, 0.85),
-    rgba(196, 181, 253, 0.5) 72%
+    circle at 50% 46%,
+    rgb(var(--accent-rgb) / 0.028) 0%,
+    rgb(var(--accent-rgb) / 0.01) 20%,
+    transparent 34%
   );
-  border: 1px solid rgb(var(--accent-rgb) / 0.28);
-  box-shadow: 0 0 30px rgb(var(--accent-rgb) / 0.14);
 }
 
 .about-crystal-fallback {

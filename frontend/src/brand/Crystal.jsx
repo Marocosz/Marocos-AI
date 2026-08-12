@@ -144,6 +144,19 @@ const Crystal = ({
    * `acentoFundo` como sempre.
    */
   luz = null,
+  /**
+   * QUANTO AS LUZES DE IDENTIDADE PESAM. 1 é a cerimônia, onde o cristal é o
+   * assunto da tela e o banho colorido é o efeito.
+   *
+   * Dentro de uma janela ele é um logotipo ao lado de um texto, e a mesma
+   * intensidade espalha cor demais em volta da peça — o "Sobre este PC" pede
+   * menos. Vem por prop e não por CSS porque estas são luzes de cena, dentro do
+   * `<Canvas>`: nenhum filtro de fora alcança o que acontece na renderização.
+   *
+   * Só as luzes COLORIDAS escalam. A branca principal fica, senão o cristal
+   * perde o relevo junto com a cor e vira uma mancha escura.
+   */
+  intensidade = 1,
 }) => {
   // Com `luz`, as DUAS fontes de identidade viram a mesma cor: é o que produz
   // um banho uniforme em volta do sólido, em vez de dois matizes competindo.
@@ -230,13 +243,13 @@ const Crystal = ({
               âmbar ou verde, e o cristal é a marca — seria o roxo mais visível
               que sobrou. */}
           <Lightformer intensity={2.4} position={[0, 4, -9]} scale={[12, 12, 1]} color="#ffffff" />
-          <Lightformer intensity={1.6} position={[-6, 1, 2]} scale={[10, 3, 1]} color={luzEsquerda} />
-          <Lightformer intensity={1.1} position={[6, -2, 2]} scale={[10, 3, 1]} color={luzDireita} />
+          <Lightformer intensity={1.6 * intensidade} position={[-6, 1, 2]} scale={[10, 3, 1]} color={luzEsquerda} />
+          <Lightformer intensity={1.1 * intensidade} position={[6, -2, 2]} scale={[10, 3, 1]} color={luzDireita} />
         </Environment>
 
         <ambientLight intensity={0.6} />
         <spotLight position={[5, 10, 5]} intensity={1.5} color="#ffffff" />
-        <pointLight position={[-5, -5, 5]} intensity={1} color={luzPonto} />
+        <pointLight position={[-5, -5, 5]} intensity={1 * intensidade} color={luzPonto} />
 
         {/* O <Float> fica SEMPRE na arvore, mesmo parado.
          *

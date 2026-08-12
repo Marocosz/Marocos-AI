@@ -99,6 +99,9 @@ const Window = ({ win, isFocused }) => {
   const duracao = prefereMovimentoReduzido
     ? MOVIMENTO.maximizarJanela.duracaoReduzida
     : MOVIMENTO.maximizarJanela.duration
+  const duracaoMinimizar = prefereMovimentoReduzido
+    ? MOVIMENTO.minimizarJanela.duracaoReduzida
+    : MOVIMENTO.minimizarJanela.duration
 
   /**
    * SÓ A TROCA DE MAXIMIZADA ANIMA. As outras duas coisas que mexem nestes
@@ -276,14 +279,55 @@ const Window = ({ win, isFocused }) => {
         zIndex: win.z,
         width: largura,
         height: altura,
-        display: win.minimized ? 'none' : undefined,
+        /* Minimizada não recebe clique. `inert` já a tira do teclado e da
+           árvore de acessibilidade; isto cobre o ponteiro durante os 260ms em
+           que ela ainda está na tela, desaparecendo. */
+        pointerEvents: win.minimized ? 'none' : undefined,
       }}
-      /* Só opacidade na abertura. Animar `scale` numa janela grande obrigava o
-         navegador a recompor a cada passo (e, quando havia backdrop-filter,
-         refazer o blur inteiro), o que travava a abertura. Fade é barato. */
+      /**
+       * ABRIR, MINIMIZAR E RESTAURAR, NOS MESMOS DOIS EIXOS.
+       *
+       * `display: none` saiu daqui. Ele fazia a janela minimizada sumir num
+       * corte seco — a única transição que faltava no sistema —, e não havia
+       * como suavizá-lo: elemento com `display: none` não anima, e voltar dele
+       * também não.
+       *
+       * No lugar, escala e opacidade. Os dois são propriedades de composição,
+       * então a animação roda fora do layout; e nenhum dos dois é disputado por
+       * outro dono, ao contrário de `x`/`y`, que pertencem ao arrasto e à
+       * geometria da maximizada logo acima.
+       *
+       * `visibility: hidden` entra por `transitionEnd`, ou seja, DEPOIS que a
+       * saída termina: assim a janela para de compor de vez quando minimizada
+       * (importa, porque ela ainda carrega `backdrop-filter`), e ao restaurar o
+       * `visible` do alvo é aplicado na hora, antes do primeiro quadro.
+       *
+       * A ABERTURA CONTINUA SÓ COM OPACIDADE. `initial` não declara `scale`,
+       * então a janela nasce em 1 e só o fade roda — animar escala numa janela
+       * grande obriga o navegador a recompor a cada passo e, com blur, a refazer
+       * o desfoque inteiro. O comentário original disto foi medido; a animação
+       * de minimizar aceita esse custo porque acontece uma vez, sob comando
+       * explícito, e é justamente o movimento que se quer ver.
+       */
       initial={{ opacity: 0 }}
-      animate={{ opacity: 1 }}
-      transition={{ duration: JANELAS.aberturaMs / 1000, ease: 'linear' }}
+      animate={{
+        opacity: win.minimized ? 0 : 1,
+        scale: win.minimized ? MOVIMENTO.minimizarJanela.escala : 1,
+        visibility: 'visible',
+        transitionEnd: win.minimized ? { visibility: 'hidden' } : undefined,
+      }}
+      transition={{
+        /* Saindo, a opacidade acompanha a escala: se ela terminasse antes (o
+           fade de abertura é curto de propósito), a janela ficaria invisível
+           encolhendo sozinha o resto do caminho, e o gesto se perderia.
+           Entrando — na abertura e na restauração — o fade curto continua, que é
+           o que faz a janela parecer já estar lá. */
+        opacity: {
+          duration: win.minimized ? duracaoMinimizar : JANELAS.aberturaMs / 1000,
+          ease: 'linear',
+        },
+        scale: { duration: duracaoMinimizar, ease: MOVIMENTO.minimizarJanela.ease },
+      }}
       drag={!win.maximized}
       dragListener={false}
       dragControls={dragControls}

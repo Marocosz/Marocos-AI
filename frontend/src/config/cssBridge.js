@@ -97,6 +97,10 @@ export function aplicarConfigNoCss(tema = 'dark', preset = null) {
      * trocá-la.
      */
     '--cfg-fonte-preset': preset?.fonte || null,
+
+    /** Quanto o chrome leva para repintar ao trocar de preset — ver a nota em
+     *  `MOVIMENTO.trocaPresetMs` e o bloco que a consome em `tokens.css`. */
+    '--cfg-troca-preset': `${MOVIMENTO.trocaPresetMs}ms`,
   }
 
   for (const [nome, valor] of Object.entries(vars)) {

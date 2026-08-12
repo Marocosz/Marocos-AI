@@ -100,8 +100,12 @@ const AboutApp = () => {
                   ("`isAnimationEnabled = false` ... o cristal cai em
                   frameloop=demand"); era a promessa que este arquivo não
                   cumpria. */}
+              {/* Luz de identidade pela metade: aqui o cristal é um logotipo ao
+                  lado de um texto, não o assunto da tela como na cerimônia, e a
+                  intensidade cheia espalhava cor demais em volta da peça. */}
               <Crystal
                 size={190}
+                intensidade={0.5}
                 animated={isAnimated}
                 acento={preset.acento}
                 acentoFundo={acentoProfundo(preset)}

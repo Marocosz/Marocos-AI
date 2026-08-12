@@ -111,7 +111,7 @@ const Ceu = ({ tema, preset, isMobile, isAnimated }) => {
 }
 
 /**
- * A TROCA DE TEMA É UM CROSSFADE, NÃO UM CORTE.
+ * TROCAR DE TEMA **OU DE PRESET** É UM CROSSFADE, NÃO UM CORTE.
  *
  * Antes o shader antigo desmontava no mesmo frame em que o novo montava, e a área
  * de trabalho piscava de um fundo para o outro. Não dava para resolver com
@@ -123,13 +123,26 @@ const Ceu = ({ tema, preset, isMobile, isAnimated }) => {
  * troca, o que é aceitável porque é uma ação deliberada do visitante e porque a
  * camada que sai é CONGELADA — ela já está sendo coberta, e desenhar frames que
  * ninguém vai ver seria pagar duas vezes pelo mesmo momento.
+ *
+ * O PRESET ENTROU NESSA CONTA DEPOIS, e faltava. A identidade da camada era só o
+ * tema, então trocar de preset DENTRO do mesmo tema não criava camada nova: o
+ * mesmo `<div>` recebia parâmetros diferentes e o shader saltava de uma paleta
+ * para a outra num quadro. Era a única troca do seletor de papel de parede sem
+ * transição, justamente a que o visitante faz mais vezes.
+ *
+ * A identidade agora é `tema:preset`, e a camada que sai carrega o preset que
+ * estava valendo — um instantâneo, porque `presets` só conhece o ATUAL de cada
+ * tema e, numa troca dentro do mesmo tema, o anterior já não existe em lugar
+ * nenhum.
  */
 const Wallpaper = ({ isAnimated = true }) => {
   const isMobile = useDeviceMode() === 'mobile'
   // `presets` (os dois), e não `preset` (o ativo): a camada que sai durante o
   // crossfade precisa dos valores do tema antigo. Ver a nota no ThemeContext.
   const { isDark, presets } = useTheme()
-  const atual = isDark ? 'dark' : 'light'
+  const tema = isDark ? 'dark' : 'light'
+  const preset = presets[tema]
+  const atual = `${tema}:${preset.id}`
 
   /**
    * O TEMA QUE ESTÁ SAINDO É DERIVADO DURANTE O RENDER, NÃO NUM EFEITO.
@@ -144,12 +157,16 @@ const Wallpaper = ({ isAnimated = true }) => {
    * este caso: ele descarta este render e refaz na hora, com as duas camadas
    * presentes já no primeiro frame da troca.
    */
-  const [temaAnterior, setTemaAnterior] = useState(atual)
+  const [anterior, setAnterior] = useState({ id: atual, tema, preset })
   const [saindo, setSaindo] = useState(null)
 
-  if (temaAnterior !== atual) {
-    setTemaAnterior(atual)
-    setSaindo(temaAnterior)
+  if (anterior.id !== atual) {
+    // O que sai vai INTEIRO para o estado. Guardar só o id não bastaria: numa
+    // troca de preset dentro do mesmo tema, o preset antigo não está mais em
+    // `presets`, e a camada que sai pintaria com a paleta nova — ou seja, com
+    // nada para revelar.
+    setSaindo(anterior)
+    setAnterior({ id: atual, tema, preset })
   }
 
   /**
@@ -182,21 +199,22 @@ const Wallpaper = ({ isAnimated = true }) => {
    *
    * A que está saindo vem primeiro, portanto embaixo.
    */
-  const camadas = saindo ? [saindo, atual] : [atual]
+  const entrando = { id: atual, tema, preset }
+  const camadas = saindo ? [saindo, entrando] : [entrando]
 
   return (
     <div className="marocos-wallpaper" aria-hidden="true">
-      {camadas.map((tema) => (
+      {camadas.map((camada) => (
         <div
-          key={tema}
-          className={`marocos-sky${tema === atual ? ' marocos-sky--entrando' : ''}`}
-          onAnimationEnd={tema === atual ? encerrar : undefined}
+          key={camada.id}
+          className={`marocos-sky${camada.id === atual ? ' marocos-sky--entrando' : ''}`}
+          onAnimationEnd={camada.id === atual ? encerrar : undefined}
         >
           <Ceu
-            tema={tema}
-            preset={presets[tema]}
+            tema={camada.tema}
+            preset={camada.preset}
             isMobile={isMobile}
-            isAnimated={tema === atual && isAnimated}
+            isAnimated={camada.id === atual && isAnimated}
           />
         </div>
       ))}

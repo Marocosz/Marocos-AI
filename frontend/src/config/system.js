@@ -783,6 +783,54 @@ export const MOVIMENTO = {
    * reduzido, o certo é a troca ser instantânea, não rápida.
    */
   maximizarJanela: { duration: 0.22, duracaoReduzida: 0, ease: 'easeOut' },
+
+  /**
+   * MINIMIZAR E RESTAURAR.
+   *
+   * Era a única transição do sistema que faltava: a janela sumia por
+   * `display: none`, um corte seco no meio de um projeto em que tudo o mais tem
+   * tempo — abrir, maximizar, trocar de tema, o véu do foco.
+   *
+   * ENCOLHE E DESVANECE, sem viajar até a barra de tarefas. O trajeto até o
+   * botão seria o gesto do Windows, mas aqui `x` e `y` da janela são motion
+   * values compartilhados com o arrasto e com a geometria da maximizada (ver o
+   * bloco da geometria em `Window.jsx`): animar posição neste momento é disputar
+   * os mesmos valores com dois outros donos. Escala e opacidade não têm dono, e
+   * por isso a animação não briga com nada.
+   *
+   * `escala` para em 0.9. A janela precisa parecer que RECUOU, não que implodiu
+   * — encolher demais lê como fechar, e fechar é outra ação, com outro destino.
+   *
+   * Duração um pouco maior que a de maximizar porque o percurso é o oposto:
+   * maximizar entrega o resultado no fim e o olho espera por ele; minimizar
+   * precisa que o olho ACOMPANHE a janela saindo, senão vira o mesmo corte seco
+   * de antes, só que atrasado.
+   */
+  minimizarJanela: {
+    duration: 0.26,
+    duracaoReduzida: 0,
+    ease: 'easeOut',
+    escala: 0.9,
+  },
+
+  /**
+   * A REPINTURA DO CHROME AO TROCAR DE PRESET. Em milissegundos, porque vira CSS.
+   *
+   * Trocar de preset repinta borda, realce, foco e tile a partir de
+   * `--accent-rgb`. Custom property NÃO transiciona sozinha: o navegador troca o
+   * valor e a próxima pintura já sai com a cor nova, num quadro. O papel de
+   * parede tinha crossfade e o resto do sistema saltava junto dele.
+   *
+   * MAIS CURTO QUE O CROSSFADE DO WALLPAPER (700ms), e a ordem é essa por um
+   * motivo: o chrome é a interface, e interface que ainda está mudando de cor
+   * depois que o fundo já assentou lê como travamento. O fundo é uma dissolução
+   * lenta de uma superfície grande — ela pode continuar acontecendo atrás de uma
+   * interface que já se decidiu.
+   *
+   * Há teste guardando a relação, e não só o número: o dia em que alguém
+   * encurtar o crossfade do wallpaper, é este valor que precisa acompanhar.
+   */
+  trocaPresetMs: 420,
   /**
    * O balão de tela cheia da área de trabalho.
    *
