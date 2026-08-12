@@ -22,6 +22,27 @@
  */
 
 /**
+ * A IDADE, DERIVADA DA DATA DE NASCIMENTO.
+ *
+ * O `profile.md` diz "nasci em 14 de dezembro de 2003"; o site precisa dizer
+ * quantos anos isso dá HOJE. Escrever o número no conteúdo é escrever um valor
+ * com data de validade, e o dia em que ele vence é justamente o dia em que
+ * ninguém está lendo este arquivo.
+ *
+ * A data de nascimento é quebrada à mão em vez de ir para o `Date`: um
+ * `new Date('2003-12-14')` é meia-noite UTC, e comparado com uma data local a
+ * oeste de Greenwich — que é onde este site roda — o aniversário chega um dia
+ * antes. Comparando três inteiros não há fuso nenhum envolvido.
+ */
+export const idadeEm = (nascimentoISO, hoje = new Date()) => {
+  const [ano, mes, dia] = nascimentoISO.split('-').map(Number);
+  const mesAtual = hoje.getMonth() + 1;
+  const aindaNaoFezAniversario =
+    mesAtual < mes || (mesAtual === mes && hoje.getDate() < dia);
+  return hoje.getFullYear() - ano - (aindaNaoFezAniversario ? 1 : 0);
+};
+
+/**
  * A MÁQUINA, de verdade. Vem da seção "Meu Setup de Desenvolvimento" do
  * `profile.md`, e é a única parte deste arquivo que descreve hardware em vez de
  * pessoa — que é exatamente o que um "Sobre este PC" promete.
@@ -38,6 +59,27 @@ const maquinaItens = [
 ];
 
 const profileDataEn = {
+  /**
+   * O NOME NÃO APARECIA EM PIXEL NENHUM DO CONTEÚDO. Estava no `<title>` da aba,
+   * no copyright do terminal e no menu Iniciar — nunca no corpo do "Sobre este
+   * PC", que é o app que abre sozinho para quem chega sem deep link. Quem entrava
+   * por `/sobre` lia um cargo e uma frase e saía sem saber de quem é o site.
+   *
+   * `nascimento` é a data, não a idade — a idade sai de `idadeEm()` acima, porque
+   * número escrito à mão envelhece errado.
+   */
+  nome: 'Marcos Rodrigues',
+  local: 'Uberlândia – MG',
+  nascimento: '2003-12-14',
+
+  /**
+   * FIEL À BASE, E NEUTRO. O `profile.md` diz "Aberto a propostas de projetos
+   * Freelance ... estou empregado atualmente". "Disponível" sugeriria outra
+   * coisa; "aberto a freelance" é o que está escrito lá, e é o que aparece com o
+   * pontinho no herói do "Sobre este PC".
+   */
+  status: 'open to freelance',
+
   /**
    * `title` saiu junto do `hero`. Era `'>_ WHOAMI'`, e o único consumidor era o
    * kicker do "Sobre este PC" — que agora mostra o CARGO, porque num guia a
@@ -86,6 +128,12 @@ const profileDataEn = {
 };
 
 const profileDataPt = {
+  /** Ver as notas no bloco em inglês, acima. */
+  nome: 'Marcos Rodrigues',
+  local: 'Uberlândia – MG',
+  nascimento: '2003-12-14',
+  status: 'aberto a freelance',
+
   role: 'Desenvolvedor Full Stack & IA',
 
   bio_highlight: 'Construo sistemas com IA que chegam em produção. Este site é um deles.',
