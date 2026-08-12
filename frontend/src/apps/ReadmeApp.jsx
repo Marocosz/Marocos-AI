@@ -2,6 +2,7 @@ import React from 'react'
 import { Github } from 'lucide-react'
 import { useLanguage } from '../contexts/LanguageContext'
 import { getOsData } from '../i18n/os'
+import { SISTEMA } from '../content/sistema'
 import './ReadmeApp.css'
 
 const REPO = 'https://github.com/Marocosz/Marocos-AI'
@@ -29,9 +30,16 @@ const ReadmeApp = () => {
     <div className="readme-app">
       <p className="readme-lead">{t.lead}</p>
 
+      {/* O `%d` de um dos títulos é o número de testes da suíte, e ele vem de
+          `content/sistema.js` — a mesma constante que a ficha "Este sistema" do
+          "Sobre este PC" exibe. Era literal aqui, dizia 36, e a suíte já tinha
+          38: uma frase que envelheceu sozinha. O `replace` não faz nada nos
+          outros títulos, que não têm marcador. */}
       {t.sections.map((secao) => (
         <section className="readme-section" key={secao.title}>
-          <h3 className="readme-section-title">{secao.title}</h3>
+          <h3 className="readme-section-title">
+            {secao.title.replace('%d', SISTEMA.testes)}
+          </h3>
           <p className="readme-section-body">{secao.body}</p>
         </section>
       ))}

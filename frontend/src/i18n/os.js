@@ -145,7 +145,14 @@ const osContentEn = {
         body: 'A LangGraph graph on FastAPI: it detects the language, summarises long conversations, routes casual from technical in a single LLM call, retrieves from a vector base over my real career data, and passes through an answerability guard that would rather say "I do not know" than invent. The answer streams over SSE, node by node.',
       },
       {
-        title: 'And 36 tests watch all of it',
+        /**
+         * O NÚMERO É INTERPOLADO, e a razão é que ele já esteve errado: esta
+         * frase dizia 36 quando a suíte tinha 38 — ela cresceu e ninguém releu o
+         * texto. Agora vem de `SISTEMA.testes` (`content/sistema.js`), a mesma
+         * constante que a ficha "Este sistema" do "Sobre este PC" exibe. As duas
+         * janelas não têm mais como discordar.
+         */
+        title: 'And %d tests watch all of it',
         body: 'A Playwright suite: 21 visual scenes at zero tolerance across both themes and mobile, plus route tests that catch what a build cannot — a broken dynamic import only fails at runtime, and every app here is loaded on demand.',
       },
     ],
@@ -521,7 +528,8 @@ const osContentPt = {
         body: 'Um grafo LangGraph sobre FastAPI: detecta o idioma, resume conversas longas, separa casual de técnico numa única chamada de LLM, recupera de uma base vetorial montada sobre a minha trajetória real, e passa por uma guarda de responsabilidade que prefere dizer "não sei" a inventar. A resposta chega por SSE, nó a nó.',
       },
       {
-        title: 'E 36 testes olham para tudo isso',
+        /** Ver a nota no bloco em inglês: o número vem de `SISTEMA.testes`. */
+        title: 'E %d testes olham para tudo isso',
         body: 'Uma suíte Playwright: 21 cenas visuais com tolerância zero nos dois temas e no mobile, mais testes de rota que pegam o que build nenhum pega — import dinâmico quebrado só falha em runtime, e todo app daqui é carregado sob demanda.',
       },
     ],
