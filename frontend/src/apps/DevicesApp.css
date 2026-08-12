@@ -1,232 +1,486 @@
-/* src/apps/DevicesApp.css */
+/* src/apps/DevicesApp.css
+   A stack técnica como uma grade de PASTAS que abrem na esteira.
 
-/*
- * Usa as variáveis de tema já globais (--text-primary, --text-secondary,
- * --accent-color, --card-bg, --card-border), as mesmas que o TechStack.css
- * da página clássica (removida no refactor) escrevia como valores fixos por
- * tema (dark/light). Como aqui viram var(), o componente ganha os dois temas
- * de graça, sem reescrever um bloco .theme-light — o container da janela
- * (Window.css) já prova que essas variáveis chegam até o conteúdo.
- *
- * Sem backdrop-filter aqui dentro: o chrome da janela já borra atrás, e
- * empilhar blur derruba o Safari do iOS.
- */
+   O design anterior era uma árvore de acordeão — quatro nós com chevron e uma tabela
+   DISPOSITIVO / STATUS dentro de cada um. Cada categoria era uma linha de texto até ser
+   aberta, e nada dizia de relance o tamanho dela.
+
+   Usa as variáveis de tema já globais, as mesmas que o TechStack.css da página clássica
+   escrevia como valores fixos por tema. Como aqui são `var()`, o componente ganha os
+   dois temas de graça, sem um bloco `.theme-light` inteiro.
+
+   Sem `backdrop-filter` aqui dentro: o chrome da janela já borra atrás, e empilhar blur
+   é o custo que Window.css documenta ter derrubado de 20px para 6px. */
 
 .devices-app {
+  /* O container de consulta: os breakpoints deste app são sobre a largura da JANELA, e
+     não da tela. Ver a regra no `AboutApp.css`. */
+  container-type: inline-size;
   display: flex;
   flex-direction: column;
   gap: 1.1rem;
   font-size: 0.9rem;
-}
-
-/* --- HEADER --- */
-/* Cabeçalho (eyebrow + título + subtítulo) extraído para AppHeader — ver
-   src/ui/AppHeader.jsx (escala="sm"). */
-
-/* --- ÁRVORE DE CATEGORIAS --- */
-.devices-tree {
-  display: flex;
-  flex-direction: column;
-  gap: 0.6rem;
-}
-
-.devices-category {
-  background: var(--card-bg);
-  border: 1px solid var(--card-border);
-  border-radius: 12px;
-  overflow: hidden;
-}
-
-/* Nó de categoria — botão real, não div, pra expandir/recolher por teclado. */
-.devices-category-toggle {
+  /* Teto de medida: maximizar numa tela grande reorganiza a grade, não estica as
+     pastas. */
+  max-width: 1040px;
+  margin-inline: auto;
   width: 100%;
-  display: flex;
-  align-items: center;
-  gap: 0.65rem;
-  padding: 0.65rem 0.8rem;
-  background: transparent;
-  border: none;
-  color: var(--text-primary);
-  font: inherit;
-  text-align: left;
-  cursor: pointer;
-  transition: background 0.15s ease;
 }
 
-.devices-category-toggle:hover {
-  background: var(--card-border);
-}
+/* --- HEADER ---
+   Cabeçalho (eyebrow + título + subtítulo) em `ui/AppHeader.jsx` (escala="sm"). */
 
-.devices-category-toggle:focus-visible {
-  outline: 2px solid var(--accent-color);
-  outline-offset: -2px;
-}
+/* ==================================================
+   A GRADE
 
-.devices-chevron {
-  flex: 0 0 auto;
-  color: var(--text-secondary);
-  transition: transform 0.2s ease, color 0.2s ease;
-}
-
-.devices-chevron.is-open {
-  transform: rotate(90deg);
-  color: var(--accent-color);
-}
-
-.devices-icon-wrapper {
-  flex: 0 0 auto;
-  width: 30px;
-  height: 30px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background: var(--card-bg);
-  border: 1px solid var(--card-border);
-  border-radius: 8px;
-  color: var(--accent-color);
-}
-
-.devices-category-title {
-  font-size: 0.92rem;
-  font-weight: 700;
-  color: var(--text-primary);
-  overflow: hidden;
-  white-space: nowrap;
-  text-overflow: ellipsis;
-}
-
-.devices-category-body {
-  overflow: hidden;
-  padding: 0 0.8rem 0.8rem;
-}
-
-.devices-category-desc {
-  font-size: 0.78rem;
-  color: var(--text-secondary);
-  line-height: 1.5;
-  margin: 0 0 0.7rem;
-}
-
-/* Cabeçalho de coluna, ao estilo "Detalhes" do Explorer. */
-.devices-list-header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 0.75rem;
-  padding: 0 0.6rem 0.35rem;
-  border-bottom: 1px solid var(--card-border);
-  margin-bottom: 0.3rem;
-  font-size: 0.66rem;
-  font-weight: 700;
-  letter-spacing: 0.05em;
-  text-transform: uppercase;
-  color: var(--text-secondary);
-}
-
-/* --- LISTA DE DISPOSITIVOS (TECNOLOGIAS) --- */
-.devices-item-list {
-  list-style: none;
+   `auto-fill` com piso de 240px: duas colunas na janela padrão (620px de conteúdo),
+   três ou quatro quando maximizada. Uma só em janela estreita.
+   ================================================== */
+.devices-grade {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+  gap: 12px;
   margin: 0;
   padding: 0;
+  list-style: none;
+  align-items: start;
+}
+
+/* ==================================================
+   A PASTA
+
+   `padding-top` reserva a faixa onde a aba aparece; a aba é `absolute` dentro dela.
+   ================================================== */
+.devices-pasta {
+  position: relative;
+  padding-top: 10px;
+}
+
+/**
+ * A ESTEIRA: a pasta aberta ocupa a linha inteira e empurra as outras para baixo.
+ *
+ * CUSTO ACEITO E CONHECIDO: abrir uma pasta da coluna DIREITA deixa um vão ao lado do
+ * par dela, porque um item de largura cheia não começa no meio de uma linha. A
+ * alternativa seria `grid-auto-flow: dense`, que puxaria uma pasta POSTERIOR para o vão
+ * — e aí a ordem das categorias (IA primeiro, de propósito) passaria a mentir. Vão
+ * honesto é melhor que ordem falsa.
+ */
+.devices-pasta--aberta {
+  grid-column: 1 / -1;
+}
+
+/**
+ * A ABA — o que faz o bloco ler como pasta.
+ *
+ * NÃO É `clip-path`, e a escolha tem motivo: `polygon()` desenharia a silhueta inteira
+ * com uma propriedade só, mas polígono só tem vértices (adeus cantos arredondados, que
+ * são a linguagem do projeto) e mata a borda; `path()` aceita curvas mas exige
+ * coordenadas absolutas, e a largura da pasta varia com a grade.
+ *
+ * Como a aba e o corpo têm o MESMO preenchimento e a aba fica atrás, a sobreposição de
+ * 10px esconde a emenda por completo — e os cantos continuam redondos.
+ *
+ * NEM A ABA NEM O CORPO TÊM BORDA, e isso não é economia: com borda nos dois, a borda de
+ * TOPO do corpo desenhava uma linha atravessando por baixo da aba, e o resultado lia como
+ * um retângulo pequeno solto em cima de um card — não como uma pasta. A silhueta única só
+ * aparece quando as duas superfícies são a mesma cor e nada as separa. Quem dá a aresta
+ * no hover é a luz que percorre a borda, mais abaixo.
+ */
+.devices-aba {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 34%;
+  max-width: 106px;
+  height: 18px;
+  border-radius: 9px 9px 0 0;
+  background-color: var(--sup-fundo);
+}
+
+.devices-corpo {
+  position: relative;
+  /* Recorta o ícone fantasma, que nasce meio para fora da caixa. */
+  overflow: hidden;
+  border-radius: 14px;
+  background-color: var(--sup-fundo);
+  /**
+   * RADIAL ANCORADA EMBAIXO À DIREITA, e não a `--sup-lavagem` do sistema.
+   *
+   * A do sistema é diagonal a 160°, o que escurece o topo ESQUERDO — exatamente onde a
+   * aba encosta. Como a aba é lisa, apareceria um degrau na emenda. Ancorada no canto
+   * oposto, a lavagem acompanha o fantasma e o topo esquerdo fica igual ao da aba.
+   */
+  background-image: radial-gradient(
+    120% 90% at 100% 100%,
+    rgb(var(--accent-rgb) / 0.13),
+    transparent 62%
+  );
+}
+
+/* ==================================================
+   A CABEÇA — a anatomia do card
+
+   Grade de duas colunas: o tile à esquerda, o badge à direita, e o resto empilhado
+   abaixo ocupando as duas.
+   ================================================== */
+.devices-cabeca {
+  position: relative;
+  overflow: hidden;
+  display: grid;
+  grid-template-columns: auto 1fr;
+  align-items: start;
+  gap: 4px 10px;
+  width: 100%;
+  /* Apertado olhando o render: com 14/13 as quatro pastas não cabiam na dobra e a linha
+     de baixo perdia o rótulo. É o mesmo raciocínio da caixa do player da Jornada — o
+     conjunto tem de ser visível para o desenho significar algo. */
+  padding: 12px 14px 11px;
+  text-align: left;
+  font-family: inherit;
+  border: none;
+  background: none;
+  color: var(--text-primary);
+  cursor: pointer;
+}
+
+.devices-cabeca:focus-visible {
+  outline: 2px solid var(--accent-color);
+  outline-offset: -3px;
+  border-radius: 13px;
+}
+
+/* O TILE DE ÍCONE — gradiente do acento para o tom fundo dele.
+   `--cfg-accent-profundo` vem da ponte e é o MESMO valor que o cristal 3D usa, então a
+   peça e os tiles não divergem. Segue o preset: escolher Brasa repinta os quatro. */
+.devices-tile {
+  display: grid;
+  place-items: center;
+  width: 42px;
+  height: 42px;
+  border-radius: 12px;
+  background-image: linear-gradient(
+    160deg,
+    var(--accent-color),
+    var(--cfg-accent-profundo, #4c1d95)
+  );
+  color: #ffffff;
+  box-shadow: 0 4px 12px rgb(var(--accent-rgb) / 0.28);
+}
+
+/* Pílula de 999px porque NÃO é interativo — a regra de raio do projeto. */
+.devices-badge {
+  justify-self: end;
+  align-self: start;
+  padding: 3px 9px;
+  border-radius: 999px;
+  border: 1px solid var(--sup-borda);
+  font-family: 'Courier New', monospace;
+  font-size: 0.6rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  color: var(--text-secondary);
+  white-space: nowrap;
+}
+
+.devices-titulo {
+  grid-column: 1 / -1;
+  margin-top: 4px;
+  font-size: 0.9rem;
+  font-weight: 700;
+  line-height: 1.2;
+  color: var(--text-primary);
+}
+
+/* O número grande, com o gradiente de texto do projeto — o mesmo gesto do nome no herói
+   do "Sobre este PC" e da capa da Jornada. */
+.devices-numero {
+  grid-column: 1 / -1;
+  /* 1.7 e não 1.9: os ~10px por card que isso devolve são o que faz as QUATRO pastas
+     caberem na dobra. Uma grade 2x2 em que a linha de baixo perde o "Abrir" não mostra
+     que ela abre. */
+  font-size: 1.7rem;
+  font-weight: 900;
+  line-height: 1.05;
+  letter-spacing: -0.03em;
+  background: linear-gradient(135deg, var(--text-primary) 25%, var(--accent-color) 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.devices-rotulo {
+  grid-column: 1 / -1;
+  margin-top: -2px;
+  font-size: 0.72rem;
+  color: var(--text-secondary);
+}
+
+.devices-acao {
+  grid-column: 1 / -1;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  margin-top: 8px;
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: var(--accent-color);
+}
+
+.devices-cabeca:hover .devices-acao {
+  gap: 7px;
+}
+
+/**
+ * ABERTA, A CABEÇA VIRA UMA LINHA.
+ *
+ * Fechada ela é um card estreito e o empilhamento é o certo: o número grande é o herói,
+ * e ele responde "o que tem nesta pasta" antes de qualquer clique.
+ *
+ * Aberta a pasta tem 574px de largura, e manter tudo empilhado gastava ~100px de altura
+ * que a grade de itens queria — com o agravante de que ali o número já não é o herói:
+ * quem responde "o que tem dentro" passa a ser o próprio conteúdo. Então ele encolhe e
+ * entra na linha, junto do resto.
+ *
+ * `order` porque a ordem do DOM é a do card fechado (badge logo depois do tile, para
+ * ficar no canto superior direito), e aqui a leitura é outra.
+ */
+.devices-pasta--aberta .devices-cabeca {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 4px 10px;
+}
+
+.devices-pasta--aberta .devices-tile { order: 1; }
+.devices-pasta--aberta .devices-titulo { order: 2; margin-top: 0; }
+.devices-pasta--aberta .devices-numero { order: 3; font-size: 1.15rem; }
+.devices-pasta--aberta .devices-rotulo { order: 4; margin-top: 0; }
+.devices-pasta--aberta .devices-badge { order: 5; margin-left: auto; }
+.devices-pasta--aberta .devices-acao { order: 6; margin-top: 0; }
+
+/* O FANTASMA — a marca d'água do print. Nasce meio para fora da caixa de propósito: é o
+   recorte que o faz ler como marca d'água em vez de segundo ícone. */
+.devices-fantasma {
+  position: absolute;
+  right: -14%;
+  bottom: -26%;
+  width: 52%;
+  height: auto;
+  color: var(--text-primary);
+  opacity: 0.055;
+  pointer-events: none;
+}
+
+/* ==================================================
+   A LUZ DE RODAPÉ — só na borda de baixo, indo e voltando
+
+   O ANEL DO "SOBRE ESTE PC" NÃO SERVE AQUI, e a razão é a silhueta: aquele efeito
+   percorre um retângulo arredondado, e esta pasta tem ABA. A luz passaria reto por cima
+   do topo direito, onde a forma não está — o contorno que ela desenha não é o contorno
+   que se vê.
+
+   A borda INFERIOR é o único trecho reto e idêntico nos dois formatos, então é a única
+   que a mesma ideia pode percorrer sem mentir. Vai e volta (`alternate`) em vez de dar a
+   volta, porque numa linha aberta o retorno é o que fecha o ciclo.
+
+   Sem `@property` aqui: `background-position` já é um valor animável por natureza, então
+   este efeito não depende do registro global que o outro precisa.
+   ================================================== */
+.devices-corpo::before,
+.devices-corpo::after {
+  content: '';
+  position: absolute;
+  inset: auto 0 0;
+  background-image: linear-gradient(
+    90deg,
+    transparent,
+    var(--sup-luz-nucleo),
+    transparent
+  );
+  /* A faixa acesa ocupa 45% da largura; o resto é transparente e é o que faz a luz ser
+     um trecho que anda, e não a borda inteira acendendo. */
+  background-size: 45% 100%;
+  background-repeat: no-repeat;
+  background-position: 0 0;
+  opacity: 0;
+  animation: luzRodapeStack var(--cfg-luz-rodape, 2.2s) ease-in-out infinite alternate;
+  animation-play-state: paused;
+  /* A duração de SAÍDA na regra base, a de entrada no hover — a luz apaga mais devagar
+     do que acende. Ver `MOVIMENTO.luzDaBordaSaidaS`. */
+  transition: opacity var(--cfg-luz-saida, 0.5s) ease;
+  pointer-events: none;
+}
+
+/* O núcleo: fino e nítido, na aresta. */
+.devices-corpo::after {
+  height: 2px;
+}
+
+/* O halo: mais alto e desfocado, atrás — as duas camadas juntas leem como luz, e cada
+   uma sozinha lê como traço ou como borrão. */
+.devices-corpo::before {
+  height: 9px;
+  filter: blur(var(--cfg-luz-desfoque, 7px));
+}
+
+.devices-pasta:hover .devices-corpo::before,
+.devices-pasta:hover .devices-corpo::after {
+  opacity: 1;
+  animation-play-state: running;
+  transition: opacity var(--cfg-luz-entrada, 0.18s) ease;
+}
+
+.devices-pasta:hover .devices-corpo::before {
+  opacity: var(--cfg-luz-alfa-halo, 0.5);
+}
+
+@keyframes luzRodapeStack {
+  /* 0% e 100% de `background-position` com `background-size` menor que a caixa são
+     "encostado à esquerda" e "encostado à direita" — a faixa atravessa sem sair. */
+  from { background-position: 0 100%; }
+  to { background-position: 100% 100%; }
+}
+
+/* Sem borda para animar, o que muda no hover é o próprio preenchimento — de leve, porque
+   quem carrega o efeito é a luz. Mistura acento na superfície em vez de empilhar alpha:
+   a superfície é opaca de propósito. */
+.devices-corpo,
+.devices-aba {
+  transition: background-color var(--cfg-luz-saida, 0.5s) ease;
+}
+
+.devices-pasta:hover .devices-corpo,
+.devices-pasta:hover .devices-aba {
+  background-color: color-mix(in srgb, rgb(var(--accent-rgb)) 7%, var(--sup-fundo));
+  transition: background-color var(--cfg-luz-entrada, 0.18s) ease;
+}
+
+/* ==================================================
+   A GRADE DE ITENS — só existe depois de um clique
+
+   O regressor visual fotografa o repouso, então quem cobre isto é o teste funcional em
+   `rotas.spec.js`. É a mesma lição que aquele arquivo já documenta sobre grupo
+   colapsado e painel fechado.
+   ================================================== */
+.devices-itens-caixa {
+  /* `overflow: hidden` é o que faz a transição de altura do motion não vazar conteúdo
+     durante o movimento. */
+  overflow: hidden;
+}
+
+.devices-desc {
+  margin: 0;
+  padding: 0 15px;
+  max-width: 68ch;
+  font-size: 0.8rem;
+  line-height: 1.55;
+  color: var(--text-secondary);
+}
+
+.devices-itens {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(190px, 1fr));
+  gap: 8px;
+  margin: 0;
+  padding: 12px 15px 15px;
+  list-style: none;
 }
 
 .devices-item {
-  display: flex;
+  display: grid;
+  grid-template-columns: auto 1fr auto;
   align-items: center;
-  justify-content: space-between;
-  gap: 0.75rem;
-  padding: 0.55rem 0.6rem;
-  border-radius: 8px;
-  transition: background 0.15s ease;
+  gap: 3px 8px;
+  padding: 8px 10px;
+  border-radius: var(--win-control-radius);
+  border: 1px solid var(--sup-borda);
+  background-color: var(--sup-fundo);
 }
 
-.devices-item + .devices-item {
-  border-top: 1px solid var(--card-border);
-}
-
-.devices-item:hover {
-  background: var(--card-border);
-}
-
-.devices-item-main {
-  display: flex;
-  align-items: center;
-  gap: 0.65rem;
-  min-width: 0;
-  flex: 1 1 auto;
-}
-
-/* Ponto de status colorido com glow — igual ao .tech-dot da TechStack da
-   página clássica (removida no refactor). */
-.devices-dot {
-  flex: 0 0 auto;
+/* O ponto na cor de MARCA, com halo da própria cor — `currentColor` vem do estilo
+   inline, que é onde a cor de cada tecnologia vive (a exceção documentada). */
+.devices-ponto {
   width: 8px;
   height: 8px;
-  border-radius: 50%;
+  border-radius: 999px;
   box-shadow: 0 0 8px currentColor;
 }
 
-.devices-item-text {
-  display: flex;
-  flex-direction: column;
-  gap: 0.1rem;
-  min-width: 0;
-}
-
-.devices-item-name {
-  font-size: 0.86rem;
-  font-weight: 400;
+.devices-item-nome {
+  font-size: 0.78rem;
+  font-weight: 700;
   color: var(--text-primary);
   overflow: hidden;
-  white-space: nowrap;
   text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
-/* Descrição da tecnologia (era tooltip no hover em TechStack) como texto
-   secundário sempre visível — ver justificativa no relatório: hover não
-   funciona por teclado nem em toque, e a árvore já rola verticalmente. */
-.devices-item-desc {
-  font-size: 0.72rem;
-  color: var(--text-secondary);
-  line-height: 1.4;
-}
-
-.devices-item-level {
-  flex: 0 0 auto;
-  font-size: 0.68rem;
+.devices-item-nivel {
+  font-family: 'Courier New', monospace;
+  font-size: 0.58rem;
   font-weight: 700;
-  letter-spacing: 0.03em;
+  letter-spacing: 0.04em;
   text-transform: uppercase;
-  padding: 0.2rem 0.6rem;
+  padding: 2px 6px;
   border-radius: 999px;
   white-space: nowrap;
 }
 
-.devices-item-level.level-expert {
+/* As três cores de nível vêm do design anterior sem alteração: `expert` no acento
+   (segue o preset), `advanced` num azul próprio e `intermediate` neutro. */
+.devices-item-nivel.level-expert {
   color: var(--accent-color);
   background: rgb(var(--accent-rgb) / 0.14);
   border: 1px solid rgb(var(--accent-rgb) / 0.32);
 }
 
-.devices-item-level.level-advanced {
+.devices-item-nivel.level-advanced {
   color: #38bdf8;
   background: rgba(56, 189, 248, 0.14);
   border: 1px solid rgba(56, 189, 248, 0.32);
 }
 
-.devices-item-level.level-intermediate {
+.devices-item-nivel.level-intermediate {
   color: var(--text-secondary);
   background: var(--card-bg);
   border: 1px solid var(--card-border);
 }
 
-/* --- RESPONSIVIDADE (janela estreitada) --- */
-@media (max-width: 420px) {
-  .devices-item {
-    flex-wrap: wrap;
+.devices-item-desc {
+  grid-column: 2 / -1;
+  font-size: 0.66rem;
+  line-height: 1.35;
+  color: var(--text-secondary);
+}
+
+/* ==================================================
+   ESTREITO
+   ================================================== */
+@container (max-width: 460px) {
+  .devices-grade {
+    grid-template-columns: 1fr;
   }
 
-  .devices-item-level {
-    margin-left: calc(8px + 0.65rem);
+  .devices-itens {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* Respeita quem pede menos movimento. A luz PARA em vez de apagar — sem ela o visitante
+   perde o único sinal de que a pasta é clicável, e quem pediu menos animação não pediu
+   menos informação. */
+@media (prefers-reduced-motion: reduce) {
+  /* A luz PARA, não apaga: sem ela o visitante perde o único sinal de que a pasta é
+     clicável, e quem pediu menos animação não pediu menos informação. Parada, a faixa
+     fica encostada à esquerda do rodapé — que é onde a animação começa. */
+  .devices-pasta:hover .devices-corpo::before,
+  .devices-pasta:hover .devices-corpo::after {
+    animation-play-state: paused;
+  }
+
+  .devices-corpo,
+  .devices-aba,
+  .devices-acao {
+    transition: none;
   }
 }

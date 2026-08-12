@@ -385,7 +385,12 @@ describe('config do sistema', () => {
     })
     expect(MOVIMENTO.quickSettingsFundo).toEqual({ duration: 0.2 })
     expect(MOVIMENTO.pushMobile).toEqual({ duration: 0.28, ease: 'easeOut' })
-    expect(MOVIMENTO.acordeaoDispositivos).toEqual({ duration: 0.2, ease: 'easeInOut' })
+    // `acordeaoDispositivos` saiu: o `layout` do motion passou a animar posição e
+    // tamanho das pastas da Stack, e duas animações na mesma altura davam tranco.
+    expect(MOVIMENTO.acordeaoDispositivos).toBeUndefined()
+    expect(MOVIMENTO.esteiraStack.duration).toBe(0.44)
+    // Sem `saida`: fechando, o conteúdo desmonta na hora e quem anima é o `layout`.
+    expect(MOVIMENTO.itensStack).toEqual({ duration: 0.26, escalonamento: 0.035 })
     expect(MOVIMENTO.indicadorTaskbar).toEqual({ type: 'spring', stiffness: 300, damping: 30 })
     expect(MOVIMENTO.minimizarJanela).toEqual({
       duration: 0.26, duracaoReduzida: 0, ease: 'easeOut', escala: 0.9,

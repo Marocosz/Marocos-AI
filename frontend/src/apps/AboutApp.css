@@ -890,23 +890,13 @@
    ================================================== */
 
 /**
- * O ÂNGULO PRECISA SER REGISTRADO PARA PODER SER ANIMADO.
+ * O `@property --giro-da-luz` MUDOU DE CASA e agora vive em `os/tokens.css`.
  *
- * Uma custom property comum é uma string para o motor de animação: interpolar de
- * "0turn" para "1turn" seria trocar texto, e o gradiente pularia em vez de girar —
- * o efeito simplesmente não acontece. `@property` dá TIPO ao valor, e aí a
- * interpolação é numérica.
- *
- * Mora neste arquivo porque só este app usa o efeito. Se um segundo app pedir,
- * isto e o bloco abaixo sobem para `os/tokens.css` — o registro é global de
- * qualquer forma, e o app é carregado por `lazy()`, então ele acontece exatamente
- * quando é preciso.
+ * Ele morava aqui porque só este app usava o efeito, e isso era o certo com um
+ * consumidor. A Stack passou a reaproveitar a mesma luz de hover, e aí um registro
+ * GLOBAL escondido no CSS de um app vira armadilha: o segundo app passaria a depender
+ * de o primeiro ter sido carregado, e os dois entram por `lazy()`.
  */
-@property --giro-da-luz {
-  syntax: '<angle>';
-  inherits: false;
-  initial-value: 0turn;
-}
 
 .about-acao::before,
 .about-acao::after,

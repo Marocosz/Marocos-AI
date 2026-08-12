@@ -22,14 +22,14 @@ export const SISTEMA = {
    * reconferir:
    *   cenas visuais  contar `{ nome:` em `frontend/visual/cenas.js`        → 21
    *   funcionais     os `test(` avulsos de `frontend/visual/rotas.spec.js`
-   *                  + uma entrada por rota no laço sobre `ROTAS`          → 19
+   *                  + uma entrada por rota no laço sobre `ROTAS`          → 20
    *
    * O texto do Leia-me dizia 36 e tinha ficado para trás — a suíte cresceu e
    * ninguém releu a frase. É por isso que o número mora AQUI, numa fonte só: a
    * partir desta mudança as duas janelas que o exibem leem a mesma constante e
    * não têm como discordar de novo.
    */
-  testes: 40,
+  testes: 41,
 
   /** Silk no tema escuro, Iridescence no claro — os dois sobre `ogl`. */
   shaders: 2,

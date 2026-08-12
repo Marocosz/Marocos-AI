@@ -899,7 +899,50 @@ export const MOVIMENTO = {
   quickSettings: { duration: 0.24, duracaoReduzida: 0.15, ease: 'easeOut' },
   quickSettingsFundo: { duration: 0.2 },
   pushMobile: { duration: 0.28, ease: 'easeOut' },
-  acordeaoDispositivos: { duration: 0.2, ease: 'easeInOut' },
+  /**
+   * `acordeaoDispositivos` SAIU. Era `{ duration: 0.2, ease: 'easeInOut' }` e animava a
+   * altura da categoria aberta da Stack. Com a esteira, quem anima posição E tamanho é o
+   * `layout` do motion — duas animações disputando a mesma altura davam tranco, e a
+   * antiga virou valor sem consumidor.
+   */
+
+  /**
+   * A ESTEIRA DA STACK — cada pasta VIAJANDO até o lugar novo dela.
+   *
+   * Quando uma pasta abre ela ocupa a linha inteira da grade, e o CSS reposiciona as
+   * outras no mesmo quadro: elas teleportavam para a linha de baixo. O `layout` do motion
+   * mede antes e depois e anima a diferença, o que cobre todas as combinações de abrir e
+   * fechar sem nenhuma regra por caso.
+   *
+   * A CURVA IMPORTA MAIS QUE A DURAÇÃO AQUI. Com `easeInOut` a 0,34s o movimento lia como
+   * tranco: ela desacelera cedo e o fim chega de repente. Esta curva é o oposto — sai
+   * rápido e passa a maior parte do tempo assentando, que é o que faz meia grade andando
+   * junto parecer suave em vez de agressiva.
+   *
+   * A duração também é o ATRASO da entrada dos itens (ver `itensStack`), lida de cá em
+   * vez de escrita duas vezes.
+   */
+  esteiraStack: { duration: 0.44, ease: [0.22, 1, 0.36, 1] },
+
+  /**
+   * A ENTRADA DOS ITENS da pasta aberta.
+   *
+   * Eles só aparecem DEPOIS que a caixa terminou de viajar, e a razão é mecânica: o
+   * `layout` anima o tamanho por escala, e tudo que está dentro é esticado junto — o
+   * conteúdo aparecia distorcido durante a viagem. Com a caixa viajando vazia e os itens
+   * entrando em seguida, a distorção acontece onde não há o que distorcer.
+   *
+   * O atraso NÃO mora aqui: ele é a duração de `esteiraStack`. Dois valores que precisam
+   * ser iguais não podem ser escritos em dois lugares.
+   */
+  /**
+   * NÃO HÁ DURAÇÃO DE SAÍDA aqui, e a ausência é um conserto. Com saída animada o
+   * conteúdo ficava montado enquanto a largura da pasta já havia colapsado — a grade de
+   * itens refluía numa coluna estreita e altíssima, e a caixa esticava até o fim da
+   * janela antes de encolher. Fechando, o conteúdo desmonta na hora e o `layout` anima a
+   * caixa vazia, simétrico com a abertura.
+   */
+  itensStack: { duration: 0.26, escalonamento: 0.035 },
   indicadorTaskbar: { type: 'spring', stiffness: 300, damping: 30 },
 
   /**
@@ -940,6 +983,18 @@ export const MOVIMENTO = {
    */
   luzDaBordaEntradaS: 0.18,
   luzDaBordaSaidaS: 0.5,
+
+  /**
+   * A LUZ DE RODAPÉ DAS PASTAS DA STACK — indo e voltando na borda de baixo.
+   *
+   * O anel que percorre a borda inteira (o hover do "Sobre este PC") não serve aqui: ele
+   * traça um retângulo arredondado, e a pasta tem aba — a luz passaria por onde a
+   * silhueta não está. A borda INFERIOR é reta nos dois formatos, então é a única que a
+   * mesma técnica pode percorrer honestamente.
+   *
+   * Mais lenta que a volta do anel: um vaivém curto e rápido lê como piscada.
+   */
+  luzRodapeStackS: 2.2,
 
   /**
    * O PULSO DO PONTO DE STATUS do "Sobre este PC" — o "aberto a freelance".

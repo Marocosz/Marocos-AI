@@ -4,6 +4,32 @@
    Convive com index.css, que segue dono das variáveis de conteúdo.
    -------------------------------------------------- */
 
+/**
+ * O ÂNGULO DA LUZ QUE PERCORRE A BORDA — registrado para poder ser ANIMADO.
+ *
+ * Uma custom property comum é uma string para o motor de animação: interpolar de
+ * "0turn" para "1turn" seria trocar texto, e o gradiente cônico pularia em vez de girar
+ * — o efeito simplesmente não acontece. `@property` dá TIPO ao valor, e aí a
+ * interpolação é numérica.
+ *
+ * MORA AQUI, e não no CSS do app que o usa — hoje só o "Sobre este PC".
+ *
+ * Ele nasceu dentro de `apps/AboutApp.css` e subiu quando a Stack ia reaproveitar o
+ * mesmo anel. No fim a Stack não usa: a silhueta dela tem aba, e um anel que percorre
+ * retângulo arredondado passaria por onde a forma não está — ela ficou com uma luz de
+ * rodapé, que nem precisa de `@property` porque `background-position` já é animável.
+ *
+ * FICOU AQUI MESMO ASSIM, e não é sobra: `@property` é registro GLOBAL, e global
+ * escondido no CSS de um app carregado por `lazy()` é armadilha esperando o segundo
+ * consumidor — que quase apareceu nesta mesma sessão. O lugar de uma declaração global é
+ * o arquivo global.
+ */
+@property --giro-da-luz {
+  syntax: '<angle>';
+  inherits: false;
+  initial-value: 0turn;
+}
+
 :root {
   /* Chrome de janela — os valores vêm do config (system.js -> cssBridge.js) via
      as custom properties --cfg-*; o segundo argumento de cada var() é o

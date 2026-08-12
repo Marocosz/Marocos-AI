@@ -346,6 +346,63 @@ test.describe('em tela grande', () => {
 })
 
 /**
+ * ABRIR UMA PASTA DA STACK LISTA AS TECNOLOGIAS.
+ *
+ * As quatro pastas nascem FECHADAS, então a grade de itens é código que só existe depois
+ * de um clique — e o regressor visual fotografa o estado de repouso. É exatamente a
+ * classe de defeito que este arquivo já documenta no chrome de explorador: subárvore que
+ * só monta sob interação não tem quem a cubra além daqui. Lá foi uma janela preta que
+ * ninguém viu porque o grupo "Rede" nasce fechado.
+ *
+ * Também fixa a promessa da ESTEIRA: a pasta aberta ocupa a linha inteira da grade, e é
+ * isso que empurra as outras para baixo.
+ */
+test('abrir uma pasta da stack lista as tecnologias', async ({ page, context }) => {
+  await definirPreferencias(context)
+  const erros = []
+  page.on('pageerror', (e) => erros.push(e.message))
+
+  await page.goto('/stack', { waitUntil: 'networkidle' })
+  await passarDaCerimonia(page)
+  await expect(page.locator('.devices-app')).toBeVisible({ timeout: 8000 })
+
+  // Em repouso: quatro pastas, nenhum item renderizado.
+  await expect(page.locator('.devices-pasta')).toHaveCount(4)
+  await expect(page.locator('.devices-item')).toHaveCount(0)
+
+  const primeira = page.locator('.devices-pasta').first()
+  const fechada = (await primeira.boundingBox()).width
+
+  await primeira.locator('.devices-cabeca').click()
+
+  // A categoria de IA tem seis tecnologias.
+  await expect(primeira.locator('.devices-item')).toHaveCount(6)
+  await expect(primeira).toHaveClass(/devices-pasta--aberta/)
+
+  /**
+   * A ESTEIRA: aberta, a pasta ocupa a linha inteira — bem mais que a largura de antes.
+   *
+   * `expect.poll` e não uma medição direta: as pastas VIAJAM até o lugar novo (o
+   * `layout` do motion anima a diferença ao longo de `MOVIMENTO.esteiraStack`), então
+   * medir logo depois do clique pega a largura no meio do caminho — a primeira versão
+   * deste teste leu 315px de uma viagem de 281 para 574 e reprovou por isso.
+   *
+   * Poll em vez de `waitForTimeout` porque a promessa que importa é "termina em largura
+   * cheia", e não "chega lá em N ms": afirmar o estado final sobrevive a qualquer ajuste
+   * de duração no config.
+   */
+  await expect
+    .poll(async () => (await primeira.boundingBox()).width, { timeout: 4000 })
+    .toBeGreaterThan(fechada * 1.5)
+
+  // E fechar devolve a grade ao repouso.
+  await primeira.locator('.devices-cabeca').click()
+  await expect(primeira.locator('.devices-item')).toHaveCount(0)
+
+  expect(erros, `erro de página não capturado: ${erros.join('; ')}`).toHaveLength(0)
+})
+
+/**
  * O BOTÃO DE CONTATO DO "SOBRE" LEVA AO TERMINAL.
  *
  * Ele existe porque a janela do "Sobre" deliberadamente NÃO repete os canais: os

@@ -157,6 +157,8 @@ export function aplicarConfigNoCss(tema = 'dark', preset = null) {
     '--cfg-luz-borda-hover': String(VIDRO.luzDaBorda.alfaBordaHover),
     '--cfg-luz-entrada': `${MOVIMENTO.luzDaBordaEntradaS}s`,
     '--cfg-luz-saida': `${MOVIMENTO.luzDaBordaSaidaS}s`,
+    /** O vaivém da luz no rodapé das pastas da Stack — ver `MOVIMENTO.luzRodapeStackS`. */
+    '--cfg-luz-rodape': `${MOVIMENTO.luzRodapeStackS}s`,
     '--cfg-luz-volta': `${MOVIMENTO.luzDaBordaS}s`,
 
     /** O pulso do ponto de status do "Sobre" — ver `MOVIMENTO.pulsoStatusS`. */
