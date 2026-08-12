@@ -24,7 +24,7 @@ Além da formação acadêmica, a faculdade me proporcionou experiências extrem
 
 Foi também durante a graduação que comecei a praticar judô, por meio da atlética da UFU. O esporte me trouxe valores fundamentais como disciplina, respeito, resiliência e autocontrole, além de experiências marcantes em competições e aprendizados que extrapolam o tatame. Sou muito grato por tudo que o judô agregou à minha formação pessoal.
 
-Atualmente, encontro-me no último período da graduação, no 8º período, consolidando todo esse percurso acadêmico e prático.
+Concluí a graduação em agosto de 2026, formando-me em Gestão da Informação pela UFU e consolidando todo esse percurso acadêmico e prático.
 
 Paralelamente, em agosto de 2025, conquistei meu estágio na empresa Supporte Logística, onde atuo como desenvolvedor full stack, com foco em soluções envolvendo Inteligência Artificial, dentro da área de inovação da empresa. Nesse ambiente, venho adquirindo um grande volume de conhecimento com o apoio de outros desenvolvedores, especialmente em boas práticas de desenvolvimento, DevOps, arquitetura de sistemas, além de uma vivência mais profunda do contexto corporativo, seus desafios e dinâmicas.
 

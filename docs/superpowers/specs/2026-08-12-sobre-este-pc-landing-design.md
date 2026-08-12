@@ -419,7 +419,207 @@ cobre estado interativo) — verificar à mão no navegador:
 
 ---
 
-## 8. Fora de escopo, de propósito
+## 8. Mudanças durante a execução
+
+Registradas aqui porque este documento é a única memória do *porquê*, e três delas
+contradizem seções acima. **Onde houver conflito, esta seção está certa.**
+
+### 8.1 O redesenho: preenchimento é ação
+
+A primeira implementação seguiu §1.3 ao pé da letra — deu superfície visível a
+todo bloco — e o resultado foi rejeitado pelo dono do projeto: *"o design dessa
+tela está horrível, nada original, parece um site qualquer… fundos chapados dos
+itens?"*.
+
+Ele estava certo, e o diagnóstico da spec estava incompleto. Sete blocos com
+mesma largura, mesmo raio, mesma borda e mesmo fundo produzem um empilhamento de
+retângulos — a janela ficou o elemento mais fraco da tela num sistema cujo resto
+tem voz (a assinatura enorme da área de trabalho, o mono da máquina, os filetes do
+explorador, o cristal). **O problema não era o contraste do card. Era o card.**
+
+A regra que substitui §1.3 e vale para o arquivo inteiro:
+
+> **Preenchimento é ação.** Exatamente dois elementos têm fundo próprio — o botão
+> de contato e a porta do Marcos Virtual. Os dois são ações. Todo o resto é
+> estrutura: tipografia, filete, trilho, régua.
+
+Os tokens `--sup-*` continuam existindo e valendo; passaram a marcar as duas ações
+em vez de pintar tudo. O que mudou de forma:
+
+| bloco | era | virou |
+|---|---|---|
+| herói | card com fundo, cristal à esquerda | sem caixa, nome em `clamp(2rem, 6.6cqi, 3.3rem)` com gradiente, cristal de 150px à direita |
+| stack | 9 pílulas com fundo, em duas linhas | ticker de uma linha, mono micro, filete acima e abaixo, nomes separados por `·` |
+| guia | grade 2×2 de cards | lista de linhas com ícone, chevron e filete — o padrão de lista do próprio explorador |
+| números | 3 cards centralizados | registro: número grande à esquerda, rótulo à direita, filete por linha |
+| ficha | card com fundo | registro puro, com linha pontilhada |
+
+**Três tentativas erradas no herói, e cada uma errou diferente** — as três estão
+documentadas em `.about-heroi` no CSS, porque a terceira é uma pegadinha de CSS
+que vale a pena não repetir: `grid-row: 1 / -1` conta a partir do fim do grid
+**explícito**, e sem `grid-template-rows` o explícito tem zero linhas — o span
+colapsa e o cristal prende a linha 1 em 150px.
+
+### 8.2 O carrossel de stack volta
+
+Decisão do dono do projeto. Voltou com dois consertos sobre a versão que existia
+antes de ser removida:
+
+1. **O laço fecha sem salto.** A versão antiga triplicava a lista e animava até
+   `translateX(-50%)` — com três cópias isso é uma cópia e meia, então a cada volta
+   havia um pulo visível. O percurso certo é uma cópia: `-33.3333%`. E o vão entre
+   os nomes teve de sair do `gap` para dentro do item (`margin-right`), senão a
+   conta não fecha: 27 itens e 26 vãos, cujo terço é 9 itens + 8,67 vãos.
+2. **Respeita o interruptor de Movimento**, não só `prefers-reduced-motion` — era
+   o mesmo defeito que o cristal deste app já teve. Com movimento desligado a
+   faixa não congela cortada: o JSX manda a lista uma vez e ela quebra linha.
+
+A duração vive em `MOVIMENTO.marqueeStackS` e chega por `--cfg-marquee-stack`.
+
+### 8.3 "Este computador" sai da janela
+
+Decisão do dono do projeto: processador, vídeo, memória e café ficam para o Marcos
+Virtual responder quando alguém perguntar. O `profile.md` continua com a seção
+inteira, então o assistente responde igual — o fato não saiu do site, saiu desta
+janela.
+
+`profile.maquina` foi **removido** de `content/profile.js`: era duplicata do
+`profile.md` cujo único consumidor era essa ficha. `machineLabel` saiu do `i18n`
+pelo mesmo motivo.
+
+### 8.4 A janela volta para 804
+
+§3 cresceu esta janela para 884 **porque** ela ia ter duas fichas lado a lado. Com
+a ficha do hardware fora, o motivo caiu, e o `ANTES.about` do `system.test.js`
+volta a `{620, 520}`. Janela maior sem conteúdo que a peça é só mais vidro para o
+sistema desfocar.
+
+### 8.5 As doses da superfície moram no config
+
+A pedido do dono do projeto (*"todas cores variáveis e etc devem ser setadas no
+arquivo de config global e apenas alterada por lá, o resto só usa elas"*), as
+porcentagens e alphas da superfície saíram do `tokens.css` e viraram
+`VIDRO.superficie.{noite,dia}` em `config/system.js`, publicadas pela ponte como
+`--cfg-sup-*`. O `tokens.css` só monta a cor a partir delas; os literais que
+sobraram lá são os fallbacks de `var()`, obrigatórios por convenção do projeto.
+
+Os dois temas vão juntos, com sufixo `-claro` para o dia — mesmo padrão de
+`--cfg-veu-alfa`. Publicar um valor só, do tema atual, faria os dois blocos de
+tema lerem a mesma dose (as duas regras coexistem na folha), que é o acoplamento à
+ordem da ponte que já quebrou o crossfade do wallpaper.
+
+Um teste novo em `system.test.js` guarda que as duas listas de doses têm as mesmas
+chaves, e que porcentagem é string e alpha é número — trocar um pelo outro
+invalida a cor em silêncio.
+
+### 8.6 Medida e tela cheia
+
+Apontado pelo dono do projeto: *"quando em tela cheia, se for uma tela grande, os
+textos ficam muito horizontais, o que é ruim de ler"*. Três mudanças, e as três
+eram necessárias:
+
+1. **`@container` em vez de `@media`.** O que estava escrito era um bug latente num
+   sistema de janelas: os breakpoints respondiam à VIEWPORT, então janela estreita
+   em tela grande nunca colapsava a grade e janela maximizada em tela pequena
+   colapsava sem precisar. `container-type: inline-size` no `.about-app` faz a
+   pergunta ser sobre a largura real do conteúdo.
+2. **Teto de medida.** `.about-app` para em 1040px e centraliza; a prosa tem
+   `max-width` em `ch`. Sem isso, maximizar em 1920 dava ~1700px de conteúdo e mais
+   de 160 caracteres por linha — maximizar *piorava* a leitura.
+3. **Duas colunas a partir de 720px de conteúdo**, e a divisão significa algo: a
+   coluna larga é a voz humana (bio, guia) e o trilho estreito é a voz da máquina
+   (números, registro do sistema). São as duas vozes tipográficas que o projeto já
+   separa, agora também no espaço — e o trilho ecoa o painel de detalhes do chrome
+   de explorador, que é onde este sistema já põe metadado.
+
+Medido em janela maximizada a 1920: app 1040px centralizado, bio 553px, nome
+52,8px, corpo em `744px 268px`. Um teste funcional novo em `rotas.spec.js` fixa
+essas promessas — asserção numérica e não captura, porque o que importa é a
+geometria.
+
+### 8.7 A faixa de destaque, e uma deduplicação
+
+Pedido do dono do projeto: as duas ações do app devem usar *"o fundo igual quando o
+item da lateral bar da janela (mas sem a linha lateral esquerda), ou seja, um
+gradiente, mas com uma borda da mesma cor do fundo"*.
+
+Esse gradiente já existia — é o `.explorer-lugar--aqui`, o item onde a janela está,
+e o comentário dele explica por que é gradiente e não retângulo chapado: o fundo
+nasce da borda esquerda e se apaga para a direita, lendo como luz entrando pela
+quina. **Chapado empataria com o hover**, e "destacado" deixaria de ser
+distinguível de "o mouse está aqui" — que é, aliás, a mesma crítica que derrubou a
+primeira versão desta tela.
+
+Virou `--sup-faixa` + `--sup-faixa-borda` em `tokens.css`, com as paradas em
+`VIDRO.superficie.*.alfaFaixa`, e **o `ExplorerChrome.css` passou a consumir o
+token** — os alphas eram literais lá e passariam a existir em dois arquivos. A
+regra `.theme-light .explorer-lugar--aqui` foi removida junto: o token já é
+redefinido por tema. As sete cenas que fotografam a lateral do explorador
+continuaram verdes, o que confirma que a troca foi byte-idêntica.
+
+Duas diferenças em relação ao explorador, as duas deliberadas:
+
+- **sem o traço de 3px na borda esquerda** — lá ele marca "a janela está NESTE
+  lugar", que é informação de navegação; aqui não há lugar sendo marcado;
+- **a borda é a cor mais forte da própria faixa**, e é o que dá o efeito: como o
+  fundo desaparece para a direita, a borda continua fechando o contorno onde o
+  gradiente já sumiu, e o bloco parece recortado da luz em vez de pintado.
+
+Um bug que apareceu no caminho e vale registrar: declarar só `background-image`
+num `<button>` deixa a cor de fundo padrão do navegador (`buttonface`, um cinza
+claro) aparecendo por baixo do gradiente — o texto do botão ficou ilegível.
+`background-color: transparent` explícito é obrigatório. O `.about-door` não sofria
+disso porque usa `background: none`, que zera as duas camadas.
+
+### 8.8 Os três números voltaram
+
+Decisão explícita do dono do projeto: o conteúdo de "Especificações do sistema"
+volta a ser **4+ serviços freelance**, **4+ anos de experiência** e **20+ projetos
+totais**.
+
+São exatamente os três que uma passada anterior removeu — o cabeçalho de
+`content/profile.js` documentava a remoção sob o argumento de que eram "números que
+ninguém consegue verificar, sob rótulos que não dizem nada". O dono é quem sabe a
+própria contagem, e a chamada é dele; o cabeçalho do arquivo foi reescrito para
+registrar a ida **e** a volta, para a próxima pessoa não "consertar" de novo.
+
+**O aviso que fica:** os três números não estão no `profile.md`, então o Marcos
+Virtual não consegue corroborá-los se alguém perguntar. Não é contradição — é
+ausência —, mas se um deles for questionado o conserto é acrescentar o fato à base,
+não apagar do site.
+
+### 8.9 Formado, e em todos os lugares
+
+O dono concluiu a graduação em **agosto de 2026**. Trocado em cinco lugares:
+
+| arquivo | era | virou |
+|---|---|---|
+| `backend/data/knowledge_base/profile.md` | "Atualmente, encontro-me no 8º período" | "Concluí a graduação em agosto de 2026" |
+| `backend/data/resumo_marcos.md` | "no último período da graduação, no 8º período" | "Concluí a graduação em agosto de 2026" |
+| `content/profile.js` · `bio_full` (EN e PT) | "Estou no 8º período de Gestão da Informação" | "Sou formado em Gestão da Informação pela UFU" |
+| `content/profile.js` · `stats` | "8º / Período na UFU" | substituído pelos três números de §8.8 |
+| `content/journey.js` | `date: "2022"` | `date: "2022 — 2026"`, com a formatura na descrição |
+
+Este arquivo já disse "formado" uma vez, foi corrigido para "8º período" — porque
+na época era o que a base dizia — e agora volta a dizer formado porque é verdade. O
+cabeçalho do `profile.js` registra o vaivém, e é o tipo de campo em que um
+comentário vale mais que o valor.
+
+**O `profile.md` mudou, então o assistente só passa a responder certo depois de um
+deploy com `FORCE_REINGEST=true`** — o site e o RAG divergem até lá.
+
+### 8.10 Dois fatos que a spec errou
+
+- **§1.6 disse que `profile.skills_highlight` perdeu o consumidor.** Falso:
+  `TerminalApp.jsx` usa a lista no `neofetch`. O que de fato não tinha consumidor
+  era o campo `color` de `contact.js` — esse ponto de §1.6 continua válido.
+- **§1.8 e §5.3 falam em 38 testes.** Eram 38 quando a spec foi escrita; a entrega
+  acrescentou dois (o botão de contato e o Sobre maximizado), então o valor final
+  de `SISTEMA.testes` é **40** — 21 visuais + 19 funcionais.
+
+---
+
+## 9. Fora de escopo, de propósito
 
 - **Migrar os outros cinco apps de explorador** para a superfície elevada —
   decisão do dono: o token nasce no sistema, o consumo espalha depois de ver

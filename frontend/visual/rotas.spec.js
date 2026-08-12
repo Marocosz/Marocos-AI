@@ -277,13 +277,100 @@ test('as portas do guia abrem os apps que prometem, em janela nova', async ({ pa
   await page.goto('/sobre', { waitUntil: 'networkidle' })
   await passarDaCerimonia(page)
   await expect(page.locator('.about-app')).toBeVisible({ timeout: 8000 })
+  // Quatro, e QUAIS quatro importa: projetos, jornada, leia-me e o Marcos
+  // Virtual. O terminal saiu do guia e virou o botão de ação do topo (ver o teste
+  // logo abaixo), então o número continuar 4 é coincidência — ele não prova que o
+  // conjunto está certo, e é a asserção seguinte que cobre o assistente.
   await expect(page.locator('.about-door')).toHaveCount(4)
+  await expect(
+    page.locator('.about-door', { hasText: 'Consigo perguntar direto a ele?' }),
+  ).toHaveCount(1)
 
   await page.locator('.about-door', { hasText: 'Ele sabe construir?' }).click()
   await expect(page.locator('.projects-app-list')).toBeVisible({ timeout: 8000 })
 
   // Duas janelas: o guia continua aberto atrás. É o ponto da decisão.
   await expect(page.locator('.marocos-window')).toHaveCount(2)
+  await expect(page.locator('.about-app')).toHaveCount(1)
+
+  expect(erros, `erro de página não capturado: ${erros.join('; ')}`).toHaveLength(0)
+})
+
+/**
+ * O "SOBRE" MAXIMIZADO NUMA TELA GRANDE NÃO ESTICA O TEXTO.
+ *
+ * Nenhuma cena do regressor maximiza janela, então a foto não cobre este caso — e
+ * ele foi apontado pelo dono do projeto: "em tela cheia, se for uma tela grande,
+ * os textos ficam muito horizontais, o que é ruim de ler".
+ *
+ * Sem teto de medida, uma janela maximizada em 1920 dá ~1700px de conteúdo, e a
+ * 0,86rem isso passa de 160 caracteres por linha — maximizar PIORARIA a leitura,
+ * que é o oposto do que maximizar deveria fazer. As duas promessas que este teste
+ * fixa: a prosa fica em medida de leitura, e o corpo vira DUAS colunas em vez de
+ * uma linha longa.
+ *
+ * Asserção numérica e não captura: o que importa aqui é a geometria, e um
+ * screenshot a mais só acrescentaria uma referência para rebaselinar.
+ */
+test.describe('em tela grande', () => {
+  test.use({ viewport: { width: 1920, height: 1080 } })
+
+  test('o Sobre maximizado limita a medida e vira duas colunas', async ({ page, context }) => {
+    await definirPreferencias(context)
+    await page.goto('/sobre', { waitUntil: 'networkidle' })
+    await passarDaCerimonia(page)
+    await expect(page.locator('.about-app')).toBeVisible({ timeout: 8000 })
+
+    // O segundo botão da barra de título é o de maximizar (minimizar, maximizar,
+    // fechar).
+    await page.locator('.marocos-titlebar button').nth(1).click()
+    await expect(page.locator('.marocos-window.maximized')).toBeVisible({ timeout: 8000 })
+
+    const app = await page.locator('.about-app').boundingBox()
+    const bio = await page.locator('.about-bio').boundingBox()
+
+    // O teto de `max-width` do `.about-app`, e ele centralizado no vão que sobra.
+    expect(app.width).toBeLessThanOrEqual(1040)
+    expect(app.x).toBeGreaterThan(300)
+
+    // ~64ch de medida. O limite generoso (700) é para o teste falhar quando a
+    // medida DESAPARECER, não a cada ajuste de escala tipográfica.
+    expect(bio.width).toBeLessThanOrEqual(700)
+
+    // Duas colunas: a larga da voz humana e o trilho da voz da máquina.
+    const colunas = await page
+      .locator('.about-corpo')
+      .evaluate((el) => getComputedStyle(el).gridTemplateColumns.split(' ').length)
+    expect(colunas).toBe(2)
+  })
+})
+
+/**
+ * O BOTÃO DE CONTATO DO "SOBRE" LEVA AO TERMINAL.
+ *
+ * Ele existe porque a janela do "Sobre" deliberadamente NÃO repete os canais: os
+ * quatro ícones dizem quais existem, e o endereço continua morando no terminal —
+ * decisão do dono do projeto ("não quero repetir informação, quero que ele use
+ * elas mandando a pessoa ir até a determinada janela com elas").
+ *
+ * O preço dessa decisão é que o contato do site inteiro passa a depender de um
+ * clique só, num app que abre sozinho na chegada. Se este botão quebrar, o
+ * visitante perde o caminho de contato acima da dobra e NADA MAIS RECLAMA: a foto
+ * mostraria o botão bonito no lugar, e nenhuma outra asserção passa por ele.
+ */
+test('o botão de contato do Sobre abre o terminal', async ({ page, context }) => {
+  await definirPreferencias(context)
+  const erros = []
+  page.on('pageerror', (e) => erros.push(e.message))
+
+  await page.goto('/sobre', { waitUntil: 'networkidle' })
+  await passarDaCerimonia(page)
+  await expect(page.locator('.about-app')).toBeVisible({ timeout: 8000 })
+
+  await page.locator('.about-acao').click()
+  await expect(page.locator('.terminal-app')).toBeVisible({ timeout: 8000 })
+
+  // Abre AO LADO, não troca o conteúdo — mesma regra das portas do guia.
   await expect(page.locator('.about-app')).toHaveCount(1)
 
   expect(erros, `erro de página não capturado: ${erros.join('; ')}`).toHaveLength(0)

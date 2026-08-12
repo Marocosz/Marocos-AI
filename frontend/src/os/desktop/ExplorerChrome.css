@@ -491,14 +491,14 @@
  * cerimônia. Chapado empataria com o hover e o ativo deixaria de ser
  * distinguível de "o mouse está aqui".
  */
+/* O gradiente virou `--sup-faixa` em tokens.css, com as paradas em
+   `VIDRO.superficie.*.alfaFaixa` — os alphas eram literais aqui até o "Sobre este
+   PC" passar a usar a MESMA faixa nos blocos de ação dele. Dois lugares com o
+   mesmo valor escrito à mão é a receita para os dois destaques do sistema
+   divergirem no primeiro ajuste. */
 .explorer-lugar--aqui {
   position: relative;
-  background: linear-gradient(
-    90deg,
-    rgb(var(--accent-rgb) / 0.26) 0%,
-    rgb(var(--accent-rgb) / 0.1) 42%,
-    transparent 100%
-  );
+  background: var(--sup-faixa);
   color: var(--text-primary);
   font-weight: 600;
 }
@@ -518,18 +518,9 @@
   box-shadow: 0 0 10px 1px rgb(var(--accent-rgb) / 0.55);
 }
 
-/* De dia o gradiente tem alphas próprias. Elas foram calibradas quando esta
-   regra chumbava um violeta mais escuro que o da noite; agora o acento é o
-   mesmo nos dois temas e vem do preset, então o que sobra aqui é só uma curva
-   mais suave — se o realce de dia ficar fraco, é nestas alphas que se mexe. */
-.theme-light .explorer-lugar--aqui {
-  background: linear-gradient(
-    90deg,
-    rgb(var(--accent-rgb) / 0.2) 0%,
-    rgb(var(--accent-rgb) / 0.08) 42%,
-    transparent 100%
-  );
-}
+/* A curva do dia não precisa mais de regra própria aqui: `--sup-faixa` já é
+   redefinido no bloco `.theme-light` de tokens.css, com as paradas de
+   `VIDRO.superficie.dia`. Se o realce de dia ficar fraco, é lá que se mexe. */
 
 /* --- Cabeçalho de grupo --- */
 

@@ -59,13 +59,15 @@ const journeyDataEn = [
   },
   {
     id: "step-uni",
-    date: "2022",
+    // Intervalo fechado, como a entrada do IFTM: a graduação terminou em agosto de
+    // 2026. Enquanto estava em curso, a data era só o ano de início.
+    date: "2022 — 2026",
     hash: "3a91c6e",
     type: "merge",
     title: "Information Management at UFU",
     org: "Federal University of Uberlândia",
     description:
-      "An interdisciplinary degree that puts Administration and Computer Science in the same room, pointed at data — Data Analysis I through IV, Artificial Intelligence, Data Structures, Software Engineering, Databases and Data Mining. Outside the classroom, I spent almost a year teaching computer classes to children at the Sal da Terra community centre, and started judo through the university athletic association.",
+      "An interdisciplinary degree that puts Administration and Computer Science in the same room, pointed at data — Data Analysis I through IV, Artificial Intelligence, Data Structures, Software Engineering, Databases and Data Mining. Graduated in August 2026. Outside the classroom, I spent almost a year teaching computer classes to children at the Sal da Terra community centre, and started judo through the university athletic association.",
     tags: ["Data Science", "SQL", "Python", "Pandas", "Teaching"],
   },
   {
@@ -128,13 +130,14 @@ const journeyDataPt = [
   },
   {
     id: "step-uni",
-    date: "2022",
+    /** Ver a nota na versão em inglês: intervalo fechado desde agosto de 2026. */
+    date: "2022 — 2026",
     hash: "3a91c6e",
     type: "merge",
     title: "Gestão da Informação na UFU",
     org: "Universidade Federal de Uberlândia",
     description:
-      "Uma graduação interdisciplinar que põe Administração e Ciência da Computação na mesma sala, apontadas para dados — Análise de Dados I a IV, Inteligência Artificial, Estrutura de Dados, Engenharia de Software, Banco de Dados e Mineração de Dados. Fora da sala, passei quase um ano dando aula de informática para crianças no Centro Comunitário Sal da Terra, e comecei a treinar judô pela atlética.",
+      "Uma graduação interdisciplinar que põe Administração e Ciência da Computação na mesma sala, apontadas para dados — Análise de Dados I a IV, Inteligência Artificial, Estrutura de Dados, Engenharia de Software, Banco de Dados e Mineração de Dados. Formado em agosto de 2026. Fora da sala, passei quase um ano dando aula de informática para crianças no Centro Comunitário Sal da Terra, e comecei a treinar judô pela atlética.",
     tags: ["Ciência de dados", "SQL", "Python", "Pandas", "Ensino"],
   },
   {

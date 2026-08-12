@@ -41,7 +41,7 @@ No IFTM, todos os anos existia o PAE (Projeto Anual de Eletrônica), no qual gru
 
 ## Graduação e Vivência Universitária (UFU)
 
-Após a conclusão do Ensino Médio, ingressei diretamente na faculdade. Em 2022, iniciei o curso de Gestão da Informação na Universidade Federal de Uberlândia (UFU). Trata-se de uma graduação bastante interessante, com forte caráter interdisciplinar, unindo conceitos de Administração e Ciência da Computação, porém com foco direcionado para a área de dados. Atualmente, encontro-me no 8º período, consolidando todo esse percurso acadêmico e prático. Caso queira conhecer um pouco mais do curso: [GI UFU](https://www.fagen.ufu.br/graduacao/gestao-da-informacao)
+Após a conclusão do Ensino Médio, ingressei diretamente na faculdade. Em 2022, iniciei o curso de Gestão da Informação na Universidade Federal de Uberlândia (UFU). Trata-se de uma graduação bastante interessante, com forte caráter interdisciplinar, unindo conceitos de Administração e Ciência da Computação, porém com foco direcionado para a área de dados. **Concluí a graduação em agosto de 2026**, então sou formado em Gestão da Informação pela UFU. Caso queira conhecer um pouco mais do curso: [GI UFU](https://www.fagen.ufu.br/graduacao/gestao-da-informacao)
 
 ### Disciplinas e Formação
 

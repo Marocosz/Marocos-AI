@@ -5,15 +5,23 @@
  * `profile.md` está certo. Ele alimenta o RAG, então divergir daqui é o site
  * contradizendo o próprio assistente.
  *
- * DUAS CORREÇÕES DE FATO nesta passada:
+ * HISTÓRICO DE DOIS CAMPOS QUE JÁ FORAM E VOLTARAM — leia antes de "consertar"
+ * qualquer um dos dois, porque os dois parecem erro e não são:
  *
- * 1. `bio_full` dizia "Formado em Gestão da Informação pela UFU". Não é: a base
- *    diz 8º período. Dizer-se formado antes de sê-lo é o tipo de detalhe que um
- *    recrutador confere.
- * 2. `stats` trazia "4+ Serviços Freelance / Entregues com Excelência",
- *    "4+ Anos de Experiência / Aprendizado Contínuo" e "20+ Projetos Totais /
- *    Soluções Inovadoras" — números que ninguém consegue verificar, sob rótulos
- *    que não dizem nada. Viraram fatos com data.
+ * 1. FORMATURA. Este arquivo já disse "Formado em Gestão da Informação pela UFU",
+ *    foi corrigido para "8º período" (a base dizia isso, e dizer-se formado antes
+ *    de sê-lo é o tipo de detalhe que um recrutador confere), e voltou a dizer
+ *    FORMADO em agosto de 2026 — porque agora é verdade. A conclusão é deste mês.
+ *
+ * 2. `stats`. Trazia "4+ Serviços Freelance", "4+ Anos de Experiência" e "20+
+ *    Projetos Totais"; uma passada trocou os três por fatos com data, sob o
+ *    argumento de que eram números que ninguém consegue verificar. Voltaram por
+ *    DECISÃO EXPLÍCITA do dono do projeto, que é quem sabe a própria contagem.
+ *
+ *    O que fica registrado do argumento antigo, porque continua valendo como
+ *    aviso: estes três números não estão no `profile.md`, então o Marcos Virtual
+ *    não consegue corroborá-los se alguém perguntar. Se um deles for questionado,
+ *    o conserto é acrescentar o fato à base — não apagar daqui.
  *
  * O objeto `hero` foi removido. Ele descrevia a landing page de rolagem que o
  * refactor apagou — `sectionLabel: "01. / PORTFÓLIO"`, um `title` com `<br />`
@@ -43,20 +51,19 @@ export const idadeEm = (nascimentoISO, hoje = new Date()) => {
 };
 
 /**
- * A MÁQUINA, de verdade. Vem da seção "Meu Setup de Desenvolvimento" do
- * `profile.md`, e é a única parte deste arquivo que descreve hardware em vez de
- * pessoa — que é exatamente o que um "Sobre este PC" promete.
+ * O `maquina` SAIU DAQUI (2026-08-12), e o fato não se perdeu.
  *
- * O café está na base de conhecimento e fica. Uma ficha técnica que só tem
- * número é ficha técnica de qualquer um.
+ * Eram sete linhas de hardware — notebook, processador, vídeo, memória, sistema,
+ * editor e café — vindas da seção "Meu Setup de Desenvolvimento" do
+ * `profile.md`, e o único consumidor era a ficha "Este computador" do "Sobre este
+ * PC". O dono do projeto tirou essa ficha da janela: o setup fica para o Marcos
+ * Virtual responder quando alguém perguntar.
+ *
+ * O `profile.md` continua com tudo, e é ele que alimenta o RAG — então o
+ * assistente responde igual. O que saiu foi a duplicata que existia só para
+ * desenhar uma tabela, e dado sem consumidor é o tipo de coisa que a próxima
+ * pessoa tenta manter em sincronia sem saber que ninguém lê.
  */
-const maquinaItens = [
-  { rotulo: 'Notebook', valor: 'Acer Nitro V15' },
-  { rotulo: 'Processador', valor: 'AMD Ryzen 7 7735HS' },
-  { rotulo: 'Vídeo', valor: 'NVIDIA RTX 4050 · 6 GB' },
-  { rotulo: 'Memória', valor: '32 GB' },
-  { rotulo: 'Sistema', valor: 'Windows 11' },
-];
 
 const profileDataEn = {
   /**
@@ -100,20 +107,22 @@ const profileDataEn = {
   bio_highlight: 'I build AI systems that reach production. This site is one of them.',
 
   bio_full:
-    "I am in the 8th semester of Information Management at UFU, a degree that sits between Administration and Computer Science with data in the middle. I work on the innovation team at Supporte Logística building full stack solutions with AI, and I freelance on the side — owning the whole cycle, from understanding the problem to the deploy and whatever breaks after it. I got here through hardware: my first job was technical support at 14.",
+    "I hold a degree in Information Management from UFU — a course that sits between Administration and Computer Science with data in the middle — completed in August 2026. I work on the innovation team at Supporte Logística building full stack solutions with AI, and I freelance on the side — owning the whole cycle, from understanding the problem to the deploy and whatever breaks after it. I got here through hardware: my first job was technical support at 14.",
 
+  /** Ver o histórico no cabeçalho do arquivo antes de mexer: estes três já saíram
+   *  uma vez e voltaram por decisão do dono do projeto. */
   stats: [
-    { number: '2018', label: 'In the field since', sublabel: 'first job at 14' },
-    { number: '8th', label: 'Semester at UFU', sublabel: 'Information Management' },
-    { number: '2', label: 'Active fronts', sublabel: 'innovation team + freelance' },
+    { number: '4+', label: 'Freelance services', sublabel: 'delivered with excellence' },
+    { number: '4+', label: 'Years of experience', sublabel: 'continuous learning' },
+    { number: '20+', label: 'Projects in total', sublabel: 'innovative solutions' },
   ],
 
-  maquina: [
-    ...maquinaItens,
-    { rotulo: 'Editor', valor: 'VS Code + Antigravity' },
-    { rotulo: 'Coffee', valor: 'with sugar' },
-  ],
-
+  /**
+   * DOIS CONSUMIDORES, e é bom saber disso antes de mexer na ordem: o carrossel
+   * de stack do "Sobre este PC" e o `neofetch` do Terminal, que junta tudo numa
+   * linha só. Nove itens é o que faz uma cópia da faixa ser mais larga que a
+   * janela, que é o que o laço do carrossel precisa para não abrir buraco.
+   */
   skills_highlight: [
     'Python',
     'FastAPI',
@@ -139,20 +148,16 @@ const profileDataPt = {
   bio_highlight: 'Construo sistemas com IA que chegam em produção. Este site é um deles.',
 
   bio_full:
-    'Estou no 8º período de Gestão da Informação na UFU, uma graduação que fica entre Administração e Ciência da Computação com dados no meio. Trabalho na área de inovação da Supporte Logística construindo soluções full stack com IA, e sigo com freelance em paralelo — assumindo o ciclo inteiro, de entender o problema ao deploy e ao que quebra depois dele. Cheguei aqui pelo hardware: meu primeiro emprego foi suporte técnico, aos 14 anos.',
+    'Sou formado em Gestão da Informação pela UFU — uma graduação que fica entre Administração e Ciência da Computação com dados no meio — concluída em agosto de 2026. Trabalho na área de inovação da Supporte Logística construindo soluções full stack com IA, e sigo com freelance em paralelo — assumindo o ciclo inteiro, de entender o problema ao deploy e ao que quebra depois dele. Cheguei aqui pelo hardware: meu primeiro emprego foi suporte técnico, aos 14 anos.',
 
+  /** Ver o histórico no cabeçalho do arquivo antes de mexer. */
   stats: [
-    { number: '2018', label: 'Na área desde', sublabel: 'primeiro emprego aos 14' },
-    { number: '8º', label: 'Período na UFU', sublabel: 'Gestão da Informação' },
-    { number: '2', label: 'Frentes ativas', sublabel: 'área de inovação + freelance' },
+    { number: '4+', label: 'Serviços freelance', sublabel: 'entregues com excelência' },
+    { number: '4+', label: 'Anos de experiência', sublabel: 'aprendizado contínuo' },
+    { number: '20+', label: 'Projetos totais', sublabel: 'soluções inovadoras' },
   ],
 
-  maquina: [
-    ...maquinaItens,
-    { rotulo: 'Editor', valor: 'VS Code + Antigravity' },
-    { rotulo: 'Café', valor: 'com açúcar' },
-  ],
-
+  /** Ver a nota no bloco em inglês: dois consumidores, e nove itens por motivo. */
   skills_highlight: [
     'Python',
     'FastAPI',

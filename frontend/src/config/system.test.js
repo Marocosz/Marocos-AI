@@ -341,6 +341,9 @@ describe('config do sistema', () => {
       duration: 0.26, duracaoReduzida: 0, ease: 'easeOut', escala: 0.9,
     })
     expect(MOVIMENTO.trocaPresetMs).toBe(420)
+    // O carrossel de stack é o único valor de movimento em SEGUNDOS, porque ele
+    // vira `animation-duration` no CSS em vez de passar pelo motion.
+    expect(MOVIMENTO.marqueeStackS).toBe(18)
   })
 
   it('o chrome assenta ANTES do wallpaper, nunca depois', () => {
@@ -376,7 +379,58 @@ describe('config do sistema', () => {
       raioControle: '8px',
       alturaTitulo: '40px',
       alturaTaskbar: 52,
+      superficie: {
+        noite: {
+          acento: '16%',
+          borda: '26%',
+          realce: '18%',
+          alfaLuz: 0.55,
+          alfaLavagem: 0.14,
+          alfaFilete: 0.45,
+          alfaFaixa: 0.26,
+          alfaFaixaMeio: 0.1,
+        },
+        dia: {
+          acento: '8%',
+          borda: '24%',
+          realce: '16%',
+          alfaLuz: 0.45,
+          alfaLavagem: 0.1,
+          alfaFilete: 0.4,
+          alfaFaixa: 0.2,
+          alfaFaixaMeio: 0.08,
+        },
+      },
     })
+  })
+
+  /**
+   * A DERIVA QUE ESTE TESTE PEGA: acrescentar uma dose de superfície para um tema
+   * e esquecer o outro. O `tokens.css` declara `--sup-*` nos dois blocos de tema,
+   * e a ponte publica um `--cfg-sup-*` por dose por tema — uma chave só de um
+   * lado deixa o tema oposto caindo silenciosamente no fallback literal, que é
+   * exatamente o tipo de coisa que aparece meses depois como "o tema claro está
+   * um pouco diferente".
+   */
+  it('as doses de superfície existem nos dois temas', () => {
+    const noite = Object.keys(VIDRO.superficie.noite).sort()
+    const dia = Object.keys(VIDRO.superficie.dia).sort()
+    expect(dia).toEqual(noite)
+
+    // As porcentagens são strings porque entram cruas no color-mix; os alphas são
+    // números porque entram num rgb(... / X). Trocar um pelo outro invalida a cor
+    // inteira em silêncio.
+    for (const tema of ['noite', 'dia']) {
+      const s = VIDRO.superficie[tema]
+      for (const chave of ['acento', 'borda', 'realce']) {
+        expect(s[chave], `${tema}.${chave}`).toMatch(/^\d+%$/)
+      }
+      for (const chave of ['alfaLuz', 'alfaLavagem', 'alfaFilete', 'alfaFaixa', 'alfaFaixaMeio']) {
+        expect(typeof s[chave], `${tema}.${chave}`).toBe('number')
+        expect(s[chave], `${tema}.${chave}`).toBeGreaterThan(0)
+        expect(s[chave], `${tema}.${chave}`).toBeLessThanOrEqual(1)
+      }
+    }
   })
 
   it('preserva o breakpoint de desktop', () => {
@@ -426,7 +480,17 @@ describe('config do sistema', () => {
     expect(lateral).toBe(184)
     expect(barras).toBe(106)
 
-    // Tamanhos de antes do chrome, por app — a base da qual o crescimento saiu.
+    /**
+     * ÁREA ÚTIL DESEJADA por app — a base da qual o crescimento saiu. O nome
+     * "ANTES" é histórico: o que este mapa guarda é que o chrome de explorador
+     * não coma o conteúdo, e essa conta segue exata mesmo quando um app decide
+     * que precisa de mais espaço.
+     *
+     * O "Sobre" chegou a ir para 700 na passada de página de entrada, quando ia
+     * ter duas fichas técnicas lado a lado; voltou para 620 quando a ficha do
+     * hardware saiu da janela. Registrado aqui porque é a pergunta que a próxima
+     * pessoa vai fazer ao ver 620 num app que tem duas grades.
+     */
     const ANTES = {
       about: { w: 620, h: 520 },
       projects: { w: 640, h: 440 },

@@ -22,14 +22,14 @@ export const SISTEMA = {
    * reconferir:
    *   cenas visuais  contar `{ nome:` em `frontend/visual/cenas.js`        → 21
    *   funcionais     os `test(` avulsos de `frontend/visual/rotas.spec.js`
-   *                  + uma entrada por rota no laço sobre `ROTAS`          → 18
+   *                  + uma entrada por rota no laço sobre `ROTAS`          → 19
    *
    * O texto do Leia-me dizia 36 e tinha ficado para trás — a suíte cresceu e
    * ninguém releu a frase. É por isso que o número mora AQUI, numa fonte só: a
    * partir desta mudança as duas janelas que o exibem leem a mesma constante e
    * não têm como discordar de novo.
    */
-  testes: 39,
+  testes: 40,
 
   /** Silk no tema escuro, Iridescence no claro — os dois sobre `ogl`. */
   shaders: 2,
@@ -52,9 +52,10 @@ const rotulosPt = {
 };
 
 /**
- * Mesma forma de `profile.maquina` — `{ rotulo, valor }` — para as duas fichas
- * do "Sobre este PC" serem renderizadas pelo mesmo bloco de JSX e pelo mesmo
- * CSS. Elas são a mesma coisa dita sobre dois assuntos.
+ * A forma é `{ rotulo, valor }`, a mesma que a ficha de hardware usava antes de
+ * sair da janela (o setup ficou só para o Marcos Virtual responder). Ela sobrevive
+ * porque é a forma que o CSS de ficha técnica do "Sobre este PC" espera — rótulo
+ * em mono à esquerda, valor à direita sobre uma linha pontilhada.
  */
 export const getSistemaData = (lang, { apps, presets }) => {
   const r = lang === 'pt' ? rotulosPt : rotulosEn;

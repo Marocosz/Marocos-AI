@@ -98,7 +98,38 @@ const osContentEn = {
    */
   about: {
     crystalAlt: '3D system logo',
+    /** Interpolado com a idade derivada de `profile.nascimento`. */
+    idade: '%d years old',
+    /**
+     * O CONTATO É UM ALVO SÓ, E NÃO REPETE NADA.
+     *
+     * A janela não traz e-mail, handle nem URL: os quatro ícones dizem QUAIS
+     * canais existem, e o botão inteiro abre o terminal, que é onde eles moram.
+     * Decisão do dono do projeto — "não quero repetir informação, quero que ele
+     * use elas mandando a pessoa ir até a determinada janela com elas".
+     *
+     * É por isso que o terminal SAIU do guia abaixo: ele deixou de ser uma
+     * pergunta a ser encontrada no meio de uma lista para virar a ação do topo,
+     * que é onde uma página de entrada põe o contato.
+     */
+    acao: {
+      titulo: 'Talk to me',
+      sub: 'E-mail, LinkedIn, GitHub and Discord — in the terminal',
+    },
+    stackLabel: 'Day to day',
+    bioLabel: 'Who writes this',
+    /**
+     * A HEADLINE É A VOZ HUMANA; o eyebrow acima dela é a da máquina. As duas
+     * juntas são a receita que `ui/AppHeader.css` já define e que este app era o
+     * único a não usar — ele tinha um nível de título só, e com ele nada na janela
+     * distinguia a ideia principal de um detalhe.
+     *
+     * E SÓ GANHA HEADLINE A SEÇÃO QUE AFIRMA. As três fichas técnicas mais abaixo
+     * ficam com o eyebrow sozinho, porque ficha técnica não afirma nada — lista.
+     */
+    bioHeadline: 'I got here through hardware.',
     guideLabel: 'Where to start',
+    guideHeadline: 'Four questions, four windows.',
     guide: {
       projects: {
         question: 'Can he build?',
@@ -112,13 +143,24 @@ const osContentEn = {
         question: 'And this site here?',
         answer: 'This operating system is hand-built. Its technical guide explains how.',
       },
-      terminal: {
-        question: 'How do I reach him?',
-        answer: 'E-mail, LinkedIn and GitHub — in a terminal that opens with them on screen.',
+      /**
+       * A QUARTA PORTA É O MARCOS VIRTUAL, e ela entrou no lugar do terminal. Ele
+       * é a prova mais forte do portfólio — grafo LangGraph com RAG, guarda de
+       * responsabilidade, resposta por SSE nó a nó — e não era porta nenhuma.
+       */
+      assistant: {
+        question: 'Can I just ask him?',
+        answer: 'An agent over my real career data — and it would rather say "I do not know" than invent.',
       },
     },
     specsLabel: 'System Specifications',
-    machineLabel: 'This computer',
+    /**
+     * `machineLabel` ("This computer") SAIU junto da ficha de hardware, por
+     * decisão do dono do projeto: o setup fica para o Marcos Virtual responder
+     * quando alguém perguntar. `sistemaLabel` é a que sobrou, e a ficha que ela
+     * rotula é a do próprio site — o outro sentido de "Sobre este PC".
+     */
+    sistemaLabel: 'This system',
   },
   /**
    * O CASE TÉCNICO DO PRÓPRIO SITE. Este app carrega sozinho a melhor prova do
@@ -490,7 +532,18 @@ const osContentPt = {
   },
   about: {
     crystalAlt: 'Logotipo 3D do sistema',
+    idade: '%d anos',
+    /** Ver a nota no bloco em inglês: um alvo só, e o terminal saiu do guia. */
+    acao: {
+      titulo: 'Falar comigo',
+      sub: 'E-mail, LinkedIn, GitHub e Discord — no terminal',
+    },
+    stackLabel: 'No dia a dia',
+    bioLabel: 'Quem escreve isto',
+    /** Ver a nota no bloco em inglês: headline só onde há afirmação. */
+    bioHeadline: 'Cheguei aqui pelo hardware.',
     guideLabel: 'Por onde começar',
+    guideHeadline: 'Quatro perguntas, quatro janelas.',
     guide: {
       projects: {
         question: 'Ele sabe construir?',
@@ -504,13 +557,15 @@ const osContentPt = {
         question: 'E este site aqui?',
         answer: 'Este sistema operacional é feito à mão. O guia técnico dele conta como.',
       },
-      terminal: {
-        question: 'Como falo com ele?',
-        answer: 'E-mail, LinkedIn e GitHub — num terminal que já abre com eles na tela.',
+      /** Ver a nota no bloco em inglês: entrou no lugar do terminal. */
+      assistant: {
+        question: 'Consigo perguntar direto a ele?',
+        answer: 'Um agente sobre a minha trajetória real — e que prefere dizer "não sei" a inventar.',
       },
     },
     specsLabel: 'Especificações do Sistema',
-    machineLabel: 'Este computador',
+    /** Ver a nota no bloco em inglês: `machineLabel` saiu com a ficha de hardware. */
+    sistemaLabel: 'Este sistema',
   },
   readme: {
     lead: 'Isto não é uma página com tema escuro. É um gerenciador de janelas, um papel de parede em WebGL e um agente de IA, tudo feito à mão — e tudo que você clicou até agora é a demonstração.',

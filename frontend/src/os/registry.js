@@ -85,6 +85,17 @@ export const APPS = [
     titleKey: 'about',
     icon: MonitorCog,
     component: AboutApp,
+    /**
+     * FICOU EM 804, e isso foi decidido duas vezes. A passada de página de entrada
+     * (spec de 2026-08-12) cresceu esta janela para 884 porque ela ia ter duas
+     * fichas técnicas lado a lado — a do hardware e a do sistema — e em 620px de
+     * área útil "Processador / AMD Ryzen 7 7735HS" quebrava em duas linhas.
+     *
+     * Depois o dono do projeto tirou a ficha do hardware da janela (ela fica só
+     * para o Marcos Virtual responder quando alguém perguntar), e com ela caiu o
+     * motivo de crescer. Voltar é o certo: janela maior sem conteúdo que a peça é
+     * só mais vidro para o sistema desfocar.
+     */
     defaultSize: { w: 804, h: 626 },
     singleton: true,
     dynamic: false,

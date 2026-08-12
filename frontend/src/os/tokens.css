@@ -259,6 +259,100 @@
   --win-body-base: color-mix(in srgb, rgb(var(--accent-rgb)) 10%, #000000);
   --win-body-bg: color-mix(in srgb, var(--win-body-base) 60%, transparent);
   --win-body-solid: var(--win-body-base);
+
+  /* SUPERFÍCIE ELEVADA — para o conteúdo que precisa ler como bloco próprio.
+   *
+   * O PROBLEMA QUE ELA RESOLVE, com a conta feita: `--card-bg` é
+   * rgba(10,10,10,.6) e o corpo da janela é acento 10% em preto a 60%. São duas
+   * camadas translúcidas quase idênticas — a diferença de luminância fica em
+   * torno de 1,05:1 — e quem separa "card" de "fundo" acaba sendo só a borda em
+   * rgba(255,255,255,.08). No tema claro é pior: card branco a 40% sobre um
+   * corpo que já é quase branco fica MAIS CLARO que o fundo.
+   *
+   * TRÊS ESCOLHAS, E CADA UMA É O MOTIVO DA OUTRA:
+   *
+   * 1. DERIVA DE --win-body-base, que é o único token que cada tema, cada preset
+   *    sóbrio e o XP já definem para si. Uma superfície derivada dele acerta em
+   *    todos de graça — o `.modo-sobrio` não precisa de uma linha, porque ele só
+   *    troca o ALPHA do corpo, não a base.
+   *
+   * 2. É OPACA. Card opaco dentro de janela translúcida é a mesma lógica que
+   *    --icon-tile-bg já paga: o contraste deixa de depender de qual região do
+   *    wallpaper caiu atrás. E custa zero, sem backdrop-filter — que é o custo
+   *    que Window.css documenta ter derrubado de 20px para 6px.
+   *
+   * 3. SAI DO ACENTO, então repinta junto com o preset escolhido.
+   *
+   * POR QUE ISTO NÃO PODE MORAR EM :root — e é uma armadilha silenciosa:
+   * a substituição de uma custom property acontece no elemento onde ela é
+   * DECLARADA, não onde é usada. `--win-body-base` só existe em
+   * .theme-dark/.theme-light; declarada em :root, esta linha receberia um var()
+   * inválido, o color-mix inteiro viraria guaranteed-invalid, e a superfície
+   * simplesmente não pintaria. É o mesmo motivo por que --win-body-bg e
+   * --win-body-solid já são declarados duas vezes, um por tema.
+   *
+   * AS DOSES NÃO SE DECIDEM AQUI. Elas vêm de `VIDRO.superficie` pela ponte
+   * (--cfg-sup-*), como todo valor de ajuste do sistema; este bloco só monta a
+   * cor a partir delas. Os literais nos fallbacks são os mesmos números do
+   * config, usados só até a ponte rodar — ou se ela falhar. */
+  --sup-fundo: color-mix(
+    in srgb,
+    rgb(var(--accent-rgb)) var(--cfg-sup-acento, 16%),
+    var(--win-body-base)
+  );
+  --sup-borda: color-mix(in srgb, rgb(var(--accent-rgb)) var(--cfg-sup-borda, 26%), transparent);
+  /* Realce de superfície CLICÁVEL. Mistura em vez de empilhar acento
+     translúcido: a superfície é opaca de propósito, e uma camada com alpha em
+     cima dela devolveria a dependência do que está atrás que ela existe para
+     eliminar. */
+  --sup-realce: color-mix(
+    in srgb,
+    rgb(var(--accent-rgb)) var(--cfg-sup-realce, 18%),
+    var(--sup-fundo)
+  );
+  /* A aresta de luz: 1px no topo da superfície, esvanecendo para a direita.
+     Mesma leitura de --win-highlight, agora tingida pelo preset. */
+  --sup-luz: linear-gradient(
+    90deg,
+    rgb(var(--accent-rgb) / var(--cfg-sup-luz, 0.55)),
+    transparent 72%
+  );
+  /* Lavagem diagonal, para o bloco que precisa de um pouco mais de peso que os
+     vizinhos sem virar cor cheia. */
+  --sup-lavagem: linear-gradient(
+    160deg,
+    rgb(var(--accent-rgb) / var(--cfg-sup-lavagem, 0.14)),
+    transparent 70%
+  );
+  /* Divisor entre seções: some antes de alcançar a outra borda, então separa sem
+     desenhar uma tabela. */
+  --filete-secao: linear-gradient(
+    90deg,
+    rgb(var(--accent-rgb) / var(--cfg-sup-filete, 0.45)),
+    transparent
+  );
+
+  /* A FAIXA DE DESTAQUE — a marca de "este é o item em destaque" do sistema.
+   *
+   * Nasceu na lateral do explorador (`.explorer-lugar--aqui`) e o raciocínio está
+   * lá: o fundo NASCE da borda esquerda e se apaga para a direita, que lê como luz
+   * entrando pela quina — a linguagem da cerimônia. Chapado empataria com o hover,
+   * e "destacado" deixaria de ser distinguível de "o mouse está aqui".
+   *
+   * Virou token quando o "Sobre este PC" passou a usar a MESMA faixa nos dois
+   * blocos de ação dele. Sem isto os alphas viveriam em dois arquivos, e o
+   * primeiro ajuste em um deles faria os dois destaques do sistema divergirem.
+   *
+   * A BORDA É A COR MAIS FORTE DA PRÓPRIA FAIXA, e é isso que dá o efeito: como o
+   * fundo se apaga para a direita, a borda continua fechando o contorno onde o
+   * gradiente já sumiu — o bloco parece recortado da luz em vez de pintado. */
+  --sup-faixa: linear-gradient(
+    90deg,
+    rgb(var(--accent-rgb) / var(--cfg-sup-faixa, 0.26)) 0%,
+    rgb(var(--accent-rgb) / var(--cfg-sup-faixa-meio, 0.1)) 42%,
+    transparent 100%
+  );
+  --sup-faixa-borda: rgb(var(--accent-rgb) / var(--cfg-sup-faixa, 0.26));
 }
 
 .theme-light {
@@ -274,6 +368,54 @@
   --win-body-solid: var(--win-body-base);
   --win-border: 1px solid rgba(255, 255, 255, 0.6);
   --win-shadow: 0 10px 24px rgb(var(--accent-rgb) / 0.22);
+
+  /* A MESMA SUPERFÍCIE ELEVADA, COM AS DOSES DO DIA — que vêm de
+     `VIDRO.superficie.dia` pela ponte, nos `--cfg-sup-*-claro`. O raciocínio
+     inteiro está no bloco de .theme-dark, inclusive por que ela não pode morar
+     em :root.
+     O que muda aqui é só a quantidade: a base já é branca (acento 4% em #fff),
+     então a dose da noite empastelaria. Mesma lição de --icon-tile-bg: dose de
+     tema escuro não se reaproveita no claro, porque de dia a mistura vai na
+     direção oposta. */
+  --sup-fundo: color-mix(
+    in srgb,
+    rgb(var(--accent-rgb)) var(--cfg-sup-acento-claro, 8%),
+    var(--win-body-base)
+  );
+  --sup-borda: color-mix(
+    in srgb,
+    rgb(var(--accent-rgb)) var(--cfg-sup-borda-claro, 24%),
+    transparent
+  );
+  --sup-realce: color-mix(
+    in srgb,
+    rgb(var(--accent-rgb)) var(--cfg-sup-realce-claro, 16%),
+    var(--sup-fundo)
+  );
+  --sup-luz: linear-gradient(
+    90deg,
+    rgb(var(--accent-rgb) / var(--cfg-sup-luz-claro, 0.45)),
+    transparent 72%
+  );
+  --sup-lavagem: linear-gradient(
+    160deg,
+    rgb(var(--accent-rgb) / var(--cfg-sup-lavagem-claro, 0.1)),
+    transparent 70%
+  );
+  --filete-secao: linear-gradient(
+    90deg,
+    rgb(var(--accent-rgb) / var(--cfg-sup-filete-claro, 0.4)),
+    transparent
+  );
+
+  /* A faixa de destaque com a curva do dia — ver a nota no bloco de .theme-dark. */
+  --sup-faixa: linear-gradient(
+    90deg,
+    rgb(var(--accent-rgb) / var(--cfg-sup-faixa-claro, 0.2)) 0%,
+    rgb(var(--accent-rgb) / var(--cfg-sup-faixa-meio-claro, 0.08)) 42%,
+    transparent 100%
+  );
+  --sup-faixa-borda: rgb(var(--accent-rgb) / var(--cfg-sup-faixa-claro, 0.2));
 
   /* Tile de app de dia: continua escuro (ver o motivo em :root), mas o matiz
      sai do quase-preto e vai para o violeta #2e1065 — o MESMO que o rótulo do
@@ -726,6 +868,23 @@
 
   --card-bg: #ffffff;
   --card-border: #b7b7a4;
+
+  /* A superfície elevada no Luna é o card branco que ele já tinha, sem lavagem e
+     sem aresta de luz: as duas são material de VIDRO, e o XP é opaco — o vidro só
+     chegou no Vista. Lavagem violeta sobre o bege quebraria a citação, e é por
+     isso que este override existe em vez de a superfície derivar sozinha (aqui
+     --win-body-base é #ece9d8, e misturar acento nele daria um bege azulado que
+     não é de nenhum sistema). */
+  --sup-fundo: #ffffff;
+  --sup-borda: #b7b7a4;
+  /* O realce vai para o bege dos diálogos — uma cor que o Luna já tem neste
+     arquivo, em vez de um azul de seleção inventado. Card branco que afunda para
+     o bege ao passar o mouse é gesto daquele sistema; um acento translúcido não
+     seria. */
+  --sup-realce: #ece9d8;
+  --sup-luz: none;
+  --sup-lavagem: none;
+  --filete-secao: linear-gradient(90deg, #b7b7a4, transparent);
 
   --icon-tile-base: transparent;
   --icon-tile-bg: transparent;

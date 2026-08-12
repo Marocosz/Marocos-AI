@@ -23,7 +23,22 @@ const contactDataItems = [
     value: "/marocosz",
     link: "https://github.com/marocosz",
     icon: Github,
-    color: "#fff" 
+    /**
+     * TOKEN, E NÃO "#fff".
+     *
+     * Este campo `color` não tinha consumidor nenhum até agora — o TerminalApp
+     * renderiza `<Icon size={14} />` sem cor (o `entry.color` dele vem de
+     * `terminal.logs`, não daqui). Então o branco literal não era um bug: passaria
+     * a ser no instante em que o botão de contato do "Sobre este PC" o usasse,
+     * porque branco sobre o vidro claro do tema de dia é invisível.
+     *
+     * As outras três ficam literais de propósito — são cores de MARCA, a exceção
+     * documentada do projeto: elas significam algo, e seguir o tema faria o
+     * LinkedIn deixar de ser azul. A do GitHub é a única que não pode ser
+     * literal, porque a marca dele é monocromática por definição: a "cor" dela é
+     * o primeiro plano de quem a exibe.
+     */
+    color: "var(--text-primary)"
   },
   {
     id: "discord",

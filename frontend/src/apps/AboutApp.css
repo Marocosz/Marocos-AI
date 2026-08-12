@@ -1,28 +1,186 @@
 /* src/apps/AboutApp.css
-   "Sobre este PC" — reaproveita a linguagem visual do Profile.jsx da página
-   clássica (removida no refactor; faixa de identidade, cards de stat,
-   marquee de skills) dentro de uma janela pequena.
-   Sem backdrop-filter: o chrome da janela já borra o que está atrás; repetir
-   o blur aqui dentro é o que derruba o Safari do iOS (ver Window.css). No
-   lugar do "vidro" com blur, uso os tokens --card-bg/--card-border, que já
-   são theme-aware sozinhos — sem precisar de overrides .theme-light manuais. */
+   "Sobre este PC" — winver e página de entrada ao mesmo tempo.
+
+   ==================================================
+   A REGRA DESTE ARQUIVO: PREENCHIMENTO É AÇÃO.
+
+   Exatamente DOIS elementos da janela têm fundo próprio — o botão de contato e a
+   porta do Marcos Virtual. Os dois são ações. Todo o resto é estrutura:
+   tipografia, filete, trilho, régua.
+
+   Isso é o conserto de um erro que passou por aqui. A primeira versão desta
+   passada tratou "os cards não têm contraste com o fundo da janela" como o
+   problema e deixou todo bloco com superfície visível: herói, botão, nove
+   pílulas, quatro portas, três cards de número, ficha. O resultado foi um
+   empilhamento de retângulos arredondados de mesma largura, mesmo raio, mesma
+   borda — a janela virou template, e ficou o elemento mais fraco da tela num
+   sistema cujo resto tem voz (a assinatura enorme da área de trabalho, o mono da
+   máquina, os filetes do explorador, o cristal).
+
+   O problema não era o contraste do card. Era o card. Os tokens `--sup-*`
+   continuam existindo e valendo — eles só passaram a marcar as duas ações em vez
+   de pintar tudo.
+
+   ==================================================
+   A SEGUNDA REGRA: A JANELA É O CONTAINER, NÃO A VIEWPORT.
+
+   Os breakpoints daqui são `@container`, e a versão anterior usava `@media` — que
+   era um bug latente num sistema de janelas: janela estreita numa tela grande
+   nunca colapsava a grade, e janela maximizada numa tela pequena colapsava sem
+   precisar. `container-type: inline-size` no `.about-app` faz as perguntas serem
+   sobre a largura REAL do conteúdo.
+
+   É também o que resolve o texto esticado em tela cheia: o corpo tem teto de
+   largura e centraliza, a prosa tem medida em `ch`, e a partir de 720px de
+   conteúdo o corpo vira duas colunas em vez de uma linha de 200 caracteres.
+
+   Sem `backdrop-filter` em lugar nenhum — o chrome da janela já borra o que está
+   atrás, e filtro sobre filtro é o custo que `Window.css` documenta ter derrubado
+   de 20px para 6px. */
 
 .about-app {
+  /**
+   * O CONTAINER DE CONSULTA, e a unidade `cqi` que o nome usa mais abaixo saem
+   * daqui. `inline-size` e não `size`: só a largura é consultada, a altura
+   * continua livre para o conteúdo crescer e o corpo da janela rolar.
+   */
+  container-type: inline-size;
+
   display: flex;
   flex-direction: column;
-  gap: 22px;
+  gap: 20px;
+
+  /**
+   * O TETO DE MEDIDA, e é ele que responde "em tela cheia numa tela grande os
+   * textos ficam muito horizontais".
+   *
+   * Uma janela maximizada em 2560px dá ~2376px de conteúdo. A 0,88rem isso é da
+   * ordem de 230 caracteres por linha — três vezes o limite em que o olho ainda
+   * acha o começo da linha seguinte. Sem teto, maximizar PIORA a leitura, que é o
+   * oposto do que maximizar deveria fazer.
+   *
+   * Centralizado e não encostado à esquerda: 1040px à esquerda de um vão de
+   * 1300px lê como layout quebrado; centralizado lê como decisão. É o que os
+   * painéis de configuração do próprio Windows 11 fazem.
+   */
+  max-width: 1040px;
+  margin-inline: auto;
+  width: 100%;
 }
 
-/* --- IDENTIDADE (cristal + destaque) --- */
-.about-identity {
+/* ==================================================
+   AS DUAS VOZES
+
+     eyebrow   mono, caixa alta, acento — o sistema rotulando a seção
+     headline  Poppins — uma pessoa afirmando algo
+
+   A receita é a de `ui/AppHeader.css` (a variante `--sm`), com o `// ` que este
+   projeto assina. Não é o componente compartilhado porque `AppHeader` emite um
+   <h2> e estas seções são <h3>: forçá-lo aqui torceria a semântica por três
+   declarações. No dia em que um segundo app pedir o par em nível de seção,
+   promove-se para `ui/`.
+
+   SÓ GANHA HEADLINE A SEÇÃO QUE AFIRMA. Bio e guia ganham; "Especificações" e
+   "Este sistema" ficam com o eyebrow sozinho — ficha técnica não afirma, lista.
+   É a mesma decisão por VOZ que separa este arquivo do `.start-menu-apps-heading`,
+   que é Poppins porque é interface.
+   ================================================== */
+.about-eyebrow {
+  margin: 0;
+  font-family: 'Courier New', monospace;
+  font-size: 0.66rem;
+  /* 'Courier New' só tem 400 e 700 (fonte de sistema, sem @font-face) e o
+     index.css tem font-synthesis: none — 700 é peso real aqui. */
+  font-weight: 700;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: var(--accent-color);
+}
+
+.about-secao-eyebrow::before {
+  content: '// ';
+}
+
+.about-headline {
+  margin: 0;
+  font-size: 1.05rem;
+  font-weight: 700;
+  line-height: 1.3;
+  letter-spacing: -0.2px;
+  color: var(--text-primary);
+}
+
+/* Seção: filete no topo, e é o filete que faz o trabalho que os fundos de card
+   faziam mal. Ele esvanece antes de alcançar a outra borda — separa sem desenhar
+   uma tabela. */
+.about-secao {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding-top: 14px;
+}
+
+.about-secao::before {
+  content: '';
+  position: absolute;
+  inset: 0 0 auto;
+  height: 1px;
+  background: var(--filete-secao);
+}
+
+/* ==================================================
+   1. HERÓI — sem caixa, e é o elemento mais forte da tela
+
+   A versão anterior punha isto num retângulo arredondado com fundo. Comparado
+   com a assinatura da área de trabalho — nome enorme, entrelinha apertada, nada
+   atrás — o card fazia a mesma informação parecer menor e mais genérica. Aqui o
+   herói fala com a MESMA voz da assinatura, porque é a mesma pessoa se
+   apresentando no mesmo sistema.
+   ================================================== */
+/**
+ * TEXTO À ESQUERDA, CRISTAL À DIREITA — e o texto num bloco só.
+ *
+ * Três tentativas, e vale registrar as duas que erraram porque cada uma errou de
+ * um jeito diferente:
+ *
+ *   1. Cristal ANTES do texto. O herói inteiro nascia ~210px para dentro, então o
+ *      nome não alinhava com o botão, nem com a faixa, nem com as seções abaixo —
+ *      a janela simplesmente não tinha espinha à esquerda.
+ *   2. Cristal dentro de UMA linha do herói, ao lado do parágrafo. A espinha
+ *      voltou, mas a linha passou a valer a altura do cristal (150px) contra duas
+ *      linhas de texto (~50px): sobravam ~80px de vão morto entre o parágrafo e a
+ *      linha de status, e o herói ficava furado no meio.
+ *   3. Grade de duas colunas com `grid-row: 1 / -1` no cristal. Não funcionou, e a
+ *      razão é uma pegadinha do grid: `-1` conta a partir do fim do grid
+ *      EXPLÍCITO, e sem `grid-template-rows` o grid explícito tem zero linhas.
+ *      `1 / -1` colapsava para uma linha só, então o cristal ficava preso à linha
+ *      1 — que passava a ter 150px — e o eyebrow era centralizado dentro dela,
+ *      com ~68px de vão acima. O sintoma parecia margem sobrando no topo do app.
+ *
+ * A forma robusta não precisa de contagem de linhas: um wrapper para o texto e o
+ * cristal como IRMÃO dele. Dois filhos flex, alinhados pelo centro. Nenhuma linha
+ * de texto herda a altura do cristal, e nada quebra se um parágrafo for
+ * acrescentado ao herói depois.
+ */
+.about-heroi {
   display: flex;
   align-items: center;
-  gap: 18px;
+  gap: 24px;
   flex-wrap: wrap;
 }
 
+.about-heroi-texto {
+  flex: 1 1 300px;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 9px;
+}
+
 /**
- * SÓ O CRISTAL — o wrapper não pinta nada.
+ * SÓ O CRISTAL — o wrapper não pinta nada, e agora nada em volta dele pinta
+ * também.
  *
  * Aqui já houve uma caixa inteira: raio de 22px, borda de acento, sombra externa
  * e um radial terminando em quase-preto, para dar ao cristal um "vazio" de onde
@@ -35,8 +193,9 @@
  * elemento disputando a mesma atenção. Ele é um objeto com volume e luz própria;
  * não precisa de nada atrás para existir na página.
  *
- * A cerimônia continua com a atmosfera dela (`--cer-nebulosa` em tokens.css) —
- * esta decisão vale só para esta janela.
+ * O halo circular que ainda aparecia vinha de `.crystal-3d::before`, em
+ * `os/tokens.css` — o COMPONENTE o traz consigo, e é por isso que mexer aqui não
+ * adiantava. `crystal-3d-sem-halo` é a saída que o próprio token já previa.
  *
  * O wrapper fica porque é ele que reserva os 190px e centraliza. (Ele já teve
  * `overflow: hidden` e uma caixa 150x190 para conter um componente com 700x700
@@ -47,8 +206,14 @@
 .about-crystal {
   position: relative;
   flex: 0 0 auto;
-  width: 190px;
-  height: 190px;
+  /* 150 e não 190. Em 190 o cristal ficava solto no meio da linha, com vão dos
+     dois lados, e sozinho empurrava a bio e o guia inteiros para baixo da dobra
+     numa janela de 574px de conteúdo — o visitante abria o app e via apenas
+     apresentação. Em 150 ele lê como a marca ao lado da frase, que é o papel dele
+     aqui (o cristal em tamanho de assunto é a cerimônia, não esta janela).
+     O valor tem de bater com o `size` passado ao <Crystal> no JSX. */
+  width: 150px;
+  height: 150px;
   display: grid;
   place-items: center;
 }
@@ -65,151 +230,429 @@
   50% { opacity: 0.9; }
 }
 
-.about-identity-text {
-  flex: 1 1 220px;
-  min-width: 180px;
-}
-
-.about-kicker {
-  font-family: 'Courier New', monospace;
-  font-size: 0.85rem;
-  font-weight: 700;
-  letter-spacing: 0.04em;
-  color: var(--accent-color);
-  margin: 0 0 8px;
-}
-
-.about-highlight {
-  margin: 0;
-  font-size: 1.1rem;
-  line-height: 1.35;
-  font-weight: 700;
-  color: var(--text-primary);
-}
-
-/* --- BIOGRAFIA COMPLETA --- */
-.about-bio {
-  margin: 0;
-  font-size: 0.85rem;
-  line-height: 1.6;
-  color: var(--text-secondary);
-  border-left: 2px solid rgb(var(--accent-rgb) / 0.25);
-  padding-left: 14px;
-}
-
-/* --- SEÇÕES (specs / features) --- */
-/* As duas <section> deste app não têm classe, e isso é deliberado.
+/**
+ * O NOME, que até esta passada não aparecia em pixel nenhum do conteúdo — só no
+ * `<title>` da aba.
  *
- * Elas usavam `about-section`, que o AboutApp.css nunca definiu — quem definia
- * era o index.css da landing page que deixou de existir, com
- * `min-height: 70vh`, `padding: 5rem 2rem` e `display: flex` em direção linha.
- * O efeito, numa janela de 620x520: as seções de especificações e de recursos
- * ficavam duas viewports abaixo da dobra, e dentro de cada uma o título e o
- * conteúdo apareciam lado a lado, com o grid de 3 colunas encolhido.
+ * O TAMANHO ACOMPANHA A JANELA, não a tela: `cqi` é 1% da largura do container
+ * de consulta (o `.about-app`), então arrastar a janela para 500px encolhe o nome
+ * e maximizar o faz crescer até o teto. É o oposto de um `clamp` em `vw`, que
+ * ignoraria a janela e mediria o monitor.
  *
- * Em fluxo normal o CSS daqui funciona sozinho: `.about-app` é a coluna flex
- * com gap de 22px, `.about-section-title` traz a própria margem inferior, e
- * `.about-specs` ocupa a largura como o grid de 3 colunas pede.
+ * A primeira declaração é fallback para navegador sem container query: sem ela,
+ * um `clamp` com unidade não suportada invalida a propriedade e o nome cairia no
+ * tamanho herdado.
+ *
+ * O gradiente é a receita que `.about-spec-number` já usava: o gesto de "número
+ * de destaque" do projeto, aplicado ao maior destaque da janela. Poppins é
+ * carregado em 400/700/900 e o index.css tem `font-synthesis: none`, então 900 é
+ * peso real e não sintetizado.
  */
-.about-section-title {
-  margin: 0 0 10px;
-  font-family: 'Courier New', monospace;
-  font-size: 0.75rem;
-  font-weight: 700;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-  color: var(--text-secondary);
-}
-
-.about-section-title::before {
-  content: '// ';
-  color: var(--accent-color);
-}
-
-/* --- ESPECIFICAÇÕES (stats como hardware) --- */
-.about-specs {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 10px;
-}
-
-.about-spec-card {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 2px;
-  text-align: center;
-  padding: 12px 8px;
-  border-radius: 14px;
-  background: var(--card-bg);
-  border: 1px solid var(--card-border);
-}
-
-.about-spec-number {
-  font-size: 1.6rem;
-  /* Poppins e carregado em 400/700/900 e o index.css tem font-synthesis: none.
-     Este valor e o peso que o navegador ja resolvia sozinho; a declaracao antiga
-     (800) nao existia e caia aqui em silencio. */
+.about-nome {
+  margin: 0;
+  font-size: 2.4rem;
+  font-size: clamp(2rem, 6.6cqi, 3.3rem);
   font-weight: 900;
-  line-height: 1.1;
+  line-height: 0.95;
+  letter-spacing: -0.035em;
   background: linear-gradient(135deg, var(--text-primary) 30%, var(--accent-color) 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
 }
 
-.about-spec-label {
-  font-family: 'Courier New', monospace;
-  font-size: 0.65rem;
+/* A medida em `ch` é o que impede a frase de esticar quando a janela cresce. Em
+   tipo grande o limite é mais curto: linha longa cansa mais rápido quanto maior
+   a letra. */
+.about-destaque {
+  margin: 0;
+  max-width: 34ch;
+  font-size: 1.05rem;
   font-weight: 700;
-  letter-spacing: 0.04em;
-  text-transform: uppercase;
+  line-height: 1.45;
   color: var(--text-primary);
 }
 
-.about-spec-sublabel {
-  font-size: 0.65rem;
-  font-weight: 400;
+.about-meta {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 7px;
+  margin: 2px 0 0;
+  font-family: 'Courier New', monospace;
+  font-size: 0.68rem;
+  letter-spacing: 0.02em;
   color: var(--text-secondary);
 }
 
-/* --- O GUIA: uma porta por pergunta ---
-   Onde ficava o marquee de skills. Ele saiu por três razões: era decoração num
-   app que precisava de navegação, não dava para ler no próprio ritmo (o texto
-   fugia), e repetia o app de Stack — que virou uma das portas daqui.
+.about-status {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  font-weight: 700;
+  text-transform: uppercase;
+  color: var(--accent-color);
+}
 
-   PARECE CARD E É BOTÃO. A superfície é a de conteúdo do projeto
-   (--card-bg/--card-border, sem receita de vidro nova) e o raio é o de
-   controle, porque a coisa toda é clicável. */
-.about-guide {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 8px;
+.about-status-ponto {
+  width: 6px;
+  height: 6px;
+  border-radius: 999px;
+  background: var(--accent-color);
+  animation: aboutPulso 2.4s ease-in-out infinite;
+}
+
+/* O interruptor de Movimento das Configurações chega aqui por esta classe (o JSX
+   a aplica), e o `prefers-reduced-motion` pelo bloco no fim do arquivo. OS DOIS
+   precisam funcionar: o cristal deste app já foi o único elemento do sistema a
+   ignorar o próprio interruptor, e não se repete o erro. */
+.about-status--parado .about-status-ponto {
+  animation: none;
+}
+
+@keyframes aboutPulso {
+  0%, 100% { box-shadow: 0 0 0 0 rgb(var(--accent-rgb) / 0.45); }
+  50% { box-shadow: 0 0 0 5px rgb(var(--accent-rgb) / 0); }
+}
+
+.about-meta-sep {
+  opacity: 0.4;
+}
+
+/* ==================================================
+   2. AÇÃO — a primeira das duas superfícies preenchidas do arquivo
+
+   Ela é preenchida porque É a ação primária: um alvo só, que abre o terminal. Os
+   quatro ícones são CONTEXTO (`aria-hidden` no JSX) — dizem quais canais existem
+   sem repetir endereço nenhum.
+   ================================================== */
+.about-acao {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  width: 100%;
+  overflow: hidden;
+  padding: 13px 15px;
+  text-align: left;
+  font-family: inherit;
+  border-radius: var(--win-control-radius);
+  /**
+   * A FAIXA DE DESTAQUE DO SISTEMA, a mesma do item ativo da lateral do
+   * explorador (`--sup-faixa`, em tokens.css). Pedido do dono do projeto — e é a
+   * decisão certa por um motivo que vale escrever: o fundo NASCE da borda
+   * esquerda e se apaga para a direita, então ele lê como luz entrando pela quina
+   * em vez de retângulo chapado. Chapado era exatamente a crítica que derrubou a
+   * primeira versão desta tela.
+   *
+   * SEM o traço de 3px na borda esquerda que a lateral do explorador tem: lá o
+   * traço marca "a janela está NESTE lugar", que é informação de navegação. Aqui
+   * não há lugar nenhum sendo marcado — é um botão.
+   *
+   * A BORDA É A COR MAIS FORTE DA PRÓPRIA FAIXA. Como o fundo desaparece para a
+   * direita, a borda continua fechando o contorno onde o gradiente já sumiu, e o
+   * bloco parece recortado da luz em vez de pintado. É o efeito que o gradiente
+   * sozinho não dá.
+   *
+   * `background-image` e não o shorthand: o shorthand com var() só é validado em
+   * computed-value time, e ali um único token inválido derruba a declaração
+   * inteira.
+   */
+  /* `transparent` EXPLÍCITO, e não por omissão. `<button>` tem cor de fundo
+     própria do navegador (`buttonface`, um cinza claro), então declarar só
+     `background-image` deixa esse cinza aparecendo por baixo do gradiente — o que
+     lavou o texto deste botão até ficar ilegível na primeira tentativa. O
+     `.about-door` não tinha o problema porque usa `background: none`, que zera as
+     duas camadas. */
+  background-color: transparent;
+  background-image: var(--sup-faixa);
+  border: 1px solid var(--sup-faixa-borda);
+  color: var(--text-primary);
+  cursor: pointer;
+  transition: background-color 0.16s ease, border-color 0.16s ease;
+}
+
+/* `--sup-realce` MISTURA acento na superfície em vez de empilhar uma camada
+   translúcida em cima dela. Ele entra por baixo da faixa: onde o gradiente já se
+   apagou, é o realce que aparece — o hover acende o lado direito do bloco, que é
+   justamente o lado que a faixa deixa apagado. A dose mora em
+   `VIDRO.superficie.*.realce`. */
+.about-acao:hover {
+  background-color: var(--sup-realce);
+  border-color: var(--accent-color);
+}
+
+.about-acao:focus-visible {
+  outline: 2px solid var(--accent-color);
+  outline-offset: 2px;
+}
+
+/* Fora de um container de navegação (`useAbrir()` devolve null) o botão não leva
+   a lugar nenhum — então ele para de se anunciar como clicável em vez de mentir
+   com o cursor. Mesma regra das portas. */
+.about-acao:disabled {
+  cursor: default;
+  opacity: 0.75;
+}
+
+.about-acao:disabled:hover {
+  background-color: transparent;
+  border-color: var(--sup-faixa-borda);
+}
+
+.about-acao-canais {
+  display: inline-flex;
+  align-items: center;
+  gap: 9px;
+  flex: 0 0 auto;
+}
+
+.about-acao-texto {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+  flex: 1 1 auto;
+}
+
+.about-acao-titulo {
+  font-size: 0.92rem;
+  font-weight: 700;
+  line-height: 1.2;
+  color: var(--text-primary);
+}
+
+.about-acao-sub {
+  font-size: 0.74rem;
+  line-height: 1.4;
+  color: var(--text-secondary);
+}
+
+.about-acao-seta {
+  flex: 0 0 auto;
+  color: var(--accent-color);
+  transition: transform 0.16s ease;
+}
+
+.about-acao:hover .about-acao-seta {
+  transform: translateX(3px);
+}
+
+/* ==================================================
+   3. STACK — um ticker, não um muro de pílulas
+
+   Ele já existiu aqui como carrossel, saiu numa passada anterior e voltou por
+   decisão do dono do projeto. Voltou como FAIXA FINA: mono, caixa alta, micro,
+   com filete acima e abaixo e os nomes separados por um ponto médio. Nove
+   pílulas com fundo e borda quebravam em duas linhas e formavam um bloco pesado
+   logo abaixo do nome — comia a dobra e lia como nuvem de tags.
+
+   CONSERTO 1 — O LAÇO FECHA SEM SALTO. A versão antiga triplicava a lista e
+   animava até `translateX(-50%)`. Com três cópias, metade da faixa é uma cópia e
+   meia: no instante do reset o que estava na borda esquerda era o MEIO da segunda
+   cópia, e voltar a zero mostra o começo da primeira — um pulo visível a cada
+   volta. O percurso tem de ser exatamente UMA cópia, que com três é 33,3333%.
+   (Três e não duas porque uma cópia precisa ser mais larga que o container para
+   nunca haver buraco.)
+
+   CONSERTO 2 — RESPEITA O INTERRUPTOR DE MOVIMENTO, não só o
+   `prefers-reduced-motion`. A versão antiga tinha apenas o media query, e era o
+   mesmo defeito do cristal: quem desligava o movimento nas Configurações
+   continuava com uma faixa correndo.
+
+   E PARADO ELA NÃO FICA CORTADA: sem a classe `--anima` o JSX manda a lista uma
+   vez só e a faixa quebra linha como texto corrido. Faixa congelada no meio do
+   laço mostraria nomes cortados nas duas pontas, e "parado" não pode significar
+   "ilegível" — que foi uma das razões de o carrossel ter saído na primeira vez.
+   ================================================== */
+.about-stack {
+  /**
+   * O VÃO ENTRE OS NOMES MORA NUMA VARIÁVEL LOCAL, e não é preciosismo: as duas
+   * variantes precisam do MESMO número por vias diferentes, e elas divergirem
+   * quebra o laço.
+   *
+   * Na variante parada o vão é `gap` (precisa valer nos dois eixos, porque a
+   * faixa quebra linha). Na que anda ele é `margin-right` DENTRO do item, porque
+   * com `gap` a conta do laço não fecha: três cópias de nove nomes dão 27 itens e
+   * 26 vãos, e um terço disso é 9 itens + 8,67 vãos — enquanto avançar uma cópia
+   * pede 9 itens + 9 vãos. Sobrariam ~2px de pulo a cada volta. Com o vão dentro
+   * do item, uma cópia é exatamente nove larguras e 33,3333% é exato.
+   */
+  --stack-vao: 14px;
+  overflow: hidden;
+  padding: 9px 0;
+  border-top: 1px solid var(--sup-borda);
+  border-bottom: 1px solid var(--sup-borda);
+}
+
+/* A máscara só existe na variante que anda: é ela que faz os nomes nascerem e
+   morrerem em fade nas bordas em vez de aparecerem cortados na aresta do
+   recorte. Numa faixa estática o mesmo fade apagaria o primeiro e o último nome. */
+.about-stack--anima {
+  mask-image: linear-gradient(to right, transparent, black 6%, black 94%, transparent);
+  -webkit-mask-image: linear-gradient(to right, transparent, black 6%, black 94%, transparent);
+}
+
+.about-stack-track {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--stack-vao);
   margin: 0;
   padding: 0;
   list-style: none;
 }
 
-.about-door {
+/* A duração vem de `MOVIMENTO.marqueeStackS` pela ponte — não é literal daqui. */
+.about-stack--anima .about-stack-track {
+  flex-wrap: nowrap;
+  width: max-content;
+  gap: 0;
+  animation: aboutStackScroll var(--cfg-marquee-stack, 18s) linear infinite;
+  will-change: transform;
+}
+
+.about-stack-track li {
+  white-space: nowrap;
+  font-family: 'Courier New', monospace;
+  font-size: 0.66rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--text-secondary);
+}
+
+/* O separador é conteúdo do próprio item, e isso é o que preserva a conta do
+   laço: uma cópia continua sendo exatamente nove larguras de item. */
+.about-stack--anima .about-stack-track li {
+  margin-right: var(--stack-vao);
+}
+
+.about-stack-track li::after {
+  content: '·';
+  margin-left: var(--stack-vao);
+  color: var(--accent-color);
+  opacity: 0.55;
+}
+
+/* Na faixa que ANDA o separador vale para todos, inclusive o último: ali a lista
+   é um anel e o último nome tem um vizinho. Na parada ela tem fim, e um ponto
+   solto depois do último nome é sujeira. */
+.about-stack:not(.about-stack--anima) .about-stack-track li:last-child::after {
+  content: none;
+}
+
+@keyframes aboutStackScroll {
+  from { transform: translateX(0); }
+  /* UMA cópia das três, e é isso que faz o laço fechar sem pulo. Ver o conserto
+     1 no topo deste bloco: com -50% o reset saltava meia lista. */
+  to { transform: translateX(-33.3333%); }
+}
+
+/* ==================================================
+   4. O CORPO EM DUAS COLUNAS
+
+   Uma coluna até 720px de conteúdo; duas a partir daí. E a divisão significa
+   algo: a larga é a voz humana, o trilho é a voz da máquina.
+
+   O trilho tem `align-self: start` porque ele é um trilho — ele não estica para
+   acompanhar a altura do guia, e o vão embaixo dele é margem, não buraco.
+   ================================================== */
+.about-corpo {
   display: flex;
-  align-items: flex-start;
-  gap: 10px;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.about-coluna,
+.about-trilho {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  min-width: 0;
+}
+
+@container (min-width: 720px) {
+  .about-corpo {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(220px, 268px);
+    gap: 28px;
+  }
+
+  .about-trilho {
+    align-self: start;
+  }
+}
+
+/* ==================================================
+   5. BIOGRAFIA
+   ================================================== */
+.about-bio {
+  margin: 2px 0 0;
+  /* A MEDIDA, em caracteres e não em pixels: 64ch acompanha o tamanho da fonte,
+     então continua sendo ~64 caracteres se alguém mexer na escala. É o número em
+     que o olho ainda encontra o começo da linha seguinte sem procurar. */
+  max-width: 64ch;
+  font-size: 0.86rem;
+  line-height: 1.65;
+  color: var(--text-secondary);
+}
+
+/* ==================================================
+   6. O GUIA — lista de linhas, não grade de cards
+
+   AS PORTAS SÃO PERGUNTAS, não uma lista de janelas: quem abre um portfólio não
+   quer "Projetos", quer saber se a pessoa sabe construir.
+
+   A FORMA VEM DO PRÓPRIO SISTEMA. Quatro cards idênticos numa grade 2×2 era o
+   que fazia esta janela parecer qualquer site; uma lista com ícone, texto,
+   chevron e filete entre as linhas é o padrão que o explorador desta interface já
+   usa. O realce no hover pinta a LINHA inteira, como numa lista de verdade.
+
+   A porta do Marcos Virtual é a segunda (e última) superfície preenchida do
+   arquivo, e é preenchida pela mesma razão do botão de contato: ela é a ação que
+   o projeto quer que aconteça.
+   ================================================== */
+.about-guide {
+  display: flex;
+  flex-direction: column;
+  margin: 4px 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.about-guide li + li {
+  border-top: 1px solid var(--sup-borda);
+}
+
+.about-door {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 13px;
   width: 100%;
-  height: 100%;
-  padding: 11px 12px;
+  padding: 13px 10px;
   text-align: left;
   font-family: inherit;
-  border: 1px solid var(--card-border);
+  border: 1px solid transparent;
   border-radius: var(--win-control-radius);
-  background: var(--card-bg);
+  background: none;
   color: var(--text-primary);
   cursor: pointer;
-  transition: background 0.16s ease, border-color 0.16s ease, transform 0.16s ease;
+  transition: background-color 0.16s ease, border-color 0.16s ease;
+}
+
+/* A ÚNICA porta com fundo, e é a MESMA faixa do botão de contato — ver a nota
+   longa em `.about-acao`. As duas coisas dizem "esta é a ação", e agora dizem com
+   a mesma marca que o item ativo da lateral do explorador usa. */
+.about-door--destaque {
+  background-image: var(--sup-faixa);
+  border-color: var(--sup-faixa-borda);
 }
 
 .about-door:hover {
-  background: rgb(var(--accent-rgb) / 0.1);
-  border-color: rgb(var(--accent-rgb) / 0.4);
+  background-color: var(--sup-realce);
+  border-color: var(--accent-color);
 }
 
 .about-door:focus-visible {
@@ -217,24 +660,26 @@
   outline-offset: 2px;
 }
 
-/* Fora de um container de navegação (`useIrPara()` devolve null) a porta não
-   leva a lugar nenhum — então ela para de se anunciar como clicável em vez de
-   mentir com o cursor. */
+/* Fora de um container de navegação (`useAbrir()` devolve null) a porta não leva
+   a lugar nenhum — então ela para de se anunciar como clicável em vez de mentir
+   com o cursor. */
 .about-door:disabled {
   cursor: default;
   opacity: 0.75;
 }
 
 .about-door:disabled:hover {
-  background: var(--card-bg);
-  border-color: var(--card-border);
+  background-color: transparent;
+  border-color: transparent;
 }
 
-/* Mesmo quadrado tingido do ícone do balão de notificação — é a marca de
-   "atalho para outro lugar" que o sistema já usa. */
+.about-door--destaque:disabled:hover {
+  background-color: transparent;
+  border-color: var(--sup-faixa-borda);
+}
+
 .about-door-icon {
   flex: 0 0 auto;
-  margin-top: 1px;
   color: var(--accent-color);
 }
 
@@ -246,48 +691,124 @@
 }
 
 /* A pergunta é Poppins: é uma pessoa perguntando, não o sistema se descrevendo
-   — a mesma decisão que separa `.about-section-title` (mono) do corpo daqui. */
+   — a mesma decisão que separa o eyebrow (mono) do corpo daqui. */
 .about-door-question {
-  font-size: 0.88rem;
+  font-size: 0.9rem;
   font-weight: 700;
   line-height: 1.25;
   color: var(--text-primary);
 }
 
 .about-door-answer {
+  max-width: 58ch;
   font-size: 0.75rem;
   line-height: 1.45;
   color: var(--text-secondary);
 }
 
-/* --- ESTA MÁQUINA (ficha técnica de verdade) ---
-   Voz da máquina falando de si: rótulo em mono, caixa alta, com espaçamento —
-   mesma receita de `.about-spec-label`. O valor volta para Poppins. */
-.about-machine {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 2px 18px;
-  margin: 0;
-  padding: 12px 14px;
-  border-radius: 14px;
-  background: var(--card-bg);
-  border: 1px solid var(--card-border);
+.about-door-seta {
+  flex: 0 0 auto;
+  color: var(--accent-color);
+  opacity: 0.5;
+  transition: transform 0.16s ease, opacity 0.16s ease;
 }
 
-.about-machine-row {
+.about-door:hover .about-door-seta {
+  opacity: 1;
+  transform: translateX(3px);
+}
+
+/* ==================================================
+   7. OS NÚMEROS — registro com número grande, não três cards
+
+   Eram três cards centralizados de tamanho igual. Aqui o número fica grande à
+   esquerda e o rótulo à direita, com filete acima de cada linha — a mesma forma
+   do registro do sistema logo abaixo, e é o que faz os dois blocos do trilho
+   lerem como um instrumento só em vez de dois componentes diferentes.
+   ================================================== */
+.about-specs {
+  display: flex;
+  flex-direction: column;
+  margin: 4px 0 0;
+}
+
+.about-spec {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  align-items: baseline;
+  column-gap: 11px;
+  padding: 9px 0;
+  border-top: 1px solid var(--sup-borda);
+}
+
+.about-spec:first-child {
+  border-top: none;
+  padding-top: 0;
+}
+
+.about-spec-number {
+  grid-row: span 2;
+  font-size: 1.5rem;
+  /* Poppins e carregado em 400/700/900 e o index.css tem font-synthesis: none.
+     Este valor e o peso que o navegador ja resolvia sozinho; a declaracao antiga
+     (800) nao existia e caia aqui em silencio. */
+  font-weight: 900;
+  line-height: 1;
+  background: linear-gradient(135deg, var(--text-primary) 30%, var(--accent-color) 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.about-spec-label {
+  font-family: 'Courier New', monospace;
+  font-size: 0.63rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--text-primary);
+}
+
+.about-spec-sub {
+  font-size: 0.68rem;
+  line-height: 1.35;
+  color: var(--text-secondary);
+}
+
+/* ==================================================
+   8. ESTE SISTEMA — a ficha técnica do próprio site
+
+   Voz da máquina falando de si: rótulo em mono, caixa alta, com espaçamento. O
+   valor volta para Poppins, alinhado à direita sobre uma linha pontilhada.
+
+   SEM CARD. A forma de ficha técnica já é a informação — rótulo à esquerda, valor
+   à direita, linha ligando os dois. Um fundo atrás disso não acrescenta nada e
+   era mais um retângulo igual aos outros.
+   ================================================== */
+.about-ficha {
+  display: flex;
+  flex-direction: column;
+  margin: 4px 0 0;
+}
+
+.about-ficha-row {
   display: flex;
   align-items: baseline;
   gap: 8px;
   min-width: 0;
-  padding: 3px 0;
+  padding: 5px 0;
 }
 
-.about-machine-row dt {
+.about-ficha-row + .about-ficha-row {
+  border-top: 1px solid var(--sup-borda);
+}
+
+.about-ficha-row dt {
   flex: 0 0 auto;
   font-family: 'Courier New', monospace;
-  font-size: 0.65rem;
+  font-size: 0.63rem;
   font-weight: 700;
-  letter-spacing: 0.04em;
+  letter-spacing: 0.06em;
   text-transform: uppercase;
   color: var(--text-secondary);
 }
@@ -295,34 +816,48 @@
 /* A linha pontilhada sob o valor é o que faz duas colunas de larguras
    diferentes lerem como ficha técnica sem virar uma tabela — mesma ideia do
    `terminal-log-fill`, que preenche o vão entre o texto e o status. */
-.about-machine-row dd {
+.about-ficha-row dd {
   flex: 1 1 auto;
   min-width: 0;
   margin: 0;
   text-align: right;
   font-size: 0.78rem;
+  font-weight: 700;
   color: var(--text-primary);
-  border-bottom: 1px dotted var(--card-border);
+  border-bottom: 1px dotted var(--sup-borda);
 }
 
-/* --- RESPONSIVIDADE --- */
-@media (max-width: 620px) {
-  .about-guide,
-  .about-machine {
-    grid-template-columns: 1fr;
+/* ==================================================
+   RESPONSIVIDADE ESTREITA
+
+   `@container` e não `@media`: a pergunta é sobre a largura da JANELA. Ver a
+   segunda regra no cabeçalho do arquivo.
+   ================================================== */
+@container (max-width: 460px) {
+  .about-heroi {
+    gap: 16px;
+  }
+
+  /* Em janela muito estreita a medida do destaque deixa de ser o limitador —
+     quem limita é a janela — e 30ch criaria uma coluna de texto mais estreita
+     que o espaço disponível. */
+  .about-destaque {
+    max-width: none;
   }
 }
 
-@media (max-width: 480px) {
-  .about-specs {
-    grid-template-columns: 1fr;
-  }
-}
+/* Respeita quem pede menos movimento: sem isto o carrossel de stack, o pulso do
+   fallback do cristal e o do ponto de status rodariam sempre.
 
-/* Respeita quem pede menos movimento: sem isto o pulso do fallback do cristal
-   roda sempre, mesmo com prefers-reduced-motion. */
+   ESTA É A SEGUNDA REDE, não a primeira: o interruptor de Movimento das
+   Configurações chega pelo JSX, e é ele que também troca a faixa pela variante
+   que quebra linha. Aqui a faixa só congela — quem tem `prefers-reduced-motion`
+   mas não desligou o Movimento vê a lista parada no início do laço, que é o
+   estado legível porque a animação começa em translateX(0). */
 @media (prefers-reduced-motion: reduce) {
-  .about-crystal-fallback {
+  .about-stack--anima .about-stack-track,
+  .about-crystal-fallback,
+  .about-status-ponto {
     animation: none;
   }
 }

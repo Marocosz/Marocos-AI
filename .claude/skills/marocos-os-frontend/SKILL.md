@@ -22,7 +22,7 @@ Existe uma suíte para isso. Rode-a:
 cd frontend/visual
 npm install          # 1ª vez: baixa o Chromium (só aqui, não polui o app)
 npm run build:frontend
-npm test             # 38 testes: 21 visuais + 17 funcionais
+npm test             # 40 testes: 21 visuais + 19 funcionais
 ```
 
 Falhou uma cena? Abra o relatório com `npm run report` — ele mostra referência,
@@ -37,7 +37,7 @@ falha que você não entendeu apaga a única evidência de que algo quebrou.
 | suíte | pega | não pega |
 |---|---|---|
 | `visual.spec.js` (21 cenas) | geometria, cor, espaçamento, tipografia, nos dois temas e no mobile | qualquer coisa que dependa de **tempo** |
-| `rotas.spec.js` (17 testes) | `import()` dinâmico quebrado, deep link, histórico, carga sob demanda, **e o que só existe depois de um clique** | aparência |
+| `rotas.spec.js` (19 testes) | `import()` dinâmico quebrado, deep link, histórico, carga sob demanda, **e o que só existe depois de um clique** | aparência |
 | `npm test` no `frontend/` | lógica pura (roteamento, reducer de janelas, config) | tudo que precisa de DOM |
 
 **O regressor visual é estruturalmente cego a tempo.** Ele desliga a animação
@@ -47,6 +47,12 @@ autoriza dizer *"nada mudou no que é fotografado"*, nunca *"nada mudou"*.
 
 **Nada cobre** `:hover`, `:focus-visible`, `:active`, navegação por teclado, nem
 duração/velocidade de animação. Isso se verifica lendo o código ou no navegador.
+
+**Nenhuma cena maximiza janela**, e é onde mora uma classe de defeito inteira:
+janela maximizada numa tela grande esticava o texto do "Sobre" para mais de 160
+caracteres por linha. Se você mexer em largura, medida ou grade de um app, teste a
+maximizada — há um caso funcional em `rotas.spec.js` (`em tela grande`) que fixa
+teto de medida e número de colunas, e é o único guarda desse eixo.
 
 **`npm run build` não pega import dinâmico quebrado.** Ele compila com o
 caminho errado e falha só em runtime. É para isso que existe o `rotas.spec.js`
@@ -90,7 +96,7 @@ camada errada é o erro mais comum:
 | camada | onde | dona de |
 |---|---|---|
 | ajuste | `config/system.js` → `--cfg-*` | blur, raios, alturas, durações |
-| chrome do SO | `os/tokens.css` | `--win-*`, `--icon-tile-*`, `--taskbar-h`, escala de z-index, arte da cerimônia |
+| chrome do SO | `os/tokens.css` | `--win-*`, `--icon-tile-*`, `--sup-*`, `--filete-secao`, `--taskbar-h`, escala de z-index, arte da cerimônia — **monta** a cor, mas as doses vêm do config |
 | chrome de explorador | `config/system.js` → `--cfg-explorer-*` | largura da lateral e altura das duas barras — **com contrato**: os seis apps com `explorer: true` têm `defaultSize` = tamanho antigo + lateral + barras, e há teste guardando a soma |
 | conteúdo | `styles/index.css` | `--bg-color`, `--text-primary/secondary`, `--accent-color`, `--card-bg/border` |
 
@@ -114,6 +120,64 @@ camada errada é o erro mais comum:
   (tipos do histórico, status do terminal, marcas em `content/tech.js` — elas
   significam algo, e seguir o tema faria "erro" e "sucesso" trocarem de cor) e o
   âmbar da tela de BIOS (máquina desligada não tem tema).
+- **PREENCHIMENTO É AÇÃO.** Antes de dar fundo a um bloco, pergunte se ele é
+  clicável e prioritário. Se não for, ele se resolve com **filete, tipografia ou
+  trilho**.
+
+  A lição custou um redesenho inteiro. O "Sobre este PC" recebeu superfície
+  visível em todo bloco — herói, botão, chips, portas, números, ficha — e o
+  veredito do dono do projeto foi *"parece um site qualquer, fundos chapados dos
+  itens"*. Sete retângulos de mesma largura, mesmo raio e mesma borda não são
+  hierarquia: são template. Hoje aquele app tem **duas** superfícies preenchidas,
+  e as duas são ações (o botão de contato e a porta do assistente).
+
+  Onde não há fundo, quem estrutura é `--filete-secao` (divisor que esvanece), o
+  contraste de tamanho tipográfico e a régua de `--sup-borda`. Ver o cabeçalho de
+  `apps/AboutApp.css`, que carrega a regra e o histórico.
+
+- **Duas superfícies de conteúdo, e elas não são intercambiáveis:**
+
+  | quer | escreva | quando |
+  |---|---|---|
+  | plana | `--card-bg` + `--card-border` | o bloco recua: as três faixas do chrome de explorador |
+  | elevada | `--sup-fundo` + `--sup-borda` | o bloco é uma AÇÃO (ver a regra acima) |
+
+  `--sup-fundo` é **opaca** e derivada de `--win-body-base` — não é `--card-bg` com
+  mais alpha. O motivo está medido em `os/tokens.css`: translúcido sobre
+  translúcido não separa, o card ficava a ~1,05:1 do corpo da janela no escuro e
+  *mais claro* que o fundo no tema claro. `--sup-luz` (aresta de 1px),
+  `--sup-lavagem` (gradiente diagonal) e `--sup-realce` (hover, por `color-mix` e
+  não por alpha empilhado) são os acabamentos; `--filete-secao` é o divisor.
+
+  **As doses vivem em `VIDRO.superficie.{noite,dia}`** no config e chegam por
+  `--cfg-sup-*`. Os dois temas são publicados juntos, com sufixo `-claro` para o
+  dia.
+
+  **Para "este é o item em destaque" use `--sup-faixa` + `--sup-faixa-borda`**, não
+  um retângulo tingido. É o gradiente que nasce da borda esquerda e se apaga para a
+  direita — a marca que a lateral do explorador (`.explorer-lugar--aqui`) e as duas
+  ações do "Sobre" compartilham. Chapado empata com o hover, e aí "destacado" deixa
+  de ser distinguível de "o mouse está aqui". A borda é a cor mais forte da própria
+  faixa: como o fundo desaparece à direita, é ela que fecha o contorno.
+
+  E ao pintar `<button>` só com `background-image`, declare
+  `background-color: transparent` junto — `buttonface` é um cinza claro do
+  navegador e aparece por baixo do gradiente, lavando o texto. E **nenhum `--sup-*` pode ser declarado em `:root`**: a substituição de
+  custom property acontece onde ela é declarada, e `--win-body-base` só existe nos
+  blocos de tema — em `:root` o `color-mix` viraria guaranteed-invalid e a
+  superfície não pintaria.
+
+- **O breakpoint de um app é `@container`, não `@media`.** A janela é o container;
+  a viewport não diz nada sobre a largura que o app recebeu. `@media` num app é um
+  bug latente: janela estreita em tela grande não colapsa, janela maximizada em
+  tela pequena colapsa sem precisar. Declare `container-type: inline-size` na raiz
+  do app e consulte nos descendentes — `apps/AboutApp.css` é o exemplo, e usa
+  `cqi` para o nome do herói acompanhar a janela em vez do monitor.
+
+- **Texto tem medida.** Janela maximizada numa tela grande passa de 160 caracteres
+  por linha. Prosa leva `max-width` em `ch`, e a raiz do app leva teto de largura
+  com `margin-inline: auto` — maximizar tem de **reorganizar**, não esticar.
+
 - **Superfície de conteúdo** é `--card-bg` + `--card-border` — não uma receita
   de vidro nova. É o que o chrome de explorador usa nas três superfícies dele, e
   **sem `backdrop-filter`**: elas ficam dentro de uma janela que já paga um
@@ -138,15 +202,23 @@ lugares e **não é decoração** — é a voz da máquina. Vale a regra, não a
 - **Poppins** = texto que uma pessoa escreveu: título de card, descrição,
   rótulo de interface.
 
-É por isso que `.about-section-title` (mono) e `.start-menu-apps-heading`
+É por isso que o eyebrow do "Sobre" (mono) e o `.start-menu-apps-heading`
 (Poppins) parecem se contradizer e não se contradizem — a janela "Sobre" é uma
 ficha técnica, o menu Iniciar é interface. **Copiar o vizinho errado desalinha.**
 Decida pela voz, depois copie.
 
-Escala aproximada, para não inventar tamanho: `1,6rem` número de destaque ·
-`1,05–1,1rem` título de card · `0,9–0,95rem` corpo · `0,85rem` corpo secundário ·
-`0,72–0,8rem` meta e hint · `0,65–0,68rem` micro-rótulo (sempre caixa alta, com
-letter-spacing).
+**O par eyebrow + headline é o cabeçalho de seção do projeto**, e a receita é a de
+`ui/AppHeader.css`: eyebrow em mono/acento/caixa alta, headline em Poppins. Ele
+vem com uma **regra de corte** — só ganha headline a seção que faz uma
+**afirmação**. Ficha técnica fica com o eyebrow sozinho, porque ficha técnica não
+afirma, lista. (`AppHeader` emite `<h2>`; em nível de seção, dentro de um app, use
+as classes locais e promova para `ui/` quando um segundo app pedir.)
+
+Escala aproximada, para não inventar tamanho: `clamp(2rem, 6.6cqi, 3.3rem)` nome
+do herói (acompanha a JANELA, por `cqi` — ver os container queries acima) ·
+`1,5–1,6rem` número de destaque · `1,05–1,1rem` título de card e headline de seção ·
+`0,9–0,95rem` corpo · `0,85rem` corpo secundário · `0,72–0,8rem` meta e hint ·
+`0,63–0,68rem` micro-rótulo (sempre caixa alta, com letter-spacing).
 
 ## Convenções do repositório
 

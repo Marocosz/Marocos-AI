@@ -38,6 +38,38 @@ export function aplicarConfigNoCss(tema = 'dark', preset = null) {
     '--cfg-altura-titulo': VIDRO.alturaTitulo,
     '--cfg-altura-taskbar': `${VIDRO.alturaTaskbar}px`,
 
+    /**
+     * AS DOSES DA SUPERFÍCIE ELEVADA — ver `VIDRO.superficie` no config para o
+     * que cada uma faz e por que noite e dia divergem.
+     *
+     * OS DOIS TEMAS VÃO JUNTOS, com o sufixo `-claro` para o dia. É o mesmo
+     * padrão de `--cfg-veu-alfa` / `--cfg-veu-alfa-claro`, e por um motivo
+     * concreto: o `tokens.css` declara `--sup-*` dentro de `.theme-dark` E de
+     * `.theme-light` (porque `--win-body-base` difere entre os dois), e as duas
+     * regras existem na folha ao mesmo tempo. Publicar um valor só, do tema
+     * atual, faria as duas lerem a mesma dose — o mesmo tipo de acoplamento à
+     * ordem da ponte que já quebrou o crossfade do wallpaper.
+     *
+     * São porcentagens e alphas sobre o acento, nunca cores: é isso que faz a
+     * superfície repintar junto com o preset.
+     */
+    '--cfg-sup-acento': VIDRO.superficie.noite.acento,
+    '--cfg-sup-borda': VIDRO.superficie.noite.borda,
+    '--cfg-sup-realce': VIDRO.superficie.noite.realce,
+    '--cfg-sup-luz': String(VIDRO.superficie.noite.alfaLuz),
+    '--cfg-sup-lavagem': String(VIDRO.superficie.noite.alfaLavagem),
+    '--cfg-sup-filete': String(VIDRO.superficie.noite.alfaFilete),
+    '--cfg-sup-faixa': String(VIDRO.superficie.noite.alfaFaixa),
+    '--cfg-sup-faixa-meio': String(VIDRO.superficie.noite.alfaFaixaMeio),
+    '--cfg-sup-acento-claro': VIDRO.superficie.dia.acento,
+    '--cfg-sup-borda-claro': VIDRO.superficie.dia.borda,
+    '--cfg-sup-realce-claro': VIDRO.superficie.dia.realce,
+    '--cfg-sup-luz-claro': String(VIDRO.superficie.dia.alfaLuz),
+    '--cfg-sup-lavagem-claro': String(VIDRO.superficie.dia.alfaLavagem),
+    '--cfg-sup-filete-claro': String(VIDRO.superficie.dia.alfaFilete),
+    '--cfg-sup-faixa-claro': String(VIDRO.superficie.dia.alfaFaixa),
+    '--cfg-sup-faixa-meio-claro': String(VIDRO.superficie.dia.alfaFaixaMeio),
+
     // Layout
     '--cfg-icone-origem-x': LAYOUT.icones.origemX,
     '--cfg-icone-origem-y': LAYOUT.icones.origemY,
@@ -101,6 +133,10 @@ export function aplicarConfigNoCss(tema = 'dark', preset = null) {
     /** Quanto o chrome leva para repintar ao trocar de preset — ver a nota em
      *  `MOVIMENTO.trocaPresetMs` e o bloco que a consome em `tokens.css`. */
     '--cfg-troca-preset': `${MOVIMENTO.trocaPresetMs}ms`,
+
+    /** A volta completa do carrossel de stack do "Sobre" — ver
+     *  `MOVIMENTO.marqueeStackS`. Em segundos porque é o que o `animation` lê. */
+    '--cfg-marquee-stack': `${MOVIMENTO.marqueeStackS}s`,
   }
 
   for (const [nome, valor] of Object.entries(vars)) {

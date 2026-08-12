@@ -862,6 +862,20 @@ export const MOVIMENTO = {
   pushMobile: { duration: 0.28, ease: 'easeOut' },
   acordeaoDispositivos: { duration: 0.2, ease: 'easeInOut' },
   indicadorTaskbar: { type: 'spring', stiffness: 300, damping: 30 },
+
+  /**
+   * O CARROSSEL DE STACK do "Sobre este PC". Em segundos, porque vira CSS.
+   *
+   * Ele já existiu, saiu numa passada anterior e voltou por decisão do dono do
+   * projeto. Duas coisas mudaram na volta, e as duas estão no AboutApp.css: o
+   * laço agora fecha sem salto (a lista é triplicada e o percurso é de UMA
+   * cópia, não de metade da faixa), e ele respeita o interruptor de Movimento
+   * além do `prefers-reduced-motion`.
+   *
+   * 18s é lento de propósito: faixa que corre rápido não dá para ler, que foi
+   * uma das razões de ela ter saído na primeira vez.
+   */
+  marqueeStackS: 18,
 }
 
 /* --------------------------------------------------
@@ -884,6 +898,76 @@ export const VIDRO = {
   raioControle: '8px',
   alturaTitulo: '40px',
   alturaTaskbar: 52,
+
+  /**
+   * SUPERFÍCIE ELEVADA — as doses do material, e este é o único lugar onde elas
+   * se mexem.
+   *
+   * O QUE É: a superfície do conteúdo que precisa ler como BLOCO PRÓPRIO dentro
+   * de uma janela, em oposição à superfície plana (`--card-bg`), que recua. Ela
+   * não é `--card-bg` com mais alpha: é OPACA, e derivada de `--win-body-base`.
+   *
+   * POR QUE OPACA — a conta que motivou o token: `--card-bg` é
+   * rgba(10,10,10,.6) e o corpo da janela é acento 10% em preto a 60%. Duas
+   * camadas translúcidas quase idênticas, ~1,05:1 de diferença, com a borda a 8%
+   * de branco carregando sozinha o trabalho. De dia era pior: card branco a 40%
+   * sobre corpo quase branco fica MAIS CLARO que o fundo.
+   *
+   * POR QUE AS DOSES DA NOITE E DO DIA SÃO DIFERENTES: a base do dia já é branca
+   * (acento 4% em #fff), e 16% de acento nela empastelaria. É a mesma lição de
+   * `--icon-tile-bg` — dose de tema escuro não se reaproveita no claro, porque
+   * de dia a mistura vai na direção oposta.
+   *
+   * Tudo aqui é PORCENTAGEM ou ALPHA sobre o acento ativo, nunca uma cor: é o
+   * que faz a superfície repintar junto com o preset que o visitante escolheu.
+   * A ponte (`cssBridge.js`) publica como `--cfg-sup-*` e o `tokens.css` monta
+   * os tokens `--sup-*` a partir daí.
+   *
+   *   acento    quanto do acento entra na base opaca
+   *   borda     alpha da borda
+   *   realce    quanto do acento entra no :hover de superfície clicável
+   *   alfaLuz   a aresta de 1px no topo do bloco
+   *   alfaLavagem  o gradiente diagonal do bloco com mais peso
+   *   alfaFilete   o divisor entre seções
+   *   alfaFaixa / alfaFaixaMeio  a FAIXA DE DESTAQUE (ver abaixo)
+   *
+   * A FAIXA é a marca de "este é o item em destaque" do sistema, e ela nasceu na
+   * lateral do explorador (`.explorer-lugar--aqui`): um gradiente que se apaga
+   * para a direita, que lê como luz entrando pela borda esquerda em vez de
+   * retângulo chapado. Chapado empata com o hover, e aí "destacado" deixa de ser
+   * distinguível de "o mouse está aqui".
+   *
+   * As duas paradas viraram config quando o "Sobre este PC" passou a usar a mesma
+   * faixa nos dois blocos de ação dele — antes os alphas estavam escritos à mão
+   * no `ExplorerChrome.css`, e passariam a estar em dois lugares.
+   */
+  superficie: {
+    noite: {
+      acento: '16%',
+      borda: '26%',
+      realce: '18%',
+      alfaLuz: 0.55,
+      alfaLavagem: 0.14,
+      alfaFilete: 0.45,
+      alfaFaixa: 0.26,
+      alfaFaixaMeio: 0.1,
+    },
+    dia: {
+      acento: '8%',
+      borda: '24%',
+      realce: '16%',
+      alfaLuz: 0.45,
+      alfaLavagem: 0.1,
+      alfaFilete: 0.4,
+      /* Uma curva mais suave que a da noite. Estas duas foram calibradas quando a
+         regra do explorador chumbava um violeta mais escuro que o da noite; hoje o
+         acento é o mesmo nos dois temas e vem do preset, então o que sobra aqui é
+         a diferença de curva — se o destaque de dia ficar fraco, é aqui que se
+         mexe. */
+      alfaFaixa: 0.2,
+      alfaFaixaMeio: 0.08,
+    },
+  },
 }
 
 /* --------------------------------------------------
