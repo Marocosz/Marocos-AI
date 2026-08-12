@@ -321,6 +321,115 @@ export function acentoProfundo(preset) {
   return typeof preset.cor === 'string' ? preset.cor : preset.ceu.baixo
 }
 
+/**
+ * QUANTOS GRAUS A ARTE DA CERIMÔNIA PRECISA GIRAR PARA CHEGAR NO ACENTO.
+ *
+ * A cerimônia é desenhada à mão: `--cer-ceu-boot`, `--cer-nebulosa` e as
+ * estrelas somam mais de trinta paradas de gradiente, com a documentação dos
+ * "seis eixos" que separam a inicialização do bloqueio escrita ao lado.
+ * Reescrever cada parada em função do acento destruiria essa composição — as
+ * relações de luminância entre as camadas são o desenho.
+ *
+ * Então em vez de trocar as cores, gira-se o MATIZ da camada inteira. E isso
+ * funciona porque a arte já separa o que tem cor do que não tem: branco, preto
+ * e cinza têm saturação zero, e `hue-rotate` não mexe em nenhum dos três. O
+ * núcleo branco da nebulosa continua branco, o palco quase preto continua quase
+ * preto, e só a família violeta gira para a cor do preset.
+ *
+ * A referência é o violeta do preset padrão (#a855f7, matiz ~271°): um preset
+ * que use esse acento gira 0° e a cena fica idêntica ao que sempre foi.
+ */
+const MATIZ_REFERENCIA = 271
+
+/**
+ * Saturação HSL, 0–1. Existe por causa de um caso que o giro de matiz sozinho
+ * não resolve: presets acromáticos.
+ *
+ * `hue-rotate` GIRA o matiz, mas não consegue tirá-lo. Um violeta saturado
+ * girado por qualquer ângulo continua saturado — vira azul, verde, laranja,
+ * nunca cinza. Com o preset Grafite (acento `#a1a1aa`, ~5% de saturação) a
+ * cerimônia saía AZUL em vez de cinza, porque 329° de giro é só outra cor
+ * viva. O que falta é encolher a saturação na mesma proporção do acento.
+ */
+export function saturacaoDoHex(hex) {
+  const rgb = hexParaRgb(hex)
+  if (!rgb) return null
+  const [r, g, b] = rgb.split(' ').map((v) => Number(v) / 255)
+  const max = Math.max(r, g, b)
+  const min = Math.min(r, g, b)
+  const d = max - min
+  if (d === 0) return 0
+  const l = (max + min) / 2
+  return d / (1 - Math.abs(2 * l - 1))
+}
+
+/**
+ * Quanto a arte da cerimônia precisa encolher (ou crescer) de saturação para
+ * chegar no preset. 1 = sem mudança, que é o caso do preset padrão.
+ */
+export function saturacaoDaCerimonia(preset) {
+  const s = saturacaoDoHex(preset?.acento)
+  if (s === null) return 1
+  const ref = saturacaoDoHex('#a855f7')
+  // Duas casas bastam, e evita publicar um número com dezessete dígitos no CSS.
+  return Math.round((s / ref) * 100) / 100
+}
+
+export function hueDoHex(hex) {
+  const rgb = hexParaRgb(hex)
+  if (!rgb) return null
+  const [r, g, b] = rgb.split(' ').map((v) => Number(v) / 255)
+  const max = Math.max(r, g, b)
+  const min = Math.min(r, g, b)
+  const d = max - min
+  if (d === 0) return 0 // cinza puro: matiz não existe, e girar não faz nada
+
+  let h
+  if (max === r) h = ((g - b) / d) % 6
+  else if (max === g) h = (b - r) / d + 2
+  else h = (r - g) / d + 4
+
+  h *= 60
+  return h < 0 ? h + 360 : h
+}
+
+/**
+ * O CORPO DO CRISTAL — o ponto médio entre o realce claro e o profundo.
+ *
+ * Era `#6b24b7` chumbado no componente, e não é um valor arbitrário: ele fica
+ * exatamente entre o acento (#a855f7) e o tom fundo (#4c1d95) do preset padrão.
+ * Essa RELAÇÃO é o que dá ao cristal a leitura de quartzo — corpo mais fechado
+ * que a luz que o atravessa. Derivar preserva a relação em qualquer preset, em
+ * vez de pedir um décimo terceiro valor por paleta.
+ */
+export function corpoDoCristal(preset) {
+  const a = hexParaRgb(preset?.acento)
+  const b = hexParaRgb(acentoProfundo(preset))
+  if (!a || !b) return '#6b24b7'
+
+  const [ar, ag, ab] = a.split(' ').map(Number)
+  const [br, bg, bb] = b.split(' ').map(Number)
+  const meio = (x, y) => Math.round((x + y) / 2)
+  const hex = (n) => n.toString(16).padStart(2, '0')
+  return `#${hex(meio(ar, br))}${hex(meio(ag, bg))}${hex(meio(ab, bb))}`
+}
+
+/**
+ * O giro a aplicar na arte da cerimônia, em graus, já normalizado.
+ *
+ * ARREDONDA A DIFERENÇA ANTES DE NORMALIZAR, e a ordem importa: o matiz real de
+ * #a855f7 é 270,74°, não os 271 redondos da referência. Normalizando primeiro, a
+ * diferença de -0,26° virava 359,74 e o arredondamento devolvia 360 — mesmo
+ * ângulo na prática, mas um valor que faz o preset padrão parecer estar girando
+ * a cena. Arredondando antes, ele dá 0 e diz a verdade.
+ */
+export function giroDaCerimonia(preset) {
+  const h = hueDoHex(preset?.acento)
+  if (h === null) return 0
+  const delta = Math.round(h - MATIZ_REFERENCIA)
+  return ((delta % 360) + 360) % 360
+}
+
 export function hexParaRgb(hex) {
   const m = /^#?([0-9a-f]{6})$/i.exec(String(hex || '').trim())
   if (!m) return null

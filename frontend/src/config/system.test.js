@@ -1,7 +1,7 @@
 import { describe, it, expect } from 'vitest'
 import {
   WALLPAPER, JANELAS, CERIMONIA, MOVIMENTO, VIDRO, LAYOUT, REDE, PRESETS, getPreset,
-  hexParaRgb,
+  hexParaRgb, hueDoHex, giroDaCerimonia, corpoDoCristal, acentoProfundo,
 } from './system'
 // O registry entra aqui porque o contrato do chrome de explorador é ENTRE os
 // dois arquivos: o config diz o tamanho do chrome, o registry diz o tamanho das
@@ -63,6 +63,41 @@ describe('config do sistema', () => {
           /^\d{1,3} \d{1,3} \d{1,3}$/,
         )
       }
+    }
+  })
+
+  /**
+   * A CERIMÔNIA SEGUE O PRESET POR GIRO DE MATIZ, e o preset padrão tem de
+   * girar ZERO — senão a cena de sempre muda de cor para quem nunca abriu as
+   * configurações.
+   */
+  it('o preset padrão não gira a arte da cerimônia', () => {
+    expect(giroDaCerimonia(PRESETS.noite[0])).toBe(0)
+  })
+
+  it('presets de outra família giram a cerimônia para o matiz deles', () => {
+    const brasa = PRESETS.noite.find((p) => p.id === 'brasa')
+    const giro = giroDaCerimonia(brasa)
+    // #fb923c é laranja (~27°), contra o violeta de referência (271°).
+    expect(giro).toBeGreaterThan(0)
+    expect(giro).toBeLessThan(360)
+    // Ida e volta: girar o matiz do acento pelo giro tem de cair na referência.
+    expect(Math.round((hueDoHex(brasa.acento) - giro + 360) % 360)).toBe(271)
+  })
+
+  it('corpoDoCristal fica entre o acento e o tom fundo', () => {
+    // A relação que dá ao cristal a leitura de quartzo: corpo mais fechado que
+    // a luz que o atravessa. Era #6b24b7 chumbado; agora é derivado.
+    const corpo = corpoDoCristal(PRESETS.noite[0])
+    expect(corpo).toMatch(/^#[0-9a-f]{6}$/i)
+
+    const [cr, cg, cb] = hexParaRgb(corpo).split(' ').map(Number)
+    const [ar, ag, ab] = hexParaRgb(PRESETS.noite[0].acento).split(' ').map(Number)
+    const [pr, pg, pb] = hexParaRgb(acentoProfundo(PRESETS.noite[0])).split(' ').map(Number)
+
+    for (const [c, a, p] of [[cr, ar, pr], [cg, ag, pg], [cb, ab, pb]]) {
+      expect(c).toBeGreaterThanOrEqual(Math.min(a, p))
+      expect(c).toBeLessThanOrEqual(Math.max(a, p))
     }
   })
 

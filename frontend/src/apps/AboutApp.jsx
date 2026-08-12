@@ -3,7 +3,7 @@ import { useLanguage } from '../contexts/LanguageContext'
 import { getProfileData } from '../content/profile'
 import { getOsData } from '../i18n/os'
 import { useDeviceMode } from '../os/useDeviceMode'
-import { CERIMONIA, acentoProfundo } from '../config/system'
+import { CERIMONIA, acentoProfundo, corpoDoCristal } from '../config/system'
 import { useTheme } from '../contexts/ThemeContext'
 import DecryptedText from '../effects/DecryptedText'
 import './AboutApp.css'
@@ -73,6 +73,7 @@ const AboutApp = () => {
                 animated
                 acento={preset.acento}
                 acentoFundo={acentoProfundo(preset)}
+                corpo={corpoDoCristal(preset)}
               />
             </Suspense>
           </div>

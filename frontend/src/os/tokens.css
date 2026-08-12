@@ -39,8 +39,11 @@
 
      --win-highlight é reaproveitado de propósito: só existe em :root, o tema
      claro não o inverte. */
-  --icon-tile-bg: rgba(14, 9, 22, 0.6); /* = --win-body-bg do .theme-dark */
-  --icon-tile-bg-hover: rgba(30, 20, 44, 0.72);
+  /* Mesma base do corpo de janela, e pelo mesmo motivo: o tile é vidro do
+     sistema, então segue o preset junto com ele. */
+  --icon-tile-base: color-mix(in srgb, rgb(var(--accent-rgb)) 10%, #000000);
+  --icon-tile-bg: color-mix(in srgb, var(--icon-tile-base) 60%, transparent);
+  --icon-tile-bg-hover: color-mix(in srgb, var(--icon-tile-base) 78%, transparent);
   /* 0.22 e não os 0.18 de --win-border: o tile é pequeno e cai onde o Silk
      mandar. Nas dobras escuras do shader o fundo do tile e o wallpaper chegam
      os dois perto de rgb(19,9,32), e aí a única coisa que define a aresta é
@@ -174,22 +177,49 @@
     radial-gradient(90vw 1vh at 50% 46%, rgba(208, 196, 255, 0.23) 0%, transparent 80%),
     radial-gradient(52vh 42vh at 50% 46%, rgba(139, 92, 246, 0.3) 0%, transparent 74%);
 
-  --cer-texto: #f5f3ff;
-  --cer-texto-suave: #c4b5fd;
+  /* --------------------------------------------------
+     O QUE FICA FORA DAS CAMADAS FILTRADAS.
+
+     O `hue-rotate` de boot.css alcança os dois céus e a nebulosa, porque são
+     camadas de tela cheia. Tudo abaixo vive no NÚCLEO da cerimônia (texto,
+     barra de progresso, bordas, véu) e não é filtrado — se continuasse literal,
+     a barra de carregamento ficaria violeta numa cena âmbar. Foi exatamente o
+     que o dono do projeto apontou.
+
+     Três degraus derivados do acento, e cada tema decide para onde eles vão:
+       --cer-luz         o acento puro
+       --cer-luz-meio    um passo em direção ao extremo do tema
+       --cer-luz-ponta   o extremo (quase branco de noite, quase preto de dia)
+
+     Com os três, todo o resto é `color-mix(... N%, transparent)`, que é só
+     "aplique esta opacidade" — as opacidades originais foram preservadas uma a
+     uma. -------------------------------------------------- */
+  --cer-luz: rgb(var(--accent-rgb));
+  --cer-luz-meio: color-mix(in srgb, rgb(var(--accent-rgb)) 45%, #ffffff);
+  --cer-luz-ponta: color-mix(in srgb, rgb(var(--accent-rgb)) 10%, #ffffff);
+
+  --cer-texto: var(--cer-luz-ponta);
+  --cer-texto-suave: var(--cer-luz-meio);
   /* Subiu junto com o escurecimento do fundo. Em #6d5b8c a dica de pular ficava
      em ~3:1 contra o quase preto — legível a duras penas, e ela aparece no canto
-     inferior, que é a parte mais fechada da vinheta. */
-  --cer-texto-fraco: #8b7ab0;
+     inferior, que é a parte mais fechada da vinheta. O cinza puxa a lavanda para
+     baixo sem apagá-la. */
+  --cer-texto-fraco: color-mix(in srgb, var(--cer-luz-meio) 62%, #55505f);
 
-  --cer-trilho: rgba(196, 181, 253, 0.14);
-  --cer-preenchimento: linear-gradient(90deg, #7c3aed, #c4b5fd 70%, #f5f3ff);
-  --cer-varredura: rgba(245, 243, 255, 0.55);
-  --cer-brilho: rgba(124, 58, 237, 0.25);
-  --cer-brilho-forte: rgba(196, 181, 253, 0.55);
+  --cer-trilho: color-mix(in srgb, var(--cer-luz-meio) 14%, transparent);
+  --cer-preenchimento: linear-gradient(
+    90deg,
+    var(--cer-luz),
+    var(--cer-luz-meio) 70%,
+    var(--cer-luz-ponta)
+  );
+  --cer-varredura: color-mix(in srgb, var(--cer-luz-ponta) 55%, transparent);
+  --cer-brilho: color-mix(in srgb, var(--cer-luz) 25%, transparent);
+  --cer-brilho-forte: color-mix(in srgb, var(--cer-luz-meio) 55%, transparent);
 
-  --cer-borda: rgba(196, 181, 253, 0.28);
-  --cer-borda-forte: rgba(196, 181, 253, 0.5);
-  --cer-veu: rgba(168, 85, 247, 0.08);
+  --cer-borda: color-mix(in srgb, var(--cer-luz-meio) 28%, transparent);
+  --cer-borda-forte: color-mix(in srgb, var(--cer-luz-meio) 50%, transparent);
+  --cer-veu: color-mix(in srgb, var(--cer-luz) 8%, transparent);
 }
 
 /* Chrome de janela — noite. (A paleta do wallpaper propriamente dito vem de
@@ -202,15 +232,34 @@
    sólida. */
 .theme-dark {
   --win-titlebar-bg: rgb(var(--accent-rgb) / 0.28);
-  --win-body-bg: rgba(14, 9, 22, 0.6);
-  --win-body-solid: #100a18;
+
+  /* O FUNDO DA JANELA TAMBÉM SEGUE O PRESET.
+     Era um quase-preto com veio violeta fixo (rgba(14,9,22,.6)). Com Brasa
+     selecionado, o wallpaper e todo o chrome viravam âmbar e o miolo de cada
+     janela continuava com veio roxo — sutil, mas é o tipo de coisa que faz a
+     tela não fechar.
+
+     Uma base opaca, e o translúcido derivado dela: assim a janela normal e a
+     MAXIMIZADA (que usa o sólido, porque não tem nada visível atrás para o
+     vidro revelar) são a mesma superfície em dois estados, e não dois valores
+     que alguém precisa lembrar de manter em sincronia. O mesmo sólido serve o
+     app em tela cheia e o painel de ajustes rápidos do mobile. */
+  --win-body-base: color-mix(in srgb, rgb(var(--accent-rgb)) 10%, #000000);
+  --win-body-bg: color-mix(in srgb, var(--win-body-base) 60%, transparent);
+  --win-body-solid: var(--win-body-base);
 }
 
 .theme-light {
   /* Mais leve que a da noite: sobre vidro branco a mesma dose empastelaria. */
   --win-titlebar-bg: rgb(var(--accent-rgb) / 0.2);
-  --win-body-bg: rgba(255, 255, 255, 0.55);
-  --win-body-solid: #faf8ff;
+
+  /* De dia a base vai para o BRANCO, não para o preto — mesma ideia com o sinal
+     trocado. 4% é o suficiente para o branco ganhar o veio da paleta sem deixar
+     de ser branco: com o acento padrão isto resolve em #fbf8ff, praticamente o
+     #faf8ff que estava escrito aqui à mão. */
+  --win-body-base: color-mix(in srgb, rgb(var(--accent-rgb)) 4%, #ffffff);
+  --win-body-bg: color-mix(in srgb, var(--win-body-base) 55%, transparent);
+  --win-body-solid: var(--win-body-base);
   --win-border: 1px solid rgba(255, 255, 255, 0.6);
   --win-shadow: 0 10px 24px rgb(var(--accent-rgb) / 0.22);
 
@@ -230,8 +279,13 @@
 
      Consequência aceita: de dia o tile é quase sólido, então quem carrega a
      leitura de material é a borda + o --win-highlight, não a transparência. */
-  --icon-tile-bg: rgba(46, 16, 101, 0.92);
-  --icon-tile-bg-hover: rgba(60, 24, 120, 0.96);
+  /* De dia o tile continua ESCURO (o motivo está em :root: o wallpaper claro
+     tem regiões quase brancas onde tile branco some), então a base vai para o
+     preto e não para o branco — ao contrário do corpo de janela logo abaixo.
+     É a única superfície do sistema que não inverte com o tema. */
+  --icon-tile-base: color-mix(in srgb, rgb(var(--accent-rgb)) 38%, #000000);
+  --icon-tile-bg: color-mix(in srgb, var(--icon-tile-base) 92%, transparent);
+  --icon-tile-bg-hover: color-mix(in srgb, var(--icon-tile-base) 96%, transparent);
   --icon-tile-border: 1px solid rgba(255, 255, 255, 0.28);
 
   /* De dia o divisor inverte: sobre superfície clara quem separa é sombra, não
@@ -288,20 +342,32 @@
     radial-gradient(90vw 0.9vh at 50% 46%, rgba(139, 92, 246, 0.4) 0%, transparent 80%),
     radial-gradient(44vh 36vh at 50% 46%, rgba(167, 139, 250, 0.26) 0%, transparent 72%);
 
-  --cer-texto: #2e1065;
-  --cer-texto-suave: #6d28d9;
-  --cer-texto-fraco: #9585b8;
+  /* Os mesmos três degraus da noite, com o extremo INVERTIDO: de dia o que
+     contrasta com o campo claro é o escuro, então `--cer-luz-ponta` vai para o
+     preto em vez do branco. As opacidades abaixo são as que já existiam. */
+  --cer-luz: rgb(var(--accent-rgb));
+  --cer-luz-meio: color-mix(in srgb, rgb(var(--accent-rgb)) 78%, #000000);
+  --cer-luz-ponta: color-mix(in srgb, rgb(var(--accent-rgb)) 34%, #000000);
 
-  --cer-trilho: rgba(109, 40, 217, 0.16);
-  --cer-preenchimento: linear-gradient(90deg, #5b21b6, #7c3aed 70%, #a855f7);
+  --cer-texto: var(--cer-luz-ponta);
+  --cer-texto-suave: var(--cer-luz-meio);
+  --cer-texto-fraco: color-mix(in srgb, var(--cer-luz-meio) 46%, #9b96a8);
+
+  --cer-trilho: color-mix(in srgb, var(--cer-luz-meio) 16%, transparent);
+  --cer-preenchimento: linear-gradient(
+    90deg,
+    var(--cer-luz-ponta),
+    var(--cer-luz-meio) 70%,
+    var(--cer-luz)
+  );
   /* Varredura escura: sobre um trilho claro, um brilho branco não apareceria. */
-  --cer-varredura: rgba(76, 29, 149, 0.28);
-  --cer-brilho: rgba(124, 58, 237, 0.18);
-  --cer-brilho-forte: rgba(124, 58, 237, 0.35);
+  --cer-varredura: color-mix(in srgb, var(--cer-luz-ponta) 28%, transparent);
+  --cer-brilho: color-mix(in srgb, var(--cer-luz-meio) 18%, transparent);
+  --cer-brilho-forte: color-mix(in srgb, var(--cer-luz-meio) 35%, transparent);
 
-  --cer-borda: rgba(109, 40, 217, 0.32);
-  --cer-borda-forte: rgba(109, 40, 217, 0.55);
-  --cer-veu: rgba(168, 85, 247, 0.1);
+  --cer-borda: color-mix(in srgb, var(--cer-luz-meio) 32%, transparent);
+  --cer-borda-forte: color-mix(in srgb, var(--cer-luz-meio) 55%, transparent);
+  --cer-veu: color-mix(in srgb, var(--cer-luz) 10%, transparent);
 }
 
 /* --------------------------------------------------

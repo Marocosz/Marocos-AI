@@ -13,7 +13,10 @@
  * janela — e um `var()` sem fallback resolve para nada, não para o valor
  * anterior.
  */
-import { VIDRO, LAYOUT, WALLPAPER, MOVIMENTO, JANELAS, hexParaRgb } from './system'
+import {
+  VIDRO, LAYOUT, WALLPAPER, MOVIMENTO, JANELAS, hexParaRgb, giroDaCerimonia,
+  saturacaoDaCerimonia,
+} from './system'
 
 export function aplicarConfigNoCss(tema = 'dark', preset = null) {
   if (typeof document === 'undefined') return
@@ -55,6 +58,18 @@ export function aplicarConfigNoCss(tema = 'dark', preset = null) {
      */
     '--cfg-accent': preset?.acento || null,
     '--cfg-accent-rgb': hexParaRgb(preset?.acento),
+    /**
+     * O giro de matiz da arte da cerimônia. Ver `giroDaCerimonia` no config: a
+     * cena tem mais de trinta paradas de gradiente desenhadas à mão, e girar o
+     * matiz da camada é o que leva o preset até lá sem desmontar a composição.
+     */
+    '--cfg-cerimonia-giro': `${giroDaCerimonia(preset)}deg`,
+    /**
+     * O giro sozinho não cobre preset acromático: `hue-rotate` gira o matiz mas
+     * não o remove, então o Grafite saía azul em vez de cinza. Este fator
+     * encolhe a saturação na mesma proporção do acento.
+     */
+    '--cfg-cerimonia-sat': String(saturacaoDaCerimonia(preset)),
     '--cfg-veu-sem-foco': JANELAS.veuSemFoco,
     '--cfg-veu-sem-foco-claro': JANELAS.veuSemFocoClaro,
     '--cfg-explorer-lateral': LAYOUT.explorador.lateralLargura,

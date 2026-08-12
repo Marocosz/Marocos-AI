@@ -41,7 +41,7 @@ const POSE_PARADA = [0.14, 0.6, 0.05]
  */
 const DISTANCIA_CAMERA = 5.6
 
-const CrystalMesh = ({ animated, spin }) => {
+const CrystalMesh = ({ animated, spin, corpo }) => {
   const meshRef = useRef()
   // Tempo de rotação acumulado, e a velocidade que está valendo agora.
   const faseRef = useRef(0)
@@ -81,7 +81,7 @@ const CrystalMesh = ({ animated, spin }) => {
           alongado em y. */}
       <icosahedronGeometry args={[1, 0]} />
       <meshPhysicalMaterial
-        color="#6b24b7"
+        color={corpo}
         emissive="#090909"
         emissiveIntensity={0.2}
         roughness={0.15}
@@ -125,6 +125,9 @@ const Crystal = ({
    */
   acento = '#a855f7',
   acentoFundo = '#4c1d95',
+  /** Corpo do material. Ponto médio entre os dois acima — ver
+   *  `corpoDoCristal()` em config/system.js. */
+  corpo = '#6b24b7',
 }) => {
   return (
     <div
@@ -192,7 +195,7 @@ const Crystal = ({
           rotationIntensity={0}
           floatIntensity={animated ? 1 : 0}
         >
-          <CrystalMesh animated={animated} spin={spin} />
+          <CrystalMesh animated={animated} spin={spin} corpo={corpo} />
         </Float>
 
         {sparkles && (

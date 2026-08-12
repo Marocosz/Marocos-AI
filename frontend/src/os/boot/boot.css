@@ -72,6 +72,47 @@
    CÉUS — a camada mais funda do parallax
    ================================================== */
 
+/* O GIRO DE MATIZ É O QUE LEVA O PRESET ATÉ A ARTE.
+ *
+ * As três camadas decorativas (os dois céus e a nebulosa) somam mais de trinta
+ * paradas de gradiente desenhadas à mão. Reescrever cada uma em função do
+ * acento destruiria a composição — as relações de luminância ENTRE as camadas
+ * são o desenho, e são elas que sustentam os seis eixos documentados lá em
+ * cima.
+ *
+ * `hue-rotate` gira só o que tem saturação. Branco, preto e cinza ficam onde
+ * estão, então o núcleo branco da nebulosa continua branco, o palco quase preto
+ * continua quase preto, e só a família violeta viaja para a cor do preset. O
+ * ângulo vem do config (`giroDaCerimonia`), e é 0° no preset padrão — quem não
+ * mexer em nada vê exatamente a cena de sempre.
+ *
+ * NÃO SE APLICA AO NÚCLEO. O cristal fica em `.cerimonia-nucleo`, fora destas
+ * camadas: ele recebe a cor por prop no three.js, e girá-lo por filtro de CSS
+ * por cima somaria dois giros na mesma peça.
+ *
+ * Custo: um passe de filtro por camada. Elas já são superfícies próprias do
+ * compositor (ver a nota de `will-change` acima), e o giro é constante — o
+ * navegador não o recalcula por quadro, só o aplica na composição. */
+/* A segunda linha de dica: mais apagada e mais estreita que a primeira, porque
+   é uma sugestão e não a instrução para entrar. Espaço reservado só quando ela
+   existe — no mobile e em tela cheia ela nem monta. */
+.lock-hint--f11 {
+  margin-top: 6px;
+  opacity: 0.62;
+  font-size: 0.76rem;
+  letter-spacing: 0.04em;
+}
+
+.cerimonia-ceu,
+.cerimonia-nebulosa {
+  /* O `saturate` não é enfeite do `hue-rotate`: sem ele, preset acromático não
+     funciona. Girar o matiz de um violeta saturado devolve outra cor viva —
+     nunca cinza. Com Grafite (acento a ~5% de saturação) a cena saía AZUL. O
+     fator encolhe a saturação na mesma proporção do acento, e é 1 no preset
+     padrão. */
+  filter: hue-rotate(var(--cfg-cerimonia-giro, 0deg)) saturate(var(--cfg-cerimonia-sat, 1));
+}
+
 .cerimonia-ceu {
   position: absolute;
   inset: 0;

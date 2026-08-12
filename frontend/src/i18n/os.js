@@ -129,6 +129,13 @@ const osContentEn = {
     enter: 'Enter',
     enterAria: 'Enter the desktop',
     hint: 'click MAROCOS OS to enter',
+    /**
+     * Só no desktop, e só enquanto a janela NÃO está em tela cheia. É um
+     * sistema operacional dentro de uma aba — a barra do navegador em volta é a
+     * única coisa que denuncia a moldura, e F11 a remove. Aqui é o momento
+     * certo de sugerir: antes de entrar, uma vez, sem interromper nada depois.
+     */
+    fullscreenHint: 'press F11 for the full experience',
     ariaLabel: 'Lock screen',
   },
   /**
@@ -387,6 +394,8 @@ const osContentPt = {
     enter: 'Entrar',
     enterAria: 'Entrar na área de trabalho',
     hint: 'clique em MAROCOS SO para entrar',
+    /** Ver a nota no bloco em inglês: desktop, e só fora de tela cheia. */
+    fullscreenHint: 'aperte F11 para a experiência completa',
     ariaLabel: 'Tela de bloqueio',
   },
   /** POST de BIOS parado — ver a nota no bloco em inglês. */
