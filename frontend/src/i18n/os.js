@@ -215,6 +215,16 @@ const osContentEn = {
   devices: {
     device: 'Device',
     status: 'Status',
+    /**
+     * OS NÍVEIS SÃO ESCRITOS EM INGLÊS NOS DADOS (`level: "Expert"`), e é assim desde a
+     * página clássica. Traduzir o DADO quebraria duas coisas de uma vez: a chave de
+     * contagem de `contarNiveis` e a classe de chip do CSS (`level-expert`). Traduzir só
+     * a EXIBIÇÃO resolve sem tocar em nenhuma das duas.
+     */
+    niveis: { expert: 'expert', advanced: 'advanced', intermediate: 'intermediate' },
+    tecnologias: 'technologies',
+    abrir: 'Open',
+    fechar: 'Close',
   },
   head: {
     about: 'About This PC | Marcos Rodrigues',
@@ -607,6 +617,11 @@ const osContentPt = {
   devices: {
     device: 'Dispositivo',
     status: 'Status',
+    /** Ver a nota no bloco em inglês: traduz-se a exibição, nunca o dado. */
+    niveis: { expert: 'expert', advanced: 'avançado', intermediate: 'intermediário' },
+    tecnologias: 'tecnologias',
+    abrir: 'Abrir',
+    fechar: 'Fechar',
   },
   head: {
     about: 'Sobre este PC | Marcos Rodrigues',

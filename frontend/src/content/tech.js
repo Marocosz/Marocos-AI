@@ -126,4 +126,36 @@ const techPageContentPt = {
   items: techDataItemsPt
 };
 
+/**
+ * OS NÍVEIS, EM ORDEM FIXA — do mais forte para o mais fraco.
+ *
+ * A ordem existe porque o badge de cada pasta lista as contagens em sequência ("2
+ * expert · 3 avançado"), e duas pastas lado a lado com ordens diferentes ficam
+ * impossíveis de comparar de relance.
+ *
+ * É também a LISTA CANÔNICA: os valores de `level` nos dados estão em inglês (herança
+ * da página clássica) e alimentam três coisas — a chave de contagem aqui, a classe de
+ * chip no CSS (`level-expert`) e o rótulo traduzido no `i18n`. Um `level` escrito com
+ * outro nome sairia do badge em silêncio e não ganharia cor; há teste guardando.
+ */
+export const NIVEIS = ['expert', 'advanced', 'intermediate'];
+
+/**
+ * A distribuição de níveis de uma categoria, derivada dos próprios itens.
+ *
+ * Derivada e não escrita: uma contagem à mão aqui envelheceria na primeira tecnologia
+ * acrescentada. Este projeto já teve três números literais envelhecerem em texto
+ * visível, e a regra que ficou é que quantidade na interface vem de fonte única.
+ *
+ * Devolve só os níveis PRESENTES — categoria sem nenhum intermediário não mostra
+ * "0 intermediário" no badge.
+ */
+export const contarNiveis = (items) =>
+  NIVEIS
+    .map((nivel) => ({
+      nivel,
+      total: items.filter((i) => i.level.toLowerCase() === nivel).length,
+    }))
+    .filter((n) => n.total > 0);
+
 export const getTechData = (lang) => (lang === 'pt' ? techPageContentPt : techPageContentEn);
