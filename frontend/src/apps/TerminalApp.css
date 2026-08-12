@@ -72,12 +72,32 @@
 
 /* Linha ecoada: prompt + o que foi digitado, congelados no histórico assim
    que o Enter é apertado. */
+/**
+ * O PROMPT RESPIRA ANTES, NÃO DEPOIS.
+ *
+ * Cada linha de eco (`visitante@portfolio:~$ comando`) começa um bloco novo:
+ * ela e a saída que vem logo abaixo são uma coisa só. Sem folga acima, o
+ * comando novo encostava na última linha da resposta anterior e a transcrição
+ * virava um parágrafo contínuo — que é o oposto do que um terminal comunica,
+ * onde cada `$` marca visualmente onde uma interação começou.
+ *
+ * A margem é `top` e não `bottom` justamente por isso: o espaço pertence à
+ * separação ENTRE blocos, e o eco fica colado na própria saída.
+ *
+ * O primeiro eco não recebe: no boot ele vem logo depois dos logs de
+ * inicialização e faz parte da mesma cena de abertura.
+ */
 .terminal-echo {
   display: flex;
   flex-wrap: wrap;
   align-items: baseline;
   gap: 0.5rem;
+  margin-top: 1.1rem;
   margin-bottom: 0.35rem;
+}
+
+.terminal-echo:first-child {
+  margin-top: 0;
 }
 
 .terminal-prompt { color: var(--accent-color); font-weight: 700; white-space: nowrap; }
@@ -237,12 +257,14 @@
 }
 
 /* --- PROMPT ATIVO (input de verdade) --- */
+/* O prompt ativo recebe a mesma folga acima que os ecos do histórico — ele é o
+   próximo bloco da conversa, e não um rodapé colado no fim dela. */
 .terminal-input-line {
   flex: 0 0 auto;
   display: flex;
   align-items: center;
   gap: 0.5rem;
-  padding: 8px 18px 14px;
+  padding: 16px 18px 14px;
   border-top: 1px solid rgba(255, 255, 255, 0.06);
 }
 
@@ -257,34 +279,195 @@
   caret-color: var(--accent-color);
 }
 
-/* ========================================
-   TEMA CLARO
-   ======================================== */
+/* ==========================================================================
+   O TERMINAL É UM TERMINAL — OPACO E ESCURO, EM QUALQUER TEMA OU PRESET.
 
-.theme-light .terminal-app { color: #333; }
-.theme-light .terminal-strong { color: #1a1a1a; }
-.theme-light .terminal-log-text { color: #444; }
-.theme-light .terminal-log-fill { border-bottom-color: #bbb; }
-.theme-light .terminal-kv-value { color: #333; }
-.theme-light .terminal-col-type { color: #333; }
-.theme-light .terminal-link { color: #555; }
-.theme-light .terminal-link:hover { color: var(--accent-color); }
-.theme-light .terminal-tag {
-  background: rgba(0, 0, 0, 0.03);
-  border-color: rgba(0, 0, 0, 0.08);
-  color: #555;
+   Antes ele era uma janela de vidro como as outras: o papel de parede aparecia
+   através do histórico, e no tema claro o bloco inteiro clareava para acompanhar
+   a interface. Nenhum terminal do mundo faz isso. Um console é uma superfície
+   OPACA e escura porque texto monoespaçado em fósforo claro sobre fundo escuro é
+   a leitura que a ferramenta pede — e porque um cursor piscando sobre um shader
+   animado é ruído sobre trabalho.
+
+   Daí este bloco desligar o vidro da JANELA, e não só pintar o miolo. O
+   `data-app` vem de `Window.jsx`; sem ele, dava para cobrir o corpo com uma cor
+   opaca, mas o `backdrop-filter` continuaria sendo calculado por baixo — custo
+   pago por um desfoque que ninguém veria.
+
+   Vale maximizada e restaurada: a regra não olha `.maximized`, de propósito. O
+   pedido é que a aparência do terminal não dependa do tamanho dele.
+   ========================================================================== */
+
+/**
+ * A PALETA DO CONSOLE — DO TEMA, NUNCA DO PRESET.
+ *
+ * Um terminal é preto à noite e branco de dia, e ponto. Ele não recebe o veio do
+ * papel de parede escolhido: nenhum console do mundo muda de cor porque o
+ * usuário trocou o wallpaper, e um terminal roxo-acinzentado em Ametista e
+ * verde-acinzentado em Esmeralda deixa de ser a citação de uma ferramenta para
+ * virar mais um painel do site.
+ *
+ * (Foi o que uma versão anterior deste bloco fazia, com um `color-mix` do acento
+ * sobre quase-preto. Ficava bonito e estava errado pelo mesmo motivo: a
+ * ferramenta perdia a identidade de ferramenta.)
+ *
+ * O ACENTO CONTINUA ENTRANDO onde é sintaxe e não superfície — o prompt, os
+ * rótulos de chave, o realce dos comandos clicáveis. É assim que um esquema de
+ * cores de terminal funciona: fundo neutro, destaque colorido.
+ *
+ * Os tokens ficam na JANELA e não em `.terminal-app` porque o fundo opaco é da
+ * janela inteira (ver logo abaixo por que o vidro morre aqui).
+ */
+.marocos-window[data-app='terminal'] {
+  --term-bg: #0c0c0c;
+  --term-fg: #d8d8d8;
+  --term-fg-forte: #ffffff;
+  --term-fg-fraco: #8f8f8f;
+  --term-linha: rgba(255, 255, 255, 0.14);
+  --term-linha-fraca: rgba(255, 255, 255, 0.07);
+  --term-superficie: rgba(255, 255, 255, 0.06);
+
+  /**
+   * SEM VIDRO, MAXIMIZADA OU NÃO. A regra não olha `.maximized` de propósito: a
+   * aparência de um console não depende do tamanho dele.
+   *
+   * Isto desliga o `backdrop-filter` da JANELA, e não só pinta o miolo. Cobrir o
+   * corpo com uma cor opaca resolveria o visual, mas o desfoque continuaria
+   * sendo calculado por baixo — custo pago por um efeito que ninguém veria. O
+   * `data-app` vem de `Window.jsx` justamente para permitir isto.
+   */
+  background: var(--term-bg);
+  -webkit-backdrop-filter: none;
+  backdrop-filter: none;
 }
-.theme-light .terminal-input { color: #111; }
-.theme-light .terminal-input-line { border-top-color: rgba(0, 0, 0, 0.08); }
-.theme-light .terminal-row { border-bottom-color: rgba(0, 0, 0, 0.05); }
-.theme-light .terminal-table-header {
-  border-bottom-color: rgba(0, 0, 0, 0.2);
+
+.theme-light .marocos-window[data-app='terminal'] {
+  --term-bg: #ffffff;
+  --term-fg: #2f2f2f;
+  --term-fg-forte: #000000;
+  --term-fg-fraco: #6d6d6d;
+  --term-linha: rgba(0, 0, 0, 0.16);
+  --term-linha-fraca: rgba(0, 0, 0, 0.07);
+  --term-superficie: rgba(0, 0, 0, 0.04);
+}
+
+/**
+ * No XP, preto puro nos DOIS temas — o prompt de comando daquele sistema não
+ * tinha modo claro, e é o contraste com a barra de título azul que o identifica.
+ *
+ * Três classes contra as duas de `.theme-light`: o modo XP fixa `theme-light`
+ * (ver `Shell.jsx`), então sem a especificidade extra o bloco de cima venceria
+ * por vir depois.
+ */
+.theme-light.modo-xp .marocos-window[data-app='terminal'] {
+  --term-bg: #000000;
+  --term-fg: #cccccc;
+  --term-fg-forte: #ffffff;
+  --term-fg-fraco: #8a8a8a;
+  --term-linha: rgba(255, 255, 255, 0.18);
+  --term-linha-fraca: rgba(255, 255, 255, 0.08);
+  --term-superficie: rgba(255, 255, 255, 0.06);
+}
+
+.marocos-window[data-app='terminal'] .marocos-window-body {
+  background: transparent;
+}
+
+/* ==========================================================================
+   AS CORES DO CONSOLE, TODAS NUM LUGAR SÓ.
+
+   Este bloco existe por causa de uma colisão de especificidade concreta, e não
+   por organização: `styles/index.css` pinta `.theme-light h1..p, span, li, div`
+   com `color: var(--text-primary)` — uma regra de dois níveis que o próprio
+   arquivo documenta como dívida. As classes do terminal têm UM nível, então
+   perdem para ela em qualquer `<span>` ou `<div>` do histórico.
+
+   Enquanto o terminal era claro no tema claro, isso passava despercebido: a cor
+   que vazava era próxima da certa. Com o console preto em qualquer tema, e
+   principalmente no XP (que fixa `theme-light` e ainda força
+   `--text-primary: #000`), o resultado era texto preto sobre fundo preto.
+
+   Prefixando por `[data-app='terminal']` (dois níveis + atributo) as regras
+   daqui passam a vencer. O atributo vem do container — `desktop/Window.jsx` e
+   `mobile/MobileApp.jsx` —, então isto vale nos dois shells.
+
+   A ordem interna importa: o pega-tudo primeiro, as classes específicas depois.
+   Elas empatam em especificidade, e no empate quem vem por último ganha.
+   ========================================================================== */
+
+[data-app='terminal'] .terminal-app {
+  color: var(--term-fg);
+}
+
+/* Pega-tudo: qualquer span/div sem cor própria volta a herdar do console. */
+[data-app='terminal'] .terminal-app span,
+[data-app='terminal'] .terminal-app div {
+  color: inherit;
+}
+
+/* Texto comum e ênfases. */
+[data-app='terminal'] .terminal-line,
+[data-app='terminal'] .terminal-log-text,
+[data-app='terminal'] .terminal-kv-value,
+[data-app='terminal'] .terminal-col-type {
+  color: var(--term-fg);
+}
+
+[data-app='terminal'] .terminal-strong,
+[data-app='terminal'] .terminal-command,
+[data-app='terminal'] .terminal-input {
+  color: var(--term-fg-forte);
+}
+
+[data-app='terminal'] .terminal-dim {
+  color: var(--term-fg-fraco);
+}
+
+/* O ACENTO CONTINUA ENTRANDO ONDE É SINTAXE, não superfície: prompt, rótulos de
+   chave e títulos de bloco. É assim que um esquema de cores de terminal
+   funciona — fundo neutro, destaque colorido. */
+[data-app='terminal'] .terminal-prompt,
+[data-app='terminal'] .terminal-accent,
+[data-app='terminal'] .terminal-kv-label,
+[data-app='terminal'] .terminal-table-header {
   color: var(--accent-color);
 }
-.theme-light .terminal-rule { border-top-color: rgba(0, 0, 0, 0.15); }
 
-/* .terminal-prompt, .terminal-accent, .terminal-kv-label e .terminal-col-status
-   usam <b>/<pre> (não <span>/<p>/<div>) de propósito — por isso continuam
-   roxo/verde mesmo no tema claro, sem precisar de override aqui: só o
-   seletor `.theme-light span/p/div {color: var(--text-primary) !important}`
-   de index.css é que os ignoraria. */
+/* Vermelho de erro e verde de status são semânticos, não decorativos: mantêm o
+   significado em qualquer tema, e por isso não entram na paleta do console. */
+[data-app='terminal'] .terminal-error {
+  color: #ff5f56;
+}
+
+[data-app='terminal'] .terminal-col-status {
+  color: #1f9d3d;
+}
+
+[data-app='terminal'] .terminal-link {
+  color: var(--term-fg);
+}
+
+[data-app='terminal'] .terminal-link:hover {
+  color: var(--accent-color);
+}
+
+/* Linhas, divisores e a superfície das etiquetas. */
+[data-app='terminal'] .terminal-rule,
+[data-app='terminal'] .terminal-table-header {
+  border-color: var(--term-linha);
+}
+
+[data-app='terminal'] .terminal-input-line,
+[data-app='terminal'] .terminal-row {
+  border-color: var(--term-linha-fraca);
+}
+
+[data-app='terminal'] .terminal-log-fill {
+  border-bottom-color: var(--term-linha);
+}
+
+[data-app='terminal'] .terminal-tag {
+  color: var(--term-fg);
+  background: var(--term-superficie);
+  border-color: var(--term-linha);
+}

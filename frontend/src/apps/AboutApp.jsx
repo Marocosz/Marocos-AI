@@ -7,7 +7,6 @@ import { useAbrir } from '../os/NavegacaoContext'
 import { useDeviceMode } from '../os/useDeviceMode'
 import { CERIMONIA, acentoProfundo, corpoDoCristal } from '../config/system'
 import { useTheme } from '../contexts/ThemeContext'
-import DecryptedText from '../effects/DecryptedText'
 import './AboutApp.css'
 
 // three + @react-three/fiber + @react-three/drei são pesados demais pra
@@ -100,11 +99,31 @@ const AboutApp = () => {
                   ("`isAnimationEnabled = false` ... o cristal cai em
                   frameloop=demand"); era a promessa que este arquivo não
                   cumpria. */}
-              {/* Luz de identidade pela metade: aqui o cristal é um logotipo ao
-                  lado de um texto, não o assunto da tela como na cerimônia, e a
-                  intensidade cheia espalhava cor demais em volta da peça. */}
+              {/**
+                * SEM O HALO CIRCULAR — e ele nunca esteve no CSS deste app.
+                *
+                * A mancha redonda em volta da peça é `.crystal-3d::before`, em
+                * `os/tokens.css`: um radial com `border-radius: 50%` e
+                * `inset: -18%` que o COMPONENTE traz consigo. Por isso mexer no
+                * `.about-crystal` daqui não adiantava — eu estava apagando um
+                * gradiente diferente, atrás do que realmente aparecia.
+                *
+                * O halo existe por um motivo real, explicado lá: o material tem
+                * `transmission: 1.0` e mostra o que está ATRÁS dele, então sobre
+                * fundo escuro o cristal simplesmente sumiria sem algo para
+                * transmitir. Na cerimônia isso é indispensável.
+                *
+                * Aqui não: a janela já é uma superfície clara o bastante para o
+                * cristal ter o que transmitir, e o halo vira uma mancha de cor
+                * disputando atenção com o texto ao lado. `crystal-3d-sem-halo`
+                * é a saída que o próprio token já previa.
+                *
+                * As partículas FICAM: são pontuais e leem como faceta captando
+                * luz, não como brilho em volta.
+                */}
               <Crystal
                 size={190}
+                className="crystal-3d-sem-halo"
                 intensidade={0.5}
                 animated={isAnimated}
                 acento={preset.acento}
@@ -117,15 +136,11 @@ const AboutApp = () => {
 
         <div className="about-identity-text">
           <p className="about-kicker">{profile.role}</p>
-          <p className="about-highlight">
-            <DecryptedText
-              text={profile.bio_highlight}
-              speed={40}
-              animateOn="view"
-              revealDirection="start"
-              useOriginalCharsOnly
-            />
-          </p>
+          {/* Texto direto. O efeito de "decriptação" que embaralhava esta frase
+              antes de revelá-la saiu do projeto: ela é a primeira coisa que o
+              visitante lê no guia, e atrasar a leitura da linha mais importante
+              da janela para exibir um truque é o custo errado. */}
+          <p className="about-highlight">{profile.bio_highlight}</p>
         </div>
       </div>
 

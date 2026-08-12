@@ -1,15 +1,90 @@
-/* src/apps/ProjectsApp.css */
+/* src/apps/ProjectsApp.css
+   ==========================================================================
+   A pasta "Projetos" em MODO DETALHES — a visão de lista do Explorer.
 
-/* A pasta "Projetos": lista em estilo explorador de arquivos. O container
-   da janela já dá padding e overflow-y auto — aqui só cuida das linhas. */
+   A GRADE É UMA SÓ, DECLARADA EM UM LUGAR. Cabeçalho e linhas usam a mesma
+   `grid-template-columns`, herdada de `.projects-app`, porque colunas que se
+   alinham por coincidência deixam de se alinhar na primeira mudança de fonte ou
+   de idioma. É também o que permite ao rótulo "Data de modificação" (bem mais
+   largo em português que "Date modified") ditar a coluna sem ninguém recalcular
+   nada à mão.
 
+   O container da janela já dá padding e `overflow-y: auto` — aqui só o miolo.
+   ========================================================================== */
+
+.projects-app {
+  /* nome (flexível) · data · tipo · tamanho.
+     `minmax(0, 1fr)` no nome, e não `1fr`: sem o mínimo zero, um título longo
+     empurra as outras colunas para fora em vez de truncar.
+     A coluna de data é a mais larga das fixas porque o RÓTULO manda, não o
+     conteúdo: "Data de modificação" é bem mais longo que a data que ele
+     encima — e mais longo ainda que "Date modified" em inglês. Dimensionar
+     pelo dado truncaria o cabeçalho, que foi o que aconteceu. */
+  --projects-grade: minmax(0, 1fr) 172px 150px 92px;
+
+  /**
+   * O CABEÇALHO FICA FORA DA ÁREA QUE ROLA.
+   *
+   * A primeira versão usava `position: sticky` e o cabeçalho aparecia por cima
+   * da primeira linha. Trocar o fundo translúcido por opaco não resolveu, o que
+   * já indicava que o problema não era transparência: era a caixa.
+   *
+   * Aqui o app vira a coluna, o cabeçalho é um item que não encolhe e só a
+   * LISTA rola. Sem `sticky`, sem `z-index`, sem sobreposição possível — é o
+   * mesmo arranjo que o Terminal usa para manter o prompt fixo embaixo enquanto
+   * o histórico rola por cima.
+   *
+   * `min-height: 0` nos dois níveis não é enfeite: item de flex não encolhe
+   * abaixo do conteúdo por padrão, e sem isso a lista cresce em vez de rolar.
+   */
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  /* Anula o padding do corpo da janela: numa lista de explorador as linhas vão
+     de borda a borda, e é o realce da linha inteira que dá a leitura de seleção.
+     O respiro volta no padding lateral de cada célula. */
+  margin: -20px -22px;
+  height: calc(100% + 40px);
+}
+
+/* --- CABEÇALHO DAS COLUNAS --- */
+
+.projects-app-head {
+  flex: 0 0 auto;
+  display: grid;
+  grid-template-columns: var(--projects-grade);
+  align-items: center;
+  gap: 16px;
+  padding: 0 22px;
+  height: 32px;
+  /* O mesmo divisor das faixas do chrome de explorador: este cabeçalho é da
+     mesma família que a barra de comandos logo acima dele. */
+  border-bottom: 1px solid var(--explorer-divisor, var(--card-border));
+
+  /* Translúcido, como as faixas do chrome — e agora ele PODE ser, porque nada
+     mais rola por baixo dele. Numa janela restaurada isso mantém o vidro
+     atravessando o app inteiro, sem uma faixa opaca no meio do material. */
+  background: var(--card-bg);
+
+  /* Micro-rótulo: caixa alta com espaçamento, na escala do resto do sistema. */
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  color: var(--text-secondary);
+}
+
+/* --- LINHAS --- */
+
+/* A única parte que rola — ver a nota no `.projects-app`. */
 .projects-app-list {
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow-y: auto;
   list-style: none;
   margin: 0;
   padding: 0;
   display: flex;
   flex-direction: column;
-  gap: 4px;
 }
 
 .projects-app-row {
@@ -17,72 +92,121 @@
 }
 
 .projects-app-item {
-  display: flex;
+  display: grid;
+  grid-template-columns: var(--projects-grade);
   align-items: center;
-  gap: 12px;
+  gap: 16px;
   width: 100%;
-  padding: 10px 12px;
+  padding: 0 22px;
+  /* Altura fixa por linha, como numa lista de arquivos: o olho varre a coluna
+     inteira e não precisa reencontrar o ritmo a cada item. */
+  height: 34px;
   background: transparent;
-  border: 1px solid transparent;
-  border-radius: 8px;
+  border: none;
   color: inherit;
   font: inherit;
   text-align: left;
   cursor: pointer;
-  transition: background-color 0.15s ease, border-color 0.15s ease;
+  transition: background-color 0.12s ease;
+}
+
+/**
+ * Faixa zebrada, muito fraca: ajuda a seguir a linha até a última coluna sem
+ * desenhar uma grade de tabela.
+ *
+ * ELA FICA NA LINHA, E O HOVER NO BOTÃO — os dois em camadas diferentes, de
+ * propósito. A primeira versão punha a faixa no próprio botão
+ * (`...row:nth-child(even) .projects-app-item`), e aquilo tem TRÊS níveis de
+ * especificidade contra os dois de `.projects-app-item:hover`: nas linhas
+ * pares a faixa vencia e o realce de hover simplesmente não aparecia.
+ *
+ * Subir a especificidade do hover resolveria o sintoma e manteria a corrida.
+ * Separando as camadas não há disputa nenhuma: a linha pinta a faixa, o botão
+ * (que é transparente por padrão e ocupa a linha inteira) pinta o realce por
+ * cima dela.
+ */
+.projects-app-row:nth-child(even) {
+  background: rgb(var(--accent-rgb) / 0.04);
 }
 
 .projects-app-item:hover,
 .projects-app-item:focus-visible {
-  background: var(--card-bg);
-  border-color: var(--card-border);
+  background: rgb(var(--accent-rgb) / 0.16);
 }
 
 .projects-app-item:focus-visible {
-  outline: 2px solid var(--accent-color);
-  outline-offset: -2px;
+  outline: 1px solid var(--accent-color);
+  outline-offset: -1px;
 }
 
-.projects-app-item-icon {
-  display: grid;
-  place-items: center;
-  flex-shrink: 0;
-  width: 36px;
-  height: 36px;
-  border-radius: 8px;
-  background: var(--card-bg);
-  border: 1px solid var(--card-border);
-  color: var(--accent-color);
-}
+/* --- CÉLULAS --- */
 
-.projects-app-item-info {
-  display: flex;
-  flex-direction: column;
-  gap: 2px;
+.projects-col {
   min-width: 0;
-}
-
-.projects-app-item-title {
-  font-size: 0.95rem;
-  /* Poppins e carregado em 400/700/900 e o index.css tem font-synthesis: none.
-     Este valor e o peso que o navegador ja resolvia sozinho; a declaracao antiga
-     (600) nao existia e caia aqui em silencio. */
-  font-weight: 700;
-  color: var(--text-primary);
-  white-space: nowrap;
   overflow: hidden;
+  white-space: nowrap;
   text-overflow: ellipsis;
 }
 
-.projects-app-item-category {
-  font-size: 0.72rem;
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 1.2px;
+.projects-col--nome {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+}
+
+.projects-app-item-icon {
+  flex-shrink: 0;
   color: var(--accent-color);
 }
 
-/* Contraste maior no tema claro, mesmo tratamento do carrossel antigo. */
-.theme-light .projects-app-item-category {
-  color: var(--accent-color);
+.projects-app-item-title {
+  min-width: 0;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  font-size: 0.86rem;
+  color: var(--text-primary);
+}
+
+.projects-col--data,
+.projects-col--tipo {
+  font-size: 0.78rem;
+  color: var(--text-secondary);
+}
+
+/* Número alinhado à direita, como em qualquer lista de arquivos — é o que
+   permite comparar tamanhos correndo o olho pela coluna. */
+.projects-col--tamanho {
+  text-align: right;
+  font-size: 0.78rem;
+  color: var(--text-secondary);
+  /* Voz de máquina: é medida, não prosa. E tabular para os dígitos alinharem
+     verticalmente mesmo em fonte proporcional. */
+  font-family: 'Courier New', monospace;
+  font-variant-numeric: tabular-nums;
+}
+
+/* --- ESTREITO ---
+   Abaixo de 620px as colunas de data e tamanho saem, nesta ordem: a data é a
+   menos acionável das quatro, e o tamanho é a que o visitante compara. Nome e
+   tipo ficam até o fim, porque sozinhos já respondem "o que é isto". */
+@media (max-width: 620px) {
+  .projects-app {
+    --projects-grade: minmax(0, 1fr) 0 130px 0;
+  }
+
+  .projects-col--data,
+  .projects-col--tamanho {
+    display: none;
+  }
+}
+
+@media (max-width: 420px) {
+  .projects-app {
+    --projects-grade: minmax(0, 1fr) 0 0 0;
+  }
+
+  .projects-col--tipo {
+    display: none;
+  }
 }

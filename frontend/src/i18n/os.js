@@ -151,6 +151,18 @@ const osContentEn = {
     ],
     repoLabel: 'The whole thing is open on GitHub',
   },
+  /**
+   * As colunas da lista de projetos em modo Detalhes. Mesmos nomes que o
+   * Explorer usa, porque a janela inteira é a citação dele.
+   */
+  projects: {
+    colName: 'Name',
+    colDate: 'Date modified',
+    colType: 'Type',
+    colSize: 'Size',
+    countOne: '%s item',
+    countMany: '%s items',
+  },
   devices: {
     device: 'Device',
     status: 'Status',
@@ -321,7 +333,8 @@ const osContentEn = {
       'What is your tech stack?',
       'Tell me about yourself',
     ],
-    betaNotice: 'Beta: answers come from a RAG over my own data.',
+    betaNotice:
+      'This assistant uses Generative AI to produce dynamic answers. Although tuned for accuracy, the model can show the imprecisions inherent to the technology. Knowledge base updated through Jan/2026.',
     closeNotice: 'Dismiss',
     usageTooltip: 'Daily quota shared by all visitors (free APIs)',
     startingStatus: 'Starting…',
@@ -514,6 +527,14 @@ const osContentPt = {
     ],
     repoLabel: 'Está tudo aberto no GitHub',
   },
+  projects: {
+    colName: 'Nome',
+    colDate: 'Data de modificação',
+    colType: 'Tipo',
+    colSize: 'Tamanho',
+    countOne: '%s item',
+    countMany: '%s itens',
+  },
   devices: {
     device: 'Dispositivo',
     status: 'Status',
@@ -645,7 +666,8 @@ const osContentPt = {
       'Qual sua stack de tecnologia?',
       'Me fale sobre você',
     ],
-    betaNotice: 'Beta: as respostas vêm de um RAG sobre meus próprios dados.',
+    betaNotice:
+      'Este assistente utiliza IA Generativa para criar respostas dinâmicas. Embora otimizado, o modelo pode apresentar imprecisões inerentes à tecnologia. Base de conhecimento atualizada até Jan/2026.',
     closeNotice: 'Dispensar',
     usageTooltip: 'Cota diária compartilhada por todos os visitantes (APIs gratuitas)',
     startingStatus: 'Iniciando…',

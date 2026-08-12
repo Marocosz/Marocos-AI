@@ -169,7 +169,7 @@ frontend/src/
   os/                 shell/ desktop/ mobile/ boot/ hooks/ + registry, rotas, windowManager
   apps/               os 9 apps, carregados por lazy()
   ui/                 componentes compartilhados
-  wallpaper/ brand/ effects/
+  wallpaper/ brand/
   content/            dados do portfólio      i18n/ strings de interface
   styles/ contexts/
 frontend/visual/      a suíte de verificação

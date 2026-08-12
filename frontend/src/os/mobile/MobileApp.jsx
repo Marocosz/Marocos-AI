@@ -46,6 +46,9 @@ const MobileApp = ({ win }) => {
   return (
     <motion.div
       className="marocos-mobile-app"
+      /* Mesmo gancho do desktop: alguns apps precisam pintar o container, e não
+         só o próprio miolo. Ver a nota em `desktop/Window.jsx`. */
+      data-app={win.appId}
       initial={prefersReducedMotion ? false : { x: '100%' }}
       animate={{ x: 0 }}
       transition={{

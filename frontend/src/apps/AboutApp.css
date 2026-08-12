@@ -21,22 +21,29 @@
   flex-wrap: wrap;
 }
 
-/* O CRISTAL SEM MOLDURA.
-   Antes havia uma caixa de verdade aqui: raio de 22px, borda de acento, sombra
-   externa e um radial que terminava em quase-preto. Ela existia para dar ao
-   cristal um "vazio" de onde emergir — mas dentro de uma janela que já é uma
-   superfície, aquilo lia como um segundo cartão desenhado por cima do primeiro,
-   e o contorno quadrado brigava com a silhueta facetada da peça.
-
-   Sobrou só o halo: um radial que desaparece ANTES de encostar na borda da
-   caixa, então não existe aresta para ver. Alpha baixo de propósito — ele é
-   atmosfera, não moldura. O cristal 3D já traz o próprio brilho, e o halo só
-   impede que ele flutue recortado sobre o fundo da janela.
-
-   (Histórico que continua valendo: o wrapper já teve `overflow: hidden` e uma
-   caixa 150x190 para conter um componente com 700x700 chumbado, e o resultado
-   era um pedaço do facetado em vez da peça inteira. Hoje o <Crystal> é um bloco
-   quadrado do tamanho que recebe, então o wrapper só acompanha.) */
+/**
+ * SÓ O CRISTAL — o wrapper não pinta nada.
+ *
+ * Aqui já houve uma caixa inteira: raio de 22px, borda de acento, sombra externa
+ * e um radial terminando em quase-preto, para dar ao cristal um "vazio" de onde
+ * emergir. Depois virou um halo largo, depois um halo estreito, até ficar claro
+ * que o certo era zero.
+ *
+ * O RACIOCÍNIO QUE SOBROU: numa tela cheia — a cerimônia — o cristal é o
+ * assunto, e a atmosfera em volta é o efeito. Dentro de uma janela ele é um
+ * logotipo ao lado de um texto, e qualquer mancha atrás dele vira um segundo
+ * elemento disputando a mesma atenção. Ele é um objeto com volume e luz própria;
+ * não precisa de nada atrás para existir na página.
+ *
+ * A cerimônia continua com a atmosfera dela (`--cer-nebulosa` em tokens.css) —
+ * esta decisão vale só para esta janela.
+ *
+ * O wrapper fica porque é ele que reserva os 190px e centraliza. (Ele já teve
+ * `overflow: hidden` e uma caixa 150x190 para conter um componente com 700x700
+ * chumbado, e o resultado era um pedaço do facetado em vez da peça inteira. Hoje
+ * o <Crystal> é um bloco quadrado do tamanho que recebe, então o wrapper só
+ * acompanha.)
+ */
 .about-crystal {
   position: relative;
   flex: 0 0 auto;
@@ -44,28 +51,6 @@
   height: 190px;
   display: grid;
   place-items: center;
-/* DOIS EIXOS, E OS DOIS PARA BAIXO: o alpha e o ALCANCE.
-   O halo terminava em 68% do wrapper — quase encostando na borda de 190px —, e
-   um halo largo é indistinguível de um fundo. Fechando a última parada em 46%,
-   ele passa a ser um assentamento colado à peça: some bem antes do limite da
-   caixa, então não há mancha, e o que se vê em volta é a superfície da janela. */
-  background: radial-gradient(
-    circle at 50% 46%,
-    rgb(var(--accent-rgb) / 0.045) 0%,
-    rgb(var(--accent-rgb) / 0.015) 20%,
-    transparent 34%
-  );
-}
-
-/* De dia, menos ainda: sobre superfície clara o mesmo alpha vira mancha, e quem
-   sustenta a leitura passa a ser o próprio cristal. */
-.theme-light .about-crystal {
-  background: radial-gradient(
-    circle at 50% 46%,
-    rgb(var(--accent-rgb) / 0.028) 0%,
-    rgb(var(--accent-rgb) / 0.01) 20%,
-    transparent 34%
-  );
 }
 
 .about-crystal-fallback {

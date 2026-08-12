@@ -267,6 +267,13 @@ const Window = ({ win, isFocused }) => {
       ref={ref}
       className={`marocos-window${win.maximized ? ' maximized' : ''}${isFocused ? ' focused' : ''}${animandoGeometria ? ' animando' : ''}`}
       role="dialog"
+      /* QUAL APP ESTÁ AQUI DENTRO, para o CSS.
+         A janela é agnóstica de app por regra, mas alguns apps precisam mudar o
+         CHROME e não só o próprio miolo — o Terminal é o caso: ele desliga o
+         vidro da janela inteira, porque terminal com wallpaper aparecendo
+         através não é terminal. Um atributo de dado mantém a decisão no CSS, do
+         lado de quem desenha, em vez de espalhar condicionais aqui. */
+      data-app={win.appId}
       aria-labelledby={`win-title-${win.key}`}
       tabIndex={-1}
       inert={win.minimized}

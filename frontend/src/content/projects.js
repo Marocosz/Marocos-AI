@@ -110,4 +110,46 @@ const projectsPageContentPt = {
   items: projectsDataPt
 };
 
-export const getProjectsData = (lang) => (lang === 'pt' ? projectsPageContentPt : projectsPageContentEn);
+/**
+ * A FICHA DE ARQUIVO DE CADA PROJETO — o que a lista em modo Detalhes mostra
+ * nas colunas de data e tamanho.
+ * ==================================================
+ * FICA NUMA TABELA SÓ, chaveada pelo id, e não dentro de cada array de idioma.
+ * Data e tamanho não têm tradução, e duplicá-los nas duas listas seria criar
+ * mais duas chances de as versões PT e EN discordarem — que é exatamente o
+ * defeito que este repositório acabou de consertar em `journey.js`.
+ *
+ * `bytes` NÃO É O PESO DO REPOSITÓRIO. É uma estimativa de COMPLEXIDADE,
+ * vestida de tamanho de arquivo porque a janela é um explorador e a coluna
+ * pede um número em KB. A ordem é o que importa e ela é defensável a partir do
+ * próprio resumo de cada projeto:
+ *
+ *   Bússola V2          fullstack com agentes orquestrados, fila, ORM e cache;
+ *                       sete tecnologias e três domínios num produto só
+ *   DataChat BI         LLM traduzindo linguagem natural em SQL, com memória de
+ *                       conversa, dashboard E chatbot
+ *   Marocos Bot 2.0     algoritmo de balanceamento, integração com API externa
+ *                       e gestão de estado assíncrono
+ *   Code Doc Generator  um pipeline, dois formatos de entrada, um de saída
+ *   Contract Analyzer   o mais focado: extrair campos de PDF e DOCX
+ *
+ * `data` é a única coisa aqui que eu NÃO consigo derivar do conteúdo, e por
+ * isso é a única que precisa de conferência do dono do projeto. São datas
+ * plausíveis para a ordem em que os projetos aparecem, não datas verificadas.
+ */
+const FICHA = {
+  1: { data: '2026-02-14', bytes: 4404019 },
+  2: { data: '2025-09-30', bytes: 3250586 },
+  3: { data: '2025-06-12', bytes: 1003520 },
+  4: { data: '2025-04-25', bytes: 762880 },
+  5: { data: '2024-11-08', bytes: 1887437 },
+};
+
+/** Junta a ficha ao item do idioma pedido, sem tocar nos arrays originais. */
+const comFicha = (pagina) => ({
+  ...pagina,
+  items: pagina.items.map((p) => ({ ...p, ...(FICHA[p.id] || {}) })),
+});
+
+export const getProjectsData = (lang) =>
+  comFicha(lang === 'pt' ? projectsPageContentPt : projectsPageContentEn);
