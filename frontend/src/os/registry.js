@@ -33,7 +33,7 @@
 
 import { lazy } from 'react'
 import {
-  MonitorCog, FolderGit2, GitCommitVertical, Cpu,
+  MonitorCog, FolderGit2, Disc3, Cpu,
   SquareTerminal, FileText, Bot, Settings,
 } from 'lucide-react'
 
@@ -139,7 +139,18 @@ export const APPS = [
     id: 'history',
     route: '/jornada',
     titleKey: 'history',
-    icon: GitCommitVertical,
+    /**
+     * `Disc3` e não `GitCommitVertical`: o conteúdo virou um player (spec de
+     * 2026-08-12), e um vinil lê como player na hora. "Disco" também é REGISTRO de
+     * algo, que é exatamente o que um log de carreira é — o duplo sentido é o motivo
+     * de ser este e não `AudioLines` ou `ListMusic` (o segundo, a 26px, ficava
+     * parecido com o ícone de Projetos).
+     *
+     * O ÍCONE DO XP NÃO ACOMPANHA: `ui/xpIcons.jsx` mantém `history: PastaRelogio`.
+     * Pasta com relógio era o idioma de "documentos recentes" daquela época, e aquele
+     * preset cita o período em vez do design atual.
+     */
+    icon: Disc3,
     component: HistoryApp,
     defaultSize: { w: 884, h: 626 },
     singleton: true,

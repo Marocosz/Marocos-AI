@@ -255,10 +255,9 @@ export const posicaoNaLinha = (entradas, entrada, anoAtual) => {
  * `dragStart` e `dragMobile` ("Arraste para Explorar") saíram no refactor que removeu
  * o carrossel da página clássica.
  *
- * `dateLabel` e `authorLabel` ainda estão aqui e SAEM junto com o card de `git log`
- * que os consome — no player a data tem lugar próprio e a organização entra na linha
- * de meta, sem rótulo. Removê-los antes do consumidor deixaria a janela renderizando
- * "undefined" no meio da série de commits.
+ * `dateLabel` e `authorLabel` ("Data:", "Autor:") saíram junto com o card de `git log`
+ * que os consumia: no player a data tem lugar próprio e a organização entra na linha
+ * de meta, sem rótulo. O mostrador técnico do player herdou o resto da voz de commit.
  *
  * As chaves de CONTROLE abaixo são strings de interface, e não dado de portfólio.
  * Ficam aqui, junto do resto do conteúdo da jornada, porque era onde `dateLabel` e
@@ -274,11 +273,13 @@ const journeyPageContentEn = {
    * diferente: os vãos.
    */
   subtitle: "Seven years in six tracks. The gaps between them count too.",
-  dateLabel: "Date:",
-  authorLabel: "Author:",
   /** Curto porque cabe na capa e na ponta direita da barra. */
   proximoCurto: "NEXT",
-  linhaLabel: "Career timeline — use the arrow keys to move between entries",
+  /**
+   * `linhaLabel` saiu junto dos marcadores: a barra virou decorativa (linha limpa,
+   * como a de um player de música), e rótulo acessível em elemento `aria-hidden` é
+   * texto que ninguém lê. A navegação inteira vive nos controles e na lista de faixas.
+   */
   faixasLabel: "Tracks",
   /** `%a` de `%b` — interpolado no app. */
   contador: "%a of %b",
@@ -298,10 +299,8 @@ const journeyPageContentPt = {
   title: "Histórico de Versões",
   /** Ver a nota no bloco em inglês: o anterior virou falso com a barra cronológica. */
   subtitle: "Sete anos em seis faixas. Os vãos entre elas também contam.",
-  dateLabel: "Data:",
-  authorLabel: "Autor:",
   proximoCurto: "PRÓXIMO",
-  linhaLabel: "Linha do tempo da carreira — use as setas para mover entre entradas",
+  /** Ver a nota no bloco em inglês: `linhaLabel` saiu com os marcadores. */
   faixasLabel: "Faixas",
   contador: "%a de %b",
   controles: {

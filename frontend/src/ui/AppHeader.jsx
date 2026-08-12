@@ -17,7 +17,14 @@ import './AppHeader.css'
  * propósito.
  *
  *   sm  DevicesApp   eyebrow 0.68 / título 1.3 / subtítulo 0.82rem, gap 0.3rem
- *   md  HistoryApp   eyebrow 0.72 / título 1.4 / subtítulo 0.85rem, gap 0.6rem
+ *   md  (sem consumidor hoje)  eyebrow 0.72 / título 1.4 / subtítulo 0.85rem, gap 0.6rem
+ *
+ * `md` FICOU SEM CONSUMIDOR e não é código morto: é o `escala` PADRÃO deste
+ * componente, ou seja o comportamento de `<AppHeader>` escrito sem a prop. O
+ * consumidor era o "Histórico de Versões", que virou um player em 2026-08-12 e
+ * passou a ter cabeçalho próprio — na escala `md` este componente ocupava ~90px dos
+ * 520 de altura útil da janela, e isso empurrava a barra do tempo do player para
+ * fora da dobra. Se um app novo precisar de cabeçalho grande, `md` está aqui.
  *
  * Não conhece o app que a usa: quem decide os textos e a escala é quem
  * renderiza.

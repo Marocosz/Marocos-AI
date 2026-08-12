@@ -1,198 +1,613 @@
-/* src/apps/HistoryApp.css */
+/* src/apps/HistoryApp.css
+   A Jornada como player — e a barra de progresso é a linha do tempo.
 
-/* Todas as classes aqui usam o prefixo `history-` de propósito: este CSS é
-   um import global (sem CSS Modules), e o Journey.css da seção de scroll da
-   página clássica (removida no refactor) era dono de nomes genéricos como
-   `.card-tag`, `.commit-hash` e `.type-init`. Na época os dois estilos
-   carregavam ao mesmo tempo, e reusar esses nomes literais vazaria um no
-   outro; a colisão que motivou o prefixo não existe mais, mas o namespacing
-   continua valendo por higiene (import global, sem CSS Modules). As CORES
-   por categoria são as mesmas; os seletores são novos por necessidade de
-   isolamento, não por escolha. */
+   Todas as classes usam o prefixo `history-` de propósito: este CSS é um import
+   global (sem CSS Modules), e o Journey.css da seção de scroll da página clássica
+   (removida no refactor) era dono de nomes genéricos como `.card-tag`,
+   `.commit-hash` e `.type-init`. A colisão que motivou o prefixo não existe mais,
+   mas o namespacing continua valendo por higiene.
+
+   O QUE MUDOU (spec de 2026-08-12): era uma lista vertical de cards de `git log`.
+   Virou player, porque a lista apagava a única coisa interessante da trajetória — os
+   VÃOS entre os anos. O `git log` sobrevive no mostrador técnico (`.history-readout`),
+   que é onde um player mostraria bitrate e codec.
+
+   Duas regras herdadas dos dois trabalhos anteriores, e este arquivo as obedece:
+   PREENCHIMENTO É AÇÃO (só a faixa ativa e os controles têm superfície; o resto é
+   filete e tipografia) e O BREAKPOINT É `@container` (a janela é o container, não a
+   viewport). */
 
 .history-app {
+  /* O container de consulta; `cqi` da capa e o breakpoint do corpo saem daqui. */
+  container-type: inline-size;
   display: flex;
   flex-direction: column;
-  gap: 1.75rem;
+  /**
+   * OS ESPAÇOS DESTE APP FORAM APERTADOS OLHANDO O RENDER, e o motivo vale escrever:
+   * o player TEM de caber acima da dobra. A barra do tempo é o argumento inteiro do
+   * design — se ela ou os controles nascem cortados, o visitante vê um card grande e
+   * mais nada, que é exatamente o que a refatoração existia para consertar.
+   *
+   * A lista de faixas, essa pode rolar: é a fila do player, e fila de player rola.
+   */
+  gap: 16px;
+  /* Teto de medida: maximizar numa tela grande tem de REORGANIZAR, não esticar. */
+  max-width: 1040px;
+  margin-inline: auto;
+  width: 100%;
 }
 
-/* ========================================
-   HEADER
-   ======================================== */
+/* ==================================================
+   COR POR CATEGORIA — a exceção documentada do projeto
 
-/* Cabeçalho (eyebrow + título + subtítulo) extraído para AppHeader — ver
-   src/ui/AppHeader.jsx (escala="md"). */
+   `--history-accent` é o ponto único por entrada, herdado pela capa, pelo marcador e
+   pelo ponto da faixa. As cores NÃO seguem o tema nem o preset: elas significam algo
+   (`init` é começo, `wip` é o que ainda não aconteceu), e seguir o acento faria
+   `release` e `merge` trocarem de cor a cada preset.
 
-/* ========================================
-   LISTA VERTICAL (substitui o carrossel + ConnectionArrow)
-   ======================================== */
-
-.history-list {
-  list-style: none;
-  margin: 0;
-  padding: 0;
-  display: flex;
-  flex-direction: column;
-  gap: 1rem;
-}
-
-.history-entry {
-  /* Variável de acento por categoria, herdada pelo hash/badge/borda do
-     card. Um único ponto de verdade em vez de repetir cor em 3 lugares. */
+   O tema claro TEM variantes próprias, e isso é acessibilidade, não estética: o mesmo
+   verde que funciona sobre vidro escuro fica lavado sobre vidro branco.
+   ================================================== */
+.history-player,
+.history-faixa-item {
   --history-accent: #a855f7;
 }
 
-.history-entry--init { --history-accent: #22c55e; }
-.history-entry--merge { --history-accent: #a855f7; }
-.history-entry--release { --history-accent: #3b82f6; }
-.history-entry--wip { --history-accent: #eab308; }
+.history-player--init,
+.history-faixa-item--init { --history-accent: #22c55e; }
 
-/* ========================================
-   CARD (git log entry)
-   ======================================== */
+.history-player--merge,
+.history-faixa-item--merge { --history-accent: #a855f7; }
 
-.history-card {
-  background: rgba(255, 255, 255, 0.04);
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  border-left: 3px solid var(--history-accent);
-  border-radius: 12px;
-  padding: 1.1rem 1.25rem;
-  transition: background 0.2s ease, border-color 0.2s ease;
+.history-player--release,
+.history-faixa-item--release { --history-accent: #3b82f6; }
+
+.history-player--wip,
+.history-faixa-item--wip { --history-accent: #eab308; }
+
+.theme-light .history-player--init,
+.theme-light .history-faixa-item--init { --history-accent: #16a34a; }
+
+.theme-light .history-player--merge,
+.theme-light .history-faixa-item--merge { --history-accent: #9333ea; }
+
+.theme-light .history-player--release,
+.theme-light .history-faixa-item--release { --history-accent: #2563eb; }
+
+.theme-light .history-player--wip,
+.theme-light .history-faixa-item--wip { --history-accent: #ca8a04; }
+
+/* ==================================================
+   CABEÇALHO PRÓPRIO
+
+   O `ui/AppHeader` na escala `md` custava ~90px dos 520 de altura útil, e com ele a
+   barra do tempo — que é o argumento inteiro deste design — nascia cortada pela
+   dobra. Eyebrow + legenda em ~40px resolve, e o título que saiu já está na barra de
+   título da janela e no botão da taskbar.
+   ================================================== */
+.history-cabecalho {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
 }
 
-.history-card:hover {
-  background: rgba(255, 255, 255, 0.06);
-  border-color: rgba(255, 255, 255, 0.14);
-  border-left-color: var(--history-accent);
+.history-legenda {
+  margin: 0;
+  max-width: 60ch;
+  font-size: 0.82rem;
+  line-height: 1.5;
+  color: var(--text-secondary);
+  /* Folga extra ANTES da caixa do player, a pedido do dono do projeto: com o `gap` do
+     `.history-app` sozinho a legenda ficava colada na borda da caixa e as duas coisas
+     leem como um bloco só. */
+  margin-bottom: 6px;
 }
 
-.history-card-header {
+/* ==================================================
+   O CORPO: uma coluna, duas quando a janela é larga
+   ================================================== */
+.history-corpo {
+  display: flex;
+  flex-direction: column;
+  gap: 22px;
+}
+
+@container (min-width: 760px) {
+  .history-corpo {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(240px, 300px);
+    gap: 28px;
+    align-items: start;
+  }
+}
+
+.history-coluna {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  min-width: 0;
+}
+
+/* ==================================================
+   A CAIXA DO PLAYER — o aparelho
+
+   Borda em volta de tudo que é player: da linha de meta até os botões. Sem ela os
+   três blocos leem como três coisas soltas empilhadas; com ela leem como um
+   dispositivo, e é o que dá sentido a ter controles.
+
+   A ALTURA VEM DA MAIOR ENTRADA, e NÃO de um `min-height`. O mecanismo está em
+   `.history-agora-pilha` logo abaixo, e a nota lá conta as duas tentativas que
+   falharam antes — inclusive a de piso medido, que só prendia as entradas curtas.
+
+   SEM PREENCHIMENTO: é uma moldura, não uma superfície. A regra do projeto é
+   "preenchimento é ação", e dentro desta caixa quem é ação são os botões.
+   ================================================== */
+.history-player {
+  display: flex;
+  flex-direction: column;
+  padding: 16px 18px 14px;
+  border: 1px solid var(--sup-borda);
+  border-radius: 14px;
+}
+
+/* ==================================================
+   1. AGORA TOCANDO
+   ================================================== */
+.history-agora {
+  display: flex;
+  align-items: flex-start;
+  gap: 18px;
+  flex-wrap: wrap;
+}
+
+/**
+ * A PILHA — as seis entradas na MESMA célula de grade, só a atual visível.
+ *
+ * É o que faz a barra e os botões nunca mudarem de lugar ao trocar de faixa, e custou
+ * duas tentativas erradas:
+ *
+ *   1. Nada. Cada descrição tem um número diferente de linhas, então os controles
+ *      subiam e desciam a cada passo — controle que se move sob o cursor é o oposto de
+ *      um player.
+ *   2. `min-height` medido na caixa. Só prende as entradas CURTAS: as longas estouram
+ *      o piso e empurram tudo para baixo de novo. Medido no deslocamento da barra
+ *      dentro da caixa: 24px de variação na largura padrão, 65px em 620px, 94px em
+ *      520px. E qualquer número escolhido envelheceria — ele depende da largura, do
+ *      idioma e de cada edição de texto.
+ *
+ * Com `grid-area: 1 / 1` em todos os filhos, a altura da célula é a da MAIOR entrada,
+ * calculada pelo navegador em qualquer largura e em qualquer idioma. Zero número
+ * mágico.
+ *
+ * `visibility: hidden` e não `display: none`: é justamente por preservar o espaço que
+ * as cópias inativas servem de gabarito. E é por isso que elas levam `aria-hidden` no
+ * JSX — ocupam layout, mas para leitor de tela existe uma entrada só.
+ */
+.history-agora-pilha {
+  flex: 1 1 280px;
+  min-width: 0;
+  display: grid;
+}
+
+.history-agora-pilha > * {
+  grid-area: 1 / 1;
+}
+
+.history-agora-texto--oculta {
+  visibility: hidden;
+  pointer-events: none;
+}
+
+/* A CAPA É O ANO. Tipo grande com o gradiente de texto do projeto — o mesmo gesto do
+   nome no herói do "Sobre este PC" e dos números de destaque. A superfície é a elevada
+   do sistema, mas a LAVAGEM vem da cor de categoria: é a única superfície deste app
+   que foge do acento, e pelo motivo documentado no bloco de categoria acima. */
+.history-capa {
+  flex: 0 0 auto;
+  /* 116 e não 132: os 16px que sobraram foram o que fez os controles caberem acima da
+     dobra. Ver a nota sobre espaços em `.history-app`. */
+  width: 116px;
+  height: 116px;
+  display: grid;
+  place-items: center;
+  padding: 10px;
+  border-radius: 14px;
+  background-color: var(--sup-fundo);
+  background-image: linear-gradient(
+    160deg,
+    color-mix(in srgb, var(--history-accent) 22%, transparent),
+    transparent 72%
+  );
+  border: 1px solid color-mix(in srgb, var(--history-accent) 34%, transparent);
+}
+
+.history-capa-ano {
+  font-size: 1.9rem;
+  font-size: clamp(1.5rem, 5cqi, 2.2rem);
+  font-weight: 900;
+  line-height: 1;
+  letter-spacing: -0.03em;
+  text-align: center;
+  background: linear-gradient(135deg, var(--text-primary) 30%, var(--history-accent) 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* A capa da entrada FUTURA: setas de avanço rápido em vez de palavra.
+   "PRÓXIMO" em tipo de capa vazava os 116px do quadrado, e encolher a fonte só para
+   caber deixaria aquela capa com metade do peso das outras. As setas resolvem por
+   outro caminho — dizem "o que vem depois" com o vocabulário do próprio player, e são
+   a única capa que não é tipografia justamente porque é a única entrada sem data. */
+.history-capa-setas {
+  width: 54%;
+  height: auto;
+  color: var(--history-accent);
+  opacity: 0.85;
+}
+
+.history-agora-texto {
+  flex: 1 1 280px;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+/* Linha de meta: o tipo em mono/caixa alta na cor da categoria, e a organização em
+   Poppins. As duas vozes do projeto na mesma linha, cada uma no seu papel. */
+.history-meta {
   display: flex;
   align-items: center;
-  justify-content: space-between;
-  gap: 0.75rem;
-  margin-bottom: 0.6rem;
-  font-family: 'Courier New', monospace;
-}
-
-.history-hash {
-  color: #888;
-  font-size: 0.8rem;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-
-.history-hash-prefix {
-  color: var(--accent-color);
-  font-weight: bold;
-}
-
-.history-badge {
+  flex-wrap: wrap;
+  gap: 7px;
+  margin: 0;
   font-size: 0.72rem;
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
-  color: var(--history-accent);
-  white-space: nowrap;
-}
-
-.history-date {
-  font-family: 'Courier New', monospace;
-  font-size: 0.75rem;
-  font-weight: 700;
-  color: #bbb;
-  text-transform: uppercase;
-  letter-spacing: 1.5px;
-  margin-bottom: 0.5rem;
-}
-
-.history-card-title {
-  font-size: 1.05rem;
-  font-weight: 700;
-  color: var(--text-primary);
-  margin: 0 0 0.25rem 0;
-  line-height: 1.25;
-}
-
-.history-card-org {
-  font-size: 0.85rem;
   color: var(--text-secondary);
+}
+
+.history-tipo {
+  font-family: 'Courier New', monospace;
+  font-size: 0.66rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--history-accent);
+}
+
+.history-meta-sep {
+  opacity: 0.4;
+}
+
+.history-titulo {
+  margin: 0;
+  font-size: 1.25rem;
+  font-weight: 900;
+  line-height: 1.15;
+  letter-spacing: -0.02em;
+  color: var(--text-primary);
+}
+
+.history-data {
   margin: 0;
   font-family: 'Courier New', monospace;
-}
-
-.history-divider {
-  width: 100%;
-  height: 1px;
-  background: linear-gradient(90deg, transparent, rgb(var(--accent-rgb) / 0.5), transparent);
-  margin: 0.9rem 0;
-}
-
-.history-description {
-  font-size: 0.85rem;
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
   color: var(--text-secondary);
+}
+
+/* Medida em `ch`: é o que impede a descrição de esticar quando a janela cresce. */
+.history-desc {
+  margin: 5px 0 0;
+  max-width: 64ch;
+  font-size: 0.84rem;
   line-height: 1.6;
-  margin: 0 0 0.9rem 0;
+  color: var(--text-secondary);
 }
 
 .history-tags {
   display: flex;
   flex-wrap: wrap;
-  gap: 0.45rem;
+  gap: 6px;
+  margin: 4px 0 0;
+  padding: 0;
+  list-style: none;
 }
 
+/* Pílula de 999px porque NÃO é interativo — a regra de raio do projeto. */
 .history-tag {
-  font-size: 0.68rem;
-  font-weight: 400;
-  padding: 0.3rem 0.65rem;
-  background: rgba(255, 255, 255, 0.05);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  border-radius: 6px;
+  padding: 3px 10px;
+  border-radius: 999px;
+  border: 1px solid var(--sup-borda);
+  background: rgb(var(--accent-rgb) / 0.08);
+  font-size: 0.66rem;
+  font-weight: 700;
   color: var(--text-secondary);
-  transition: all 0.2s ease;
 }
 
-.history-tag:hover {
+/* O MOSTRADOR TÉCNICO — onde o `git log` do design anterior sobrevive. Players mostram
+   bitrate e codec nesta posição; este mostra o commit. */
+.history-readout {
+  margin: 8px 0 0;
+  font-family: 'Courier New', monospace;
+  font-size: 0.66rem;
+  letter-spacing: 0.06em;
+  color: var(--text-secondary);
+  opacity: 0.75;
+}
+
+/* ==================================================
+   2. A LINHA DO TEMPO
+
+   O trilho é o tempo; os marcadores ficam em `left: N%` calculado por
+   `posicaoNaLinha()`. É o bloco que carrega a informação nova deste design — os vãos
+   entre os marcadores dizem quantos anos passaram.
+   ================================================== */
+.history-linha {
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+  /* 28px e não 14: a barra precisa de ar entre ela e o mostrador técnico logo acima,
+     senão o rodapé do player lê como um bloco de quatro linhas empilhadas em vez de um
+     controle separado do conteúdo. Pedido do dono do projeto, e é o mesmo princípio da
+     folga antes da caixa. */
+  margin-top: 88px;
+}
+
+/* O TRILHO É UMA BARRA DE DURAÇÃO, e a versão anterior tinha um marcador por entrada
+   em cima dele. O dono do projeto pediu a linha limpa — e a informação de tempo não
+   se perdeu: a parte preenchida para na posição proporcional ao ANO da entrada atual,
+   então cada passo avança um pedaço diferente. O salto de 2019 para 2022 é três vezes
+   o de 2024 para 2025, e isso se sente na barra andando.
+
+   4px e não 2px: sem marcadores em cima, a barra é o único elemento gráfico do bloco e
+   2px lê como filete esquecido em vez de controle. */
+.history-trilho {
+  position: relative;
+  height: 4px;
+  border-radius: 999px;
+  background: var(--sup-borda);
+  overflow: hidden;
+}
+
+.history-trilho-feito {
+  height: 100%;
+  border-radius: 999px;
+  background: linear-gradient(
+    90deg,
+    rgb(var(--accent-rgb) / 0.35),
+    var(--accent-color)
+  );
+  transition: width var(--cfg-jornada-troca, 0.32s) ease;
+}
+
+/* As pontas são o "decorrido / total" de um player: o ano em que a trajetória começou
+   e o que ainda não aconteceu. */
+.history-linha-pontas {
+  display: flex;
+  justify-content: space-between;
+  font-family: 'Courier New', monospace;
+  font-size: 0.64rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  color: var(--text-secondary);
+  opacity: 0.7;
+}
+
+/* ==================================================
+   3. CONTROLES
+   ================================================== */
+/* GRADE DE TRÊS COLUNAS, e não flex com `justify-content: center`.
+   O contador ocupa a direita; centralizar por flex empurraria o grupo de botões para a
+   esquerda pela largura dele. Com uma coluna vazia à esquerda do mesmo peso, os botões
+   ficam no centro óptico da caixa. */
+.history-controles {
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  align-items: center;
+  margin-top: 5px;
+}
+
+.history-botoes {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+}
+
+.history-btn {
+  display: grid;
+  place-items: center;
+  width: 32px;
+  height: 32px;
+  padding: 0;
+  border: 1px solid var(--sup-borda);
+  border-radius: var(--win-control-radius);
+  background-color: transparent;
   color: var(--text-primary);
-  border-color: rgb(var(--accent-rgb) / 0.5);
-  background: rgb(var(--accent-rgb) / 0.1);
+  cursor: pointer;
+  transition: border-color 0.16s ease, color 0.16s ease;
 }
 
-/* ========================================
-   THEME LIGHT — mesma lógica de contraste do Journey.css da página clássica
-   (removida no refactor): o acento e as cores de categoria precisam de
-   variantes mais escuras sobre fundo claro.
-   ======================================== */
-
-/* Sem literal: este override anulava o var(--accent-color) da regra base e
-   travava o prefixo em roxo no tema claro. O acento do dia já vem do preset. */
-.theme-light .history-hash-prefix { color: var(--accent-color); }
-.theme-light .history-hash { color: #666; }
-
-.theme-light .history-entry--init { --history-accent: #16a34a; }
-.theme-light .history-entry--merge { --history-accent: #9333ea; }
-.theme-light .history-entry--release { --history-accent: #2563eb; }
-.theme-light .history-entry--wip { --history-accent: #ca8a04; }
-
-.theme-light .history-card {
-  background: rgba(0, 0, 0, 0.03);
-  border-color: rgba(0, 0, 0, 0.08);
+.history-btn:hover:not(:disabled) {
+  border-color: var(--accent-color);
+  color: var(--accent-color);
 }
 
-.theme-light .history-card:hover {
-  background: rgba(0, 0, 0, 0.05);
-  border-color: rgba(0, 0, 0, 0.14);
+.history-btn:focus-visible {
+  outline: 2px solid var(--accent-color);
+  outline-offset: 2px;
 }
 
-.theme-light .history-tag {
-  background: rgba(0, 0, 0, 0.05);
-  border-color: rgba(0, 0, 0, 0.1);
+.history-btn:disabled {
+  cursor: default;
+  opacity: 0.35;
+}
+
+/* O botão de passeio é o único preenchido da fileira: é a ação, e preenchimento é
+   ação. Usa a faixa de destaque do sistema, como as ações do "Sobre". */
+.history-btn--passeio {
+  width: 38px;
+  height: 38px;
+  background-image: var(--sup-faixa);
+  border-color: var(--sup-faixa-borda);
+  color: var(--accent-color);
+}
+
+.history-contador {
+  justify-self: end;
+  font-family: 'Courier New', monospace;
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
   color: var(--text-secondary);
 }
 
-.theme-light .history-tag:hover {
-  background: rgb(var(--accent-rgb) / 0.1);
-  border-color: rgb(var(--accent-rgb) / 0.5);
-  color: #000;
+/* ==================================================
+   4. LISTA DE FAIXAS
+   ================================================== */
+.history-faixas-secao {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  position: relative;
+  padding-top: 14px;
+  min-width: 0;
+}
+
+.history-faixas-secao::before {
+  content: '';
+  position: absolute;
+  inset: 0 0 auto;
+  height: 1px;
+  background: var(--filete-secao);
+}
+
+/* No trilho largo o filete sai: ali a coluna já é separada pelo próprio espaço. */
+@container (min-width: 760px) {
+  .history-faixas-secao {
+    padding-top: 0;
+  }
+
+  .history-faixas-secao::before {
+    content: none;
+  }
+}
+
+/* SEM o `// ` que o "Sobre este PC" e o leia-me põem no eyebrow, e a razão é o
+   conteúdo: `sectionLabel` já vem com prefixo próprio ("04. / JORNADA
+   PROFISSIONAL"), e os dois juntos davam "// 04. / JORNADA PROFISSIONAL" — dois
+   separadores empilhados. Sem o `//` este app fica igual ao Stack, que usa o
+   `ui/AppHeader` e também não tem. (O "04. /" é resto da landing page de rolagem e
+   aparece em vários `content/*.js`; trocar a convenção é decisão de projeto
+   inteiro.) */
+.history-eyebrow {
+  margin: 0;
+  font-family: 'Courier New', monospace;
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: var(--accent-color);
+}
+
+.history-faixas {
+  display: flex;
+  flex-direction: column;
+  margin: 4px 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.history-faixa {
+  display: grid;
+  grid-template-columns: 1.2rem auto auto minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 9px;
+  width: 100%;
+  padding: 7px 9px;
+  text-align: left;
+  font-family: inherit;
+  border: 1px solid transparent;
+  border-radius: var(--win-control-radius);
+  background-color: transparent;
+  color: var(--text-primary);
+  cursor: pointer;
+  transition: border-color 0.16s ease;
+}
+
+/* A ativa usa a faixa de destaque do sistema — a mesma marca do item ativo da lateral
+   do explorador e das ações do "Sobre". O app não inventa vocabulário novo. */
+.history-faixa--ativa {
+  background-image: var(--sup-faixa);
+  border-color: var(--sup-faixa-borda);
+}
+
+.history-faixa:hover {
+  border-color: var(--accent-color);
+}
+
+.history-faixa:focus-visible {
+  outline: 2px solid var(--accent-color);
+  outline-offset: 2px;
+}
+
+.history-faixa-num {
+  font-family: 'Courier New', monospace;
+  font-size: 0.66rem;
+  color: var(--text-secondary);
+  text-align: right;
+}
+
+.history-faixa-ponto {
+  width: 7px;
+  height: 7px;
+  border-radius: 999px;
+  border: 1.5px solid var(--history-accent);
+  background: var(--history-accent);
+}
+
+.history-faixa-ponto--futuro {
+  background: transparent;
+}
+
+.history-faixa-data {
+  font-family: 'Courier New', monospace;
+  font-size: 0.64rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--text-secondary);
+  white-space: nowrap;
+}
+
+.history-faixa-titulo {
+  font-size: 0.78rem;
+  font-weight: 700;
+  line-height: 1.25;
+  color: var(--text-primary);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.history-faixa-agora {
+  color: var(--accent-color);
+}
+
+/* ==================================================
+   MOVIMENTO
+
+   O passeio automático nem chega aqui: ele é removido no JSX quando o interruptor de
+   Movimento está desligado ou quando há `prefers-reduced-motion` — botão que não faz
+   nada é pior que botão nenhum. O que este bloco cobre são as transições.
+   ================================================== */
+@media (prefers-reduced-motion: reduce) {
+  .history-trilho-feito,
+  .history-btn,
+  .history-faixa {
+    transition: none;
+  }
 }
