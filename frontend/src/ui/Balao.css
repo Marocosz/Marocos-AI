@@ -1,0 +1,145 @@
+/* --------------------------------------------------
+   BALÃO — notificação do sistema
+
+   A MATÉRIA É A DO CHROME: vidro translúcido com blur, borda de janela, raio de
+   janela, sombra de janela. É o mesmo material do menu Iniciar e da barra de
+   tarefas — os outros dois painéis que flutuam sobre o wallpaper. O blur aqui é
+   legítimo (superfície pequena, sobre o wallpaper, como a taskbar), diferente
+   das superfícies DENTRO de uma janela, que não podem empilhar filtro.
+
+   Nenhuma cor literal: acento, texto e superfície saem dos tokens, então o
+   balão repinta junto com o preset escolhido.
+   -------------------------------------------------- */
+
+.balao {
+  position: relative;
+  display: flex;
+  align-items: flex-start;
+  gap: 4px;
+  width: 320px;
+  padding: 11px 8px 11px 14px;
+
+  border: var(--win-border);
+  border-radius: var(--win-radius);
+  background: var(--win-body-bg);
+  box-shadow: var(--win-shadow);
+  -webkit-backdrop-filter: var(--win-glass-blur);
+  backdrop-filter: var(--win-glass-blur);
+
+  color: var(--text-primary);
+  font-family: inherit;
+  font-size: 0.78rem;
+  line-height: 1.5;
+}
+
+/* A MESMA MARCA DE "ISTO PEDE ATENÇÃO" QUE O RESTO DO SISTEMA USA: a pílula de
+   3px com raio 2 do `.app-indicator` da taskbar, girada para a vertical — igual
+   ao item ativo do explorador. Uma barra de borda cheia seria um elemento novo
+   num sistema que já tem o seu. */
+.balao::before {
+  content: '';
+  position: absolute;
+  left: 5px;
+  /* Vai de ponta a ponta, com uma folga igual em cima e embaixo — encostar na
+     borda faria a marca virar parte da moldura em vez de leitura sobre ela.
+     `top`/`bottom` e não `height`: assim ela acompanha balões de duas ou de
+     quatro linhas sem ninguém recalcular porcentagem. */
+  top: 9px;
+  bottom: 9px;
+  width: 3px;
+  border-radius: 2px;
+  background: var(--accent-color);
+  box-shadow: 0 0 10px 1px rgb(var(--accent-rgb) / 0.5);
+}
+
+.balao-corpo {
+  flex: 1 1 auto;
+  min-width: 0;
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 0;
+  border: none;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  text-align: left;
+}
+
+/* Com ação, o corpo inteiro é o alvo — não um link escondido no meio do texto. */
+.balao-corpo--acao {
+  border-radius: var(--win-control-radius);
+  margin: -4px;
+  padding: 4px;
+  cursor: pointer;
+  transition: background 0.15s ease;
+}
+
+.balao-corpo--acao:hover {
+  background: rgb(var(--accent-rgb) / 0.12);
+}
+
+.balao-corpo--acao:focus-visible {
+  outline: 2px solid var(--accent-color);
+  outline-offset: -2px;
+}
+
+.balao-icone {
+  display: grid;
+  place-items: center;
+  flex: 0 0 auto;
+  width: 28px;
+  height: 28px;
+  border-radius: var(--win-control-radius);
+  background: rgb(var(--accent-rgb) / 0.16);
+  color: var(--accent-color);
+}
+
+.balao-texto {
+  flex: 1 1 auto;
+  min-width: 0;
+  color: var(--text-secondary);
+}
+
+.balao-titulo {
+  display: block;
+  margin-bottom: 2px;
+  color: var(--text-primary);
+  font-weight: 600;
+  font-size: 0.82rem;
+}
+
+/* A tecla nomeada vem em mono: voz da máquina, mesma receita do POST da BIOS. */
+.balao-texto kbd {
+  padding: 1px 5px;
+  border-radius: 4px;
+  background: rgb(var(--accent-rgb) / 0.18);
+  color: var(--accent-color);
+  font-family: 'Courier New', monospace;
+  font-size: 0.74rem;
+  font-weight: 700;
+}
+
+.balao-fechar {
+  display: grid;
+  place-items: center;
+  flex: 0 0 auto;
+  width: 22px;
+  height: 22px;
+  border: none;
+  border-radius: var(--win-control-radius);
+  background: transparent;
+  color: var(--text-secondary);
+  cursor: pointer;
+  transition: background 0.15s ease, color 0.15s ease;
+}
+
+.balao-fechar:hover {
+  background: rgb(var(--accent-rgb) / 0.16);
+  color: var(--text-primary);
+}
+
+.balao-fechar:focus-visible {
+  outline: 2px solid var(--accent-color);
+  outline-offset: -2px;
+}

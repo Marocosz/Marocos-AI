@@ -5,6 +5,7 @@ import { useTheme } from '../contexts/ThemeContext'
 import { getOsData } from '../i18n/os'
 import { useSystemToggles } from '../ui/useSystemToggles'
 import ToggleRow from '../ui/ToggleRow'
+import Dica from '../ui/Dica'
 import { PRESETS } from '../config/system'
 import './SettingsApp.css'
 
@@ -20,8 +21,13 @@ const Amostra = ({ preset }) => (
   <span
     className="settings-preset-amostra"
     aria-hidden="true"
+    /* Nos sóbrios a amostra mostra o FUNDO REAL do preset, com trama e tudo —
+       é o que diferencia um do outro, e um degradê de três tons não contaria
+       essa diferença. */
     style={{
-      backgroundImage: `linear-gradient(140deg, ${preset.ceu.topo} 0%, ${preset.ceu.meio} 52%, ${preset.ceu.baixo} 100%)`,
+      background: preset.sobrio
+        ? preset.fundo
+        : `linear-gradient(140deg, ${preset.ceu.topo} 0%, ${preset.ceu.meio} 52%, ${preset.ceu.baixo} 100%)`,
     }}
   />
 )
@@ -80,6 +86,18 @@ const SettingsApp = () => {
                 >
                   <Amostra preset={p} />
                   <span className="settings-preset-nome">{t.presets[p.id] ?? p.id}</span>
+                  {/* Os sóbrios mudam o MODO, não só a paleta — quem escolhe
+                      precisa saber que está desligando o movimento e o vidro.
+                      Numa dica e não numa linha de texto: a grade existe para
+                      ser escaneada de relance, e uma legenda por item embaixo
+                      de cada nome dobrava a altura de cada cartão. */}
+                  {p.sobrio && (
+                    <Dica
+                      texto={t.sober}
+                      rotulo={t.soberLabel}
+                      className="settings-preset-dica"
+                    />
+                  )}
                   {ativo && (
                     <span className="settings-preset-check" title={t.current}>
                       <Check size={13} strokeWidth={2.5} />

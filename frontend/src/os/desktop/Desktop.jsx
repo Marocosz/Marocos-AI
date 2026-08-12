@@ -3,6 +3,7 @@ import { motion } from 'motion/react'
 import Wallpaper from '../../wallpaper/Wallpaper'
 import Window from './Window'
 import ContextMenu from './ContextMenu'
+import AvisosDesktop from './AvisosDesktop'
 import AppIconButton from '../../ui/AppIconButton'
 import { APPS } from '../registry'
 import { useWindows } from '../WindowManagerContext'
@@ -97,6 +98,11 @@ const Desktop = ({ isAnimated = true }) => {
       {windows.map((win) => (
         <Window key={win.key} win={win} isFocused={win.key === focusedKey} />
       ))}
+
+      {/* Depois das janelas, para ficar por cima delas na ordem do DOM sem
+          precisar de um z-index novo — a escala de tokens.css é fonte única e
+          estes avisos dividem a faixa da taskbar com ela. */}
+      <AvisosDesktop />
     </div>
   )
 }

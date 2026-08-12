@@ -53,6 +53,35 @@ caminho errado e falha só em runtime. É para isso que existe o `rotas.spec.js`
 — os nove apps, o cristal e o markdown do assistente são todos carregados por
 `import()`.
 
+## A regra que vale antes de todas as outras
+
+**Nada novo no frontend nasce com valor literal.** Componente, CSS, app, aviso,
+balão — se você está escrevendo uma cor, uma medida, uma duração ou uma curva,
+ela vem de `config/system.js` pela ponte, ou de um token que já existe.
+
+O caminho é sempre o mesmo:
+
+```
+config/system.js  →  config/cssBridge.js  →  --cfg-*  →  var() no CSS
+```
+
+**Por que isso não é burocracia:** o visitante escolhe um *preset* nas
+Configurações, e o preset repinta o sistema inteiro — acento, chrome, fundo de
+janela, cerimônia, cristal. Todo literal perdido é um lugar onde a escolha dele
+**não chega**, e o sintoma é sempre o mesmo: um pedaço da interface fica roxo
+depois que todo o resto já mudou de cor.
+
+Antes de dar um valor por escrito, pergunte nesta ordem:
+
+1. **já existe token para isto?** (`--accent-color`, `--card-bg`, `--win-*`,
+   `--cer-*`, `--veu-*`, a escala de z-index, a escala tipográfica)
+2. **é ajuste do sistema?** → vai para `config/system.js` e ganha um `--cfg-*`
+3. **é arte desenhada ou cor semântica?** → só então fica literal, **com o
+   porquê escrito ao lado** (ver as três exceções abaixo)
+
+Preset novo: acrescente ao array em `PRESETS`, com `acento` e `ceu`, e o nome
+nos dois idiomas em `i18n/os.js`. Nada mais precisa saber que ele existe.
+
 ## A linguagem visual
 
 O sistema de design está em três camadas, com donos distintos. Escrever na

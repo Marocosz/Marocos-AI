@@ -99,9 +99,17 @@
 
 .settings-preset-nome {
   flex: 1 1 auto;
+  min-width: 0;
   overflow: hidden;
   white-space: nowrap;
   text-overflow: ellipsis;
+}
+
+/* A dica fica ANTES do check e depois do nome, e não encolhe: ela é o único
+   sinal de que este preset muda o modo, e some junto com o nome truncado seria
+   pior que não existir. */
+.settings-preset-dica {
+  flex: 0 0 auto;
 }
 
 .settings-preset-check {

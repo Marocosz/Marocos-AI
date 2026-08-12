@@ -1,0 +1,134 @@
+/* --------------------------------------------------
+   DICA — balão de ajuda do sistema
+
+   Segue a linguagem do chrome: superfície sólida do sistema, borda de janela,
+   raio de controle, sombra de janela. Nada de cor nova — o alvo usa o acento
+   quando está ativo, e o resto sai dos tokens de texto.
+
+   Sem `backdrop-filter`: o balão é pequeno, aparece por cima de conteúdo já
+   translúcido, e empilhar filtro sobre filtro é o custo que Window.css
+   documenta. Fundo sólido também é o que garante leitura sobre qualquer coisa.
+   -------------------------------------------------- */
+
+.dica {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  /* A pilha do balão precisa vencer irmãos posicionados da mesma grade. */
+  z-index: 1;
+}
+
+.dica-alvo {
+  display: grid;
+  place-items: center;
+  width: 18px;
+  height: 18px;
+  padding: 0;
+  border: none;
+  border-radius: 50%;
+  background: transparent;
+  color: var(--text-secondary);
+  cursor: help;
+  opacity: 0.7;
+  transition: color 0.15s ease, opacity 0.15s ease, background 0.15s ease;
+}
+
+.dica-alvo:hover,
+.dica-alvo:focus-visible {
+  color: var(--accent-color);
+  background: rgb(var(--accent-rgb) / 0.16);
+  opacity: 1;
+  outline: none;
+}
+
+.dica-alvo:focus-visible {
+  box-shadow: 0 0 0 2px var(--accent-color);
+}
+
+.dica-balao {
+  position: absolute;
+  left: 50%;
+  z-index: 30;
+  width: max-content;
+  max-width: 210px;
+  padding: 6px 9px;
+  border: var(--win-border);
+  border-radius: var(--win-control-radius);
+  background: var(--win-body-solid);
+  box-shadow: var(--win-shadow);
+  color: var(--text-primary);
+  font-family: inherit;
+  font-size: 0.72rem;
+  line-height: 1.45;
+  text-align: left;
+  /* Nunca rouba o clique de quem tenta alcançar o que está atrás. */
+  pointer-events: none;
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.15s ease, transform 0.15s ease, visibility 0s linear 0.15s;
+}
+
+/* `visibility` volta a ser imediata ao aparecer (o `0s` sem atraso), e só o
+   desaparecimento espera a transição terminar — sem isso o balão fica na
+   árvore de acessibilidade depois de invisível. */
+.dica-balao--visivel {
+  opacity: 1;
+  visibility: visible;
+  transition: opacity 0.15s ease, transform 0.15s ease, visibility 0s;
+}
+
+/* --- A seta do balão, que é o que o faz ler como balão e não como caixa --- */
+.dica-balao::after {
+  content: '';
+  position: absolute;
+  left: 50%;
+  width: 8px;
+  height: 8px;
+  transform: translateX(-50%) rotate(45deg);
+  background: var(--win-body-solid);
+  /* Só duas bordas: as outras duas ficariam por dentro do balão, atravessando
+     o texto. */
+  border-right: var(--win-border);
+  border-bottom: var(--win-border);
+}
+
+/* --- Acima (padrão) --- */
+.dica-balao--acima {
+  bottom: calc(100% + 9px);
+  transform: translateX(-50%) translateY(4px);
+}
+
+.dica-balao--acima.dica-balao--visivel {
+  transform: translateX(-50%) translateY(0);
+}
+
+.dica-balao--acima::after {
+  top: 100%;
+  margin-top: -5px;
+}
+
+/* --- Abaixo --- */
+.dica-balao--abaixo {
+  top: calc(100% + 9px);
+  transform: translateX(-50%) translateY(-4px);
+}
+
+.dica-balao--abaixo.dica-balao--visivel {
+  transform: translateX(-50%) translateY(0);
+}
+
+.dica-balao--abaixo::after {
+  bottom: 100%;
+  margin-bottom: -5px;
+  border: none;
+  border-left: var(--win-border);
+  border-top: var(--win-border);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .dica-balao,
+  .dica-balao--visivel {
+    transition: opacity 0.01s linear, visibility 0s;
+    transform: translateX(-50%);
+  }
+}

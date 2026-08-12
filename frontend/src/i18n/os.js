@@ -135,8 +135,25 @@ const osContentEn = {
      * única coisa que denuncia a moldura, e F11 a remove. Aqui é o momento
      * certo de sugerir: antes de entrar, uma vez, sem interromper nada depois.
      */
-    fullscreenHint: 'press F11 for the full experience',
     ariaLabel: 'Lock screen',
+  },
+  /**
+   * O balão do canto inferior direito da área de trabalho. `corpo` traz um
+   * <kbd> porque a tecla é um objeto na frase, não uma palavra — e é assim que
+   * ela ganha a voz de máquina do projeto.
+   */
+  desktop: {
+    avisos: {
+      fechar: 'Dismiss',
+      telaCheia: {
+        titulo: 'Full screen works better',
+        corpo: 'This is an OS inside a browser tab. Press F11 to hide everything around it.',
+      },
+      temas: {
+        titulo: 'Make it yours',
+        corpo: 'Twelve wallpapers, and each one repaints the whole system. Open Settings.',
+      },
+    },
   },
   /**
    * A tela de desligado é um POST de BIOS parado no meio.
@@ -267,7 +284,15 @@ const osContentEn = {
         'ceu-claro': 'Clear sky',
         citrino: 'Citrine',
         neblina: 'Mist',
+        ardosia: 'Slate',
+        carvao: 'Charcoal',
+        papel: 'Paper',
+        linho: 'Linen',
       },
+      /** Explica os presets sem shader e sem vidro. Vive numa dica, não numa
+       *  legenda: a grade existe para ser escaneada de relance. */
+      sober: 'Static background, opaque windows — no animation and no glass. The lightest of the presets.',
+      soberLabel: 'About this preset',
     },
   },
   controls: {
@@ -395,8 +420,21 @@ const osContentPt = {
     enterAria: 'Entrar na área de trabalho',
     hint: 'clique em MAROCOS SO para entrar',
     /** Ver a nota no bloco em inglês: desktop, e só fora de tela cheia. */
-    fullscreenHint: 'aperte F11 para a experiência completa',
     ariaLabel: 'Tela de bloqueio',
+  },
+  /** Ver a nota no bloco em inglês. */
+  desktop: {
+    avisos: {
+      fechar: 'Dispensar',
+      telaCheia: {
+        titulo: 'Melhor em tela cheia',
+        corpo: 'Isto é um sistema operacional dentro de uma aba. Aperte F11 para esconder tudo em volta.',
+      },
+      temas: {
+        titulo: 'Deixe do seu jeito',
+        corpo: 'Doze papéis de parede, e cada um repinta o sistema inteiro. Abra as Configurações.',
+      },
+    },
   },
   /** POST de BIOS parado — ver a nota no bloco em inglês. */
   shutdown: {
@@ -513,7 +551,14 @@ const osContentPt = {
         'ceu-claro': 'Céu claro',
         citrino: 'Citrino',
         neblina: 'Neblina',
+        ardosia: 'Ardósia',
+        carvao: 'Carvão',
+        papel: 'Papel',
+        linho: 'Linho',
       },
+      /** Ver a nota no bloco em inglês: vive numa dica, não numa legenda. */
+      sober: 'Fundo parado, janelas opacas — sem animação e sem vidro. É o mais leve dos presets.',
+      soberLabel: 'Sobre este preset',
     },
   },
   controls: {

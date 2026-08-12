@@ -70,8 +70,9 @@ export function aplicarConfigNoCss(tema = 'dark', preset = null) {
      * encolhe a saturação na mesma proporção do acento.
      */
     '--cfg-cerimonia-sat': String(saturacaoDaCerimonia(preset)),
-    '--cfg-veu-sem-foco': JANELAS.veuSemFoco,
-    '--cfg-veu-sem-foco-claro': JANELAS.veuSemFocoClaro,
+    '--cfg-veu-alfa': JANELAS.veuAlfa,
+    '--cfg-veu-alfa-claro': JANELAS.veuAlfaClaro,
+    '--cfg-veu-duracao': `${JANELAS.veuDuracaoMs}ms`,
     '--cfg-explorer-lateral': LAYOUT.explorador.lateralLargura,
     '--cfg-explorer-nav': LAYOUT.explorador.navAltura,
     '--cfg-explorer-comandos': LAYOUT.explorador.comandosAltura,

@@ -60,6 +60,13 @@
      painel em vez de continuação do conteúdo. */
   --explorer-divisor: rgba(255, 255, 255, 0.16);
 
+  /* O VÉU DAS JANELAS SEM FOCO — a cor mora aqui, a opacidade no config.
+     De noite a base é PRETO PURO: o que se quer é recuo, e cor nenhuma recua
+     melhor que a ausência dela. É por isso que de noite o véu não precisa
+     seguir o preset — preto é preto em qualquer paleta. */
+  --veu-base: #000000;
+  --veu-alfa: var(--cfg-veu-alfa, 78%);
+
   /* Escala de z-index — única fonte de verdade */
   --z-wallpaper: 0;
   --z-icons: 10;
@@ -292,6 +299,16 @@
      luz. Branco a 16% num painel claro é invisível. */
   --explorer-divisor: rgba(0, 0, 0, 0.16);
 
+  /* DE DIA O VÉU PRECISA DE COR, e precisa ser a do preset.
+     Preto puro sobre painel claro não recua: vira fuligem cinza por cima do
+     conteúdo. E um violeta fixo — que foi o primeiro valor aqui — briga com
+     qualquer preset que não seja roxo; com o Papel (verde-azulado) ficava
+     visivelmente errado.
+     A base é um tom FUNDO do acento ativo: as janelas de trás recuam para a
+     sombra da própria paleta, em vez de para uma cor que não é de ninguém. */
+  --veu-base: color-mix(in srgb, rgb(var(--accent-rgb)) 42%, #000000);
+  --veu-alfa: var(--cfg-veu-alfa-claro, 55%);
+
   /* Cerimônia de dia.
      A leitura da cena não muda: a inicialização acontece antes de o roxo do
      sistema acender, então aqui ela é um branco frio e quase sem cor, e é a
@@ -424,6 +441,13 @@
   height: 100%;
 }
 
+/* O fundo dos presets sóbrios. A composição vem do preset por estilo inline —
+   uma por preset, e cada uma é a identidade dele. Aqui só a caixa. */
+.marocos-sky-sobrio {
+  width: 100%;
+  height: 100%;
+}
+
 /* Cada camada de mobile precisa da paleta do SEU tema em vez de herdar a que
    está valendo — senão as duas pintariam igual e o crossfade não teria o que
    revelar. Os valores vêm de WALLPAPER.ceu, escritos aqui como LITERAIS, DE
@@ -496,6 +520,48 @@
       var(--ceu-meio, #ebe5ff) 52%,
       var(--ceu-baixo, #d9ccfb) 100%
     );
+}
+
+/* ==================================================
+   MODO SÓBRIO — sem vidro.
+
+   Os presets `sobrio` existem para quem quer o portfólio parecendo um site
+   normal. Não basta trocar o wallpaper: o que define este sistema visualmente é
+   o VIDRO — janelas translúcidas com blur, tiles semitransparentes, campos
+   rebaixados. Aqui tudo isso vira superfície opaca.
+
+   A classe fica no MESMO elemento que a classe de tema (ver Shell.jsx), e não
+   no <html>. Custom property resolve pelo ancestral mais próximo que a declara:
+   com `.theme-light` num div e o modo no <html>, o tema venceria sempre. No
+   mesmo elemento, `.theme-light.modo-sobrio` tem duas classes contra uma e
+   ganha por especificidade — e o `!important` cobre os tokens que o index.css
+   declara com `!important` no tema claro.
+
+   Blur desligado não é só estética: é o custo mais alto do sistema (ver o
+   cabeçalho de Window.css). Estes presets são, de longe, os mais baratos.
+   ================================================== */
+
+.modo-sobrio {
+  --win-glass-blur: none;
+  --win-body-bg: var(--win-body-base);
+  --win-titlebar-bg: color-mix(in srgb, rgb(var(--accent-rgb)) 16%, var(--win-body-base));
+  --icon-tile-bg: var(--icon-tile-base);
+  --icon-tile-bg-hover: color-mix(in srgb, rgb(var(--accent-rgb)) 22%, var(--icon-tile-base));
+  --card-bg: var(--win-body-base) !important;
+}
+
+/* Nenhuma superfície do sistema desfoca o que está atrás dela neste modo. O
+   seletor enumera em vez de usar `*` de propósito: `backdrop-filter: none` num
+   universal força o navegador a avaliar a propriedade em toda a árvore. */
+.modo-sobrio .marocos-window,
+.modo-sobrio .marocos-titlebar,
+.modo-sobrio .taskbar-container,
+.modo-sobrio .start-menu,
+.modo-sobrio .marocos-context-menu,
+.modo-sobrio .marocos-mobile-dock,
+.modo-sobrio .marocos-mobile-app-header {
+  -webkit-backdrop-filter: none;
+  backdrop-filter: none;
 }
 
 /* --------------------------------------------------

@@ -1,0 +1,44 @@
+/* --------------------------------------------------
+   PILHA DE AVISOS DA ÁREA DE TRABALHO
+
+   Só posicionamento e empilhamento — a aparência de cada balão é de
+   `ui/Balao.css`.
+   -------------------------------------------------- */
+
+.avisos-desktop {
+  position: absolute;
+  right: 18px;
+  /* Encostado na barra de tarefas, nunca por cima: a taskbar é a única coisa
+     que não pode ser coberta, porque é por ela que se sai de qualquer lugar.
+     O token é a altura real da barra, não um número copiado. */
+  bottom: calc(var(--taskbar-h) + 16px);
+  z-index: var(--z-taskbar);
+
+  display: flex;
+  /* Coluna invertida: o primeiro filho no DOM fica EMBAIXO. Assim o balão que
+     sai (o de tela cheia, quando alguém aperta F11) some de baixo e os de cima
+     descem — em vez de a pilha inteira saltar. */
+  flex-direction: column-reverse;
+  gap: 10px;
+
+  /* O container não intercepta clique nenhum; os balões voltam a interceptar.
+     Sem isto, uma faixa invisível de 320px cobriria o canto da área de trabalho
+     e engoliria o clique direito do menu de contexto. */
+  pointer-events: none;
+}
+
+.avisos-desktop > * {
+  pointer-events: auto;
+}
+
+@media (max-width: 520px) {
+  .avisos-desktop {
+    right: 12px;
+    left: 12px;
+    bottom: calc(var(--taskbar-h) + 12px);
+  }
+
+  .avisos-desktop .balao {
+    width: auto;
+  }
+}

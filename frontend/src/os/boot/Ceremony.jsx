@@ -3,7 +3,6 @@ import { useLanguage } from '../../contexts/LanguageContext'
 import { getOsData } from '../../i18n/os'
 import { getStartMenuData } from '../../i18n/startMenu'
 import { lerMovimentoReduzido } from '../hooks/useMediaQuery'
-import { useDeviceMode } from '../useDeviceMode'
 import { CERIMONIA, acentoProfundo, corpoDoCristal } from '../../config/system'
 import { useTheme } from '../../contexts/ThemeContext'
 import Clock from '../../ui/Clock'
@@ -70,7 +69,6 @@ const Ceremony = ({ fase, onBootDone, onUnlock, onUnlockStart }) => {
   // O cristal é o único ponto da cerimônia que carrega cor de identidade — o
   // resto das cores dela vem dos tokens --cer-*, que são arte fixa.
   const { preset } = useTheme()
-  const sugerirTelaCheia = useSugerirTelaCheia()
 
   // Congelada na montagem, de propósito: a tela de bloqueio pode ficar
   // minutos esperando um clique, e a preferência mudando nesse meio faria o
@@ -258,12 +256,7 @@ const Ceremony = ({ fase, onBootDone, onUnlock, onUnlockStart }) => {
         />
       )}
 
-      <CenaBloqueio
-        strings={bloqueio}
-        language={language}
-        ativa={!noBoot}
-        sugerirTelaCheia={sugerirTelaCheia}
-      />
+      <CenaBloqueio strings={bloqueio} language={language} ativa={!noBoot} />
     </div>
   )
 }
@@ -343,7 +336,7 @@ const CenaBoot = ({ strings, ativa, reduceMotion, onDone }) => {
  * Cena do bloqueio: o relógio, a dica, e nada mais. O cristal, a marca e o botão
  * vivem no núcleo — aqui só entra o que é exclusivo desta cena.
  */
-const CenaBloqueio = ({ strings, language, ativa, sugerirTelaCheia }) => (
+const CenaBloqueio = ({ strings, language, ativa }) => (
   <div className="cena cena--lock" aria-hidden={!ativa}>
     {/* Locale explícito (diferente da taskbar e da barra de status mobile,
         que usam o padrão do navegador): aqui a data sai por extenso, e o
@@ -358,40 +351,13 @@ const CenaBloqueio = ({ strings, language, ativa, sugerirTelaCheia }) => (
         classeSecundaria="lock-date"
       />
     </div>
+    {/* A sugestão de F11 NÃO vem aqui. Ela viveu nesta cena por uma versão e
+        foi para a área de trabalho (`desktop/AvisoTelaCheia.jsx`): `.lock-hint`
+        é posicionado, então uma segunda linha caía POR CIMA da primeira, e o
+        instante do bloqueio é curto demais para uma sugestão que a pessoa
+        precisa decidir se aceita. */}
     <p className="lock-hint">{strings.hint}</p>
-    {sugerirTelaCheia && (
-      <p className="lock-hint lock-hint--f11">{strings.fullscreenHint}</p>
-    )}
   </div>
 )
-
-/**
- * A SUGESTÃO DE F11 — desktop, e só fora de tela cheia.
- *
- * Este projeto é um sistema operacional dentro de uma aba, e a barra do
- * navegador em volta é a única coisa que denuncia a moldura. F11 a remove.
- *
- * Aqui é o único lugar do sistema onde cabe: a tela de bloqueio é o instante
- * ANTES de entrar, já tem uma linha de dica, e é vista uma vez por sessão. Nas
- * outras telas viraria interrupção — e num sistema que se leva a sério, aviso
- * que reaparece é mais irritante que útil.
- *
- * Some quando o visitante entra em tela cheia (por F11 ou por qualquer outro
- * caminho): dizer a alguém para fazer o que já fez é ruído.
- */
-function useSugerirTelaCheia() {
-  const ehDesktop = useDeviceMode() === 'desktop'
-  const [emTelaCheia, setEmTelaCheia] = useState(
-    () => typeof document !== 'undefined' && !!document.fullscreenElement,
-  )
-
-  useEffect(() => {
-    const aoTrocar = () => setEmTelaCheia(!!document.fullscreenElement)
-    document.addEventListener('fullscreenchange', aoTrocar)
-    return () => document.removeEventListener('fullscreenchange', aoTrocar)
-  }, [])
-
-  return ehDesktop && !emTelaCheia
-}
 
 export default Ceremony

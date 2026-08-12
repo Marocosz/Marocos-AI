@@ -62,6 +62,21 @@ const Ceu = ({ tema, preset, isMobile, isAnimated }) => {
    * preset — a que sai continua com a paleta antiga, que é o que o crossfade
    * precisa revelar.
    */
+  /**
+   * PRESET SÓBRIO NÃO TEM SHADER — e é a decisão dele, não uma limitação.
+   *
+   * Estes presets existem para quem quer o portfólio parecendo um site normal:
+   * fundo parado, sem vidro, sem nada se mexendo atrás do texto. O fundo é uma
+   * composição CSS que vem do próprio preset (`fundo`), diferente em cada um.
+   *
+   * Vale para desktop E mobile: no mobile os outros presets já caem no
+   * gradiente, e aqui a arte simplesmente substitui esse gradiente. Também é o
+   * caminho mais barato do sistema — zero WebGL, zero quadro por segundo.
+   */
+  if (preset.sobrio) {
+    return <div className="marocos-sky-sobrio" style={{ background: preset.fundo }} />
+  }
+
   if (isMobile) {
     return (
       <div

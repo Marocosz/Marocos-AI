@@ -225,6 +225,37 @@ export const PRESETS = {
       ruido: 2.4,
       ceu: { topo: '#240a17', meio: '#4a0f2a', baixo: '#831843' },
     },
+
+    /* ----------------------------------------------------------------
+       OS SÓBRIOS. Sem shader e sem vidro — ver a nota de `sobrio` acima
+       do array. Fundo desenhado em CSS, uma composição por preset.
+       ---------------------------------------------------------------- */
+    {
+      // Frio e retilíneo: linhas finas em diagonal sobre ardósia, com uma luz
+      // fria entrando pelo canto superior esquerdo.
+      id: 'ardosia',
+      sobrio: true,
+      acento: '#38bdf8',
+      ceu: { topo: '#0f172a', meio: '#131c31', baixo: '#0b1120' },
+      fundo: `
+        radial-gradient(120% 80% at 18% 0%, rgba(56, 189, 248, 0.16) 0%, transparent 58%),
+        repeating-linear-gradient(115deg, rgba(255, 255, 255, 0.035) 0 1px, transparent 1px 22px),
+        linear-gradient(160deg, #0f172a 0%, #131c31 55%, #0b1120 100%)
+      `,
+    },
+    {
+      // Quente e curvo: arcos concêntricos nascendo abaixo da tela, como ondas
+      // de calor. O oposto do Ardósia nos dois eixos — temperatura e forma.
+      id: 'carvao',
+      sobrio: true,
+      acento: '#fbbf24',
+      ceu: { topo: '#17161a', meio: '#101014', baixo: '#0a0a0d' },
+      fundo: `
+        radial-gradient(140% 90% at 50% 118%, rgba(251, 191, 36, 0.15) 0%, transparent 55%),
+        repeating-radial-gradient(circle at 50% 118%, rgba(255, 255, 255, 0.038) 0 1px, transparent 1px 44px),
+        linear-gradient(180deg, #17161a 0%, #101014 60%, #0a0a0d 100%)
+      `,
+    },
   ],
 
   /**
@@ -282,6 +313,38 @@ export const PRESETS = {
       amplitude: 0.05,
       velocidade: 0.45,
       ceu: { topo: '#f8fafc', meio: '#eef1f5', baixo: '#dbe0e8' },
+    },
+
+    /* ----------------------------------------------------------------
+       OS SÓBRIOS DO DIA. Mesma ideia dos da noite: papel em vez de vidro.
+       ---------------------------------------------------------------- */
+    {
+      // Papel quadriculado, quente. A grade é fina e larga o bastante para ler
+      // como textura de caderno, não como tabela.
+      id: 'papel',
+      sobrio: true,
+      acento: '#0f766e',
+      ceu: { topo: '#fbfaf7', meio: '#f6f4ef', baixo: '#efece4' },
+      fundo: `
+        repeating-linear-gradient(0deg, rgba(15, 118, 110, 0.055) 0 1px, transparent 1px 30px),
+        repeating-linear-gradient(90deg, rgba(15, 118, 110, 0.055) 0 1px, transparent 1px 30px),
+        radial-gradient(110% 75% at 88% 6%, rgba(15, 118, 110, 0.1) 0%, transparent 62%),
+        linear-gradient(165deg, #fbfaf7 0%, #f2efe8 100%)
+      `,
+    },
+    {
+      // Linho frio: faixas diagonais finas, como trama de tecido, com a luz
+      // entrando por baixo à esquerda. O oposto do Papel na temperatura e na
+      // direção — grade ortogonal contra trama diagonal.
+      id: 'linho',
+      sobrio: true,
+      acento: '#4338ca',
+      ceu: { topo: '#fafbff', meio: '#f2f4fb', baixo: '#e8ebf6' },
+      fundo: `
+        repeating-linear-gradient(135deg, rgba(67, 56, 202, 0.045) 0 2px, transparent 2px 26px),
+        radial-gradient(120% 80% at 8% 100%, rgba(67, 56, 202, 0.11) 0%, transparent 62%),
+        linear-gradient(155deg, #fafbff 0%, #eceff8 100%)
+      `,
     },
   ],
 }
@@ -503,8 +566,27 @@ export const JANELAS = {
    * mesmo 0.78 de preto não recua, ele suja — vira fuligem em cima do conteúdo.
    * O que se quer nos dois casos é distância, e cada fundo pede uma dose.
    */
-  veuSemFoco: 'rgba(0, 0, 0, 0.78)',
-  veuSemFocoClaro: 'rgba(46, 16, 101, 0.55)',
+  /**
+   * A OPACIDADE, e não a cor. A cor do véu é theme-aware e depende do acento
+   * ativo, então ela mora em `os/tokens.css` (`--veu-base`), que é a camada
+   * dona do chrome. Aqui fica o que é ajuste: quanto ele apaga.
+   *
+   * De noite a base é preto puro — recuo, sem cor. De dia é um tom FUNDO do
+   * acento: um véu preto sobre painel claro vira fuligem cinza, e um violeta
+   * fixo (que era o valor antigo) briga com qualquer preset que não seja roxo.
+   * O dono do projeto pegou isso com o preset Papel.
+   *
+   * Percentual e não decimal: é o que `color-mix()` consome direto.
+   */
+  veuAlfa: '78%',
+  veuAlfaClaro: '55%',
+  /**
+   * Quanto tempo o véu leva para entrar e sair. Trocar de foco entre janelas é
+   * gesto frequente: rápido demais lê como piscada, lento demais atrasa a
+   * resposta ao clique. 220ms é a mesma faixa das outras transições nomeadas do
+   * sistema (o menu Iniciar em 160ms, o painel de ajustes em 240ms).
+   */
+  veuDuracaoMs: 220,
 }
 
 /* --------------------------------------------------
@@ -594,6 +676,31 @@ export const MOVIMENTO = {
    * reduzido, o certo é a troca ser instantânea, não rápida.
    */
   maximizarJanela: { duration: 0.22, duracaoReduzida: 0, ease: 'easeOut' },
+  /**
+   * O balão de tela cheia da área de trabalho.
+   *
+   * `delay` grande de propósito: ele entra DEPOIS que a cortina da cerimônia
+   * subiu e os ícones terminaram de cascatear. Aparecer junto com o resto
+   * faria dele mais um elemento chegando ao mesmo tempo — e o ponto dele é ser
+   * notado.
+   */
+  /**
+   * Os balões da área de trabalho.
+   *
+   * `delay` grande de propósito: eles entram DEPOIS que a cortina da cerimônia
+   * subiu e os ícones terminaram de cascatear. Chegar junto com o resto faria
+   * deles mais um elemento no mesmo instante — e o ponto é serem notados.
+   *
+   * `intervalo` escalona o segundo: dois avisos aparecendo juntos no mesmo
+   * canto lêem como erro; um depois do outro lê como sistema conversando.
+   */
+  avisoDesktop: {
+    duration: 0.4,
+    duracaoReduzida: 0.2,
+    delay: 1.6,
+    intervalo: 0.45,
+    ease: 'easeOut',
+  },
   menuIniciar: { duration: 0.16, ease: 'easeOut' },
   quickSettings: { duration: 0.24, duracaoReduzida: 0.15, ease: 'easeOut' },
   quickSettingsFundo: { duration: 0.2 },

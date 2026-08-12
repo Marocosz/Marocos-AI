@@ -52,24 +52,42 @@
  * `pointer-events: none` porque o véu é aparência, não bloqueio: clicar numa
  * janela apagada continua focando ela, que é o gesto esperado.
  */
-.marocos-window:not(.focused)::after {
+/* O VÉU EXISTE SEMPRE; O QUE MUDA É A OPACIDADE.
+ *
+ * Antes o `content: ''` morava dentro do `:not(.focused)`, e aí o
+ * pseudo-elemento deixava de ser GERADO ao focar — não existia o que animar, e
+ * a `transition` declarada ali nunca teve efeito nenhum. O véu aparecia e sumia
+ * de estalo, que foi o que o dono do projeto viu.
+ *
+ * Gerando sempre e alternando só a opacidade, a transição funciona nos dois
+ * sentidos — e opacidade é a propriedade mais barata de animar: composição
+ * pura, sem repintura, o que importa quando há várias janelas trocando de foco
+ * ao mesmo tempo. */
+.marocos-window::after {
   content: '';
   position: absolute;
   inset: var(--win-titlebar-h) 0 0 0;
   z-index: 2;
-  background: var(--cfg-veu-sem-foco, rgba(0, 0, 0, 0.78));
+  /* Cor da camada de tema (--veu-base), opacidade do config (--veu-alfa) —
+     ver as notas nos dois lugares. */
+  background: color-mix(in srgb, var(--veu-base) var(--veu-alfa), transparent);
+  opacity: 1;
   pointer-events: none;
-  transition: background 0.18s ease;
+  transition: opacity var(--cfg-veu-duracao, 220ms) ease-out;
+}
+
+.marocos-window.focused::after {
+  opacity: 0;
 }
 
 /* Maximizada não tem barra de título flutuando sobre o corpo? Tem — o inset
    acima já a preserva nos dois estados, porque --win-titlebar-h é a altura
    dela em ambos. Nada a fazer aqui além de não esquecer que é assim. */
 
-/* De dia a dose é outra e a cor também — ver a justificativa em JANELAS.veuSemFoco. */
-.theme-light .marocos-window:not(.focused)::after {
-  background: var(--cfg-veu-sem-foco-claro, rgba(46, 16, 101, 0.55));
-}
+/* Não há regra de tema claro aqui: `--veu-base` e `--veu-alfa` já invertem em
+   tokens.css, e a regra acima resolve os dois casos com os mesmos dois tokens.
+   Duplicar o seletor por tema era o que fazia o véu de dia ficar preso numa cor
+   fixa. */
 
 /* MAXIMIZADA — sem vidro, de propósito.
  *

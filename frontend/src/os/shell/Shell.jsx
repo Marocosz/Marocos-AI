@@ -136,8 +136,16 @@ const Shell = () => {
     ativo: fase !== 'boot',
   })
 
+  // `modo-sobrio` acompanha a classe de tema no MESMO elemento, e não no
+  // <html>: custom property resolve pelo ancestral mais próximo que a declara,
+  // então um modo lá em cima perderia para o tema aqui. Ver a nota em
+  // tokens.css.
+  const classesDoTema = `${isDark ? 'theme-dark' : 'theme-light'}${
+    preset.sobrio ? ' modo-sobrio' : ''
+  }`
+
   return (
-    <div className={isDark ? 'theme-dark' : 'theme-light'}>
+    <div className={classesDoTema}>
       <WindowManagerProvider>
         <TituloDaPagina />
 

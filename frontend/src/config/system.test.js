@@ -138,8 +138,34 @@ describe('config do sistema', () => {
     expect(getPreset('dark', 'brasa').id).toBe('brasa')
   })
 
+  /**
+   * PRESET SÓBRIO É OUTRO MODO, não outra paleta: ele não tem shader, então não
+   * tem `cor`/`velocidade`, e em compensação precisa de `fundo` — sem ele o
+   * wallpaper renderiza uma div vazia e a tela fica preta.
+   */
+  it('todo preset sóbrio traz o fundo desenhado e dispensa os campos de shader', () => {
+    const sobrios = [...PRESETS.noite, ...PRESETS.dia].filter((p) => p.sobrio)
+    expect(sobrios.length, 'era para haver 2 sóbrios por tema').toBe(4)
+
+    for (const p of sobrios) {
+      expect(typeof p.fundo, `${p.id}.fundo`).toBe('string')
+      expect(p.fundo.trim().length).toBeGreaterThan(0)
+      // Sem shader, estes campos não fazem sentido — e declará-los daria a
+      // impressão de que mudam alguma coisa.
+      expect(p.cor, `${p.id} não deve declarar cor de shader`).toBeUndefined()
+      expect(p.velocidade, `${p.id} não deve declarar velocidade`).toBeUndefined()
+    }
+  })
+
+  it('cada tema tem pelo menos dois presets sóbrios e dois animados', () => {
+    for (const [tema, lista] of Object.entries(PRESETS)) {
+      expect(lista.filter((p) => p.sobrio).length, `sóbrios em ${tema}`).toBeGreaterThanOrEqual(2)
+      expect(lista.filter((p) => !p.sobrio).length, `animados em ${tema}`).toBeGreaterThanOrEqual(2)
+    }
+  })
+
   it('os presets de noite e de dia têm as formas que cada shader consome', () => {
-    for (const p of PRESETS.noite) {
+    for (const p of PRESETS.noite.filter((x) => !x.sobrio)) {
       expect(p.cor, `noite/${p.id}.cor`).toMatch(/^#[0-9a-f]{6}$/i)
       // Velocidade 0 e escala 0 nao sao "mais sutil": sao fundo parado e fundo
       // sem padrao. Ruido pode ser 0, que e o liso chapado descrito no config.
@@ -148,7 +174,7 @@ describe('config do sistema', () => {
       expect(p.ruido).toBeGreaterThanOrEqual(0)
     }
 
-    for (const p of PRESETS.dia) {
+    for (const p of PRESETS.dia.filter((x) => !x.sobrio)) {
       // O Iridescence recebe multiplicador RGB normalizado, nao hex — trocar a
       // forma aqui pinta preto sem erro nenhum no console.
       expect(Array.isArray(p.cor), `dia/${p.id}.cor precisa ser [r,g,b]`).toBe(true)
