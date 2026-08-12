@@ -183,53 +183,155 @@
   color: var(--text-secondary);
 }
 
-/* --- RECURSOS INSTALADOS (skills como marquee infinito) --- */
-.about-features-wrapper {
-  overflow: hidden;
-  position: relative;
-  mask-image: linear-gradient(to right, transparent, black 8%, black 92%, transparent);
-  -webkit-mask-image: linear-gradient(to right, transparent, black 8%, black 92%, transparent);
-}
+/* --- O GUIA: uma porta por pergunta ---
+   Onde ficava o marquee de skills. Ele saiu por três razões: era decoração num
+   app que precisava de navegação, não dava para ler no próprio ritmo (o texto
+   fugia), e repetia o app de Stack — que virou uma das portas daqui.
 
-.about-features-track {
-  display: flex;
-  width: max-content;
+   PARECE CARD E É BOTÃO. A superfície é a de conteúdo do projeto
+   (--card-bg/--card-border, sem receita de vidro nova) e o raio é o de
+   controle, porque a coisa toda é clicável. */
+.about-guide {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
   gap: 8px;
-  animation: aboutFeaturesScroll var(--cfg-marquee-skills, 18s) linear infinite;
-  will-change: transform;
+  margin: 0;
+  padding: 0;
+  list-style: none;
 }
 
-.about-feature-chip {
-  white-space: nowrap;
-  font-size: 0.75rem;
-  font-weight: 700;
-  letter-spacing: 0.03em;
-  text-transform: uppercase;
+.about-door {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  width: 100%;
+  height: 100%;
+  padding: 11px 12px;
+  text-align: left;
+  font-family: inherit;
+  border: 1px solid var(--card-border);
+  border-radius: var(--win-control-radius);
+  background: var(--card-bg);
   color: var(--text-primary);
+  cursor: pointer;
+  transition: background 0.16s ease, border-color 0.16s ease, transform 0.16s ease;
+}
+
+.about-door:hover {
+  background: rgb(var(--accent-rgb) / 0.1);
+  border-color: rgb(var(--accent-rgb) / 0.4);
+}
+
+.about-door:focus-visible {
+  outline: 2px solid var(--accent-color);
+  outline-offset: 2px;
+}
+
+/* Fora de um container de navegação (`useIrPara()` devolve null) a porta não
+   leva a lugar nenhum — então ela para de se anunciar como clicável em vez de
+   mentir com o cursor. */
+.about-door:disabled {
+  cursor: default;
+  opacity: 0.75;
+}
+
+.about-door:disabled:hover {
+  background: var(--card-bg);
+  border-color: var(--card-border);
+}
+
+/* Mesmo quadrado tingido do ícone do balão de notificação — é a marca de
+   "atalho para outro lugar" que o sistema já usa. */
+.about-door-icon {
+  flex: 0 0 auto;
+  margin-top: 1px;
+  color: var(--accent-color);
+}
+
+.about-door-text {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  min-width: 0;
+}
+
+/* A pergunta é Poppins: é uma pessoa perguntando, não o sistema se descrevendo
+   — a mesma decisão que separa `.about-section-title` (mono) do corpo daqui. */
+.about-door-question {
+  font-size: 0.88rem;
+  font-weight: 700;
+  line-height: 1.25;
+  color: var(--text-primary);
+}
+
+.about-door-answer {
+  font-size: 0.75rem;
+  line-height: 1.45;
+  color: var(--text-secondary);
+}
+
+/* --- ESTA MÁQUINA (ficha técnica de verdade) ---
+   Voz da máquina falando de si: rótulo em mono, caixa alta, com espaçamento —
+   mesma receita de `.about-spec-label`. O valor volta para Poppins. */
+.about-machine {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 2px 18px;
+  margin: 0;
+  padding: 12px 14px;
+  border-radius: 14px;
   background: var(--card-bg);
   border: 1px solid var(--card-border);
-  border-radius: 8px;
-  padding: 6px 12px;
 }
 
-@keyframes aboutFeaturesScroll {
-  from { transform: translateX(0); }
-  /* Lista triplicada acima: anda só metade, o resto é a folga que evita
-     buraco no ponto do reset. */
-  to { transform: translateX(-50%); }
+.about-machine-row {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  min-width: 0;
+  padding: 3px 0;
+}
+
+.about-machine-row dt {
+  flex: 0 0 auto;
+  font-family: 'Courier New', monospace;
+  font-size: 0.65rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--text-secondary);
+}
+
+/* A linha pontilhada sob o valor é o que faz duas colunas de larguras
+   diferentes lerem como ficha técnica sem virar uma tabela — mesma ideia do
+   `terminal-log-fill`, que preenche o vão entre o texto e o status. */
+.about-machine-row dd {
+  flex: 1 1 auto;
+  min-width: 0;
+  margin: 0;
+  text-align: right;
+  font-size: 0.78rem;
+  color: var(--text-primary);
+  border-bottom: 1px dotted var(--card-border);
 }
 
 /* --- RESPONSIVIDADE --- */
+@media (max-width: 620px) {
+  .about-guide,
+  .about-machine {
+    grid-template-columns: 1fr;
+  }
+}
+
 @media (max-width: 480px) {
   .about-specs {
     grid-template-columns: 1fr;
   }
 }
 
-/* Respeita quem pede menos movimento: sem isso o marquee e o pulso do
-   fallback do cristal rodam sempre, mesmo com prefers-reduced-motion. */
+/* Respeita quem pede menos movimento: sem isto o pulso do fallback do cristal
+   roda sempre, mesmo com prefers-reduced-motion. */
 @media (prefers-reduced-motion: reduce) {
-  .about-features-track,
   .about-crystal-fallback {
     animation: none;
   }

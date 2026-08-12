@@ -4,8 +4,12 @@ import {
   assinaturaLocal,
   estaEm,
   cascadePosition,
+  areaUtil,
+  tamanhoQueCabe,
+  posicaoAlcancavel,
   windowReducer,
 } from './windowManager'
+import { JANELAS } from '../config/system'
 
 /**
  * OS TESTES PERGUNTAM PELO APP, NÃO PELA CHAVE.
@@ -90,6 +94,89 @@ describe('cascadePosition', () => {
     expect(x).toBeGreaterThanOrEqual(16)
     expect(x + tam.w).toBeLessThanOrEqual(tela.width)
     expect(y).toBeGreaterThanOrEqual(16)
+  })
+
+  it('centra pelo tamanho JÁ ENCOLHIDO, não pelo desejado', () => {
+    // Sem isto a conta de centro usa uma janela que não vai existir, e a janela
+    // nasce deslocada exatamente na tela onde ela mais precisa estar certa.
+    const tela = { width: 1280, height: 700 }
+    const alto = { w: 560, h: 660 } // as Configurações, a janela mais alta
+    const { y } = cascadePosition(0, tela, alto)
+    const cabe = tamanhoQueCabe(alto, tela.width, tela.height)
+
+    expect(y + cabe.h).toBeLessThanOrEqual(tela.height - JANELAS.alturaTaskbar)
+  })
+})
+
+/**
+ * O BUG DA TELA BAIXA. A posição era limitada e o tamanho não, então numa tela
+ * baixa a janela nascia com a altura cheia do registry e o excesso ficava
+ * embaixo da barra de tarefas, fora de alcance.
+ */
+describe('tamanhoQueCabe', () => {
+  it('não mexe no tamanho quando a tela comporta', () => {
+    expect(tamanhoQueCabe({ w: 560, h: 660 }, 1920, 1080)).toEqual({ w: 560, h: 660 })
+  })
+
+  it('encolhe a janela mais alta para caber num notebook de 768', () => {
+    // O caso relatado: 1366x768 com o navegador em janela normal dá ~640 de
+    // viewport, e as Configurações (660 de altura) passavam por baixo da barra.
+    const cabe = tamanhoQueCabe({ w: 560, h: 660 }, 1366, 640)
+
+    expect(cabe.h).toBeLessThan(660)
+    expect(cabe.h + JANELAS.alturaTaskbar + JANELAS.margem * 2).toBeLessThanOrEqual(640)
+    expect(cabe.w).toBe(560) // a largura cabia: não deve encolher junto
+  })
+
+  it('reserva a barra de tarefas e as duas margens', () => {
+    const area = areaUtil(1000, 800)
+    expect(area.h).toBe(800 - JANELAS.alturaTaskbar - JANELAS.margem * 2)
+    expect(area.w).toBe(1000 - JANELAS.margem * 2)
+  })
+
+  it('para de encolher no piso, em vez de virar uma fresta', () => {
+    // 200 de altura deixa 116 úteis, abaixo do piso de 280 — aqui ele entra.
+    // A largura precisa ser bem menor: em 400px sobram 368 úteis, que ainda
+    // estão ACIMA do piso de 320, e nesse caso encolher até a área é o certo.
+    const cabe = tamanhoQueCabe({ w: 560, h: 660 }, 300, 200)
+    expect(cabe.h).toBe(JANELAS.tamanhoMinimo.h)
+    expect(cabe.w).toBe(JANELAS.tamanhoMinimo.w)
+  })
+
+  it('encolhe até a área disponível enquanto ela for maior que o piso', () => {
+    const cabe = tamanhoQueCabe({ w: 560, h: 660 }, 400, 800)
+    expect(cabe.w).toBe(400 - JANELAS.margem * 2)
+  })
+
+  it('devolve o tamanho original quando a tela ainda não foi medida', () => {
+    // Primeiro instantâneo do useViewport e SSR chegam com 0 — melhor cair no
+    // comportamento antigo do que calcular com viewport zerada.
+    const tam = { w: 560, h: 660 }
+    expect(tamanhoQueCabe(tam, 0, 0)).toBe(tam)
+  })
+})
+
+describe('posicaoAlcancavel', () => {
+  it('não desfaz um arrasto legítimo para o canto', () => {
+    // O limite aqui É o do arrasto. Se fosse mais apertado, toda janela puxada
+    // para a borda voltaria sozinha no render seguinte.
+    const x = 1920 - JANELAS.folgaArrastoX
+    const y = 1080 - JANELAS.folgaArrastoY
+    expect(posicaoAlcancavel(x, y, 1920, 1080)).toEqual({ x, y })
+  })
+
+  it('traz de volta a janela que ficou fora depois de a tela encolher', () => {
+    const fora = posicaoAlcancavel(1500, 900, 1280, 720)
+    expect(fora.x).toBe(1280 - JANELAS.folgaArrastoX)
+    expect(fora.y).toBe(720 - JANELAS.folgaArrastoY)
+  })
+
+  it('não deixa a janela subir acima do topo', () => {
+    expect(posicaoAlcancavel(-40, -80, 1280, 720)).toEqual({ x: 0, y: 0 })
+  })
+
+  it('não mexe em nada quando a tela ainda não foi medida', () => {
+    expect(posicaoAlcancavel(300, 200, 0, 0)).toEqual({ x: 300, y: 200 })
   })
 })
 

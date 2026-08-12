@@ -83,11 +83,18 @@ async def chat_endpoint(request: ChatRequest, fast_api_request: Request):
     logger.info(f"Incoming chat request from IP: {client_ip}\nMessage: {request.message}")
     
     # 1. Validação de Rate Limit (Segurança)
+    # A mensagem segue o idioma da interface: ela estava cravada em português e
+    # aparecia assim para quem estava lendo o site em inglês. É a única resposta
+    # de erro que o visitante lê por extenso, então errar o idioma aqui é caro.
     if not limiter.check_request():
         logger.warning(f"Rate limit exceeded. IP: {client_ip} tried to request.")
         raise HTTPException(
-            status_code=429, 
-            detail="Limite diário global do projeto atingido (APIs gratuitas). Volte amanhã!"
+            status_code=429,
+            detail=(
+                "Limite diário global do projeto atingido (APIs gratuitas). Volte amanhã!"
+                if request.language != "en"
+                else "The project's global daily limit has been reached (free APIs). Come back tomorrow!"
+            )
         )
 
     # 2. Conversão de Histórico (JSON -> Objetos LangChain)
@@ -142,12 +149,18 @@ async def chat_endpoint(request: ChatRequest, fast_api_request: Request):
                     status_msg = "Lendo histórico..." if is_pt else "Reading history..."
                 elif node_name == "summarize_conversation":
                     status_msg = "Entendendo contexto..." if is_pt else "Understanding context..."
-                elif node_name == "contextualize_input":
-                    status_msg = "Analisando intenção..." if is_pt else "Analyzing intent..."
-                elif node_name == "router_node":
-                    # Se o router decidiu que é técnico, avisa que vai pesquisar.
+                # O nó que existe HOJE. `contextualize_input` e `router_node`
+                # foram fundidos no `semantic_gateway_node` para cortar
+                # latência, mas este mapa continuou citando os dois nomes
+                # antigos — e nenhum dos dois volta do grafo. O resultado era o
+                # passo mais demorado do pipeline (a única chamada de LLM do
+                # gateway) rodando sem nenhum feedback na tela.
+                elif node_name == "semantic_gateway_node":
+                    # Mesma leitura de antes: se o gateway classificou como
+                    # técnico, o próximo passo é buscar na base — e vale avisar,
+                    # porque é o trecho que mais demora.
                     classification = node_output.get("classification", "technical")
-                    
+
                     if classification == "technical":
                         status_msg = "Pesquisando nas memórias..." if is_pt else "Searching memories..."
                     else:
@@ -183,7 +196,11 @@ async def chat_endpoint(request: ChatRequest, fast_api_request: Request):
                     "usage": stats
                 })
             else:
-                 yield format_event("error", {"detail": "No response generated."})
+                 # Espelho do 429: estava cravada em inglês e caía dentro da
+                 # interface em português.
+                 yield format_event("error", {
+                     "detail": "Nenhuma resposta foi gerada." if is_pt else "No response generated."
+                 })
 
         except Exception as e:
             logger.error(f"Stream Error: {e}")

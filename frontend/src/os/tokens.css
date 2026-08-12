@@ -78,6 +78,11 @@
      pela ordem do DOM — o bloqueio vinha depois, era opaco, e cobria a
      inicialização inteira. Hoje elas são cenas do mesmo palco. */
   --z-boot: 2000;
+  /* A dica flutuante fica ACIMA de tudo, inclusive da cerimônia: ela é
+     `position: fixed` justamente para escapar do `overflow` da janela que a
+     contém, e um balão que escapa do recorte mas some atrás da barra de tarefas
+     só troca um defeito por outro. Ver o cabeçalho de `ui/Dica.jsx`. */
+  --z-dica: 2100;
 
   /* --------------------------------------------------
      CERIMÔNIA (inicialização + tela de bloqueio)
@@ -562,6 +567,485 @@
 .modo-sobrio .marocos-mobile-app-header {
   -webkit-backdrop-filter: none;
   backdrop-filter: none;
+}
+
+/* ==================================================
+   MODO XP — o Luna, inteiro, e igual nos dois temas.
+
+   Este é o único modo que IGNORA o tema: o Windows XP não tinha modo escuro, e
+   a piada só funciona se dia e noite renderizarem idênticos. Por isso cada
+   seletor aqui aparece nas DUAS combinações (`.theme-dark.modo-xp` e
+   `.theme-light.modo-xp`) em vez de só `.modo-xp`: são duas classes contra a
+   uma de `.theme-light`, então ganham por especificidade em vez de depender da
+   ordem do arquivo.
+
+   O XP JÁ ERA SÓBRIO. O preset carrega `sobrio: true`, então o bloco acima já
+   tirou o blur e o vidro — o Luna era opaco, e o vidro só chegou no Vista.
+   Aqui só entram as cores e as formas.
+
+   AS CORES SÃO LITERAIS, E ESTA É UMA EXCEÇÃO CONSCIENTE à regra de tudo vir do
+   config. Elas não são configuração: são a citação de um produto específico, do
+   mesmo jeito que os gradientes da cerimônia são arte e o âmbar do POST é a cor
+   de um fósforo de CRT. Parametrizá-las sugeriria que existe um XP mais escuro
+   ou mais roxo para escolher, e não existe.
+   ================================================== */
+
+/**
+ * Tahoma, a fonte de interface do XP. Vem do preset pela ponte de config; o
+ * fallback repete a pilha para o caso de a ponte não ter rodado ainda.
+ *
+ * DECLARADA NO CONTAINER, E SÓ NELE. A primeira versão tinha um
+ * `.modo-xp * { font-family: inherit }` junto, para alcançar quem declara a
+ * própria fonte — e isso teria apagado a VOZ MONO do sistema: o terminal, os
+ * rótulos de ficha técnica e o POST da BIOS usam `'Courier New', monospace` de
+ * propósito, e o projeto trata isso como significado, não como decoração (é o
+ * sistema falando sobre si mesmo). Um preset troca a fonte da interface; não
+ * tem autoridade para calar a outra voz.
+ *
+ * Herança normal já basta: quem não declara fonte própria pega Tahoma daqui.
+ */
+.modo-xp {
+  font-family: var(--cfg-fonte-preset, Tahoma, Verdana, 'DejaVu Sans', sans-serif);
+}
+
+/**
+ * O PONTEIRO DAQUELA ÉPOCA.
+ *
+ * Seta branca com contorno preto, e a mãozinha sobre o que é clicável — o par
+ * que qualquer pessoa reconhece sem saber que reconhece. Desenhados em SVG e
+ * embutidos como data URI, pela mesma razão do papel de parede e dos ícones: os
+ * arquivos `.cur` originais são da Microsoft, e desenhar custa alguns bytes.
+ *
+ * OS DOIS NÚMEROS DEPOIS DA URL SÃO O PONTO QUENTE — onde, dentro da imagem,
+ * fica a ponta que realmente clica. Sem eles o navegador assume o canto (0,0) e
+ * o cursor parece "atrasado" em relação ao alvo. Na seta é a ponta (1,1); na
+ * mão é a ponta do indicador (9,1).
+ *
+ * O `default` e o `pointer` no fim de cada declaração são o fallback: se o
+ * navegador recusar a imagem (alguns limitam cursor a 32x32), volta ao cursor do
+ * sistema em vez de sumir com ele.
+ *
+ * Sem aspas duplas e sem `#` dentro do SVG: os dois quebram o data URI sem
+ * escape, e nomes de cor evitam o problema na origem.
+ */
+/**
+ * A SETA VAI SÓ NO CONTAINER, E A HERANÇA FAZ O RESTO.
+ *
+ * A primeira versão usava `.modo-xp *`, e isso quebrou o sistema de cursores do
+ * projeto inteiro. `cursor` é propriedade HERDADA: declarar no container já
+ * alcança todo descendente que não tenha opinião própria. Com o `*`, cada
+ * elemento passava a ter uma declaração direta de especificidade (0,1,0), que
+ * empata ou vence as regras de componente — e o projeto declara cursor de
+ * propósito em uns trinta lugares:
+ *
+ *   grab / grabbing   a barra de título, que é o que se arrasta
+ *   help              a interrogação da dica e o medidor de cota do assistente
+ *   text              o terminal e os campos de digitação
+ *   default           itens NÃO clicáveis da bandeja, e tudo que está :disabled
+ *
+ * Todos viravam seta. Sem o `*`, cada um desses continua mandando no próprio
+ * cursor, que é o certo — eles carregam informação sobre o que dá para fazer.
+ */
+.modo-xp {
+  cursor: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 22 22"><path d="M1 1 L1 16.4 L5.1 12.6 L7.6 18.4 L10.2 17.3 L7.7 11.7 L12.9 11.6 Z" fill="white" stroke="black" stroke-width="1.1" stroke-linejoin="round"/></svg>')
+      1 1,
+    default;
+}
+
+/**
+ * A MÃOZINHA, sobre o que é de fato clicável.
+ *
+ * `a[href]` e não `a`: âncora sem destino não clica em nada. `label` e `select`
+ * saíram da lista — a primeira versão os incluía e era ali que a mão aparecia
+ * "em lugar errado", porque rótulo de formulário e caixa de seleção nunca foram
+ * alvo de mão no XP.
+ */
+.modo-xp a[href],
+.modo-xp button,
+.modo-xp [role='button'],
+.modo-xp summary {
+  cursor: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 22 22"><path d="M8 2.2c0-1.1 2.2-1.1 2.2 0v6.9h1.1V7.4c0-1.1 2.2-1.1 2.2 0v1.7h1.1V8c0-1.1 2.2-1.1 2.2 0v1.1h1.1v-.6c0-1.1 2.2-1.1 2.2 0V14c0 3.2-2.1 5.6-5.3 5.6h-3.2c-1.6 0-2.7-.6-3.6-1.7l-3.4-4.2c-.8-1 .8-2.3 1.8-1.4l2.6 2.2z" fill="white" stroke="black" stroke-width="1.1" stroke-linejoin="round"/></svg>')
+      9 1,
+    pointer;
+}
+
+/**
+ * AS EXCEÇÕES, que são botões sem serem alvos de clique comum.
+ *
+ * Estes casos existem porque `<button>` é o elemento certo por acessibilidade
+ * mesmo quando o cursor não deve prometer navegação. Sem este bloco, a mão
+ * aparecia sobre a interrogação da dica, sobre o relógio e os ícones da bandeja
+ * (que não fazem nada) e sobre botões desabilitados — a mão prometendo uma ação
+ * que não acontece é pior que cursor nenhum.
+ *
+ * Especificidade (0,2,0) contra os (0,1,1) da regra da mão: vencem sem
+ * `!important` e sem depender da ordem dos arquivos.
+ */
+.modo-xp button:disabled,
+.modo-xp .tray-icons,
+.modo-xp .tray-clock {
+  cursor: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 22 22"><path d="M1 1 L1 16.4 L5.1 12.6 L7.6 18.4 L10.2 17.3 L7.7 11.7 L12.9 11.6 Z" fill="white" stroke="black" stroke-width="1.1" stroke-linejoin="round"/></svg>')
+      1 1,
+    default;
+}
+
+/* Os dois alvos de "isto explica algo" continuam com a interrogação. */
+.modo-xp .dica-alvo,
+.modo-xp .assistant-usage {
+  cursor: help;
+}
+
+.theme-light.modo-xp {
+  /* O bege dos diálogos, que é o que a maioria lembra do XP. */
+  --win-body-base: #ece9d8;
+  --win-body-bg: #ece9d8;
+  --win-body-solid: #ece9d8;
+
+  /* A barra de título ativa: azul com o realce claro logo abaixo da borda de
+     cima, que é o que dá o brilho plástico do Luna. */
+  --win-titlebar-bg: linear-gradient(
+    180deg,
+    #0054e3 0%,
+    #2d8ceb 6%,
+    #0054e3 14%,
+    #0054e3 82%,
+    #003ab0 100%
+  );
+
+  --win-border: 1px solid #0831d9;
+  --win-shadow: 3px 3px 10px rgba(0, 0, 0, 0.45);
+  --win-highlight: none;
+
+  /* Cantos arredondados só EM CIMA — a assinatura da janela do XP. O token é
+     usado sozinho em `border-radius`, então a forma inteira cabe nele. */
+  --win-radius: 8px 8px 0 0;
+  --win-control-radius: 3px;
+
+  --accent-color: #245edc;
+  --accent-rgb: 36 94 220;
+
+  --card-bg: #ffffff;
+  --card-border: #b7b7a4;
+
+  --icon-tile-base: transparent;
+  --icon-tile-bg: transparent;
+  --icon-tile-bg-hover: rgba(255, 255, 255, 0.22);
+  --icon-tile-border: 1px solid transparent;
+
+  --scroll-thumb: #c5c2b8;
+  --scroll-thumb-hover: #a9a695;
+  --scroll-track: #f1efe2;
+}
+
+/* O texto do miolo volta a ser preto sobre o bege. O `!important` existe porque
+   o index.css pinta `.theme-light span, li, div` com `!important`. */
+.theme-light.modo-xp {
+  --text-primary: #000000 !important;
+  --text-secondary: #3f3f36 !important;
+  --bg-color: #ece9d8;
+}
+
+/* A barra de tarefas do Luna: azul, com o filete claro em cima e o degradê
+   descendo. Sem raio, sem margem, encostada no rodapé — como era. */
+.theme-light.modo-xp .taskbar-container {
+  background: linear-gradient(
+    180deg,
+    #3f8cf3 0%,
+    #245edc 5%,
+    #1941a5 46%,
+    #2458cd 92%,
+    #4a8ff0 100%
+  );
+  border-top: 1px solid #0831d9;
+  border-radius: 0;
+}
+
+/* O botão Iniciar era verde, e é o detalhe que mais denuncia o XP. */
+.theme-light.modo-xp .taskbar-btn[aria-expanded] {
+  background: linear-gradient(180deg, #63b357 0%, #3c8b37 48%, #2c7328 100%);
+  border-radius: 0 14px 14px 0;
+  color: #ffffff;
+  font-style: italic;
+  font-weight: 700;
+  text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);
+}
+
+/**
+ * OS BOTÕES DE JANELA DA BARRA — o texto sumia quando a janela estava em foco.
+ *
+ * O estado ativo herdava um fundo claro do tema, e a legenda continuava clara
+ * por cima dele. No XP é o contrário: o botão ativo AFUNDA (fica mais escuro que
+ * a barra) e a legenda fica branca e em negrito. O inativo é levemente mais
+ * claro que a barra, e também com legenda branca.
+ *
+ * As duas legendas ganham sombra: sobre azul saturado, branco puro sem sombra
+ * vibra e cansa de ler.
+ */
+.theme-light.modo-xp .taskbar-window-btn {
+  background: linear-gradient(180deg, #4a8ff0 0%, #2a63d8 50%, #1f4fbe 100%);
+  border: 1px solid #17399a;
+  border-radius: 3px;
+  color: #ffffff !important;
+  text-shadow: 1px 1px 1px rgba(0, 0, 0, 0.45);
+}
+
+.theme-light.modo-xp .taskbar-window-btn * {
+  color: #ffffff !important;
+}
+
+.theme-light.modo-xp .taskbar-window-btn:hover {
+  background: linear-gradient(180deg, #6aa6f5 0%, #3a76e4 50%, #2a5fce 100%);
+}
+
+.theme-light.modo-xp .taskbar-window-btn.active {
+  background: linear-gradient(180deg, #16337a 0%, #1c47a8 55%, #2559c4 100%);
+  border-color: #10275e;
+  box-shadow: inset 1px 1px 3px rgba(0, 0, 0, 0.45);
+  font-weight: 700;
+}
+
+/* O indicador roxo de app ativo não existe no XP — quem marca o ativo é o
+   próprio afundamento do botão. */
+.theme-light.modo-xp .app-indicator {
+  background: #ffffff;
+}
+
+/**
+ * A BANDEJA DA DIREITA — relógio, idioma, som, rede.
+ *
+ * Ela herdava as cores do tema claro (texto escuro, ícone escuro) e ficava
+ * ilegível sobre o azul saturado da barra. No XP tudo ali era branco, e a
+ * separação entre a bandeja e o resto da barra vinha de um sulco, não de cor.
+ */
+.theme-light.modo-xp .taskbar-right,
+.theme-light.modo-xp .taskbar-right *,
+.theme-light.modo-xp .tray-clock,
+.theme-light.modo-xp .tray-clock *,
+.theme-light.modo-xp .tray-icons svg,
+.theme-light.modo-xp .theme-toggle-btn {
+  color: #ffffff !important;
+  text-shadow: 1px 1px 1px rgba(0, 0, 0, 0.4);
+}
+
+/* O sulco que separava a bandeja do resto da barra. */
+.theme-light.modo-xp .taskbar-right {
+  background: linear-gradient(180deg, #1a4bb5 0%, #2a63d8 50%, #14398f 100%);
+  border-left: 1px solid #17399a;
+  box-shadow: inset 1px 0 0 rgba(255, 255, 255, 0.25);
+}
+
+.theme-light.modo-xp .tray-icons:hover,
+.theme-light.modo-xp .theme-toggle-btn:hover,
+.theme-light.modo-xp .tray-clock:hover {
+  background: rgba(255, 255, 255, 0.18);
+}
+
+.theme-light.modo-xp .tray-divider {
+  background: rgba(255, 255, 255, 0.3);
+}
+
+/* A faixa de "mostrar área de trabalho", no canto. */
+.theme-light.modo-xp .show-desktop-line {
+  background: rgba(255, 255, 255, 0.3);
+}
+
+/* Título em branco com sombra, como o Luna desenhava. */
+.theme-light.modo-xp .marocos-titlebar {
+  color: #ffffff;
+  text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.45);
+}
+
+.theme-light.modo-xp .marocos-titlebar * {
+  color: #ffffff !important;
+}
+
+/* Os rótulos dos ícones da área de trabalho: branco com sombra dura sobre o
+   papel de parede, sem tile atrás — exatamente como o XP fazia. */
+.theme-light.modo-xp .marocos-icons * {
+  color: #ffffff !important;
+  text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.85);
+}
+
+/* ==================================================
+   O MENU INICIAR DO XP
+
+   O painel mais reconhecível do sistema, e o que mais destoava sem tratamento:
+   cabeçalho azul com o nome do visitante, corpo branco, rodapé azul com o botão
+   de desligar. Três faixas, e é essa divisão que denuncia o XP à distância.
+   ================================================== */
+
+.theme-light.modo-xp .start-menu {
+  background: #ffffff;
+  border: 1px solid #0831d9;
+  border-radius: 8px 8px 0 0;
+  box-shadow: 3px 0 12px rgba(0, 0, 0, 0.4);
+  overflow: hidden;
+}
+
+/* A busca no lugar onde o XP punha o cabeçalho do usuário: faixa azul no topo,
+   com o campo em branco por cima dela. */
+.theme-light.modo-xp .start-menu-search {
+  background: #ffffff;
+  border: 1px solid #7f9db9;
+  border-radius: 2px;
+  margin: 8px;
+}
+
+.theme-light.modo-xp .start-menu-search input {
+  color: #000000;
+}
+
+.theme-light.modo-xp .start-menu-apps-heading {
+  color: #0831d9 !important;
+  font-weight: 700;
+}
+
+/* Realce de item: o azul sólido de seleção do XP, sem raio e sem transparência. */
+.theme-light.modo-xp .start-menu-apps li > * {
+  border-radius: 2px;
+}
+
+.theme-light.modo-xp .start-menu-apps li > *:hover {
+  background: #2f71cd;
+}
+
+.theme-light.modo-xp .start-menu-apps li > *:hover * {
+  color: #ffffff !important;
+}
+
+/* O rodapé azul, com "Desligar" à direita — a faixa que fechava o menu. */
+.theme-light.modo-xp .start-menu-footer {
+  background: linear-gradient(180deg, #4a8ff0 0%, #245edc 45%, #1941a5 100%);
+  border-top: 1px solid #0831d9;
+}
+
+.theme-light.modo-xp .start-menu-visitor-name,
+.theme-light.modo-xp .start-menu-footer * {
+  color: #ffffff !important;
+  text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.45);
+}
+
+.theme-light.modo-xp .start-menu-avatar {
+  border: 2px solid #ffffff;
+  border-radius: 4px;
+}
+
+.theme-light.modo-xp .start-menu-power-btn:hover {
+  background: rgba(255, 255, 255, 0.22);
+}
+
+/* ==================================================
+   A CERIMÔNIA NO MODO XP
+
+   As duas telas daquele sistema eram inconfundíveis e OPOSTAS entre si: a
+   inicialização era PRETA, com a barra deslizando embaixo; a de boas-vindas era
+   AZUL, clara, com uma faixa mais viva no meio. Aqui a mesma oposição, nos
+   mesmos dois momentos que a cerimônia já separa.
+
+   Os tokens `--cer-*` são substituídos em vez de girados. O mecanismo normal de
+   preset gira o MATIZ da arte (ver `giroDaCerimonia` no config), o que serve
+   para levar a mesma composição a uma paleta nova — mas o XP não quer a mesma
+   composição em outra cor, quer outra composição. Por isso o filtro é desligado
+   logo abaixo: deixá-lo ligado giraria de novo o que estas linhas acabaram de
+   definir.
+   ================================================== */
+
+.theme-light.modo-xp {
+  --cer-base: #000000;
+  --cer-ceu-boot: linear-gradient(180deg, #000000 0%, #050e24 52%, #000000 100%);
+  --cer-campo-lock: linear-gradient(180deg, #5a7edc 0%, #3f66cd 38%, #2a4fb8 72%, #23429e 100%);
+  --cer-estrelas: none;
+
+  /**
+   * O HALO VERDE ATRÁS DO CRISTAL. Eu tinha zerado a nebulosa junto com as
+   * estrelas, e com isso sumiu a luz que envolve o cristal na tela de bloqueio —
+   * o cristal ficava chapado contra o azul, sem a atmosfera que a cena tem nos
+   * outros presets.
+   *
+   * Verde porque é a cor que o cristal do XP emite (corpo laranja, luz verde,
+   * ver `luzCristal` no config): o halo tem de ser a MESMA luz que as fontes 3D
+   * lançam, senão a peça parece recortada e colada em cima do fundo em vez de
+   * estar dentro dele.
+   */
+  --cer-nebulosa: radial-gradient(
+    circle at 50% 46%,
+    rgba(124, 187, 0, 0.5) 0%,
+    rgba(124, 187, 0, 0.22) 34%,
+    rgba(124, 187, 0, 0) 68%
+  );
+  --cer-nebulosa-forte: radial-gradient(
+    circle at 50% 46%,
+    rgba(158, 220, 40, 0.72) 0%,
+    rgba(124, 187, 0, 0.34) 38%,
+    rgba(124, 187, 0, 0) 72%
+  );
+
+  --cer-luz: #7cbb00;
+  --cer-luz-meio: #cfe0ff;
+  --cer-luz-ponta: #ffffff;
+
+  --cer-texto: #ffffff;
+  --cer-texto-suave: #d8e4ff;
+  --cer-texto-fraco: #9db6e8;
+
+  /* A barra do boot do XP: trilho fundo e três blocos azuis correndo dentro. */
+  --cer-trilho: rgba(255, 255, 255, 0.14);
+  --cer-preenchimento: linear-gradient(90deg, #1f4fbe 0%, #4a8ff0 50%, #1f4fbe 100%);
+  --cer-varredura: rgba(255, 255, 255, 0.55);
+  /* Verde, pelo mesmo motivo da nebulosa: é a luz que o cristal lança. */
+  --cer-brilho: rgba(124, 187, 0, 0.35);
+  --cer-brilho-forte: rgba(158, 220, 40, 0.6);
+  --cer-borda: rgba(255, 255, 255, 0.3);
+  --cer-borda-forte: rgba(255, 255, 255, 0.55);
+  --cer-veu: rgba(36, 94, 220, 0.12);
+}
+
+/* Ver a nota acima: com os tokens já em cores do XP, girar o matiz por cima
+   levaria a arte para longe delas. */
+.theme-light.modo-xp .cerimonia-ceu,
+.theme-light.modo-xp .cerimonia-nebulosa {
+  filter: none;
+}
+
+/**
+ * OS TEXTOS DA CERIMÔNIA, LEGÍVEIS.
+ *
+ * O XP inverte o fundo das duas cenas — preto no boot, azul saturado no
+ * bloqueio — e o tema claro, que o modo XP herda, escreve com tons ESCUROS
+ * derivados do acento. Sobre preto isso some. Aqui o texto volta a ser branco,
+ * com sombra, que é o que aquele sistema fazia nas duas telas.
+ *
+ * O seletor pega os descendentes porque a cerimônia distribui a cor por vários
+ * tokens (`--cer-texto`, `--cer-texto-suave`, `--cer-texto-fraco`) e por regras
+ * de componente; forçar na folha é o que garante que nenhuma delas escape.
+ */
+.theme-light.modo-xp .cerimonia,
+.theme-light.modo-xp .cerimonia * {
+  color: #ffffff !important;
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.75);
+}
+
+/* A marca ganha o peso do logotipo daquele sistema: pesada, apertada e com um
+   brilho azul por baixo — é a leitura que a tela de boas-vindas do XP tinha. */
+.theme-light.modo-xp .cerimonia-marca {
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-shadow: 0 2px 10px rgba(74, 143, 240, 0.9), 0 1px 3px rgba(0, 0, 0, 0.7);
+}
+
+/**
+ * A ASSINATURA SOBRE O PAPEL DE PAREDE.
+ *
+ * Nome, cargo e frase ficam sobre uma FOTO — céu claro em cima, grama embaixo —
+ * e não sobre um gradiente controlado. O tema claro escreve em tom escuro, e
+ * sobre o céu daquela imagem isso vira um borrão cinza. Branco com sombra dura
+ * é a única combinação que aguenta as duas metades da foto, e é o mesmo
+ * tratamento que os rótulos dos ícones já recebem logo acima.
+ */
+.theme-light.modo-xp .marocos-signature,
+.theme-light.modo-xp .marocos-signature * {
+  color: #ffffff !important;
+  text-shadow: 0 2px 6px rgba(0, 0, 0, 0.85), 0 1px 2px rgba(0, 0, 0, 0.9);
 }
 
 /* --------------------------------------------------

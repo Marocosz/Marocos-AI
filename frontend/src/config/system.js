@@ -159,6 +159,87 @@ export const WALLPAPER = {
  * O PRIMEIRO DE CADA LISTA É O PADRÃO — e é o visual que o projeto já tinha,
  * para quem nunca abrir as configurações não ver nada mudar.
  */
+/**
+ * O PRESET WINDOWS XP — a piada, e a única exceção à regra de "um preset por tema".
+ * ==================================================
+ * Ele entra nas DUAS listas, como o mesmo objeto, e é de propósito: o XP não
+ * tinha modo escuro, então dia e noite renderizam idênticos. É o único preset em
+ * que trocar o tema não muda nada — e a graça depende disso.
+ *
+ * MECANICAMENTE ELE É UM SÓBRIO. Sem shader, sem vidro, sem blur: o Luna era
+ * opaco, e o vidro só chegou no Vista. Herdar o modo sóbrio dá isso de graça e
+ * ainda o torna o preset mais barato do sistema, junto com os outros dois.
+ *
+ * A marca `xp: true` é o que liga o resto — a paleta fixa em `.modo-xp`, o nome
+ * do sistema na cerimônia e as cores da bandeirinha no cristal. Uma marca, e não
+ * comparações com `id === 'xp'` espalhadas: quem ler o preset vê tudo que ele
+ * muda sem caçar condicionais pelo código.
+ *
+ * O PAPEL DE PAREDE É DESENHADO, NÃO BAIXADO. A foto original do Bliss é da
+ * Microsoft (de Charles O'Rear), e servi-la num portfólio público seria risco de
+ * direito autoral — e contradiria o argumento do site, que é ter tudo feito à
+ * mão. Aqui são sete camadas de gradiente: a colina, cinco nuvens e o céu. Pesa
+ * alguns bytes em vez de centenas de KB, e escala em qualquer resolução sem
+ * borrar. Mesma razão pela qual os ícones são desenhados no ESTILO do XP em vez
+ * de copiados dele.
+ */
+const PRESET_XP = {
+  id: 'xp',
+  sobrio: true,
+  xp: true,
+
+  /** Substitui "MAROCOS OS" na cerimônia e na tela de bloqueio. */
+  nomeSistema: 'MAROCOS XP',
+
+  /** O azul do Luna, o mesmo da barra de tarefas e da barra de título ativa. */
+  acento: '#245edc',
+
+  /** Céu e grama, para o mobile — onde o `fundo` também vale, mas o `ceu`
+   *  alimenta o crossfade entre temas. */
+  ceu: { topo: '#1b57ad', meio: '#63a4dd', baixo: '#63a12b' },
+
+  /**
+   * O CRISTAL DA CERIMÔNIA: LARANJA, COM LUZ VERDE EM VOLTA.
+   *
+   * A primeira tentativa foi pôr as quatro cores da bandeirinha como quatro
+   * luzes ao redor do sólido. Não funcionou, e o motivo é o material: com
+   * `transmission: 1.0` o cristal atravessa e MISTURA o que recebe, então
+   * quatro fontes saturadas viram um borrão acinzentado em vez de quatro cores.
+   * Cor demais num prisma dá cinza — é o oposto do que a intuição sugere.
+   *
+   * Duas cores em oposição resolvem: corpo laranja quente contra luz verde
+   * fria. O contraste é o que faz cada uma continuar sendo ela mesma depois da
+   * refração, e as duas são do próprio logotipo daquele sistema.
+   */
+  corpoCristal: '#f97316',
+  luzCristal: '#7cbb00',
+
+  /**
+   * A IMAGEM VEM DE `frontend/public/`, servida na raiz.
+   *
+   * Tudo em `public/` é copiado para a raiz do build sem passar pelo pipeline do
+   * Vite, então o caminho é absoluto e estável (`/xp-wallpaper.png`) — não pode
+   * virar `import`, senão o Vite geraria um nome com hash e este arquivo, que é
+   * só configuração, passaria a depender do bundler.
+   *
+   * O gradiente atrás não é enfeite: ele pinta enquanto a imagem carrega e cobre
+   * qualquer proporção que o `cover` não alcance. Sem ele, a primeira pintura da
+   * área de trabalho é branca.
+   */
+  fundo: `
+    url('/xp-wallpaper.png') center / cover no-repeat,
+    linear-gradient(180deg, #1b57ad 0%, #63a4dd 55%, #63a12b 72%, #3a6419 100%)
+  `,
+
+  /**
+   * Tahoma era a fonte de interface do XP — menus, botões, barra de título.
+   * Está instalada em Windows e macOS; Verdana e DejaVu Sans cobrem o Linux com
+   * métricas parecidas. Nenhum webfont novo: o preset não pode custar um
+   * download só para fazer uma piada.
+   */
+  fonte: "Tahoma, Verdana, 'DejaVu Sans', Geneva, sans-serif",
+}
+
 export const PRESETS = {
   /** Noite: shader Silk. Padrão de seda em movimento. */
   noite: [
@@ -256,6 +337,9 @@ export const PRESETS = {
         linear-gradient(180deg, #17161a 0%, #101014 60%, #0a0a0d 100%)
       `,
     },
+
+    // O mesmo objeto entra nas duas listas — ver o cabeçalho de PRESET_XP.
+    PRESET_XP,
   ],
 
   /**
@@ -346,6 +430,10 @@ export const PRESETS = {
         linear-gradient(155deg, #fafbff 0%, #eceff8 100%)
       `,
     },
+
+    // O MESMO objeto da lista da noite, não uma cópia: o XP tem de renderizar
+    // idêntico nos dois temas, e duas cópias derivariam na primeira edição.
+    PRESET_XP,
   ],
 }
 
@@ -466,6 +554,14 @@ export function hueDoHex(hex) {
  * vez de pedir um décimo terceiro valor por paleta.
  */
 export function corpoDoCristal(preset) {
+  /**
+   * O preset pode DITAR o corpo, e o XP dita. A regra geral abaixo tira a média
+   * entre o acento e o companheiro fundo — com o azul do Luna isso dá um corpo
+   * azul, que engoliria as quatro cores da bandeirinha em vez de deixá-las
+   * atravessar. Um corpo quase neutro devolve o cristal ao papel de prisma.
+   */
+  if (preset?.corpoCristal) return preset.corpoCristal
+
   const a = hexParaRgb(preset?.acento)
   const b = hexParaRgb(acentoProfundo(preset))
   if (!a || !b) return '#6b24b7'
@@ -532,6 +628,17 @@ export const JANELAS = {
 
   /** Folga mínima até as bordas da tela. */
   margem: 16,
+
+  /**
+   * O PISO DE UMA JANELA. Quando a tela é pequena demais, a janela encolhe até
+   * caber — mas não além disto, senão vira uma fresta com barra de rolagem.
+   *
+   * Abaixo deste piso a janela volta a passar do quadro, e é a escolha certa:
+   * numa viewport com menos de ~300px úteis de altura o problema não é mais
+   * layout de janela. O shell de desktop só existe a partir de 1024px de
+   * largura, então a largura mínima aqui quase nunca entra em jogo.
+   */
+  tamanhoMinimo: { w: 320, h: 280 },
   /** Faixa que a barra de tarefas ocupa no rodapé. Precisa bater com
    *  VIDRO.alturaTaskbar — há teste garantindo. */
   alturaTaskbar: 52,
@@ -707,8 +814,6 @@ export const MOVIMENTO = {
   pushMobile: { duration: 0.28, ease: 'easeOut' },
   acordeaoDispositivos: { duration: 0.2, ease: 'easeInOut' },
   indicadorTaskbar: { type: 'spring', stiffness: 300, damping: 30 },
-  /** Marquee de skills do "Sobre". Em segundos, porque vira CSS. */
-  marqueeSkillsS: 18,
 }
 
 /* --------------------------------------------------

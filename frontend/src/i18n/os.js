@@ -84,10 +84,72 @@ const osContentEn = {
       close: 'Close details',
     },
   },
+  /**
+   * O GUIA. Este app abre sozinho para quem chega sem deep link (ver
+   * `os/shell/BoasVindas.jsx`), e é a primeira coisa que quase todo visitante
+   * lê. Antes ele não tinha um único link: a porta de entrada era um beco.
+   *
+   * AS PORTAS SÃO PERGUNTAS, não seções. Quem chega não quer "Projetos", quer
+   * saber se a pessoa sabe construir — e uma lista de nomes de janela obriga o
+   * visitante a adivinhar qual delas responde a isso.
+   *
+   * CHAVEADAS POR ID DE APP, e não por posição: reordenar as portas não pode
+   * trocar o texto de ninguém. Mesma razão do bloco `iconLabels`.
+   */
   about: {
-    specsLabel: 'System Specifications',
-    featuresLabel: 'Installed Features',
     crystalAlt: '3D system logo',
+    guideLabel: 'Where to start',
+    guide: {
+      projects: {
+        question: 'Can he build?',
+        answer: 'Five projects, each led by its hard problem instead of a list of technologies.',
+      },
+      history: {
+        question: 'For how long?',
+        answer: 'From fixing printers at 14 to full stack developer. Seven years, in order.',
+      },
+      readme: {
+        question: 'And this site here?',
+        answer: 'This operating system is hand-built. Its technical guide explains how.',
+      },
+      terminal: {
+        question: 'How do I reach him?',
+        answer: 'E-mail, LinkedIn and GitHub — in a terminal that opens with them on screen.',
+      },
+    },
+    specsLabel: 'System Specifications',
+    machineLabel: 'This computer',
+  },
+  /**
+   * O CASE TÉCNICO DO PRÓPRIO SITE. Este app carrega sozinho a melhor prova do
+   * portfólio: marocos.dev ficou deliberadamente fora da janela de Projetos
+   * (decisão registrada na spec da fase 1), então é aqui ou em lugar nenhum.
+   *
+   * O texto morava chumbado em JSX dentro de `ReadmeApp.jsx`, por idioma — o
+   * único app do projeto que fazia isso, contra a convenção de que texto vive
+   * em `i18n/` ou `content/`.
+   */
+  readme: {
+    lead: 'This is not a page with a dark theme. It is a window manager, a WebGL wallpaper and an AI agent, all hand-built — and everything you have clicked so far is the demo.',
+    sections: [
+      {
+        title: 'The window system',
+        body: 'A pure reducer that separates a window\'s identity from its location, so the same window can navigate between contents while keeping its position, size and place in the z-order. Desktop and mobile are two shells reading the same state: one as a set, the other as a stack. That is what keeps this from being two frontends.',
+      },
+      {
+        title: 'The wallpaper is a shader',
+        body: 'Two fragment shaders over ogl — silk for the dark theme, iridescence for the light one — with an fps ceiling and a hard stop when they are not visible, because an animated wallpaper you cannot switch off is a battery bug. Below 1024px it becomes a CSS gradient: a phone has no budget for this.',
+      },
+      {
+        title: 'Virtual Marcos is an agent, not a chatbot',
+        body: 'A LangGraph graph on FastAPI: it detects the language, summarises long conversations, routes casual from technical in a single LLM call, retrieves from a vector base over my real career data, and passes through an answerability guard that would rather say "I do not know" than invent. The answer streams over SSE, node by node.',
+      },
+      {
+        title: 'And 36 tests watch all of it',
+        body: 'A Playwright suite: 21 visual scenes at zero tolerance across both themes and mobile, plus route tests that catch what a build cannot — a broken dynamic import only fails at runtime, and every app here is loaded on demand.',
+      },
+    ],
+    repoLabel: 'The whole thing is open on GitHub',
   },
   devices: {
     device: 'Device',
@@ -202,18 +264,45 @@ const osContentEn = {
   },
   terminal: {
     helpTitle: 'Available commands:',
+    /**
+     * OS NOMES QUE O `help` MOSTRA. A lista era montada a partir das chaves
+     * canônicas do mapa de comandos, que são portuguesas — então quem lia a
+     * interface em inglês via "contato — contact channels": nome numa língua,
+     * descrição na outra, e os aliases ingleses que o app já aceitava
+     * (`contact`, `who`, `projects`, `devices`) nunca apareciam em lugar nenhum.
+     *
+     * Só existe no bloco inglês. Em português a chave canônica já é o nome.
+     */
+    helpNames: {
+      whoami: 'who',
+      contato: 'contact',
+      projetos: 'projects',
+      stack: 'devices',
+    },
     helpCommands: {
       help: 'this list',
       whoami: 'who Marcos is',
       neofetch: 'system specifications',
       contato: 'contact channels',
-      vps: 'hosting service',
+      vps: 'the machine this runs on',
       clear: 'clear the screen',
       projetos: 'open the projects folder',
       stack: 'open the device manager',
     },
     commandNotFound: 'command not found',
     tryHelp: "Type 'help' to see what is available.",
+    /**
+     * A VOZ DA MÁQUINA. Antes o `whoami` imprimia o `bio_highlight` — a mesma
+     * string do topo do guia, e escrita em primeira pessoa de marketing. Um
+     * `whoami` responde com registro de identidade, não com headline.
+     */
+    whoami: [
+      'marcos · full stack developer, focused on AI',
+      'in the field since 2018 · Uberlândia, Brazil',
+      'now: innovation team at Supporte Logística + freelance',
+    ],
+    /** Impressa no boot, com os nomes clicáveis — ver a nota em TerminalApp. */
+    commandsHint: 'Also available:',
     neofetchSkillsLabel: 'Installed features',
     contactStatus: 'ONLINE',
     outputLabel: 'Terminal output',
@@ -288,6 +377,8 @@ const osContentEn = {
         carvao: 'Charcoal',
         papel: 'Paper',
         linho: 'Linen',
+        // Não traduz, e é o ponto: o nome do produto é o mesmo em toda língua.
+        xp: 'Windows XP',
       },
       /** Explica os presets sem shader e sem vidro. Vive numa dica, não numa
        *  legenda: a grade existe para ser escaneada de relance. */
@@ -310,8 +401,11 @@ const osContentEn = {
     language: 'Language',
     animation: 'Animation',
   },
+  // Mesmo cargo de `content/profile.js`. Eram dois textos para a mesma coisa,
+  // na mesma tela: a assinatura dizia "AI Developer & Full-Stack Engineer" e o
+  // guia logo abaixo dizia outra coisa.
   signature: {
-    role: 'AI Developer & Full-Stack Engineer',
+    role: 'Full Stack Developer & AI',
   },
 }
 
@@ -375,9 +469,50 @@ const osContentPt = {
     },
   },
   about: {
-    specsLabel: 'Especificações do Sistema',
-    featuresLabel: 'Recursos Instalados',
     crystalAlt: 'Logotipo 3D do sistema',
+    guideLabel: 'Por onde começar',
+    guide: {
+      projects: {
+        question: 'Ele sabe construir?',
+        answer: 'Cinco projetos, cada um puxado pelo problema difícil em vez da lista de tecnologias.',
+      },
+      history: {
+        question: 'Há quanto tempo?',
+        answer: 'De consertar impressora aos 14 a desenvolvedor full stack. Sete anos, em ordem.',
+      },
+      readme: {
+        question: 'E este site aqui?',
+        answer: 'Este sistema operacional é feito à mão. O guia técnico dele conta como.',
+      },
+      terminal: {
+        question: 'Como falo com ele?',
+        answer: 'E-mail, LinkedIn e GitHub — num terminal que já abre com eles na tela.',
+      },
+    },
+    specsLabel: 'Especificações do Sistema',
+    machineLabel: 'Este computador',
+  },
+  readme: {
+    lead: 'Isto não é uma página com tema escuro. É um gerenciador de janelas, um papel de parede em WebGL e um agente de IA, tudo feito à mão — e tudo que você clicou até agora é a demonstração.',
+    sections: [
+      {
+        title: 'O sistema de janelas',
+        body: 'Um reducer puro que separa a identidade de uma janela da sua localização, então a mesma janela navega entre conteúdos sem perder posição, tamanho nem lugar na ordem de empilhamento. Desktop e mobile são dois shells lendo o mesmo estado: um como conjunto, o outro como pilha. É o que impede isto de virar dois frontends.',
+      },
+      {
+        title: 'O papel de parede é um shader',
+        body: 'Dois fragment shaders sobre ogl — seda no tema escuro, iridescência no claro — com teto de fps e parada seca quando não estão visíveis, porque papel de parede animado que não desliga é bug de bateria. Abaixo de 1024px vira gradiente CSS: celular não tem orçamento para isso.',
+      },
+      {
+        title: 'O Marcos Virtual é um agente, não um chatbot',
+        body: 'Um grafo LangGraph sobre FastAPI: detecta o idioma, resume conversas longas, separa casual de técnico numa única chamada de LLM, recupera de uma base vetorial montada sobre a minha trajetória real, e passa por uma guarda de responsabilidade que prefere dizer "não sei" a inventar. A resposta chega por SSE, nó a nó.',
+      },
+      {
+        title: 'E 36 testes olham para tudo isso',
+        body: 'Uma suíte Playwright: 21 cenas visuais com tolerância zero nos dois temas e no mobile, mais testes de rota que pegam o que build nenhum pega — import dinâmico quebrado só falha em runtime, e todo app daqui é carregado sob demanda.',
+      },
+    ],
+    repoLabel: 'Está tudo aberto no GitHub',
   },
   devices: {
     device: 'Dispositivo',
@@ -478,13 +613,20 @@ const osContentPt = {
       whoami: 'quem é o Marcos',
       neofetch: 'especificações do sistema',
       contato: 'canais de contato',
-      vps: 'serviço de hospedagem',
+      vps: 'a máquina onde isto roda',
       clear: 'limpa a tela',
       projetos: 'abre a pasta de projetos',
       stack: 'abre o gerenciador de dispositivos',
     },
     commandNotFound: 'comando não encontrado',
     tryHelp: "Digite 'help' para ver o que existe.",
+    /** Voz da máquina — ver a nota no bloco inglês. */
+    whoami: [
+      'marcos · desenvolvedor full stack, foco em IA',
+      'na área desde 2018 · Uberlândia, MG',
+      'agora: área de inovação da Supporte Logística + freelance',
+    ],
+    commandsHint: 'Também disponível:',
     neofetchSkillsLabel: 'Recursos instalados',
     contactStatus: 'ONLINE',
     outputLabel: 'Saída do terminal',
@@ -555,6 +697,7 @@ const osContentPt = {
         carvao: 'Carvão',
         papel: 'Papel',
         linho: 'Linho',
+        xp: 'Windows XP',
       },
       /** Ver a nota no bloco em inglês: vive numa dica, não numa legenda. */
       sober: 'Fundo parado, janelas opacas — sem animação e sem vidro. É o mais leve dos presets.',
@@ -577,7 +720,7 @@ const osContentPt = {
     animation: 'Animação',
   },
   signature: {
-    role: 'Desenvolvedor de IA & Full-Stack',
+    role: 'Desenvolvedor Full Stack & IA',
   },
 }
 

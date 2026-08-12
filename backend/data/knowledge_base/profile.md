@@ -207,7 +207,8 @@ Todos esses interesses funcionam como fontes constantes de inspiração e reflex
 - **Frameworks & Bibliotecas:** React. Desenvolvimento de interfaces modernas e responsivas.
 - **Prototipagem Rápida:** Streamlit. Criação rápida de demos e dashboards de dados.
 - **Estilização:** HTML/CSS/Tailwind. Foco em interfaces limpas e uso de frameworks utilitários.
-- **Animações:** Motion Frame. Adição de interatividade e polimento visual.
+- **Animações:** Motion (a biblioteca sucessora do Framer Motion). Adição de interatividade e polimento visual.
+- **WebGL:** three.js (via react-three-fiber) e ogl. Shaders escritos à mão para fundo animado e objetos 3D em página.
 
 ## Projetos de Destaque
 
@@ -254,19 +255,40 @@ O **Meu Portfolio** é uma aplicação **Agentica** moderna que serve como o por
 - **Linguagem:** Python 3.12+
 - **Framework Web:** FastAPI (Alta performance, Assíncrono)
 - **Orquestração de Agentes:** LangGraph (StateGraph)
-  - Controla o fluxo lógico: Router -> Retrieval -> Guard -> Generation
+  - Controla o fluxo lógico: Gateway semântico -> Retrieval -> Guard -> Generation
 - **Framework de IA:** LangChain
 - **Banco Vetorial:** ChromaDB (Persistência local em `./backend/chroma_db`)
 - **LLMs (Modelos de Linguagem):**
-  - **Google Gemini 1.5 Flash:** Modelo principal para raciocínio rápido (Router, Guard).
-  - **OpenAI GPT-4o-mini:** Utilizado como alternativa/backup em alguns fluxos.
+  - O provider é escolhido por variável de ambiente (`LLM_PROVIDER`) e vale para o
+    sistema inteiro; trocá-lo exige reiniciar a aplicação. Um registro central
+    (`MODEL_REGISTRY`) mapeia provider + faixa de capacidade para o nome do modelo,
+    então trocar de modelo é editar um dicionário só.
+  - Quatro instâncias são criadas no import, cada uma com a temperatura adequada ao
+    seu papel: 0.0 para idioma, memória, gateway e conversa casual; 0.0 para a guarda
+    de responsabilidade; 0.1 para a geração com RAG e para o fallback.
+  - **Os embeddings são sempre do Google**, independente do provider escolhido.
 
 ### Frontend (Interface)
 
-- **Framework:** React (Vite)
-- **Estilização:** TailwindCSS (Utility-first)
-- **Animações:** Framer Motion
-- **Comunicação:** API REST customizada (`/api/chat`)
+- **Framework:** React 19 com Vite.
+- **Estilização:** CSS próprio, sem framework utilitário. O sistema de design é
+  uma pirâmide de custom properties: um arquivo único de configuração publica
+  tudo como variáveis `--cfg-*`, e o CSS só lê. Não usa TailwindCSS.
+- **Animações:** biblioteca `motion` (a sucessora do Framer Motion), importada
+  como `motion/react`.
+- **3D e shaders:** o papel de parede são dois fragment shaders escritos à mão
+  sobre `ogl` (seda no tema escuro, iridescência no claro), com teto de fps e
+  parada seca quando invisíveis. A marca é um cristal em `three.js` via
+  react-three-fiber, carregado sob demanda para ficar fora do caminho crítico.
+- **A interface simula um sistema operacional:** área de trabalho com janelas
+  arrastáveis, barra de tarefas, menu Iniciar, cerimônia de boot e tela de
+  bloqueio. O gerenciador de janelas é um reducer puro que separa a identidade
+  de uma janela da sua localização. Desktop e mobile são dois shells lendo o
+  mesmo estado — um como conjunto, o outro como pilha.
+- **Comunicação:** API REST customizada (`/api/chat`), com a resposta chegando
+  por streaming SSE, nó a nó.
+- **Verificação:** suíte Playwright com 21 cenas visuais em tolerância zero e
+  testes funcionais de rota.
 
 ### Infraestrutura & DevOps
 
@@ -281,8 +303,8 @@ O "cérebro" do sistema opera como um **Grafo de Estados (StateGraph)**. Cada me
 1.  **Entrada:** A API recebe a mensagem e inicia o estado do agente.
 2.  **Análise (Nodes):**
     - `detect_language`: Identifica o idioma (PT-BR, EN, ES, etc).
-    - `contextualize_input`: Reescreve perguntas ambíguas (Ex: "E ele?" -> "E o Marcos?") usando histórico de conversas.
-    - `router_node`: Classifica a intenção. Se for sobre código/carreira -> **RAG**. Se for "Oi/Tudo bem" -> **Casual**.
+    - `summarize_conversation`: Resume o histórico quando ele fica longo, preservando as últimas mensagens intactas.
+    - `semantic_gateway_node`: faz **de uma vez só** o que antes eram dois nós separados (reescrever a pergunta ambígua e classificar a intenção), para cortar uma chamada de LLM inteira do caminho. Ele reescreve perguntas ambíguas ("E ele?" -> "E o Marcos?") usando o histórico e classifica: código/carreira -> **RAG**, "Oi/Tudo bem" -> **Casual**. Antes de gastar LLM, uma camada de regex resolve saudações e agradecimentos curtos sozinha. Quando a confiança da classificação fica baixa, ele força o caminho técnico — errar para o lado de responder é mais seguro que descartar uma pergunta real.
 3.  **Recuperação (RAG Branch):**
     - `retrieve`: Busca vetores semânticos no ChromaDB.
     - `answerability_guard`: Um "Guarda" de IA avalia se os documentos encontrados realmente respondem à pergunta. Se não, ativa o fallback.
@@ -297,7 +319,7 @@ O objetivo foi demonstrar domínio sobre **Engenharia de IA** e **Sistemas Compl
 6. **Meu Portfolio (Este Projeto):**
    - Categoria: Fullstack & IA Agentica
    - Descrição: Portfólio interativo baseado em IA Generativa que simula minha própria persona (Marcos). Diferente de sites estáticos, ele utiliza uma arquitetura de Agentes (LangGraph) para "conversar" com visitantes em tempo real. O sistema possui RAG (Retrieval-Augmented Generation) para acessar minha base de conhecimentos, Router Semântico para classificar intenções e Guardrails para segurança. É uma prova de conceito viva das minhas capacidades em criar sistemas complexos e modernos.
-   - Tecnologias: React (Vite+Tailwind), Python (FastAPI), LangGraph, LangChain, ChromaDB (Vector Store), Google Gemini 1.5 Flash.
+   - Tecnologias: React 19 (Vite), CSS com design tokens, three.js e ogl (WebGL), Python (FastAPI), LangGraph, LangChain, ChromaDB (Vector Store), SSE, Playwright.
    - Link: [GitHub](https://github.com/Marocosz/Marocos-AI)
 
 Se quiser ver mais dos meus projetos, acesse meu GitHub: [https://github.com/marocosz](https://github.com/marocosz)

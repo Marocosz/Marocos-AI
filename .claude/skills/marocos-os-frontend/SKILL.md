@@ -22,7 +22,7 @@ Existe uma suíte para isso. Rode-a:
 cd frontend/visual
 npm install          # 1ª vez: baixa o Chromium (só aqui, não polui o app)
 npm run build:frontend
-npm test             # 34 testes: 21 visuais + 13 funcionais
+npm test             # 38 testes: 21 visuais + 17 funcionais
 ```
 
 Falhou uma cena? Abra o relatório com `npm run report` — ele mostra referência,
@@ -37,7 +37,7 @@ falha que você não entendeu apaga a única evidência de que algo quebrou.
 | suíte | pega | não pega |
 |---|---|---|
 | `visual.spec.js` (21 cenas) | geometria, cor, espaçamento, tipografia, nos dois temas e no mobile | qualquer coisa que dependa de **tempo** |
-| `rotas.spec.js` (13 testes) | `import()` dinâmico quebrado, deep link, histórico, carga sob demanda | aparência |
+| `rotas.spec.js` (17 testes) | `import()` dinâmico quebrado, deep link, histórico, carga sob demanda, **e o que só existe depois de um clique** | aparência |
 | `npm test` no `frontend/` | lógica pura (roteamento, reducer de janelas, config) | tudo que precisa de DOM |
 
 **O regressor visual é estruturalmente cego a tempo.** Ele desliga a animação
@@ -186,7 +186,9 @@ uma decisão que custou medição ou depuração:
 | CSS de componente novo | `ui/AppIconButton.css` — o hack global de tema claro de `index.css`, e por que a variante `--tile` precisa **vencê-lo** com seletor composto enquanto a `--plana` precisa **herdar** com `color: inherit` |
 | custom property nova | `config/cssBridge.js` — por que todo `var(--cfg-*)` precisa de fallback |
 | chrome de janela, navegação entre apps | `os/windowManager.js` — a chave é id de INSTÂNCIA, não o appId, e as três portas (`OPEN` de fora, `NAVIGATE` de dentro, `EXTERNAL_ROUTE` do voltar do navegador) |
-| um app precisar levar o visitante a outro | `os/NavegacaoContext.jsx` — quem decide se navega no lugar ou abre janela é o container, nunca o app |
+| um app precisar levar o visitante a outro | `os/NavegacaoContext.jsx` — **duas** intenções: `useIrPara()` entra (troca o conteúdo desta janela, como a lateral do explorador) e `useAbrir()` abre ao lado (janela nova, como as portas do guia). Quem traduz cada uma para o shell é o container, nunca o app |
+| um preset precisar mudar mais que cor | `config/system.js`, o bloco `PRESET_XP` — um preset pode declarar `fonte`, `nomeSistema`, `corpoCristal`, `luzCristal` e o marcador `xp`, e cada um deles tem um consumidor único documentado |
+| ícone de app no modo XP | `ui/xpIcons.jsx` — SVG desenhado, um por app, chaveado pelo `id` do registry; app sem entrada cai no glifo lucide |
 | wallpaper ou shader | `wallpaper/Silk.jsx` — teto de fps, tempo acumulado, e por que a pausa vive numa ref |
 | acrescentar um app | `os/registry.js` — por que só `component` pode ser `lazy` |
 | a cerimônia de boot | `os/shell/Shell.jsx` e `os/boot/boot.css` — os tempos medidos e os seis eixos das duas cenas |
@@ -202,8 +204,47 @@ uma decisão que custou medição ou depuração:
 - **Subir tolerância para calar ruído.** O limiar de cada cena foi medido
   rodando o mesmo commit duas vezes; cenas sem WebGL têm piso **zero** e
   qualquer diferença nelas é sinal.
+- **Procurar no CÓDIGO uma instabilidade que era do HARNESS.** Esta suíte
+  reprovava de forma intermitente, em cenas sempre diferentes, e a investigação
+  passou por duas suspeitas erradas antes de achar a certa:
+
+  1. o `ruido` do shader Silk — errada: as cenas que só têm shader nunca
+     reclamaram;
+  2. o giro do cristal 3D — parcialmente certa, e virou duas correções de
+     produto de verdade (o `Crystal` respeita `prefers-reduced-motion`, e o
+     "Sobre este PC" respeita o interruptor de Movimento), mas não explicava
+     tudo;
+  3. **`workers: 4` no `playwright.config.js`** — a causa. Aqui não há GPU: é
+     SwiftShader, rasterização por software. Quatro Chromium com WebGL ao mesmo
+     tempo atrasavam os quadros e o Playwright reprovava com *"failed to take
+     two consecutive stable screenshots"*.
+
+  O que desmontou as duas primeiras hipóteses foi uma cena: `mobile-home-claro`
+  falhava, e ela não tem shader, nem cristal, nem janela. **Quando o sintoma
+  aparece onde não existe a causa suspeita, a causa é outra.**
+
+  Hoje `workers: 1` (medido: 37/38 contra 6-7 reprovando), e a suíte demora
+  ~4,3 min em vez de ~1,8. É o preço certo — regressor que reprova sozinho
+  ensina a ignorar o vermelho.
+
+  **Não rode outra coisa pesada na máquina enquanto a suíte roda**, pelo mesmo
+  motivo: um `npm run build` em paralelo disputa a mesma CPU.
 - **Editar o literal no componente** em vez do `config/system.js`, deixando a
   configuração inerte — a chave passa a existir sem fazer nada.
+- **Tentar neutralizar o tema token por token.** O preset XP precisa renderizar
+  IGUAL de dia e de noite, e a primeira tentativa enumerou os tokens em
+  `.theme-dark.modo-xp` e `.theme-light.modo-xp`. Não bastou e não podia bastar:
+  há dezenas de regras `.theme-light .alguma-coisa` nos CSS de componente, mais
+  o hack global do `index.css`. A saída foi **fixar** a classe de tema no
+  `Shell.jsx` (`preset.xp` força `theme-light`) e repintar por cima de um alvo
+  estável. Quando um modo precisa ignorar o tema, fixe o tema; não persiga os
+  tokens.
+- **Esquecer que `position: fixed` não escapa de um ancestral com `transform`.**
+  A janela é um `motion.div` posicionado por `translate`, e isso a torna o bloco
+  de contenção de qualquer descendente `fixed`. Um balão `fixed` dentro dela
+  acerta o lugar só quando ela está maximizada (translate zero) e erra pela
+  posição da janela em qualquer outro caso. Para sair de verdade: **portal para
+  `document.body`** — ver `ui/Dica.jsx`.
 - **Estranhar que um app novo rebaseie ~15 capturas.** A grade de ícones do
   desktop, o menu Iniciar e a home mobile são chrome presente em quase toda
   cena, então um app a mais mexe em todas. É esperado — mas **confira diff por
@@ -226,6 +267,7 @@ commit** — não depois, não num commit de limpeza:
 | acrescentou, removeu ou renomeou um app | o mapa e o aviso de rebaseline |
 | a escala tipográfica, o acento, os tokens de vidro, os raios | "A linguagem visual" |
 | acrescentou um componente compartilhado em `ui/` | "Deixe o código te ensinar" |
+| acrescentou um preset, ou um campo novo de preset | "Deixe o código te ensinar" — e confira se `config/system.test.js` ainda conta certo |
 | como se roda a suíte, ou o que ela cobre | as duas primeiras seções |
 | qualquer coisa que torne falso um limite declarado aqui | a seção que o declara |
 

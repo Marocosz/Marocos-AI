@@ -1,4 +1,6 @@
 import React, { forwardRef } from 'react'
+import { useTheme } from '../contexts/ThemeContext'
+import IconeXp from './xpIcons'
 import './AppIconButton.css'
 
 /**
@@ -50,6 +52,24 @@ const AppIconButton = forwardRef(function AppIconButton(
   { app, titulo, variante = 'tile', tamanho = 'desktop', onClick, ...resto },
   ref,
 ) {
+  /**
+   * O PRESET PODE TROCAR O GLIFO INTEIRO, e hoje só o XP troca.
+   *
+   * Os ícones do XP não são variações de cor do glifo lucide: são desenhos com
+   * volume, contorno e degradê, de outra família visual — um traço de 2px não
+   * vira um monitor de tubo com ajuste de token. Por isso a substituição é do
+   * COMPONENTE, e não do estilo.
+   *
+   * A leitura do preset acontece aqui, e não em cada um dos quatro lugares que
+   * montam este botão (área de trabalho, tela inicial do mobile, dock e menu
+   * Iniciar). Passar por prop obrigaria os quatro a conhecer a regra, e o
+   * primeiro que esquecesse ficaria com um ícone fora do conjunto.
+   *
+   * App sem ícone XP cai no lucide de sempre — `IconeXp` devolve `null` nesse
+   * caso, e o `??` abaixo cobre.
+   */
+  const { preset } = useTheme()
+  const usaXp = !!preset?.xp
   const Icon = app.icon
 
   return (
@@ -60,8 +80,12 @@ const AppIconButton = forwardRef(function AppIconButton(
       onClick={onClick}
       {...resto}
     >
+      {/* Os ícones do XP são desenhos com volume, não traços: eles pedem mais
+          área que o glifo lucide para a silhueta ficar legível no mesmo tile. */}
       <span className="app-icon-btn-glifo">
-        {Icon ? (
+        {usaXp ? (
+          <IconeXp appId={app.id} size={TAMANHO_ICONE[tamanho] + 8} />
+        ) : Icon ? (
           <Icon size={TAMANHO_ICONE[tamanho]} strokeWidth={ESPESSURA_ICONE[tamanho]} />
         ) : null}
       </span>

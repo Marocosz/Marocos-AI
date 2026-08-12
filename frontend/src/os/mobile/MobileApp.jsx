@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, Suspense } from 'react'
+import React, { useEffect, useMemo, useRef, Suspense } from 'react'
 import { motion, useReducedMotion } from 'motion/react'
 import { ChevronLeft } from 'lucide-react'
 import { useWindowActions } from '../WindowManagerContext'
@@ -33,6 +33,10 @@ const MobileApp = ({ win }) => {
 
   const title = app?.titleKey ? os.windows[app.titleKey] : win.params?.slug || ''
 
+  // As duas intenções apontam para o mesmo lugar neste shell — ver a nota no
+  // provider, mais abaixo.
+  const navegacao = useMemo(() => ({ irPara: open, abrir: open }), [open])
+
   // Cada app novo começa com o scroll no topo. Sem isto, abrir um projeto
   // herdaria a posição de rolagem de quem estava aberto antes na pilha.
   useEffect(() => {
@@ -66,8 +70,12 @@ const MobileApp = ({ win }) => {
         {/* No mobile, ir a um destino é EMPILHAR uma tela, não trocar o conteúdo
             desta: a metáfora daqui é pilha com botão voltar, e o chrome de
             explorador não existe neste shell. Por isso `open` — ver
-            os/NavegacaoContext.jsx. */}
-        <NavegacaoProvider value={open}>
+            os/NavegacaoContext.jsx.
+
+            AS DUAS INTENÇÕES COLAPSAM AQUI. No desktop "entrar" e "abrir ao
+            lado" são coisas diferentes; num shell de tela cheia as duas viram a
+            mesma — empilhar. O app não precisa saber disso. */}
+        <NavegacaoProvider value={navegacao}>
           {/* fallback nulo de propósito: com o prefetch em ociosidade o chunk já
               chegou, e um spinner que pisca por 20ms é pior que nada. */}
           {AppComponent ? (

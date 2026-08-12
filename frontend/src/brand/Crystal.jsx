@@ -1,5 +1,6 @@
 import { useRef } from 'react'
 import { Canvas, useFrame } from '@react-three/fiber'
+import { useMovimentoReduzido } from '../os/hooks/useMediaQuery'
 import { Float, Environment, Lightformer, Sparkles } from '@react-three/drei'
 
 /**
@@ -128,7 +129,65 @@ const Crystal = ({
   /** Corpo do material. Ponto médio entre os dois acima — ver
    *  `corpoDoCristal()` em config/system.js. */
   corpo = '#6b24b7',
+  /**
+   * UMA COR PARA TODA A LUZ EM VOLTA, quando o preset pede. Só o XP usa hoje:
+   * corpo laranja, luz verde — as duas cores do logotipo daquele sistema, em
+   * oposição quente/fria.
+   *
+   * A OPOSIÇÃO É O QUE FAZ FUNCIONAR. A tentativa anterior foi pôr as quatro
+   * cores da bandeirinha como quatro luzes distintas, e saiu acinzentada: com
+   * `transmission: 1.0` o material atravessa e MISTURA o que recebe, então
+   * saturação demais vinda de muitos lados se anula. Duas cores complementares
+   * sobrevivem à refração; quatro viram cinza.
+   *
+   * Ausente (o caso de todos os outros presets), valem `acento` e
+   * `acentoFundo` como sempre.
+   */
+  luz = null,
 }) => {
+  // Com `luz`, as DUAS fontes de identidade viram a mesma cor: é o que produz
+  // um banho uniforme em volta do sólido, em vez de dois matizes competindo.
+  const luzEsquerda = luz || acento
+  const luzDireita = luz || acentoFundo
+  const luzPonto = luz || acento
+  /**
+   * QUEM PEDE MENOS MOVIMENTO NÃO RECEBE UM CRISTAL GIRANDO.
+   *
+   * O resto do sistema respeita `prefers-reduced-motion` — as janelas, os
+   * balões, o marquee que existia aqui — e este componente era o único que
+   * girava de qualquer jeito. É a peça com MAIS movimento do site, e a única
+   * que ignorava o pedido.
+   *
+   * E ISSO ERA TAMBÉM A INSTABILIDADE DO REGRESSOR VISUAL. O `useFrame` abaixo
+   * integra `delta` de tempo real com `frameloop="always"`, e nem o
+   * `reducedMotion: 'reduce'` do Playwright nem o `animations: 'disabled'` do
+   * `toHaveScreenshot` alcançam isso — os dois param CSS, não o loop do
+   * react-three-fiber. O ângulo do cristal na hora da foto era, literalmente,
+   * quantos quadros couberam no tempo decorrido: nunca o mesmo duas vezes.
+   *
+   * Daí o sintoma que parecia inexplicável — cenas de tolerância zero falhando
+   * de forma intermitente, e sempre cenas DIFERENTES. A suspeita anterior
+   * (ruído do shader de wallpaper) estava errada: as cenas que só têm shader,
+   * como `wallpaper-escuro` e `mobile-home`, sempre estiveram em tolerância
+   * zero sem reclamar. As que oscilavam eram exatamente as marcadas
+   * `cristal3d`.
+   *
+   * Com o giro parado sob `prefers-reduced-motion`, o cristal cai na
+   * `POSE_PARADA` — um ângulo fixo — e as cenas do harness voltam a ser
+   * reproduzíveis. A correção é de acessibilidade; a suíte determinística é
+   * consequência.
+   *
+   * A LEITURA PRECISA SER SÍNCRONA, e este hook é o que garante isso: ele
+   * inicializa o estado com `window.matchMedia(...).matches` já no primeiro
+   * render. O `useReducedMotion()` do motion, que era o candidato óbvio aqui,
+   * só resolve depois de montar — e essa janela de alguns quadros bastava para
+   * o `useFrame` acumular um ângulo qualquer em `faseRef` antes de congelar.
+   * O cristal parava, mas parava num lugar diferente a cada execução, que é
+   * exatamente o defeito que este bloco existe para eliminar.
+   */
+  const prefereMovimentoReduzido = useMovimentoReduzido()
+  const animar = animated && !prefereMovimentoReduzido
+
   return (
     <div
       className={`crystal-3d ${className}`.trim()}
@@ -138,7 +197,7 @@ const Crystal = ({
       <Canvas
         camera={{ position: [0, 0, DISTANCIA_CAMERA], fov: 45 }}
         /* Parado, renderiza um frame e dorme: 0% de GPU em repouso. */
-        frameloop={animated ? 'always' : 'demand'}
+        frameloop={animar ? 'always' : 'demand'}
         /* Clampa o pixel ratio: evita renderizar 3x ou 4x pixels em telas
            Retina, o que é puro desperdício num objeto translúcido e difuso. */
         dpr={[1, 1.5]}
@@ -171,13 +230,13 @@ const Crystal = ({
               âmbar ou verde, e o cristal é a marca — seria o roxo mais visível
               que sobrou. */}
           <Lightformer intensity={2.4} position={[0, 4, -9]} scale={[12, 12, 1]} color="#ffffff" />
-          <Lightformer intensity={1.6} position={[-6, 1, 2]} scale={[10, 3, 1]} color={acento} />
-          <Lightformer intensity={1.1} position={[6, -2, 2]} scale={[10, 3, 1]} color={acentoFundo} />
+          <Lightformer intensity={1.6} position={[-6, 1, 2]} scale={[10, 3, 1]} color={luzEsquerda} />
+          <Lightformer intensity={1.1} position={[6, -2, 2]} scale={[10, 3, 1]} color={luzDireita} />
         </Environment>
 
         <ambientLight intensity={0.6} />
         <spotLight position={[5, 10, 5]} intensity={1.5} color="#ffffff" />
-        <pointLight position={[-5, -5, 5]} intensity={1} color={acento} />
+        <pointLight position={[-5, -5, 5]} intensity={1} color={luzPonto} />
 
         {/* O <Float> fica SEMPRE na arvore, mesmo parado.
          *
@@ -191,11 +250,11 @@ const Crystal = ({
          * entao manter o componente montado custa nada e a arvore fica
          * estavel entre os dois estados. */}
         <Float
-          speed={animated ? 2 : 0}
+          speed={animar ? 2 : 0}
           rotationIntensity={0}
-          floatIntensity={animated ? 1 : 0}
+          floatIntensity={animar ? 1 : 0}
         >
-          <CrystalMesh animated={animated} spin={spin} corpo={corpo} />
+          <CrystalMesh animated={animar} spin={spin} corpo={corpo} />
         </Float>
 
         {sparkles && (
@@ -205,7 +264,7 @@ const Crystal = ({
             size={3}
             /* Parado, speed=0: com frameloop="demand" um valor maior só
                congelaria no primeiro instante da animação, sem ganho. */
-            speed={animated ? 0.5 : 0}
+            speed={animar ? 0.5 : 0}
             opacity={0.6}
             color="#d8b4fe"
           />

@@ -145,7 +145,8 @@ describe('config do sistema', () => {
    */
   it('todo preset sóbrio traz o fundo desenhado e dispensa os campos de shader', () => {
     const sobrios = [...PRESETS.noite, ...PRESETS.dia].filter((p) => p.sobrio)
-    expect(sobrios.length, 'era para haver 2 sóbrios por tema').toBe(4)
+    // 2 por tema + o XP, que aparece nos dois (e é sóbrio: o Luna era opaco).
+    expect(sobrios.length, 'era para haver 2 sóbrios por tema, mais o XP em ambos').toBe(6)
 
     for (const p of sobrios) {
       expect(typeof p.fundo, `${p.id}.fundo`).toBe('string')
@@ -162,6 +163,46 @@ describe('config do sistema', () => {
       expect(lista.filter((p) => p.sobrio).length, `sóbrios em ${tema}`).toBeGreaterThanOrEqual(2)
       expect(lista.filter((p) => !p.sobrio).length, `animados em ${tema}`).toBeGreaterThanOrEqual(2)
     }
+  })
+
+  /**
+   * O XP É O MESMO OBJETO NOS DOIS TEMAS, e o teste é por identidade de
+   * referência de propósito: duas cópias iguais passariam num `toEqual` hoje e
+   * derivariam na primeira vez que alguém editasse uma delas. A piada depende de
+   * dia e noite renderizarem idêntico — é o único preset em que trocar o tema
+   * não muda nada.
+   */
+  it('o preset XP é literalmente o mesmo objeto nas duas listas', () => {
+    const noite = PRESETS.noite.find((p) => p.id === 'xp')
+    const dia = PRESETS.dia.find((p) => p.id === 'xp')
+
+    expect(noite, 'o XP some da lista da noite').toBeDefined()
+    expect(dia, 'o XP some da lista do dia').toBeDefined()
+    expect(noite).toBe(dia)
+    expect(getPreset('dark', 'xp')).toBe(getPreset('light', 'xp'))
+  })
+
+  it('o XP carrega o que o resto do sistema lê dele', () => {
+    const xp = getPreset('dark', 'xp')
+
+    // A marca que liga `.modo-xp` no Shell.
+    expect(xp.xp).toBe(true)
+    // Troca "MAROCOS OS" na cerimônia e na tela de bloqueio.
+    expect(xp.nomeSistema).toBe('MAROCOS XP')
+    // Cristal laranja com luz verde — ver a nota no preset sobre por que duas
+    // cores em oposição funcionam onde quatro saturadas viravam cinza.
+    expect(xp.corpoCristal).toMatch(/^#[0-9a-f]{6}$/i)
+    expect(xp.luzCristal).toMatch(/^#[0-9a-f]{6}$/i)
+    // A fonte do XP, publicada pela ponte de config como `--cfg-fonte-preset`.
+    expect(xp.fonte).toContain('Tahoma')
+  })
+
+  it('o corpo do cristal obedece o preset quando ele manda', () => {
+    // Sem isto a regra geral tiraria a média do acento (azul Luna) e devolveria
+    // um cristal azul, engolindo o laranja.
+    expect(corpoDoCristal(getPreset('dark', 'xp'))).toBe('#f97316')
+    // E quem não manda continua caindo na média de sempre.
+    expect(corpoDoCristal(getPreset('dark', 'ametista'))).toMatch(/^#[0-9a-f]{6}$/i)
   })
 
   it('os presets de noite e de dia têm as formas que cada shader consome', () => {
@@ -296,7 +337,6 @@ describe('config do sistema', () => {
     expect(MOVIMENTO.pushMobile).toEqual({ duration: 0.28, ease: 'easeOut' })
     expect(MOVIMENTO.acordeaoDispositivos).toEqual({ duration: 0.2, ease: 'easeInOut' })
     expect(MOVIMENTO.indicadorTaskbar).toEqual({ type: 'spring', stiffness: 300, damping: 30 })
-    expect(MOVIMENTO.marqueeSkillsS).toBe(18)
   })
 
   it('a taskbar tem a mesma altura no JS e no CSS', () => {

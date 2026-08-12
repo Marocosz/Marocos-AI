@@ -1,10 +1,11 @@
-import React, { useRef, useEffect, useState, useCallback, Suspense } from 'react'
+import React, { useRef, useEffect, useState, useCallback, useMemo, Suspense } from 'react'
 import { motion, useMotionValue, useDragControls, useReducedMotion, animate } from 'motion/react'
 import { Minus, Square, X } from 'lucide-react'
 import { useWindowActions } from '../WindowManagerContext'
 import ExplorerChrome from './ExplorerChrome'
 import { NavegacaoProvider } from '../NavegacaoContext'
 import { useViewport } from '../hooks/useViewport'
+import { tamanhoQueCabe, posicaoAlcancavel } from '../windowManager'
 import { getApp } from '../registry'
 import { useLanguage } from '../../contexts/LanguageContext'
 import { getOsData } from '../../i18n/os'
@@ -60,11 +61,31 @@ const Window = ({ win, isFocused }) => {
    * `- alturaTaskbar` é o mesmo 52px que o `bottom` do CSS usava, e há teste
    * garantindo que ele bate com VIDRO.alturaTaskbar.
    */
+  /**
+   * O TAMANHO PASSA PELO FILTRO DA TELA ANTES DE VIRAR PIXEL.
+   *
+   * `defaultSize` é um desejo, não uma medida: numa tela baixa a janela nascia
+   * com a altura cheia do registry e o excesso ia parar embaixo da barra de
+   * tarefas. `tamanhoQueCabe` encolhe até caber; o porquê e as contas por app
+   * estão em `os/windowManager.js`.
+   *
+   * É reativo de graça porque `useViewport()` já reavalia a cada `resize` —
+   * então diminuir a janela do navegador reacomoda o que está aberto, em vez de
+   * empurrar para fora do quadro. A posição passa por um filtro parecido, mas
+   * com os limites do ARRASTO e não os do nascimento; o porquê está em
+   * `posicaoAlcancavel`, e resumido é: apertar mais desfaria todo arrasto
+   * legítimo no render seguinte.
+   *
+   * A maximizada não passa por aqui: ela já é calculada a partir da viewport.
+   */
   const tamanhoPadrao = app?.defaultSize
-  const alvoX = win.maximized ? 0 : win.x
-  const alvoY = win.maximized ? 0 : win.y
-  const alvoLargura = win.maximized ? viewport.w : tamanhoPadrao?.w
-  const alvoAltura = win.maximized ? viewport.h - JANELAS.alturaTaskbar : tamanhoPadrao?.h
+  const tamanhoUtil = tamanhoQueCabe(tamanhoPadrao, viewport.w, viewport.h)
+  const ancorada = posicaoAlcancavel(win.x, win.y, viewport.w, viewport.h)
+
+  const alvoX = win.maximized ? 0 : ancorada.x
+  const alvoY = win.maximized ? 0 : ancorada.y
+  const alvoLargura = win.maximized ? viewport.w : tamanhoUtil?.w
+  const alvoAltura = win.maximized ? viewport.h - JANELAS.alturaTaskbar : tamanhoUtil?.h
 
   // Geometria vive em motion values, não em `animate`: durante o gesto o drag
   // é dono de x/y (sem re-render), e fora do gesto o efeito abaixo devolve o
@@ -165,12 +186,76 @@ const Window = ({ win, isFocused }) => {
    * COMO O APP DENTRO DESTA JANELA NAVEGA. Com chrome de explorador, ir a um
    * destino é trocar o conteúdo desta janela; sem chrome, é abrir outra. O app
    * não decide — ver os/NavegacaoContext.jsx.
+   *
+   * O DESTINO TAMBÉM PRECISA TER CHROME, e não só a origem.
+   *
+   * Trocar o conteúdo por um app SEM chrome deixaria a janela sem a lateral e
+   * sem o botão voltar — que é onde mora o único caminho de volta. O visitante
+   * entraria no Terminal a partir do guia e ficaria preso lá, com a janela
+   * ainda no tamanho de quem tinha lateral.
+   *
+   * Ninguém tinha esbarrado nisso porque até agora todo destino de navegação
+   * (a lateral do explorador, o card de projeto) era um app com `explorer:
+   * true`. O guia do "Sobre este PC" é o primeiro a apontar para fora desse
+   * conjunto, e nesse caso abrir janela é a leitura certa: o Terminal não é um
+   * lugar do explorador, é outra ferramenta.
    */
-  const irPara = useCallback(
-    (appId, params = null) => {
-      if (app?.explorer) navigate(win.key, appId, params)
-      else open(appId, params)
-    },
+  /**
+   * O CLIQUE QUE TRAZ A JANELA PARA A FRENTE NÃO CLICA EM NADA.
+   *
+   * Sem isto, ir de uma janela para outra ativa o que estiver embaixo do cursor
+   * na chegada — um link externo abre uma aba, uma porta do guia navega, um card
+   * de projeto troca o conteúdo. O visitante pediu foco e recebeu uma ação que
+   * não escolheu, porque no instante do clique ele ainda estava lendo a OUTRA
+   * janela.
+   *
+   * É o comportamento do macOS, e é o certo aqui: com várias janelas abertas
+   * sobrepostas, trazer uma para a frente é uma intenção completa em si mesma.
+   *
+   * COMO: `pointerdown` decide, `click` executa. Quando o pointer desce numa
+   * janela sem foco, marcamos a intenção e focamos; o `click` que vem em seguida
+   * é engolido na fase de CAPTURA, antes de chegar a qualquer alvo. Não dá para
+   * decidir no próprio `click`, porque a essa altura `isFocused` já virou true e
+   * o clique pareceria comum.
+   *
+   * A marca é zerada em todo `pointerdown` de janela já focada — assim um gesto
+   * que começa aqui e termina fora (arrastar para outro lugar e soltar, sem
+   * `click` nenhum) não deixa a marca acesa para engolir o clique seguinte.
+   *
+   * A BARRA DE TÍTULO FICA DE FORA. Fechar, minimizar e maximizar continuam
+   * respondendo de primeira, como em qualquer sistema — ver o `stopPropagation`
+   * nos controles. Quem quer fechar uma janela de fundo não quer focá-la antes.
+   */
+  const engoliuCliqueRef = useRef(false)
+
+  const aoApontar = useCallback((e) => {
+    // A barra de título é a exceção: fechar ou minimizar uma janela de fundo é
+    // uma intenção inequívoca, e exigir dois cliques para isso pareceria
+    // travamento. É o que o macOS faz — os controles respondem sem foco.
+    const naBarraDeTitulo = !!e.target?.closest?.('.marocos-titlebar')
+
+    engoliuCliqueRef.current = !isFocused && !naBarraDeTitulo
+    if (!isFocused) focus(win.key)
+  }, [isFocused, focus, win.key])
+
+  const aoClicar = useCallback((e) => {
+    if (!engoliuCliqueRef.current) return
+    engoliuCliqueRef.current = false
+    e.preventDefault()
+    e.stopPropagation()
+  }, [])
+
+  const navegacao = useMemo(
+    () => ({
+      irPara: (appId, params = null) => {
+        const destino = getApp(appId)
+        if (app?.explorer && destino?.explorer) navigate(win.key, appId, params)
+        else open(appId, params)
+      },
+      // Sempre janela nova, mesmo partindo de uma janela com chrome — é o que o
+      // guia do "Sobre este PC" pede: ele fica aberto atrás do que abriu.
+      abrir: (appId, params = null) => open(appId, params),
+    }),
     [app?.explorer, navigate, open, win.key],
   )
 
@@ -183,7 +268,8 @@ const Window = ({ win, isFocused }) => {
       tabIndex={-1}
       inert={win.minimized}
       onKeyDown={onKeyDown}
-      onPointerDownCapture={() => !isFocused && focus(win.key)}
+      onPointerDownCapture={aoApontar}
+      onClickCapture={aoClicar}
       style={{
         x,
         y,
@@ -229,7 +315,7 @@ const Window = ({ win, isFocused }) => {
           A decisão de quem recebe está no `explorer` do registry, e o app segue
           agnóstico de container — ele recebe as mesmas props com ou sem chrome.
           Terminal, Marcos Virtual e Configurações caem no ramo de baixo. */}
-      <NavegacaoProvider value={irPara}>
+      <NavegacaoProvider value={navegacao}>
         {app?.explorer ? (
           <ExplorerChrome win={win}>
             <div className="marocos-window-body">

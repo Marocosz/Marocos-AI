@@ -1,0 +1,85 @@
+/* src/apps/ReadmeApp.css
+   leia-me.txt — o case técnico do próprio site.
+
+   Antes este app usava `.app-prose` (três regras em Window.css: tamanho, margem
+   de parágrafo e cor de link), que é o suficiente para três parágrafos e não
+   para um documento com seções. As duas vozes tipográficas do projeto valem
+   aqui como em qualquer lugar: o título de seção nomeia um subsistema e vem em
+   mono; o corpo é uma pessoa explicando e volta para Poppins.
+
+   Nenhuma cor literal — tudo sai dos tokens, então o app repinta junto com o
+   preset escolhido. */
+
+.readme-app {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+/* A abertura carrega o argumento inteiro; quem parar aqui já entendeu. */
+.readme-lead {
+  margin: 0;
+  font-size: 1rem;
+  line-height: 1.5;
+  font-weight: 700;
+  color: var(--text-primary);
+  border-left: 2px solid rgb(var(--accent-rgb) / 0.35);
+  padding-left: 14px;
+}
+
+.readme-section {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+/* Mesma receita de `.about-section-title`: é o sistema se descrevendo. */
+.readme-section-title {
+  margin: 0;
+  font-family: 'Courier New', monospace;
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--text-secondary);
+}
+
+.readme-section-title::before {
+  content: '// ';
+  color: var(--accent-color);
+}
+
+.readme-section-body {
+  margin: 0;
+  font-size: 0.88rem;
+  line-height: 1.65;
+  color: var(--text-secondary);
+}
+
+/* Alvo de verdade, então raio de controle e superfície de conteúdo — não um
+   link solto no fim do texto. */
+.readme-repo {
+  display: inline-flex;
+  align-items: center;
+  align-self: flex-start;
+  gap: 8px;
+  padding: 9px 14px;
+  border: 1px solid var(--card-border);
+  border-radius: var(--win-control-radius);
+  background: var(--card-bg);
+  color: var(--text-primary);
+  font-size: 0.82rem;
+  font-weight: 700;
+  text-decoration: none;
+  transition: background 0.16s ease, border-color 0.16s ease;
+}
+
+.readme-repo:hover {
+  background: rgb(var(--accent-rgb) / 0.12);
+  border-color: rgb(var(--accent-rgb) / 0.4);
+}
+
+.readme-repo:focus-visible {
+  outline: 2px solid var(--accent-color);
+  outline-offset: 2px;
+}

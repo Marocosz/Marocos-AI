@@ -839,6 +839,28 @@
   );
 }
 
+/**
+ * O ÂMBAR PRECISA DE `!important`, E O CULPADO NÃO É ESTA TELA.
+ *
+ * `styles/index.css` tem uma regra que casa com quase toda a árvore no tema
+ * claro — `.theme-light h1, h2, h3, h4, p, span, li, div { color:
+ * var(--text-primary) }` — e o próprio arquivo a documenta como dívida
+ * conhecida. Ela VENCE a herança: a cor declarada aqui em `.shutdown-screen`
+ * não chega aos filhos, e o POST inteiro saía escuro sobre preto.
+ *
+ * Era um defeito antigo do tema claro que ninguém tinha visto, porque quem
+ * desliga a máquina raramente está no tema claro. O preset XP o expôs por fixar
+ * `theme-light`, e aí ficou impossível de ignorar.
+ *
+ * A correção certa é remover aquela regra global, e o comentário dela explica
+ * por que isso pede uma varredura visual do tema claro inteiro — trabalho de
+ * outro commit. Até lá, esta tela reafirma a própria cor.
+ */
+.shutdown-screen,
+.shutdown-screen * {
+  color: #ffb000 !important;
+}
+
 .shutdown-post {
   width: 100%;
   max-width: 720px;

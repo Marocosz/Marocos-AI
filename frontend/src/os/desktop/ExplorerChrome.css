@@ -359,8 +359,29 @@
   opacity: 0.25;
 }
 
-.explorer-cmd-espaco {
+/**
+ * O GRUPO DE ENFEITE — ele encolhe, e o botão real não.
+ *
+ * Substituiu um `.explorer-cmd-espaco` (um `flex: 1` vazio empurrando o botão
+ * para a direita). Aquilo funcionava só enquanto tudo coubesse: como cada
+ * comando é `flex: 0 0 auto` e a barra tem `overflow: hidden`, numa janela
+ * estreita o espaçador colapsava a zero e o que transbordava era o ÚLTIMO
+ * elemento — "Detalhes", o único botão da barra que faz alguma coisa. A janela
+ * de projeto (744px) cortava sempre.
+ *
+ * Agora o enfeite é um grupo que pode encolher (`flex: 1 1 auto` + `min-width:
+ * 0`) e truncar dentro de si (`overflow: hidden`), enquanto o botão continua
+ * `flex: 0 0 auto` e nunca perde espaço. O `min-width: 0` não é opcional: sem
+ * ele um container flex não encolhe abaixo do conteúdo, e o grupo empurraria o
+ * botão para fora de novo.
+ */
+.explorer-cmd-enfeites {
+  display: flex;
+  align-items: center;
+  gap: 2px;
   flex: 1 1 auto;
+  min-width: 0;
+  overflow: hidden;
 }
 
 /* ==========================================================================

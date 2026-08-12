@@ -77,18 +77,10 @@
   opacity: 0.7;
 }
 
-.marocos-signature-bio {
-  display: block;
-  margin-top: 14px;
-  font-size: 0.86rem;
-  line-height: 1.6;
-  color: #fff;
-  opacity: 0.62;
-}
-
+/* `.marocos-signature-bio` saiu junto com a frase que ela vestia — ver a nota em
+   Desktop.jsx. Sobraram o nome e o cargo, que é o que uma assinatura precisa. */
 .theme-light .marocos-signature h1,
-.theme-light .marocos-signature p,
-.theme-light .marocos-signature-bio {
+.theme-light .marocos-signature p {
   color: #1e1b4b;
   text-shadow: 0 1px 2px rgba(255, 255, 255, 0.6);
 }
@@ -108,9 +100,5 @@
 
   .marocos-signature p {
     font-size: 0.82rem;
-  }
-
-  .marocos-signature-bio {
-    display: none; /* só a bio sai; h1 e cargo permanecem */
   }
 }

@@ -45,12 +45,19 @@
   box-shadow: 0 0 0 2px var(--accent-color);
 }
 
+/* FIXO, E FORA DE QUALQUER RECORTE.
+   Era `absolute`, e por isso ficava preso ao corpo da janela — que rola. Com
+   `overflow-y: auto` o CSS deixa de tratar o eixo X como `visible`, então o
+   balão era cortado E fazia a janela de Configurações ganhar uma barra de
+   rolagem horizontal sem nada para rolar. As coordenadas vêm do JS, medidas a
+   partir do alvo; ver o cabeçalho de `ui/Dica.jsx`. */
 .dica-balao {
-  position: absolute;
-  left: 50%;
-  z-index: 30;
+  position: fixed;
+  left: 0;
+  top: 0;
+  z-index: var(--z-dica, 2100);
   width: max-content;
-  max-width: 210px;
+  max-width: 240px;
   padding: 6px 9px;
   border: var(--win-border);
   border-radius: var(--win-control-radius);
@@ -92,14 +99,18 @@
   border-bottom: var(--win-border);
 }
 
+/* O JS põe `left`/`top` no PONTO DE ANCORAGEM (o meio do alvo, logo acima ou
+   logo abaixo dele). O deslocamento do balão em relação a esse ponto é destas
+   transformações — assim a medida em JS fica sendo só "onde está o alvo", sem
+   precisar conhecer o tamanho do balão. */
+
 /* --- Acima (padrão) --- */
 .dica-balao--acima {
-  bottom: calc(100% + 9px);
-  transform: translateX(-50%) translateY(4px);
+  transform: translate(-50%, calc(-100% + 4px));
 }
 
 .dica-balao--acima.dica-balao--visivel {
-  transform: translateX(-50%) translateY(0);
+  transform: translate(-50%, -100%);
 }
 
 .dica-balao--acima::after {
@@ -109,12 +120,11 @@
 
 /* --- Abaixo --- */
 .dica-balao--abaixo {
-  top: calc(100% + 9px);
-  transform: translateX(-50%) translateY(-4px);
+  transform: translate(-50%, -4px);
 }
 
 .dica-balao--abaixo.dica-balao--visivel {
-  transform: translateX(-50%) translateY(0);
+  transform: translate(-50%, 0);
 }
 
 .dica-balao--abaixo::after {
@@ -126,9 +136,15 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .dica-balao,
-  .dica-balao--visivel {
+  .dica-balao--acima,
+  .dica-balao--acima.dica-balao--visivel {
     transition: opacity 0.01s linear, visibility 0s;
-    transform: translateX(-50%);
+    transform: translate(-50%, -100%);
+  }
+
+  .dica-balao--abaixo,
+  .dica-balao--abaixo.dica-balao--visivel {
+    transition: opacity 0.01s linear, visibility 0s;
+    transform: translate(-50%, 0);
   }
 }

@@ -83,9 +83,9 @@ npm run report         # abre o último relatório HTML (screenshots de diff do 
 Fotografa 21 cenas fixas do Marocos OS e compara pixel a pixel com
 referências versionadas em `__screenshots__/`.
 
-### As três coisas que mudam sozinhas, e como cada uma foi congelada
+### As quatro coisas que mudam sozinhas, e como cada uma foi congelada
 
-O difícil não é fotografar, é congelar. Três fontes de não-determinismo
+O difícil não é fotografar, é congelar. Quatro fontes de não-determinismo
 existem neste projeto e destruiriam qualquer comparação sem tratamento:
 
 #### 1. Shader do wallpaper e cristal 3D
@@ -98,6 +98,13 @@ desligados pelo controle de animação do próprio sistema:
 leem o valor na montagem). Com a animação desligada, o Silk para de invalidar
 o canvas e o cristal cai em `frameloop="demand"`: os dois desenham UM frame e
 dormem, o que é reprodutível.
+
+> **Isto foi uma promessa não cumprida durante um bom tempo.** O `AboutApp`
+> passava `animated` FIXO para o `<Crystal>`, então o cristal daquela janela
+> girava mesmo com `isAnimationEnabled = false` — e as cenas com ele
+> (`sobre-*`, `menu-iniciar-*`, `bloqueio-*`) nunca foram reprodutíveis de
+> verdade. Corrigido; o cristal agora respeita o interruptor E o
+> `prefers-reduced-motion`, este último por acessibilidade antes de tudo.
 
 #### 2. Os relógios (taskbar e tela de bloqueio)
 
@@ -134,7 +141,40 @@ prática elas não introduziram instabilidade nos testes. Mas isso é uma
 garantia do Playwright sobre Web Animations, não do app — vale saber que ela
 existe e por que este harness depende dela.
 
-#### A quarta coisa que não é "tempo", mas parecia
+#### 4. O paralelismo do próprio harness
+
+**Esta foi a mais cara de encontrar, porque não está no app.**
+
+A suíte reprovava de forma intermitente com *"failed to take two consecutive
+stable screenshots"*, em cenas SEMPRE DIFERENTES a cada execução. Duas
+investigações acusaram o app: primeiro o `ruido` do shader Silk, depois o giro
+do cristal. A segunda rendeu duas correções de produto legítimas (ver o aviso
+no item 1), mas nenhuma das duas era a causa.
+
+Quem desmontou as hipóteses foi uma cena: **`mobile-home-claro` falhava, e ela
+não tem shader, nem cristal, nem janela** — no tema claro o fundo da home
+mobile é gradiente CSS puro. Quando o sintoma aparece onde a causa suspeita não
+existe, a causa é outra.
+
+Era `workers: 4`. Aqui não existe GPU — é SwiftShader, rasterização por
+software na CPU. Quatro Chromium com contexto WebGL ao mesmo tempo faziam os
+quadros chegarem atrasados, e a página não assentava dentro do tempo que o
+Playwright dá.
+
+Medido no mesmo commit, sem mudar mais nada:
+
+| workers | resultado |
+|---|---|
+| 4 | 6 a 7 cenas reprovando por instabilidade, variando a cada execução |
+| 1 | 37 de 38 passando, e a única falha é diferença de pixel real |
+
+Hoje é `workers: 1`. A suíte demora ~4,3 min em vez de ~1,8 — e vale, porque um
+regressor que reprova sozinho ensina a ignorar o vermelho.
+
+**Corolário prático:** não rode build, dev server ou outra coisa pesada na
+máquina enquanto a suíte roda. A disputa é pela mesma CPU.
+
+#### A quinta coisa que não é "tempo", mas parecia
 
 Durante a montagem deste harness, três cenas de app (`contato`, `stack`,
 `projeto-detalhe`) falharam de forma intermitente: a captura às vezes pegava

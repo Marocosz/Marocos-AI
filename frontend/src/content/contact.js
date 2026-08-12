@@ -40,11 +40,19 @@ const contactPageContentEn = {
   sectionLabel: "06. / CONNECT",
   title: "Let's Talk",
   description: "Below are the best channels to find me. Run the command or click the links.",
+  /**
+   * `vps` PROVA DEVOPS EM VEZ DE VENDER HOSPEDAGEM.
+   *
+   * Eram 55 palavras de anúncio ("Perfect for small to medium projects that
+   * need reliable, custom hosting...") no meio de um app de CONTATO, com quatro
+   * bullets de folheto. O fato por baixo é bom e some no discurso: ele mantém a
+   * própria infra, e o site que o visitante está usando roda nela.
+   */
   hosting: {
-    badge: "HOSTING SERVICE",
-    title: "Professional VPS Hosting Available",
-    description: "I offer complete end-to-end web hosting solutions through my own VPS infrastructure. From deployment to monitoring, database management to SSL certificates, I handle everything. Perfect for small to medium projects that need reliable, custom hosting with direct support from the developer.",
-    features: ["✓ Custom Configuration", "✓ 24/7 Monitoring", "✓ Direct Support", "✓ SSL & Security"]
+    badge: "INFRASTRUCTURE",
+    title: "I run my own VPS — this site is on it.",
+    description: "Docker, Traefik with automatic HTTPS, continuous deploy from git, and every container I put there. I also host projects for clients.",
+    features: ["Docker", "Traefik", "CI/CD", "Linux"]
   },
   terminal: {
     title: "visitor@portfolio: ~",
@@ -67,10 +75,10 @@ const contactPageContentPt = {
   title: "Vamos Conversar",
   description: "Abaixo estão os melhores canais para me encontrar. Execute o comando ou clique nos links.",
   hosting: {
-    badge: "SERVIÇO DE HOSPEDAGEM",
-    title: "Hospedagem VPS Profissional Disponível",
-    description: "Ofereço soluções completas de hospedagem web através de minha própria infraestrutura VPS. Do deploy ao monitoramento, gerenciamento de banco de dados e certificados SSL, eu cuido de tudo. Perfeito para projetos de pequeno e médio porte que precisam de hospedagem confiável, personalizada e com suporte direto do desenvolvedor.",
-    features: ["✓ Configuração Personalizada", "✓ Monitoramento 24/7", "✓ Suporte Direto", "✓ SSL & Segurança"]
+    badge: "INFRAESTRUTURA",
+    title: "Rodo minha própria VPS — este site está nela.",
+    description: "Docker, Traefik com HTTPS automático, deploy contínuo a partir do git, e cada container que eu subo lá. Também hospedo projetos de clientes.",
+    features: ["Docker", "Traefik", "CI/CD", "Linux"]
   },
   terminal: {
     title: "visitante@portfolio: ~",

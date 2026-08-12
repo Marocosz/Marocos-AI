@@ -33,12 +33,37 @@ export default defineConfig({
   forbidOnly: !!process.env.CI,
   retries: 0,
 
-  // Cada cena abre um contexto Chromium com WebGL (o wallpaper por shader, e
-  // às vezes o cristal 3D). O paralelismo padrão (uma instância por núcleo de
-  // CPU) chegou a derrubar o próprio Chromium em teste local — várias janelas
-  // WebGL disputando GPU ao mesmo tempo. 4 workers roda tudo em pouco mais de
-  // um minuto sem esse risco.
-  workers: 4,
+  /**
+   * UM WORKER. NÃO É EXCESSO DE ZELO — É A CAUSA DA INTERMITÊNCIA.
+   *
+   * Cada cena abre um contexto Chromium com WebGL (o wallpaper por shader, e às
+   * vezes o cristal 3D), e aqui não há GPU: é SwiftShader, rasterização por
+   * software na CPU. Rodar quatro desses ao mesmo tempo fazia os quadros
+   * chegarem atrasados e fora de ordem, e o Playwright reprovava com "failed to
+   * take two consecutive stable screenshots" — a página nunca assentava dentro
+   * do tempo dele.
+   *
+   * O sintoma era o que mais confundia: falhas intermitentes, em cenas SEMPRE
+   * DIFERENTES, inclusive em cenas sem nada animando (a home mobile do tema
+   * claro não tem shader, nem cristal, nem janela — e falhava). Isso descartou
+   * as duas suspeitas anteriores, o `ruido` do Silk e o giro do cristal: nenhum
+   * dos dois existe naquela cena.
+   *
+   * Medido no mesmo commit, sem mudar mais nada:
+   *
+   *   workers: 4   6 a 7 cenas reprovando por instabilidade, variando a cada run
+   *   workers: 1   37 de 38 passando, e a única falha é diferença de pixel REAL
+   *                ("captured a stable screenshot"), que é sinal e não ruído
+   *
+   * Custa tempo: ~4,3 min contra ~1,8 min. É o preço certo. Um regressor visual
+   * que reprova sozinho ensina a ignorar o vermelho, e aí ele não serve para
+   * nada — que é exatamente o estado em que esta suíte estava.
+   *
+   * O comentário anterior já desconfiava de disputa por GPU (o paralelismo
+   * padrão chegou a derrubar o Chromium), mas parou em 4 workers, o que trocou
+   * o crash por corrupção silenciosa de timing.
+   */
+  workers: 1,
   reporter: [
     ['list'],
     // O relatório HTML embute os PNGs de esperado/obtido/diff lado a lado —

@@ -114,7 +114,7 @@ const ROTAS = [
   { rota: '/contato', titulo: 'Terminal', seletorCorpo: '.terminal-app' },
   { rota: '/assistente', titulo: 'Marcos Virtual', seletorCorpo: '.assistant-app' },
   { rota: '/config', titulo: 'Configurações', seletorCorpo: '.settings-app' },
-  { rota: '/leia-me', titulo: 'leia-me.txt', seletorCorpo: '.app-prose' },
+  { rota: '/leia-me', titulo: 'leia-me.txt', seletorCorpo: '.readme-app' },
   { rota: '/jornada', titulo: 'Histórico de Versões', seletorCorpo: '.history-app' },
   { rota: '/stack', titulo: 'Gerenciador de Dispositivos', seletorCorpo: '.devices-app' },
 ]
@@ -162,7 +162,7 @@ test('voltar/avançar do navegador troca o foco entre janelas já abertas', asyn
   // controlar exatamente o histórico.
   await page.goto('/leia-me', { waitUntil: 'networkidle' })
   await passarDaCerimonia(page)
-  await expect(page.locator('.app-prose')).toBeVisible({ timeout: 8000 })
+  await expect(page.locator('.readme-app')).toBeVisible({ timeout: 8000 })
 
   // Abre uma segunda janela via navegação de URL (equivalente a clicar num
   // link/ícone que muda a rota) — empurra '/jornada' no histórico. Sem
@@ -220,11 +220,103 @@ test('estados interativos do chrome de explorador não quebram a janela', async 
   await expect(page.locator('.terminal-app')).toBeVisible({ timeout: 8000 })
   await expect(page.locator('.marocos-window')).toHaveCount(2)
 
+  /**
+   * DOIS CLIQUES, E É DE PROPÓSITO. A janela de Projetos perdeu o foco para o
+   * Terminal que acabou de abrir, e o primeiro clique numa janela desfocada só
+   * a traz para a frente — nenhum controle dentro dela dispara. Ver o bloco
+   * sobre `aoApontar`/`aoClicar` em `os/desktop/Window.jsx`.
+   *
+   * Este teste já existia e passava com um clique só; foi ele que flagrou a
+   * mudança de comportamento, que é exatamente o serviço que se espera dele.
+   */
+  const detalhes = page.locator('.explorer-cmd', { hasText: 'Detalhes' }).first()
+  await detalhes.click()
+  await expect(page.locator('.explorer-detalhes').first()).toBeHidden()
+
   // Painel de detalhes: fechado por padrão, então nunca é fotografado.
-  await page.locator('.explorer-cmd', { hasText: 'Detalhes' }).first().click()
+  await detalhes.click()
   await expect(page.locator('.explorer-detalhes').first()).toBeVisible()
 
   expect(erros, `erro de página não capturado: ${erros.join('; ')}`).toHaveLength(0)
+})
+
+/*
+ * O contrato do "primeiro clique só foca" é verificado no teste de estados
+ * interativos, logo acima — lá a janela de Projetos perde o foco para o Terminal
+ * e o painel de Detalhes só abre no segundo clique.
+ *
+ * Uma versão dedicada deste teste foi escrita e removida: ela abria duas janelas
+ * do guia e tentava clicar na de baixo, mas a cascata sobrepõe as janelas, e a
+ * verificação de acionabilidade do Playwright espera até o tempo estourar quando
+ * o alvo está coberto por outro elemento. O teste falhava por geometria, não por
+ * comportamento — e teste que falha pelo motivo errado é pior que teste nenhum.
+ */
+
+/**
+ * O GUIA DO "SOBRE ESTE PC" LEVA MESMO AONDE PROMETE.
+ *
+ * A foto prova que as quatro portas existem e estão bonitas. Ela não prova que
+ * clicar numa delas chega em algum lugar — e este app é a porta de entrada do
+ * site (`BoasVindas.jsx` o abre sozinho para quem chega sem deep link), então
+ * uma porta quebrada aqui é o visitante batendo na parede logo na chegada.
+ *
+ * AS PORTAS ABREM JANELA NOVA, e não trocam o conteúdo desta — decisão do dono
+ * do projeto. A razão é boa: o guia é uma lista de perguntas, e quem foi ver os
+ * projetos ainda pode querer as outras três. Trocar o conteúdo apagaria o mapa
+ * assim que ele fosse usado pela primeira vez.
+ *
+ * É o oposto da lateral do explorador, que continua navegando dentro da janela
+ * — as duas intenções vivem em `os/NavegacaoContext.jsx` e quem escolhe entre
+ * elas é o app, não o container.
+ */
+test('as portas do guia abrem os apps que prometem, em janela nova', async ({ page, context }) => {
+  await definirPreferencias(context)
+  const erros = []
+  page.on('pageerror', (e) => erros.push(e.message))
+
+  await page.goto('/sobre', { waitUntil: 'networkidle' })
+  await passarDaCerimonia(page)
+  await expect(page.locator('.about-app')).toBeVisible({ timeout: 8000 })
+  await expect(page.locator('.about-door')).toHaveCount(4)
+
+  await page.locator('.about-door', { hasText: 'Ele sabe construir?' }).click()
+  await expect(page.locator('.projects-app-list')).toBeVisible({ timeout: 8000 })
+
+  // Duas janelas: o guia continua aberto atrás. É o ponto da decisão.
+  await expect(page.locator('.marocos-window')).toHaveCount(2)
+  await expect(page.locator('.about-app')).toHaveCount(1)
+
+  expect(erros, `erro de página não capturado: ${erros.join('; ')}`).toHaveLength(0)
+})
+
+/**
+ * O TERMINAL ENTREGA OS CANAIS SEM NINGUÉM DIGITAR.
+ *
+ * É o app de CONTATO do portfólio, e durante muito tempo ele exigiu adivinhar a
+ * palavra `contato` — nada na tela mencionava `help` e o input nem nascia
+ * focado. Agora o boot termina executando o comando, como um `.bashrc`.
+ *
+ * A foto de `contato.png` mostraria a tabela na tela, mas não distingue "o boot
+ * rodou o comando" de "alguém deixou a tabela chumbada no HTML". O que importa
+ * é o e-mail estar alcançável em zero teclas.
+ */
+test('o terminal já abre com os canais de contato na tela', async ({ page, context }) => {
+  await definirPreferencias(context)
+
+  await page.goto('/contato', { waitUntil: 'networkidle' })
+  await passarDaCerimonia(page)
+  await expect(page.locator('.terminal-app')).toBeVisible({ timeout: 8000 })
+
+  // Sem nenhuma digitação: os quatro canais, como links de verdade.
+  const canais = page.locator('.terminal-table .terminal-link')
+  await expect(canais).toHaveCount(4)
+  await expect(canais.first()).toHaveAttribute('href', /^mailto:/)
+
+  // E os comandos são descobríveis com o mouse, não só por adivinhação.
+  const atalhos = page.locator('.terminal-cmd-chip')
+  await expect(atalhos.first()).toBeVisible()
+  await atalhos.filter({ hasText: 'whoami' }).click()
+  await expect(page.locator('.terminal-output')).toContainText('marcos')
 })
 
 /**

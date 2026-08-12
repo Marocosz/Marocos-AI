@@ -1,63 +1,47 @@
 import React from 'react'
+import { Github } from 'lucide-react'
 import { useLanguage } from '../contexts/LanguageContext'
+import { getOsData } from '../i18n/os'
+import './ReadmeApp.css'
+
+const REPO = 'https://github.com/Marocosz/Marocos-AI'
 
 /**
  * leia-me.txt — o portfólio como case técnico.
  *
- * Primeiro app do Marocos OS de propósito: é só texto, então serve para validar
- * o chrome de janela sem que bug de conteúdo se confunda com bug de sistema.
+ * ESTE APP CARREGA A MELHOR PROVA DO SITE SOZINHO. marocos.dev ficou de fora da
+ * janela de Projetos por decisão do dono do projeto, então é aqui ou em lugar
+ * nenhum que o visitante descobre que o sistema em que ele está clicando é o
+ * trabalho. Uma das quatro portas do guia ("E este site aqui?") aponta para cá.
+ *
+ * O TEXTO SAIU DO JSX. Ele morava chumbado neste arquivo, em dois blocos de
+ * markup por idioma — o único app do projeto que fazia isso, contra a convenção
+ * de que texto de interface vive em `i18n/` e dado de portfólio em `content/`.
+ * Trocar uma palavra exigia mexer no componente.
+ *
  * Não sabe que janelas existem.
  */
 const ReadmeApp = () => {
   const { language } = useLanguage()
+  const t = getOsData(language).readme
 
-  const content = {
-    pt: (
-      <>
-        <p>
-          Além dos projetos listados, <strong>este próprio portfólio</strong> é um case
-          técnico que demonstra competências em <strong>UX Design</strong>,{' '}
-          <strong>Engenharia de Software</strong> e <strong>IA Generativa</strong>.
-        </p>
-        <p>
-          O sistema opera sobre um backend em <strong>FastAPI</strong> que usa{' '}
-          <strong>LangGraph</strong> para orquestrar agentes e uma arquitetura{' '}
-          <strong>RAG</strong>, permitindo que o site responda perguntas com base em
-          dados reais.
-        </p>
-        <p>
-          Código aberto e documentado no{' '}
-          <a href="https://github.com/Marocosz/Marocos-AI" target="_blank" rel="noopener noreferrer">
-            GitHub
-          </a>
-          .
-        </p>
-      </>
-    ),
-    en: (
-      <>
-        <p>
-          Beyond the projects listed, <strong>this portfolio itself</strong> is a
-          technical case study demonstrating skills in <strong>UX Design</strong>,{' '}
-          <strong>Software Engineering</strong> and <strong>Generative AI</strong>.
-        </p>
-        <p>
-          It runs on a <strong>FastAPI</strong> backend using <strong>LangGraph</strong>{' '}
-          to orchestrate agents and a <strong>RAG</strong> architecture, letting the site
-          answer questions from real data.
-        </p>
-        <p>
-          Open source and documented on{' '}
-          <a href="https://github.com/Marocosz/Marocos-AI" target="_blank" rel="noopener noreferrer">
-            GitHub
-          </a>
-          .
-        </p>
-      </>
-    ),
-  }
+  return (
+    <div className="readme-app">
+      <p className="readme-lead">{t.lead}</p>
 
-  return <div className="app-prose">{content[language] || content.en}</div>
+      {t.sections.map((secao) => (
+        <section className="readme-section" key={secao.title}>
+          <h3 className="readme-section-title">{secao.title}</h3>
+          <p className="readme-section-body">{secao.body}</p>
+        </section>
+      ))}
+
+      <a className="readme-repo" href={REPO} target="_blank" rel="noopener noreferrer">
+        <Github size={16} aria-hidden="true" />
+        {t.repoLabel}
+      </a>
+    </div>
+  )
 }
 
 export default ReadmeApp

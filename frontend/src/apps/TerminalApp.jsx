@@ -29,31 +29,81 @@ const uid = () => {
   return nextEntryId
 }
 
-/** Linhas impressas assim que a janela abre: versão, copyright, logs de
- * handshake (com status colorido) e o system check — tudo de
- * getContactData(lang).terminal. */
-const buildBootEntries = (content) => {
-  const t = content.terminal
+/**
+ * Os comandos que o boot oferece de bandeja. Não são todos: `contato` já rodou,
+ * `clear` não tem o que descobrir, e uma fileira com os oito viraria a mesma
+ * parede de opções que a lista do `help` já é.
+ */
+const COMANDOS_SUGERIDOS = ['whoami', 'neofetch', 'projetos', 'stack', 'help']
+
+/**
+ * O QUE A JANELA MOSTRA ANTES DE ALGUÉM DIGITAR — e é aqui que estava o único
+ * problema deste levantamento que custava uma oportunidade.
+ *
+ * O app de CONTATO de um portfólio exigia adivinhar uma palavra. Ele se chama
+ * "Terminal" no atalho, abria com versão, copyright e três logs de ficção, nada
+ * na tela mencionava `help`, e o input não nascia focado. O caminho até o
+ * e-mail era digitar `contato` no escuro — e nenhum dos oito comandos era
+ * descobrível sem essa aposta.
+ *
+ * Agora o boot termina EXECUTANDO `contato`, como um `.bashrc` faria: quem abre
+ * já tem e-mail, LinkedIn e GitHub na tela. A metáfora sobrevive inteira —
+ * prompt, histórico com as setas, comandos de verdade — mas o valor principal
+ * deixa de depender de digitação. E a linha de comandos que vem depois é
+ * clicável, então descobrir o resto também não depende.
+ */
+const buildBootEntries = (ctx) => {
+  const t = ctx.content.terminal
   return [
     { id: uid(), kind: 'line', text: t.version },
     { id: uid(), kind: 'line', text: t.copyright },
     { id: uid(), kind: 'line', text: t.systemCheck, dim: true },
     ...t.logs.map((log) => ({ id: uid(), kind: 'log', text: log.text, status: log.status, color: log.color })),
+
+    // O eco vem junto de propósito: sem ele a tabela apareceria sozinha e
+    // pareceria decoração do boot, em vez do resultado de um comando que o
+    // visitante pode repetir.
+    { id: uid(), kind: 'echo', prompt: t.prompt, command: 'contato' },
+    ...buildContatoEntries(ctx),
+
+    {
+      id: uid(),
+      kind: 'cmds',
+      text: ctx.strings.commandsHint,
+      items: COMANDOS_SUGERIDOS.map((nome) => ({
+        nome,
+        rotulo: ctx.strings.helpNames?.[nome] ?? nome,
+      })),
+    },
   ]
 }
 
+/**
+ * O NOME EXIBIDO PODE NÃO SER A CHAVE. As chaves do mapa de comandos são
+ * portuguesas (`contato`, `projetos`), e quem lia a interface em inglês via
+ * "contato — contact channels": nome numa língua, descrição na outra. Os
+ * aliases ingleses que o app sempre aceitou não apareciam em lugar nenhum.
+ */
 const buildHelpEntries = ({ strings }) => [
   { id: uid(), kind: 'line', text: strings.helpTitle, accent: true },
   {
     id: uid(),
     kind: 'kv',
-    rows: Object.keys(COMMANDS).map((name) => ({ label: name, value: strings.helpCommands?.[name] })),
+    rows: Object.keys(COMMANDS).map((name) => ({
+      label: strings.helpNames?.[name] ?? name,
+      value: strings.helpCommands?.[name],
+    })),
   },
 ]
 
-const buildWhoamiEntries = ({ profile }) => [
-  { id: uid(), kind: 'line', text: profile.bio_highlight },
-]
+/**
+ * `whoami` responde com registro de identidade, não com headline. Antes ele
+ * imprimia `profile.bio_highlight` — exatamente a mesma string que o topo do
+ * guia mostra, e escrita em primeira pessoa de marketing. Duas superfícies
+ * dizendo o mesmo, uma delas na voz errada.
+ */
+const buildWhoamiEntries = ({ strings }) =>
+  (strings.whoami ?? []).map((text) => ({ id: uid(), kind: 'line', text }))
 
 const buildNeofetchEntries = ({ profile, strings }) => [
   { id: uid(), kind: 'line', text: profile.role, accent: true },
@@ -137,8 +187,12 @@ const resolveCommandName = (typed, language) => {
 }
 
 /** Uma linha (ou bloco) de saída já resolvida em JSX. Separado do componente
- * para não misturar "o que uma entrada é" com "como o terminal se comporta". */
-const renderEntry = (entry) => {
+ * para não misturar "o que uma entrada é" com "como o terminal se comporta".
+ *
+ * `executar` só é usado pelo bloco de comandos clicáveis; as outras entradas
+ * ignoram. Vem por parâmetro em vez de import porque rodar um comando é
+ * comportamento do terminal, e esta função só sabe desenhar. */
+const renderEntry = (entry, executar) => {
   switch (entry.kind) {
     case 'echo':
       return (
@@ -196,6 +250,26 @@ const renderEntry = (entry) => {
         </div>
       )
 
+    // Clicáveis porque digitar não pode ser o pedágio para descobrir o que
+    // existe. Quem prefere digitar continua digitando — o clique só roda o
+    // mesmo `runCommand`, ecoando o comando como se tivesse vindo do teclado.
+    case 'cmds':
+      return (
+        <div className="terminal-cmds" key={entry.id}>
+          <span className="terminal-dim">{entry.text}</span>
+          {entry.items.map((cmd) => (
+            <button
+              type="button"
+              className="terminal-cmd-chip"
+              key={cmd.nome}
+              onClick={() => executar?.(cmd.nome)}
+            >
+              {cmd.rotulo}
+            </button>
+          ))}
+        </div>
+      )
+
     case 'table':
       return (
         <div className="terminal-table" key={entry.id}>
@@ -243,7 +317,7 @@ const TerminalApp = () => {
   // Estado inicial "preguiçoso": o boot só roda uma vez, na primeira
   // renderização, capturando o idioma que estava ativo quando a janela abriu
   // — não precisa de useEffect nem entra em conflito com exhaustive-deps.
-  const [output, setOutput] = useState(() => buildBootEntries(content))
+  const [output, setOutput] = useState(() => buildBootEntries({ content, profile, strings, open }))
   const [commandHistory, setCommandHistory] = useState([])
   const [historyIndex, setHistoryIndex] = useState(-1)
   const [draft, setDraft] = useState('')
@@ -325,7 +399,7 @@ const TerminalApp = () => {
   return (
     <div className="terminal-app" onClick={focusInput}>
       <div className="terminal-output" ref={outputRef} role="log" aria-label={strings.outputLabel}>
-        {output.map(renderEntry)}
+        {output.map((entry) => renderEntry(entry, runCommand))}
       </div>
 
       <form className="terminal-input-line" onSubmit={onSubmit}>
@@ -338,6 +412,12 @@ const TerminalApp = () => {
           onChange={(e) => setDraft(e.target.value)}
           onKeyDown={onKeyDown}
           aria-label={strings.inputLabel}
+          /* Nasce focado: num terminal, digitar É a interação — obrigar um
+             clique antes da primeira tecla é atrito sem contrapartida. O app
+             carrega por lazy() dentro de um Suspense, então este foco acontece
+             DEPOIS do `ref.current?.focus()` que a janela dá em si mesma na
+             montagem, e ganha dele sem disputa. */
+          autoFocus
           autoComplete="off"
           autoCapitalize="off"
           autoCorrect="off"

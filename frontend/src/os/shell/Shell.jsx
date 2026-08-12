@@ -140,9 +140,37 @@ const Shell = () => {
   // <html>: custom property resolve pelo ancestral mais próximo que a declara,
   // então um modo lá em cima perderia para o tema aqui. Ver a nota em
   // tokens.css.
-  const classesDoTema = `${isDark ? 'theme-dark' : 'theme-light'}${
-    preset.sobrio ? ' modo-sobrio' : ''
-  }`
+  //
+  /**
+   * O XP IGNORA O TEMA — e a forma de garantir isso é FIXAR a classe de tema,
+   * não tentar sobrescrever token por token.
+   *
+   * A primeira tentativa foi enumerar os tokens em `.theme-dark.modo-xp` e
+   * `.theme-light.modo-xp`. Não bastou, e não podia bastar: o projeto tem
+   * dezenas de regras `.theme-light .alguma-coisa` espalhadas pelos CSS de
+   * componente (e um hack global de cor no index.css). Todas continuavam
+   * valendo, então trocar dia/noite ainda mexia no XP em cantos que nenhuma
+   * lista de tokens alcança.
+   *
+   * Fixando `theme-light`, o sistema inteiro resolve pelo MESMO caminho nos dois
+   * casos — cada regra de componente, cada `!important` do index.css — e o
+   * `.modo-xp` só precisa repintar por cima de um alvo estável.
+   *
+   * `theme-light` e não `theme-dark` porque o Luna É um tema claro: janela bege,
+   * texto preto. Herdar o tema claro deixa o XP corrigindo pouco em vez de
+   * lutar contra um tema escuro inteiro.
+   *
+   * `modo-xp` entra POR CIMA do sóbrio, e não no lugar dele: o preset do XP é um
+   * sóbrio (sem shader, sem vidro — o Luna era opaco) e ainda repinta tudo. É a
+   * ordem que os dois blocos de tokens.css assumem.
+   */
+  const classesDoTema = [
+    preset.xp || !isDark ? 'theme-light' : 'theme-dark',
+    preset.sobrio ? 'modo-sobrio' : '',
+    preset.xp ? 'modo-xp' : '',
+  ]
+    .filter(Boolean)
+    .join(' ')
 
   return (
     <div className={classesDoTema}>

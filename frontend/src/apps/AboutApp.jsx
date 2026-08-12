@@ -2,6 +2,8 @@ import React, { Suspense, lazy, useState, useEffect } from 'react'
 import { useLanguage } from '../contexts/LanguageContext'
 import { getProfileData } from '../content/profile'
 import { getOsData } from '../i18n/os'
+import { getApp } from '../os/registry'
+import { useAbrir } from '../os/NavegacaoContext'
 import { useDeviceMode } from '../os/useDeviceMode'
 import { CERIMONIA, acentoProfundo, corpoDoCristal } from '../config/system'
 import { useTheme } from '../contexts/ThemeContext'
@@ -14,19 +16,40 @@ import './AboutApp.css'
 const Crystal = lazy(() => import('../brand/Crystal'))
 
 /**
- * "Sobre este PC" — o winver do Marocos OS: identidade + especificações.
+ * "Sobre este PC" — o winver do Marocos OS, e o GUIA do site.
  *
- * A piada é ler bio/skills como se fossem specs de hardware. Conteúdo vem
- * inteiro de getProfileData (mesma fonte do Profile.jsx da página clássica,
- * removida no refactor); aqui só muda a moldura. Não sabe que janelas
- * existem — sem título, sem botão de fechar, sem posição.
+ * ESTE APP ABRE SOZINHO para quem chega sem deep link (ver
+ * `os/shell/BoasVindas.jsx`, que o monta em tempo ocioso durante a tela de
+ * bloqueio). Ou seja: é a primeira coisa que quase todo visitante lê.
+ *
+ * E era um beco sem saída. Não tinha um único link, não mencionava nenhum outro
+ * app, e não dizia o que existe nesta máquina — numa metáfora de sistema
+ * operacional que ninguém explicou ao visitante. A parte "guia" existe para
+ * resolver isso.
+ *
+ * AS PORTAS SÃO PERGUNTAS, não uma lista de janelas. Quem abre um portfólio não
+ * quer "Projetos": quer saber se a pessoa sabe construir. Uma lista de nomes de
+ * app obriga o visitante a adivinhar qual deles responde à pergunta que ele
+ * trouxe — e sessenta segundos não dão para adivinhar duas vezes.
+ *
+ * AS PORTAS ABREM JANELA, E NÃO TROCAM ESTA — decisão do dono do projeto, e a
+ * razão é boa: o guia é uma lista de perguntas, e quem foi ver os projetos
+ * ainda pode querer as outras três. Trocar o conteúdo apagaria o mapa assim que
+ * ele fosse usado pela primeira vez.
+ *
+ * É por isso que o app pede `useAbrir()` e não `useIrPara()`. A distinção entre
+ * "entrar" (trocar o conteúdo, como a lateral do explorador) e "abrir ao lado"
+ * é do sistema, não deste app — ver `os/NavegacaoContext.jsx`. Ele continua sem
+ * saber que janelas existem; fora de um container o hook devolve `null` e as
+ * portas viram texto, sem quebrar num teste isolado.
  */
 const AboutApp = () => {
   const { language } = useLanguage()
   const deviceMode = useDeviceMode()
-  const { preset } = useTheme()
+  const { preset, isAnimated } = useTheme()
   const profile = getProfileData(language)
   const os = getOsData(language)
+  const abrir = useAbrir()
 
   /**
    * PERFORMANCE: o cristal só monta depois que a janela pintou.
@@ -48,15 +71,15 @@ const AboutApp = () => {
     return () => clearTimeout(id)
   }, [deviceMode])
 
-  // Igual ao Profile.jsx da página clássica (removida no refactor):
-  // tripliquei a lista pra garantir que o marquee de 50% de translação
-  // nunca mostre buraco, mesmo se o container for mais largo que uma cópia
-  // só da lista de skills.
-  const scrollingSkills = [
-    ...profile.skills_highlight,
-    ...profile.skills_highlight,
-    ...profile.skills_highlight,
-  ]
+  /**
+   * A ORDEM É A DO INTERESSE, não a do menu: primeiro se ele sabe construir,
+   * depois há quanto tempo, depois esta máquina, e por fim como falar com ele.
+   *
+   * O ícone vem do `registry` em vez de ser escolhido aqui — ele é a fonte
+   * única do ícone de cada app, e uma segunda escolha aqui sairia do lugar na
+   * primeira vez que alguém trocasse o do desktop.
+   */
+  const portas = ['projects', 'history', 'readme', 'terminal']
 
   return (
     <div className="about-app">
@@ -68,9 +91,18 @@ const AboutApp = () => {
               {/* O acento atravessa por prop: o cristal monta dentro de um
                   <Canvas> do react-three-fiber, que reconcilia numa árvore
                   própria — contexto do React de fora não chega lá sozinho. */}
+              {/* `animated` ERA FIXO AQUI, e o controle "Movimento" das
+                  Configurações não alcançava este cristal — o único do sistema
+                  que ignorava o próprio interruptor. Quem pausava o papel de
+                  parede para poupar bateria continuava com um objeto 3D girando
+                  numa janela aberta.
+                  O README do harness visual já descrevia o mundo certo
+                  ("`isAnimationEnabled = false` ... o cristal cai em
+                  frameloop=demand"); era a promessa que este arquivo não
+                  cumpria. */}
               <Crystal
                 size={190}
-                animated
+                animated={isAnimated}
                 acento={preset.acento}
                 acentoFundo={acentoProfundo(preset)}
                 corpo={corpoDoCristal(preset)}
@@ -80,7 +112,7 @@ const AboutApp = () => {
         )}
 
         <div className="about-identity-text">
-          <p className="about-kicker">{profile.title}</p>
+          <p className="about-kicker">{profile.role}</p>
           <p className="about-highlight">
             <DecryptedText
               text={profile.bio_highlight}
@@ -95,7 +127,37 @@ const AboutApp = () => {
 
       <p className="about-bio">{profile.bio_full}</p>
 
-      {/* --- ESPECIFICAÇÕES: stats lidas como hardware --- */}
+      {/* --- O GUIA: quatro perguntas, cada uma com a sua porta --- */}
+      <section>
+        <h3 className="about-section-title">{os.about.guideLabel}</h3>
+        <ul className="about-guide">
+          {portas.map((id) => {
+            const app = getApp(id)
+            const Icone = app?.icon
+            const texto = os.about.guide[id]
+            if (!texto) return null
+
+            return (
+              <li key={id}>
+                <button
+                  type="button"
+                  className="about-door"
+                  onClick={() => abrir?.(id)}
+                  disabled={!abrir}
+                >
+                  {Icone && <Icone size={18} className="about-door-icon" aria-hidden="true" />}
+                  <span className="about-door-text">
+                    <span className="about-door-question">{texto.question}</span>
+                    <span className="about-door-answer">{texto.answer}</span>
+                  </span>
+                </button>
+              </li>
+            )
+          })}
+        </ul>
+      </section>
+
+      {/* --- ESPECIFICAÇÕES: os fatos, lidos como ficha técnica --- */}
       <section>
         <h3 className="about-section-title">{os.about.specsLabel}</h3>
         <div className="about-specs">
@@ -109,18 +171,20 @@ const AboutApp = () => {
         </div>
       </section>
 
-      {/* --- RECURSOS INSTALADOS: skills como marquee infinito --- */}
+      {/* --- ESTA MÁQUINA: o outro metade do winver, e desta vez é hardware
+              de verdade. O marquee de skills que ficava aqui saiu: era
+              decorativo, não dava para ler no próprio ritmo, e repetia o app
+              de Stack — que agora é uma das portas acima. */}
       <section>
-        <h3 className="about-section-title">{os.about.featuresLabel}</h3>
-        <div className="about-features-wrapper">
-          <div className="about-features-track">
-            {scrollingSkills.map((skill, index) => (
-              <span className="about-feature-chip" key={index}>
-                {skill}
-              </span>
-            ))}
-          </div>
-        </div>
+        <h3 className="about-section-title">{os.about.machineLabel}</h3>
+        <dl className="about-machine">
+          {profile.maquina.map((item) => (
+            <div className="about-machine-row" key={item.rotulo}>
+              <dt>{item.rotulo}</dt>
+              <dd>{item.valor}</dd>
+            </div>
+          ))}
+        </dl>
       </section>
     </div>
   )

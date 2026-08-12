@@ -137,6 +137,46 @@
   border-radius: 5px;
 }
 
+/* --- COMANDOS CLICÁVEIS (impressos no boot) ---
+   Digitar não pode ser o pedágio para descobrir o que existe. Estes são os
+   mesmos comandos do `help`, só que alcançáveis com o mouse.
+
+   SEM COR LITERAL, ao contrário da vizinhança. O resto deste arquivo é de
+   antes dos presets e ainda paga com `#ddd`, `#555` e um bloco `.theme-light`
+   para cada um — dívida já registrada para a fase 3. Código novo não aumenta a
+   conta: aqui tudo sai de `--accent-rgb` e dos tokens de texto, então os chips
+   repintam sozinhos com o preset escolhido, nos dois temas. */
+.terminal-cmds {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.4rem;
+  margin: 0.5rem 0 0.6rem;
+}
+
+.terminal-cmd-chip {
+  font-family: inherit;
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: var(--accent-color);
+  background: rgb(var(--accent-rgb) / 0.12);
+  border: 1px solid rgb(var(--accent-rgb) / 0.32);
+  padding: 0.28rem 0.6rem;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background 0.16s ease, border-color 0.16s ease;
+}
+
+.terminal-cmd-chip:hover {
+  background: rgb(var(--accent-rgb) / 0.24);
+  border-color: rgb(var(--accent-rgb) / 0.55);
+}
+
+.terminal-cmd-chip:focus-visible {
+  outline: 2px solid var(--accent-color);
+  outline-offset: 2px;
+}
+
 /* --- TABELA DE CANAIS (contato) --- */
 .terminal-table { margin: 0.3rem 0 0.6rem; }
 

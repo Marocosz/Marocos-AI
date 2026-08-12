@@ -251,21 +251,27 @@ const ExplorerChrome = ({ win, children }) => {
           LINHA 2 — barra de comandos (ver a nota sobre cinza no topo)
           ========================================================== */}
       <div className="explorer-comandos">
-        <Comando Icon={Plus} rotulo={t.commands.new} dica={t.commands.disabledHint} comTexto comSeta />
-        <span className="explorer-cmd-sep" aria-hidden="true" />
-        <Comando Icon={Scissors} rotulo={t.commands.cut} dica={t.commands.disabledHint} />
-        <Comando Icon={Copy} rotulo={t.commands.copy} dica={t.commands.disabledHint} />
-        <Comando Icon={ClipboardPaste} rotulo={t.commands.paste} dica={t.commands.disabledHint} />
-        <Comando Icon={PenLine} rotulo={t.commands.rename} dica={t.commands.disabledHint} />
-        <Comando Icon={Share2} rotulo={t.commands.share} dica={t.commands.disabledHint} />
-        <Comando Icon={Trash2} rotulo={t.commands.delete} dica={t.commands.disabledHint} />
-        <span className="explorer-cmd-sep" aria-hidden="true" />
-        <Comando Icon={ArrowUpDown} rotulo={t.commands.sort} dica={t.commands.disabledHint} comTexto comSeta />
-        <Comando Icon={LayoutList} rotulo={t.commands.view} dica={t.commands.disabledHint} comTexto comSeta />
-        <Comando Icon={Filter} rotulo={t.commands.filter} dica={t.commands.disabledHint} comTexto comSeta />
-        <Comando Icon={MoreHorizontal} rotulo={t.commands.more} dica={t.commands.disabledHint} />
-
-        <span className="explorer-cmd-espaco" />
+        {/* O ENFEITE CEDE ESPAÇO ANTES DO BOTÃO DE VERDADE.
+            Todos os comandos aqui dentro estão desabilitados de propósito — são
+            o estado "nada selecionado" do Explorer. Antes eles dividiam a linha
+            de igual para igual com "Detalhes", e numa janela estreita (a de
+            projeto tem 744px) quem ficava cortado era justamente o único botão
+            que faz alguma coisa. Agrupados, eles truncam primeiro. */}
+        <div className="explorer-cmd-enfeites">
+          <Comando Icon={Plus} rotulo={t.commands.new} dica={t.commands.disabledHint} comTexto comSeta />
+          <span className="explorer-cmd-sep" aria-hidden="true" />
+          <Comando Icon={Scissors} rotulo={t.commands.cut} dica={t.commands.disabledHint} />
+          <Comando Icon={Copy} rotulo={t.commands.copy} dica={t.commands.disabledHint} />
+          <Comando Icon={ClipboardPaste} rotulo={t.commands.paste} dica={t.commands.disabledHint} />
+          <Comando Icon={PenLine} rotulo={t.commands.rename} dica={t.commands.disabledHint} />
+          <Comando Icon={Share2} rotulo={t.commands.share} dica={t.commands.disabledHint} />
+          <Comando Icon={Trash2} rotulo={t.commands.delete} dica={t.commands.disabledHint} />
+          <span className="explorer-cmd-sep" aria-hidden="true" />
+          <Comando Icon={ArrowUpDown} rotulo={t.commands.sort} dica={t.commands.disabledHint} comTexto comSeta />
+          <Comando Icon={LayoutList} rotulo={t.commands.view} dica={t.commands.disabledHint} comTexto comSeta />
+          <Comando Icon={Filter} rotulo={t.commands.filter} dica={t.commands.disabledHint} comTexto comSeta />
+          <Comando Icon={MoreHorizontal} rotulo={t.commands.more} dica={t.commands.disabledHint} />
+        </div>
 
         {/* Único da barra que age: ele só precisa do que o chrome já sabe. */}
         <button

@@ -11,7 +11,6 @@ import { useDeviceMode } from '../useDeviceMode'
 import { useIdleTask } from '../hooks/useIdleTask'
 import { useLanguage } from '../../contexts/LanguageContext'
 import { getOsData } from '../../i18n/os'
-import { getProfileData } from '../../content/profile'
 import { MOVIMENTO, CERIMONIA } from '../../config/system'
 import './Desktop.css'
 
@@ -20,7 +19,6 @@ const Desktop = ({ isAnimated = true }) => {
   const { language } = useLanguage()
   const isDesktop = useDeviceMode() === 'desktop'
   const os = getOsData(language)
-  const profile = getProfileData(language)
 
   const icons = APPS.filter((a) => a.onDesktop)
 
@@ -62,11 +60,16 @@ const Desktop = ({ isAnimated = true }) => {
       <Wallpaper isAnimated={isAnimated} />
 
       {/* Assinatura: é aqui que vive o <h1> da página. A Hero deixou de
-          existir, e sem isto o site perde o cabeçalho principal. */}
+          existir, e sem isto o site perde o cabeçalho principal.
+
+          A FRASE DE BIO SAIU DAQUI, por decisão do dono do projeto. Ela continua
+          existindo — é a linha de identidade no topo do guia, em "Sobre este PC"
+          — mas na área de trabalho competia com os ícones e com o papel de
+          parede por uma atenção que o nome e o cargo já resolvem. Um sistema
+          operacional não escreve a bio do dono na tela inicial. */}
       <div className="marocos-signature">
         <h1>Marcos Rodrigues</h1>
         <p>{os.signature.role}</p>
-        <span className="marocos-signature-bio">{profile.bio_highlight}</span>
       </div>
 
       <ul className="marocos-icons">

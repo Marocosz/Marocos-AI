@@ -235,6 +235,10 @@ const Ceremony = ({ fase, onBootDone, onUnlock, onUnlockStart }) => {
                   acento={preset.acento}
                   acentoFundo={acentoProfundo(preset)}
                   corpo={corpoDoCristal(preset)}
+                  /* O XP manda a luz verde em volta do corpo laranja; os outros
+                     presets não declaram `luzCristal` e o cristal segue com o
+                     acento de sempre. */
+                  luz={preset.luzCristal}
                 />
               </span>
             </Suspense>
@@ -242,7 +246,10 @@ const Ceremony = ({ fase, onBootDone, onUnlock, onUnlockStart }) => {
 
           {/* Só aparece no bloqueio, mas ocupa a altura dela desde já — ver a
               nota sobre espaço reservado no cabeçalho. */}
-          <span className="cerimonia-marca">{boot.systemName}</span>
+          {/* O preset pode renomear o sistema — é o XP virando "MAROCOS XP".
+              Vem do preset e não do i18n porque não é tradução: o nome muda com
+              a escolha de aparência, não com o idioma. */}
+          <span className="cerimonia-marca">{preset.nomeSistema || boot.systemName}</span>
           <span className="porta-entrar">{bloqueio.enter}</span>
         </button>
       </div>

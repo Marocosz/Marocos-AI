@@ -68,6 +68,86 @@ export function estaEm(w, appId, params) {
 }
 
 /**
+ * QUANTO SOBRA PARA UMA JANELA depois da barra de tarefas e das margens.
+ *
+ * Recebe números soltos, e não um objeto, porque os dois chamadores descrevem a
+ * tela com nomes diferentes — as ações do reducer mandam `{width,height}` e o
+ * `useViewport()` devolve `{w,h}`. Pedir números evita um adaptador em cada
+ * ponta só para acertar o nome da chave.
+ */
+export function areaUtil(larguraTela, alturaTela) {
+  return {
+    w: Math.max(JANELAS.tamanhoMinimo.w, larguraTela - MARGEM * 2),
+    h: Math.max(JANELAS.tamanhoMinimo.h, alturaTela - TASKBAR_H - MARGEM * 2),
+  }
+}
+
+/**
+ * O `defaultSize` DO REGISTRY, ENCOLHIDO ATÉ CABER NA TELA.
+ *
+ * Isto faltava, e era um bug de verdade: a posição era limitada mas o TAMANHO
+ * não. Numa tela baixa o clamp de `y` só empurrava a janela até a margem de
+ * cima, e o que passava do limite continuava passando — para debaixo da barra
+ * de tarefas, fora de alcance.
+ *
+ * Ninguém tinha visto porque o cálculo que dimensionou os apps olhou só para a
+ * LARGURA: o comentário do `defaultSize` em `registry.js` conclui que a maior
+ * janela cabe no breakpoint de 1024px, e para na largura. Só que a altura não
+ * tem breakpoint nenhum. As contas, com barra de tarefas (52) e margens (2x16):
+ *
+ *   settings  660 de altura  ->  exige 744 de viewport
+ *   about / history / devices  626  ->  710
+ *   assistant 620  ->  704
+ *
+ * Um notebook de 1366x768 com o navegador em janela normal dá ~620-650 de
+ * viewport. Sete dos nove apps não cabiam lá. Em 1920x1080 todos cabem, que é
+ * onde isto foi construído — daí o bug ter sobrevivido.
+ *
+ * Encolher é seguro porque `.marocos-window-body` já rola (`overflow-y: auto`):
+ * o conteúdo não some, ele passa a rolar dentro de uma janela menor.
+ *
+ * Sem tela conhecida (SSR, primeiro instantâneo do `useViewport`) devolve o
+ * tamanho original — melhor cair no comportamento de antes do que calcular com
+ * viewport zerada.
+ */
+export function tamanhoQueCabe(size, larguraTela, alturaTela) {
+  if (!size || !larguraTela || !alturaTela) return size
+
+  const area = areaUtil(larguraTela, alturaTela)
+  return { w: Math.min(size.w, area.w), h: Math.min(size.h, area.h) }
+}
+
+/**
+ * REANCORA UMA JANELA QUE FICOU FORA DE ALCANCE.
+ *
+ * O tamanho encolhe sozinho quando a tela encolhe, mas a posição é estado
+ * guardado: uma janela colocada numa tela grande continua com o `x`/`y` de lá
+ * quando a janela do navegador diminui, e escorrega para trás da barra de
+ * tarefas ou para fora da borda.
+ *
+ * OS LIMITES SÃO OS MESMOS DO ARRASTO, e não as margens de nascimento — esta é
+ * a parte que não pode errar. `dragConstraints` deixa o visitante puxar uma
+ * janela até sobrar só `folgaArrasto` dela na tela, de propósito, como faz
+ * qualquer sistema de janelas. Se aqui a regra fosse mais apertada, todo
+ * arrasto legítimo seria desfeito no render seguinte: a janela voltaria
+ * sozinha, e o arrasto pareceria quebrado.
+ *
+ * A regra que sobra é exatamente uma: *a janela nunca fica onde você não
+ * poderia tê-la arrastado*. Quem foi arrastado para o canto fica no canto; quem
+ * ficou fora de alcance por mudança de tela volta para a borda mais próxima.
+ *
+ * Não depende do tamanho da janela porque `dragConstraints` também não depende.
+ */
+export function posicaoAlcancavel(x, y, larguraTela, alturaTela) {
+  if (!larguraTela || !alturaTela) return { x, y }
+
+  return {
+    x: limitar(x, 0, Math.max(0, larguraTela - JANELAS.folgaArrastoX)),
+    y: limitar(y, 0, Math.max(0, alturaTela - JANELAS.folgaArrastoY)),
+  }
+}
+
+/**
  * Onde uma janela nova nasce. Cada uma se desloca em cascata para não cobrir a
  * anterior.
  *
@@ -79,22 +159,26 @@ export function estaEm(w, appId, params) {
  * Com eles, a primeira janela nasce centrada horizontalmente em vez de encostada
  * na esquerda, e o clamp garante que nem a cascata nem uma tela pequena joguem
  * uma janela para fora do quadro.
+ *
+ * A CONTA USA O TAMANHO JÁ ENCOLHIDO. Centrar pelo `defaultSize` numa tela onde
+ * ele não cabe daria a posição de uma janela que não vai existir.
  */
 export function cascadePosition(n, viewport = null, size = null) {
   const offset = (CASCADE_STEP * n) % CASCADE_WRAP
   if (!viewport || !size) return { x: BASE_X + offset, y: BASE_Y + offset }
 
+  const cabe = tamanhoQueCabe(size, viewport.width, viewport.height)
   const alturaLivre = viewport.height - TASKBAR_H
-  const centroX = (viewport.width - size.w) / 2
+  const centroX = (viewport.width - cabe.w) / 2
   const baseX = BASE_X + (centroX - BASE_X) * VIES_HORIZONTAL
-  const baseY = (alturaLivre - size.h) * VIES_VERTICAL
+  const baseY = (alturaLivre - cabe.h) * VIES_VERTICAL
 
   return {
     x: Math.round(
-      limitar(baseX + offset, MARGEM, Math.max(MARGEM, viewport.width - size.w - MARGEM)),
+      limitar(baseX + offset, MARGEM, Math.max(MARGEM, viewport.width - cabe.w - MARGEM)),
     ),
     y: Math.round(
-      limitar(baseY + offset, MARGEM, Math.max(MARGEM, alturaLivre - size.h - MARGEM)),
+      limitar(baseY + offset, MARGEM, Math.max(MARGEM, alturaLivre - cabe.h - MARGEM)),
     ),
   }
 }

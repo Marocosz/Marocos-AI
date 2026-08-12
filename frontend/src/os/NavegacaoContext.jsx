@@ -24,11 +24,33 @@ import { createContext, useContext } from 'react'
  * isso. Não lança: um app renderizado num teste ou numa página isolada não
  * deve quebrar por causa de navegação que ninguém pediu.
  */
+/**
+ * DUAS INTENÇÕES, NÃO UMA.
+ *
+ * `irPara` é "entrar": trocar o conteúdo desta janela, como a lateral do
+ * explorador faz. `abrir` é "trazer para o lado": uma janela nova, como um
+ * atalho da área de trabalho.
+ *
+ * A distinção é do DONO DO PROJETO e vale como regra do sistema. Ela apareceu
+ * de novo no guia do "Sobre este PC": as quatro portas abrem janela, para o
+ * guia continuar aberto atrás — quem foi ver os projetos ainda quer voltar às
+ * outras perguntas. A lateral do explorador segue trocando o conteúdo, porque
+ * ali a metáfora é navegar por pastas.
+ *
+ * O app continua sem saber que janelas existem: ele declara qual das duas
+ * intenções tem, e o container decide o que isso significa no shell dele. No
+ * mobile, por exemplo, as duas empilham uma tela — é a metáfora de lá.
+ */
 const NavegacaoContext = createContext(null)
 
 export const NavegacaoProvider = NavegacaoContext.Provider
 
-/** `(appId, params) => void`, ou `null` fora de um container. */
+/** Entrar: `(appId, params) => void`, ou `null` fora de um container. */
 export function useIrPara() {
-  return useContext(NavegacaoContext)
+  return useContext(NavegacaoContext)?.irPara ?? null
+}
+
+/** Abrir ao lado: `(appId, params) => void`, ou `null` fora de um container. */
+export function useAbrir() {
+  return useContext(NavegacaoContext)?.abrir ?? null
 }

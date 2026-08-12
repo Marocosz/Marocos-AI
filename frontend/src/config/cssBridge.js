@@ -89,8 +89,14 @@ export function aplicarConfigNoCss(tema = 'dark', preset = null) {
     '--cfg-ceu-baixo': ceu.baixo,
     '--cfg-crossfade': `${WALLPAPER.crossfade.duracaoMs}ms`,
 
-    // Movimento que vive em CSS
-    '--cfg-marquee-skills': `${MOVIMENTO.marqueeSkillsS}s`,
+    /**
+     * A FONTE, quando o preset traz uma. Só o XP traz hoje (Tahoma, a fonte de
+     * interface daquele sistema), e é o mesmo caminho de todo o resto: o preset
+     * declara, a ponte publica, o CSS lê. Sem isto o `.modo-xp` teria a pilha de
+     * fontes escrita à mão no CSS, e passariam a existir dois lugares para
+     * trocá-la.
+     */
+    '--cfg-fonte-preset': preset?.fonte || null,
   }
 
   for (const [nome, valor] of Object.entries(vars)) {
