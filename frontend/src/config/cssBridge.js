@@ -15,7 +15,7 @@
  */
 import {
   VIDRO, LAYOUT, WALLPAPER, MOVIMENTO, JANELAS, hexParaRgb, giroDaCerimonia,
-  saturacaoDaCerimonia,
+  saturacaoDaCerimonia, acentoProfundo,
 } from './system'
 
 export function aplicarConfigNoCss(tema = 'dark', preset = null) {
@@ -88,6 +88,17 @@ export function aplicarConfigNoCss(tema = 'dark', preset = null) {
      */
     '--cfg-accent': preset?.acento || null,
     '--cfg-accent-rgb': hexParaRgb(preset?.acento),
+    /**
+     * O TOM FUNDO DO ACENTO. `acentoProfundo()` já existia no config e era consumido só
+     * pelo cristal, por prop (ele monta dentro de um <Canvas> e contexto do React não
+     * chega lá). Agora o CSS também precisa: o tile de ícone das pastas da Stack é um
+     * gradiente do acento para este tom.
+     *
+     * Publicar em vez de recalcular no CSS com `color-mix` mantém UMA definição de "o
+     * tom fundo deste acento" — a mesma que o cristal usa, então a peça 3D e os tiles
+     * não podem divergir.
+     */
+    '--cfg-accent-profundo': acentoProfundo(preset),
     /**
      * O giro de matiz da arte da cerimônia. Ver `giroDaCerimonia` no config: a
      * cena tem mais de trinta paradas de gradiente desenhadas à mão, e girar o

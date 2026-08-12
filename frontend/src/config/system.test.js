@@ -105,6 +105,22 @@ describe('config do sistema', () => {
     }
   })
 
+  /**
+   * `acentoProfundo` GANHOU UM SEGUNDO CONSUMIDOR, e ele é o CSS.
+   *
+   * Era usado só pelo cristal, por prop. Agora a ponte o publica como
+   * `--cfg-accent-profundo` porque o tile de ícone das pastas da Stack é um gradiente
+   * do acento para este tom. Um hex malformado antes só afetaria a peça 3D; agora
+   * derruba um gradiente de CSS, que degrada em silêncio.
+   */
+  it('acentoProfundo devolve hex válido para todo preset', () => {
+    for (const [tema, lista] of [['noite', PRESETS.noite], ['dia', PRESETS.dia]]) {
+      for (const p of lista) {
+        expect(acentoProfundo(p), `${tema}/${p.id}`).toMatch(/^#[0-9a-f]{6}$/i)
+      }
+    }
+  })
+
   it('hexParaRgb devolve o trio da sintaxe rgb(... / alpha)', () => {
     expect(hexParaRgb('#a855f7')).toBe('168 85 247')
     expect(hexParaRgb('a855f7')).toBe('168 85 247')
