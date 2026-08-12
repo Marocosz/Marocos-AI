@@ -6,7 +6,7 @@ import Balao from '../../ui/Balao'
 import { useWindowActions } from '../WindowManagerContext'
 import { useLanguage } from '../../contexts/LanguageContext'
 import { getOsData } from '../../i18n/os'
-import { MOVIMENTO } from '../../config/system'
+import { MOVIMENTO, contarPresets } from '../../config/system'
 import './AvisosDesktop.css'
 
 /**
@@ -121,12 +121,17 @@ const AvisosDesktop = () => {
   return (
     <div className="avisos-desktop">
       <AnimatePresence>
+        {/* O `%d` do balão de temas é o número de papéis de parede, e vem de
+            `contarPresets()` — a mesma função que a ficha "Este sistema" do
+            "Sobre este PC" usa. O texto era literal no i18n, dizia "Doze", e a
+            lista já tinha crescido: dois lugares contando a mesma coisa à mão
+            sempre acabam discordando. */}
         {!fechados.temas && (
           <Balao
             key="temas"
             Icone={Palette}
             titulo={t.temas.titulo}
-            corpo={t.temas.corpo}
+            corpo={t.temas.corpo.replace('%d', contarPresets())}
             rotuloFechar={t.fechar}
             onFechar={() => fechar('temas')}
             acao={() => {

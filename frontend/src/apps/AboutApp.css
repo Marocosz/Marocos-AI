@@ -299,14 +299,17 @@
   height: 6px;
   border-radius: 999px;
   background: var(--accent-color);
-  animation: aboutPulso 2.4s ease-in-out infinite;
+  /* A duração vem de `MOVIMENTO.pulsoStatusS` pela ponte, como as outras duas
+     animações deste app. Era literal aqui, e ser a única fora do config é o tipo
+     de inconsistência que faz a próxima pessoa não achar o valor. */
+  animation: aboutPulso var(--cfg-pulso-status, 2.4s) ease-in-out infinite;
 }
 
-/* O interruptor de Movimento das Configurações chega aqui por esta classe (o JSX
-   a aplica), e o `prefers-reduced-motion` pelo bloco no fim do arquivo. OS DOIS
-   precisam funcionar: o cristal deste app já foi o único elemento do sistema a
-   ignorar o próprio interruptor, e não se repete o erro. */
-.about-status--parado .about-status-ponto {
+/* O interruptor de Movimento das Configurações chega pela classe na RAIZ do app (o
+   JSX a aplica), e o `prefers-reduced-motion` pelo bloco no fim do arquivo. OS
+   DOIS precisam funcionar: o cristal deste app já foi o único elemento do sistema
+   a ignorar o próprio interruptor, e não se repete o erro. */
+.about-app--sem-movimento .about-status-ponto {
   animation: none;
 }
 
@@ -332,7 +335,23 @@
   align-items: center;
   gap: 14px;
   width: 100%;
-  overflow: hidden;
+  /**
+   * SEM `overflow: hidden`, E ISSO CUSTOU 88 PIXELS DE REFERÊNCIA VISUAL.
+   *
+   * Ele existia para conter a aresta de luz de 1px que este botão tinha no topo, e
+   * a aresta saiu quando a faixa entrou. Manter o recorte custaria o efeito de
+   * hover: o anel de luz vive em `inset: -1px` para cobrir a BORDA, e
+   * `overflow: hidden` clipa no padding box — a luz apareceria dentro de uma
+   * segunda linha estática, que é o contorno duplo que a faixa existe para evitar.
+   * O halo desfocado também não sairia da caixa.
+   *
+   * O CUSTO, MEDIDO: remover este clip muda o caminho de rasterização do subtree e
+   * desloca 88 subpixels nas arestas dos quatro ícones de canal — determinístico
+   * (88 exatos em três execuções), invisível a olho, e só na cena `mobile-sobre`,
+   * onde a largura menor põe os ícones em posições fracionárias diferentes.
+   * Isolado por eliminação: com os pseudo-elementos desligados o diff continuava
+   * 88; com o `overflow` de volta ele ia a zero.
+   */
   padding: 13px 15px;
   text-align: left;
   font-family: inherit;
@@ -372,15 +391,21 @@
   transition: background-color 0.16s ease, border-color 0.16s ease;
 }
 
-/* `--sup-realce` MISTURA acento na superfície em vez de empilhar uma camada
-   translúcida em cima dela. Ele entra por baixo da faixa: onde o gradiente já se
-   apagou, é o realce que aparece — o hover acende o lado direito do bloco, que é
-   justamente o lado que a faixa deixa apagado. A dose mora em
-   `VIDRO.superficie.*.realce`. */
-.about-acao:hover {
-  background-color: var(--sup-realce);
-  border-color: var(--accent-color);
-}
+/* NÃO EXISTE `:hover` NESTE BOTÃO, e a ausência é a decisão.
+ *
+ * Fundo, borda e cor ficam exatamente como estão; o hover inteiro é a luz que
+ * percorre a borda (bloco no fim deste arquivo). Decisão do dono do projeto, e o
+ * raciocínio se sustenta: duas coisas mudando na mesma passada de mouse fazem o
+ * alvo piscar duas vezes, e aí a luz — que é o efeito caro e bonito — passa a
+ * competir com um realce de fundo que não acrescenta informação nenhuma.
+ *
+ * Consequência: `--sup-realce` perdeu o único consumidor que tinha e saiu do
+ * sistema junto, com a dose `VIDRO.superficie.*.realce`. Token sem consumidor é o
+ * tipo de coisa que a próxima pessoa tenta manter em sincronia sem saber que
+ * ninguém lê.
+ *
+ * A seta continua deslizando: ela é o único movimento do elemento em si, e diz
+ * "isto leva a outro lugar" em vez de repetir "o mouse está aqui". */
 
 .about-acao:focus-visible {
   outline: 2px solid var(--accent-color);
@@ -393,11 +418,6 @@
 .about-acao:disabled {
   cursor: default;
   opacity: 0.75;
-}
-
-.about-acao:disabled:hover {
-  background-color: transparent;
-  border-color: var(--sup-faixa-borda);
 }
 
 .about-acao-canais {
@@ -614,6 +634,14 @@
    o projeto quer que aconteça.
    ================================================== */
 .about-guide {
+  /**
+   * O RECUO DO DIVISOR MORA NUMA VARIÁVEL LOCAL porque ele tem de ser o MESMO
+   * padding horizontal da porta. É isso que faz a linha começar e terminar onde o
+   * conteúdo começa e termina, em vez de atravessar a coluna de ponta a ponta —
+   * dois valores iguais escritos separados divergem na primeira vez que alguém
+   * ajustar o padding.
+   */
+  --guia-recuo: 10px;
   display: flex;
   flex-direction: column;
   margin: 4px 0 0;
@@ -621,17 +649,33 @@
   list-style: none;
 }
 
+/* O divisor é um pseudo-elemento recuado, e não `border-top` na li: borda vai
+   sempre de ponta a ponta da caixa, e o que se quer aqui é uma linha mais curta
+   que a linha. */
 .about-guide li + li {
-  border-top: 1px solid var(--sup-borda);
+  position: relative;
+}
+
+.about-guide li + li::before {
+  content: '';
+  position: absolute;
+  inset: 0 var(--guia-recuo) auto;
+  height: 1px;
+  background: var(--sup-borda);
 }
 
 .about-door {
+  /* `relative` porque os dois anéis de luz do hover são pseudo-elementos
+     absolutos — sem isto eles se posicionariam contra a janela inteira. */
+  position: relative;
   display: grid;
   grid-template-columns: auto minmax(0, 1fr) auto;
   align-items: center;
   gap: 13px;
   width: 100%;
-  padding: 13px 10px;
+  /* O horizontal é o mesmo `--guia-recuo` do divisor, de propósito — ver a nota em
+     `.about-guide`. */
+  padding: 13px var(--guia-recuo, 10px);
   text-align: left;
   font-family: inherit;
   border: 1px solid transparent;
@@ -650,10 +694,8 @@
   border-color: var(--sup-faixa-borda);
 }
 
-.about-door:hover {
-  background-color: var(--sup-realce);
-  border-color: var(--accent-color);
-}
+/* Igual ao botão de contato: NÃO existe `:hover` na porta. O hover inteiro é a luz
+   na borda — ver a nota longa em `.about-acao`. */
 
 .about-door:focus-visible {
   outline: 2px solid var(--accent-color);
@@ -666,16 +708,6 @@
 .about-door:disabled {
   cursor: default;
   opacity: 0.75;
-}
-
-.about-door:disabled:hover {
-  background-color: transparent;
-  border-color: transparent;
-}
-
-.about-door--destaque:disabled:hover {
-  background-color: transparent;
-  border-color: var(--sup-faixa-borda);
 }
 
 .about-door-icon {
@@ -791,16 +823,17 @@
   margin: 4px 0 0;
 }
 
+/* SEM DIVISOR ENTRE AS LINHAS. Cada linha já tem o pontilhado que liga o rótulo ao
+   valor, e uma linha cheia por cima disso dava dois traços horizontais por linha —
+   o bloco lia como tabela de planilha em vez de ficha técnica. Decisão do dono do
+   projeto, e ela está certa: o pontilhado é o que conduz o olho da esquerda para a
+   direita; o divisor só empilhava. */
 .about-ficha-row {
   display: flex;
   align-items: baseline;
   gap: 8px;
   min-width: 0;
-  padding: 5px 0;
-}
-
-.about-ficha-row + .about-ficha-row {
-  border-top: 1px solid var(--sup-borda);
+  padding: 4px 0;
 }
 
 .about-ficha-row dt {
@@ -825,6 +858,180 @@
   font-weight: 700;
   color: var(--text-primary);
   border-bottom: 1px dotted var(--sup-borda);
+}
+
+/* ==================================================
+   O HOVER: UMA LUZ QUE PERCORRE A BORDA
+
+   Vale para os dois alvos do app — o botão de contato e as quatro portas.
+
+   COMO FUNCIONA. Um gradiente CÔNICO girando dentro de uma máscara em forma de
+   anel. Cônico e não linear porque o ângulo do gradiente é o que faz a luz
+   acompanhar os cantos arredondados: com um linear ela deslizaria reto e sumiria
+   nas quinas. A máscara é o par de camadas que recorta o miolo — a primeira cobre
+   a caixa de CONTEÚDO, a segunda a caixa inteira, e `exclude` mantém só a
+   diferença, que é a moldura de `padding` de espessura.
+
+   SÃO DUAS CAMADAS, E AS DUAS SÃO NECESSÁRIAS. O `::after` é o núcleo: fino e
+   nítido. O `::before` é o halo: mais largo, desfocado e mais fraco, atrás. Só o
+   núcleo lê como contorno tracejado girando; só o halo lê como borrão sem direção.
+   Juntos leem como luz.
+
+   O FUNDO NÃO MUDA, e isso é a decisão. Nem fundo, nem borda, nem cor de texto: a
+   luz é o hover inteiro. Duas coisas mudando na mesma passada de mouse fazem o
+   alvo piscar duas vezes, e o realce de fundo não acrescentava informação nenhuma
+   que a luz já não dê. (Houve uma versão intermediária com o fundo mudando pouco;
+   o dono do projeto cortou, e `--sup-realce` saiu do sistema junto por ter perdido
+   o único consumidor.)
+
+   `inset: -1px` para o anel cobrir a BORDA do elemento, não o lado de dentro dela
+   — senão aparecem duas linhas concêntricas. Foi por isso que o `overflow: hidden`
+   saiu do `.about-acao` (ver a nota lá).
+   ================================================== */
+
+/**
+ * O ÂNGULO PRECISA SER REGISTRADO PARA PODER SER ANIMADO.
+ *
+ * Uma custom property comum é uma string para o motor de animação: interpolar de
+ * "0turn" para "1turn" seria trocar texto, e o gradiente pularia em vez de girar —
+ * o efeito simplesmente não acontece. `@property` dá TIPO ao valor, e aí a
+ * interpolação é numérica.
+ *
+ * Mora neste arquivo porque só este app usa o efeito. Se um segundo app pedir,
+ * isto e o bloco abaixo sobem para `os/tokens.css` — o registro é global de
+ * qualquer forma, e o app é carregado por `lazy()`, então ele acontece exatamente
+ * quando é preciso.
+ */
+@property --giro-da-luz {
+  syntax: '<angle>';
+  inherits: false;
+  initial-value: 0turn;
+}
+
+.about-acao::before,
+.about-acao::after,
+.about-door::before,
+.about-door::after {
+  content: '';
+  position: absolute;
+  inset: -1px;
+  border-radius: inherit;
+  padding: var(--cfg-luz-espessura, 2px);
+  /* A luz é um arco curto do círculo: ~34% de volta acesa, o resto transparente.
+     Arco maior vira anel inteiro pulsando e perde a direção do movimento. */
+  background: conic-gradient(
+    from var(--giro-da-luz),
+    transparent 0turn,
+    transparent 0.58turn,
+    var(--sup-luz-nucleo) 0.75turn,
+    transparent 0.92turn
+  );
+  mask:
+    linear-gradient(#000 0 0) content-box,
+    linear-gradient(#000 0 0);
+  mask-composite: exclude;
+  -webkit-mask:
+    linear-gradient(#000 0 0) content-box,
+    linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor;
+  opacity: 0;
+  /**
+   * A ANIMAÇÃO VIVE AQUI, PAUSADA — e é isto que conserta o efeito sumindo seco.
+   *
+   * A primeira versão declarava `animation` só no `:hover`. Ao sair o mouse a
+   * propriedade era REMOVIDA, e com ela `--giro-da-luz` voltava ao valor inicial no
+   * mesmo quadro: o feixe saltava para o ângulo 0 e só depois desaparecia. A
+   * opacidade fazia fade direito; o que se via era o salto.
+   *
+   * Com a animação no estado base e `paused`, sair do hover apenas PAUSA: o feixe
+   * congela onde estava e a opacidade o apaga de lá. E pausado não custa quadro
+   * nenhum, então os cinco alvos do app não ficam animando à toa — que era o outro
+   * jeito de resolver isto, e o caro.
+   */
+  animation: giroDaLuz var(--cfg-luz-volta, 2.6s) linear infinite;
+  animation-play-state: paused;
+  /* A duração de SAÍDA mora aqui, na regra base: é ela que vale quando o mouse
+     sai. A de entrada está na regra de `:hover`. Ver a nota em
+     `MOVIMENTO.luzDaBordaSaidaS` para por que são assimétricas. */
+  transition: opacity var(--cfg-luz-saida, 0.5s) ease;
+  pointer-events: none;
+}
+
+/* O halo: mesmo anel, mais largo, desfocado e mais fraco. */
+.about-acao::before,
+.about-door::before {
+  padding: var(--cfg-luz-halo, 6px);
+  filter: blur(var(--cfg-luz-desfoque, 7px));
+}
+
+/* `:not(:disabled)` no ELEMENTO, e não um par de regras `:disabled:hover` desfazendo
+   o efeito depois. Desfazer exigiria repetir o valor base de cada alvo (o botão tem
+   borda de faixa, a porta tem borda transparente, a porta em destaque tem a de
+   faixa de novo), e três valores repetidos é três lugares para divergir. Alvo que
+   não leva a lugar nenhum simplesmente nunca entra na regra. */
+.about-acao:hover:not(:disabled)::before,
+.about-acao:hover:not(:disabled)::after,
+.about-door:hover:not(:disabled)::before,
+.about-door:hover:not(:disabled)::after {
+  opacity: 1;
+  animation-play-state: running;
+  transition: opacity var(--cfg-luz-entrada, 0.18s) ease;
+}
+
+.about-acao:hover:not(:disabled)::before,
+.about-door:hover:not(:disabled)::before {
+  opacity: var(--cfg-luz-alfa-halo, 0.5);
+}
+
+/**
+ * A BORDA FININHA QUE FECHA A FORMA.
+ *
+ * O feixe é um arco curto girando, então em qualquer instante três quartos do
+ * contorno estão apagados. Esta borda é o que diz "o item INTEIRO é o alvo",
+ * enquanto a luz diz "e ele está aceso". Pedido do dono do projeto, e ela é a única
+ * coisa além da luz que muda no hover — fundo e cor de texto continuam intactos.
+ *
+ * Ela entra e sai com as MESMAS durações assimétricas da luz, senão o contorno
+ * apaga antes do feixe e o bloco pisca.
+ */
+.about-acao,
+.about-door {
+  transition: border-color var(--cfg-luz-saida, 0.5s) ease;
+}
+
+.about-acao:hover:not(:disabled),
+.about-door:hover:not(:disabled) {
+  border-color: rgb(var(--accent-rgb) / var(--cfg-luz-borda-hover, 0.45));
+  transition: border-color var(--cfg-luz-entrada, 0.18s) ease;
+}
+
+@keyframes giroDaLuz {
+  from { --giro-da-luz: 0turn; }
+  to { --giro-da-luz: 1turn; }
+}
+
+/**
+ * SEM MOVIMENTO, A LUZ NÃO DESAPARECE — ELA PARA.
+ *
+ * O interruptor de Movimento das Configurações chega pela classe na raiz do app
+ * (o JSX a aplica), e o `prefers-reduced-motion` pelo bloco no fim do arquivo. Nos
+ * dois casos o anel continua acendendo no hover, parado no ângulo inicial: o
+ * visitante ainda precisa saber que aquilo é clicável, e apagar o único sinal de
+ * hover para respeitar uma preferência de MOVIMENTO seria tirar informação de quem
+ * só pediu menos animação.
+ */
+/* O `:not(:disabled)` REPETIDO AQUI não é cosmético: sem ele este seletor empata em
+   especificidade com `.about-acao:hover:not(:disabled)::after` (três classes e um
+   pseudo-elemento cada) e quem ganha passa a ser a ordem no arquivo. Empate
+   resolvido por ordem é o tipo de regra que quebra na primeira reorganização. */
+.about-app--sem-movimento .about-acao:hover:not(:disabled)::before,
+.about-app--sem-movimento .about-acao:hover:not(:disabled)::after,
+.about-app--sem-movimento .about-door:hover:not(:disabled)::before,
+.about-app--sem-movimento .about-door:hover:not(:disabled)::after {
+  /* `paused` e não `animation: none`: os dois deixam o anel parado, mas `none`
+     remove a animação e devolve `--giro-da-luz` ao valor inicial num salto — que é
+     exatamente o defeito que a animação pausada no estado base conserta. */
+  animation-play-state: paused;
 }
 
 /* ==================================================
@@ -859,5 +1066,19 @@
   .about-crystal-fallback,
   .about-status-ponto {
     animation: none;
+  }
+
+  /* Os anéis de luz ficam de fora do `animation: none` acima de propósito: eles
+     PAUSAM em vez de perder a animação, pelo mesmo motivo explicado no bloco de
+     `.about-app--sem-movimento`. Removê-la faria o feixe saltar para o ângulo 0.
+
+     `:not(:disabled)` pelo mesmo motivo de especificidade explicado lá: sem ele
+     este seletor empata com a regra de hover e passa a depender da ordem — e como
+     um `@media` não muda especificidade, o empate seria real. */
+  .about-acao:hover:not(:disabled)::before,
+  .about-acao:hover:not(:disabled)::after,
+  .about-door:hover:not(:disabled)::before,
+  .about-door:hover:not(:disabled)::after {
+    animation-play-state: paused;
   }
 }

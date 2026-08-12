@@ -55,8 +55,10 @@ export const ThemeProvider = ({ children }) => {
    * sobre uma cópia de si mesmo, que é exatamente o bug que tokens.css
    * documenta ter acontecido com os gradientes do céu.
    *
-   * `getPreset` já cai no primeiro da lista quando o id não existe, o que cobre
-   * um localStorage com preset removido numa versão futura.
+   * `getPreset` já cai no padrão DECLARADO do tema (`PRESET_PADRAO` no config)
+   * quando não há id salvo ou quando o id salvo não existe mais — o que cobre
+   * tanto o visitante novo como um localStorage com preset removido numa versão
+   * futura.
    */
   const presets = useMemo(
     () => ({ dark: getPreset('dark', idNoite), light: getPreset('light', idDia) }),

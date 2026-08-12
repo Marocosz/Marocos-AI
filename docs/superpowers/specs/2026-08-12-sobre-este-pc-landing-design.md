@@ -608,7 +608,87 @@ comentário vale mais que o valor.
 **O `profile.md` mudou, então o assistente só passa a responder certo depois de um
 deploy com `FORCE_REINGEST=true`** — o site e o RAG divergem até lá.
 
-### 8.10 Dois fatos que a spec errou
+### 8.10 O hover é uma luz que percorre a borda, e é o hover inteiro
+
+Pedido do dono do projeto: *"muda pouco a cor de fundo e afins (bem pouco), e o
+maior efeito vai ser uma borda brilhante que percorre em loop"* — e, na revisão
+seguinte, *"tirar no hover apenas o efeito da luz na borda, sem mudar a cor de
+fundo e afins"*.
+
+**Fundo, borda e cor de texto não mudam no hover.** O efeito é um gradiente cônico
+girando dentro de uma máscara em forma de anel, em duas camadas: núcleo fino e
+nítido (`::after`), halo largo e desfocado (`::before`). Cônico porque o ângulo é o
+que faz a luz acompanhar os cantos arredondados — com linear ela deslizaria reto e
+sumiria nas quinas. Duas camadas porque só o núcleo lê como contorno tracejado e só
+o halo lê como borrão sem direção.
+
+Três coisas que valem registro:
+
+1. **`@property` é obrigatório.** Uma custom property comum é string para o motor
+   de animação: interpolar `0turn → 1turn` seria trocar texto, e o gradiente
+   pularia em vez de girar. Verificado empiricamente — o ângulo saiu de 41,5° para
+   ~118° em 500ms, que é o que prova a interpolação numérica.
+2. **A luz é mais clara que a superfície, e isso inverte por tema.** Acento puro lê
+   como borda colorida, não como luz. De noite `--sup-luz-nucleo` puxa o acento
+   para o branco (dose em `VIDRO.luzDaBorda.brilho`); de dia é o acento CHEIO,
+   porque sobre campo pálido o brilho lê por saturação e não por luminância — a
+   mesma lição que `--cer-nebulosa` já pagou.
+3. **`--sup-realce` foi removido do sistema.** Ele era o realce de fundo do hover e
+   perdeu o único consumidor: saíram o token (nos três blocos de tema) e a dose
+   `VIDRO.superficie.*.realce`. Token órfão é o que a próxima pessoa tenta manter
+   em sincronia sem saber que ninguém lê.
+
+**Sem movimento a luz não desaparece — ela para.** O anel continua acendendo no
+hover, parado no ângulo inicial, tanto com o interruptor de Movimento desligado
+como com `prefers-reduced-motion`. Apagar o único sinal de hover para respeitar uma
+preferência de *movimento* seria tirar informação de quem só pediu menos animação.
+O interruptor passou a chegar por uma classe única na raiz do app
+(`about-app--sem-movimento`), porque este app já tinha três coisas que se movem e
+cada uma havia inventado o próprio jeito de obedecer.
+
+**O custo medido, e a decisão consciente:** o anel vive em `inset: -1px` para cobrir
+a borda, o que exigiu tirar o `overflow: hidden` do botão de contato. Isso mudou o
+caminho de rasterização do subtree e deslocou **88 subpixels** nas arestas dos
+quatro ícones de canal, só na cena `mobile-sobre`. Determinístico (88 exatos em três
+execuções) e isolado por eliminação: com os pseudo-elementos desligados o diff
+continuava 88; com o `overflow` de volta ia a zero. Rebaselinada com a causa escrita
+em `cenas.js`, ao lado da cena, para não custar uma segunda investigação.
+
+### 8.11 Ajustes finais, e um terceiro número envelhecido
+
+**A borda fininha no hover.** Pedida junto com o feixe: ele é um arco curto girando,
+então em qualquer instante três quartos do contorno estão apagados. A borda fecha a
+forma e diz "o item inteiro é o alvo" enquanto a luz diz "e ele está aceso". Entra e
+sai com as mesmas durações assimétricas da luz — se apagasse antes, o bloco piscaria.
+
+**O padrão dos presets virou declarado.** `PRESET_PADRAO = { dark: 'ametista',
+light: 'ceu-claro' }`, a pedido do dono do projeto (o dia era `perola` por ser o
+primeiro do array). O padrão deixou de ser consequência da ordem da grade das
+Configurações: reordenar amostras não pode trocar em silêncio a primeira impressão do
+site. Há teste guardando que o id declarado existe na lista do tema.
+
+Custo: **as sete cenas claras rebaselinaram inteiras** — trocar o preset repinta
+wallpaper, acento, chrome e cristal. Verificado que a repintura é coerente, não
+quebrada.
+
+**O divisor do guia e a ficha.** Os divisores entre as quatro perguntas recuaram nas
+pontas (pseudo-elemento com `inset` no lugar de `border-top`, que vai sempre de ponta
+a ponta), com o recuo amarrado ao padding da porta por uma variável local. E a ficha
+"Este sistema" perdeu o divisor entre linhas: com ele havia dois traços horizontais
+por linha e o bloco lia como planilha; o pontilhado que liga rótulo e valor já
+conduz o olho.
+
+**O terceiro número que envelheceu.** A ficha exibiu "PRESETS 18" e o balão da área
+de trabalho dizia "Doze papéis de parede" — dois números para o mesmo fato, e nenhum
+certo: `noite.length + dia.length` conta o XP duas vezes (ele é o mesmo objeto nas
+duas listas). Virou `contarPresets()`, que conta por identidade, e os dois lugares
+passaram a ler dela — o balão com `%d`, igual ao que já foi feito com o "36 testes"
+do leia-me.
+
+São três agora, no mesmo padrão: 36 testes, Doze papéis, 8º período. **Quantidade na
+interface não se escreve à mão** — a regra entrou na skill.
+
+### 8.12 Dois fatos que a spec errou
 
 - **§1.6 disse que `profile.skills_highlight` perdeu o consumidor.** Falso:
   `TerminalApp.jsx` usa a lista no `neofetch`. O que de fato não tinha consumidor

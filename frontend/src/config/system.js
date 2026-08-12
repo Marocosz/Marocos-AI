@@ -437,10 +437,49 @@ export const PRESETS = {
   ],
 }
 
-/** O preset salvo, ou o primeiro da lista. Usado pela ponte e pelo wallpaper. */
+/**
+ * O PRESET COM QUE UM VISITANTE NOVO CHEGA, por tema.
+ *
+ * Declarado, e não "o primeiro da lista": a ordem do array é a ordem em que as
+ * amostras aparecem nas Configurações, que é decisão de apresentação. Amarrar o
+ * padrão a ela faz reordenar a grade trocar em silêncio a primeira impressão do
+ * site — e ninguém liga uma coisa à outra ao mexer.
+ *
+ * `ametista` de noite é o violeta que dá nome ao sistema. `ceu-claro` de dia é
+ * escolha do dono do projeto.
+ */
+export const PRESET_PADRAO = {
+  dark: 'ametista',
+  light: 'ceu-claro',
+}
+
+/**
+ * QUANTOS PAPÉIS DE PAREDE DISTINTOS EXISTEM — e é distinto, não a soma.
+ *
+ * `PRESETS.noite.length + PRESETS.dia.length` conta o XP duas vezes: ele é o MESMO
+ * objeto nas duas listas de propósito (tem de renderizar idêntico nos dois temas), e
+ * somar daria uma escolha a mais do que o visitante tem. `Set` resolve por
+ * identidade, então continua certo se outro preset passar a ser compartilhado.
+ *
+ * Existe como função porque DOIS lugares mostram este número — a ficha "Este
+ * sistema" do "Sobre este PC" e o balão de boas-vindas da área de trabalho. Eles
+ * já discordaram: o balão dizia "Doze papéis de parede" quando havia dezessete,
+ * porque o texto era literal e a lista cresceu. Mesma história do "36 testes" do
+ * leia-me, e o mesmo conserto: um lugar só para contar.
+ */
+export const contarPresets = () => new Set([...PRESETS.noite, ...PRESETS.dia]).size
+
+/**
+ * O preset salvo, ou o padrão do tema. Usado pela ponte e pelo wallpaper.
+ *
+ * O `|| lista[0]` no fim não é redundância: se algum dia um id de `PRESET_PADRAO`
+ * deixar de existir na lista, é melhor cair no primeiro do que devolver
+ * `undefined` e derrubar o boot num `preset.acento`.
+ */
 export function getPreset(tema, id) {
   const lista = tema === 'dark' ? PRESETS.noite : PRESETS.dia
-  return lista.find((p) => p.id === id) || lista[0]
+  const padrao = PRESET_PADRAO[tema === 'dark' ? 'dark' : 'light']
+  return lista.find((p) => p.id === id) || lista.find((p) => p.id === padrao) || lista[0]
 }
 
 /**
@@ -876,6 +915,41 @@ export const MOVIMENTO = {
    * uma das razões de ela ter saído na primeira vez.
    */
   marqueeStackS: 18,
+
+  /**
+   * A VOLTA COMPLETA DA LUZ NA BORDA (ver `VIDRO.luzDaBorda`). Em segundos,
+   * porque vira `animation-duration` no CSS em vez de passar pelo motion.
+   *
+   * 2,6s é uma volta que o olho acompanha sem ficar ansioso. Abaixo de ~1,5s a luz
+   * lê como pisca-pisca, e acima de ~4s o visitante tira o mouse antes de a volta
+   * fechar — e um efeito que nunca é visto inteiro não vale o custo de existir.
+   */
+  luzDaBordaS: 2.6,
+
+  /**
+   * ENTRADA E SAÍDA DA LUZ, e elas são ASSIMÉTRICAS de propósito.
+   *
+   * A saída é ~2,5x mais longa que a entrada. Acender rápido faz o alvo responder
+   * na hora, que é o que o hover precisa; apagar rápido faz o efeito "sumir" em vez
+   * de "se apagar", e foi exatamente essa a queixa. Luz que desliga devagar é a
+   * única parte disto que lê como luz de verdade.
+   *
+   * (A técnica: a duração de saída fica na regra BASE, que é a que vale quando o
+   * mouse sai; a de entrada fica na regra de `:hover`. Não é o mesmo valor em dois
+   * lugares — são dois valores em dois estados.)
+   */
+  luzDaBordaEntradaS: 0.18,
+  luzDaBordaSaidaS: 0.5,
+
+  /**
+   * O PULSO DO PONTO DE STATUS do "Sobre este PC" — o "aberto a freelance".
+   *
+   * Estava literal no CSS (`2.4s`) enquanto as outras duas durações de animação
+   * deste app já vinham daqui, e essa inconsistência é pior que os dois extremos:
+   * quem for ajustar o ritmo do app encontra duas no config, conclui que é ali que
+   * se mexe, e não acha a terceira.
+   */
+  pulsoStatusS: 2.4,
 }
 
 /* --------------------------------------------------
@@ -925,7 +999,6 @@ export const VIDRO = {
    *
    *   acento    quanto do acento entra na base opaca
    *   borda     alpha da borda
-   *   realce    quanto do acento entra no :hover de superfície clicável
    *   alfaLuz   a aresta de 1px no topo do bloco
    *   alfaLavagem  o gradiente diagonal do bloco com mais peso
    *   alfaFilete   o divisor entre seções
@@ -945,7 +1018,18 @@ export const VIDRO = {
     noite: {
       acento: '16%',
       borda: '26%',
-      realce: '18%',
+      /**
+       * NÃO EXISTE MAIS UMA DOSE DE `realce` AQUI, e a ausência é intencional.
+       *
+       * Ela era o quanto de acento entrava no fundo no `:hover` das ações do
+       * "Sobre este PC" — 18%, depois 8%, e depois nada: o dono do projeto decidiu
+       * que o hover é SÓ a luz que percorre a borda (`VIDRO.luzDaBorda`), sem
+       * mudança de fundo. Com o último consumidor fora, a dose e o token
+       * `--sup-realce` saíram junto, em vez de ficarem órfãos.
+       *
+       * Se algum bloco voltar a precisar de realce de fundo, a dose volta para
+       * cá — não para o CSS do componente.
+       */
       alfaLuz: 0.55,
       alfaLavagem: 0.14,
       alfaFilete: 0.45,
@@ -955,7 +1039,6 @@ export const VIDRO = {
     dia: {
       acento: '8%',
       borda: '24%',
-      realce: '16%',
       alfaLuz: 0.45,
       alfaLavagem: 0.1,
       alfaFilete: 0.4,
@@ -967,6 +1050,51 @@ export const VIDRO = {
       alfaFaixa: 0.2,
       alfaFaixaMeio: 0.08,
     },
+  },
+
+  /**
+   * A LUZ QUE PERCORRE A BORDA — o hover das ações do "Sobre este PC".
+   *
+   * O efeito é um gradiente CÔNICO girando dentro de uma máscara em forma de anel,
+   * então a luz acompanha os cantos arredondados em vez de deslizar reto. São
+   * DUAS camadas, e as duas são necessárias: uma fina e nítida (o núcleo) e uma
+   * mais grossa e desfocada atrás (o halo). Só o núcleo lê como contorno
+   * tracejado; só o halo lê como borrão sem direção.
+   *
+   *   espessura  o núcleo — 2px, para a luz ter corpo e não virar fio de cabelo
+   *   halo       a camada de trás, mais larga que o núcleo
+   *   desfoque   o quanto o halo espalha
+   *   alfaHalo   o halo é mais fraco que o núcleo, senão vira mancha
+   *
+   * A duração fica em `MOVIMENTO.luzDaBordaS`, com o resto do movimento.
+   */
+  luzDaBorda: {
+    espessura: '2px',
+    halo: '6px',
+    desfoque: '7px',
+    alfaHalo: 0.5,
+    /**
+     * A BORDA FININHA que aparece junto com a luz. Alpha do acento.
+     *
+     * Ela não é redundante com o feixe: o feixe é um arco curto girando, então em
+     * qualquer instante três quartos do contorno estão apagados. A borda é o que
+     * fecha a forma e diz "este item inteiro é o alvo", enquanto a luz diz "e ele
+     * está aceso".
+     */
+    alfaBordaHover: 0.45,
+    /**
+     * Quanto do acento fica no NÚCLEO da luz; o resto vai para o branco.
+     *
+     * Existe porque acento puro não lê como luz — lê como borda colorida. Uma
+     * fonte de luz tem de ser mais clara que a superfície que ela ilumina, e no
+     * tema escuro isso significa puxar o acento para o branco.
+     *
+     * Só vale para a noite. De dia o núcleo é o acento CHEIO, e essa divergência
+     * está documentada em `--sup-luz-nucleo` (tokens.css): sobre campo pálido o
+     * brilho lê por saturação, não por luminância — é a mesma lição que a nebulosa
+     * da cerimônia já pagou.
+     */
+    brilho: '55%',
   },
 }
 

@@ -274,7 +274,13 @@ const osContentEn = {
       },
       temas: {
         titulo: 'Make it yours',
-        corpo: 'Twelve wallpapers, and each one repaints the whole system. Open Settings.',
+        /**
+         * O NÚMERO É INTERPOLADO, e a razão é que ele já esteve errado: esta frase
+         * dizia "Twelve" quando havia dezessete papéis de parede — a lista cresceu e
+         * ninguém releu o texto. Agora vem de `contarPresets()`, a mesma função que
+         * a ficha "Este sistema" do "Sobre este PC" usa.
+         */
+        corpo: '%d wallpapers, and each one repaints the whole system. Open Settings.',
       },
     },
   },
@@ -651,7 +657,8 @@ const osContentPt = {
       },
       temas: {
         titulo: 'Deixe do seu jeito',
-        corpo: 'Doze papéis de parede, e cada um repinta o sistema inteiro. Abra as Configurações.',
+        /** Ver a nota no bloco em inglês: o número vem de `contarPresets()`. */
+        corpo: '%d papéis de parede, e cada um repinta o sistema inteiro. Abra as Configurações.',
       },
     },
   },

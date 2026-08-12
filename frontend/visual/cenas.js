@@ -107,6 +107,22 @@ export const CENAS = [
    *
    * (No tema claro a home mobile nem shader tem: o fundo é gradiente CSS. Só o
    * tema escuro e o desktop usam Silk/Iridescence nessa superfície.)
+   *
+   * `mobile-sobre` É SENSÍVEL A CONTEXTO DE PINTURA, e isso já custou uma
+   * investigação — está registrado aqui para não custar duas.
+   *
+   * Em 2026-08-12, tirar um `overflow: hidden` do botão de contato do "Sobre"
+   * (necessário para o anel de luz do hover cobrir a borda) deslocou 88 subpixels
+   * nas arestas dos QUATRO ÍCONES DE CANAL daquele botão. Determinístico — 88
+   * exatos em três execuções, e zero com o `overflow` de volta —, invisível a olho,
+   * e só nesta cena: a largura menor põe os ícones em posições fracionárias
+   * diferentes das do desktop, onde as mesmas mudanças não moveram nada.
+   *
+   * A lição não é sobre este botão: mexer em `overflow`, `filter`, `mask`,
+   * `transform` ou `opacity` de um ancestral de conteúdo VETORIAL muda a
+   * rasterização dele. Se esta cena reprovar com um número pequeno e estável
+   * depois de uma mudança dessas, é isto — e a checagem certa é ligar/desligar a
+   * propriedade suspeita, não subir tolerância.
    */
   { nome: 'mobile-home', rota: '/', tema: 'dark', mobile: true },
   { nome: 'mobile-sobre', rota: '/sobre', tema: 'dark', mobile: true },

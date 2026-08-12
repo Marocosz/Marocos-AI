@@ -86,7 +86,29 @@ Antes de dar um valor por escrito, pergunte nesta ordem:
    porquê escrito ao lado** (ver as três exceções abaixo)
 
 Preset novo: acrescente ao array em `PRESETS`, com `acento` e `ceu`, e o nome
-nos dois idiomas em `i18n/os.js`. Nada mais precisa saber que ele existe.
+nos dois idiomas em `i18n/os.js`. Nada mais precisa saber que ele existe — a ordem
+do array é só a ordem das amostras nas Configurações.
+
+**O preset padrão é declarado em `PRESET_PADRAO`, não é "o primeiro da lista".**
+Reordenar a grade não pode trocar em silêncio a primeira impressão do site, e
+`getPreset` cai nele quando não há id salvo. Há teste guardando que o id declarado
+existe na lista do tema.
+
+**E não escreva à mão quantos presets existem:** use `contarPresets()`. Ele conta
+por identidade, porque o XP é o MESMO objeto nas duas listas e somar `noite.length +
+dia.length` daria uma escolha a mais do que o visitante tem.
+
+### Número na interface não se escreve à mão
+
+Este projeto já teve **três** números literais envelhecerem em texto visível: "36
+testes" no leia-me (eram 38), "Doze papéis de parede" no balão (eram dezessete) e o
+"8º período" depois da formatura. O padrão é sempre o mesmo — o texto foi escrito
+certo, a coisa contada cresceu, e ninguém releu a frase.
+
+A regra: **quantidade na interface vem de uma fonte única.** Derive em runtime
+quando der (`APPS.length`, `contarPresets()`, `idadeEm()`); quando não der, ponha a
+constante num lugar só e interpole com `%d` nos textos do `i18n` — `content/sistema.js`
+é o exemplo, e ele carrega no comentário COMO reconferir o valor.
 
 ## A linguagem visual
 
@@ -162,7 +184,20 @@ camada errada é o erro mais comum:
 
   E ao pintar `<button>` só com `background-image`, declare
   `background-color: transparent` junto — `buttonface` é um cinza claro do
-  navegador e aparece por baixo do gradiente, lavando o texto. E **nenhum `--sup-*` pode ser declarado em `:root`**: a substituição de
+  navegador e aparece por baixo do gradiente, lavando o texto.
+
+- **O hover das ações do "Sobre" é uma LUZ que percorre a borda, e é o hover
+  inteiro** — fundo, borda e cor de texto não mudam. Gradiente cônico girando dentro
+  de uma máscara em anel, em duas camadas (núcleo nítido + halo desfocado). Duas
+  coisas mudando na mesma passada de mouse fazem o alvo piscar duas vezes.
+
+  Três armadilhas, cada uma já paga: **`@property` é obrigatório** para o ângulo
+  poder ser animado (custom property comum é string para o motor de animação, e o
+  gradiente pula em vez de girar); **a luz tem de ser mais clara que a superfície**,
+  o que inverte por tema (`--sup-luz-nucleo` puxa para o branco de noite e é o
+  acento cheio de dia, porque sobre campo pálido o brilho lê por saturação — a
+  lição de `--cer-nebulosa`); e **sem movimento a luz PARA, não apaga**, senão
+  quem pediu menos animação perde o único sinal de que o alvo é clicável. E **nenhum `--sup-*` pode ser declarado em `:root`**: a substituição de
   custom property acontece onde ela é declarada, e `--win-body-base` só existe nos
   blocos de tema — em `:root` o `color-mix` viraria guaranteed-invalid e a
   superfície não pintaria.
@@ -276,6 +311,19 @@ uma decisão que custou medição ou depuração:
 - **Subir tolerância para calar ruído.** O limiar de cada cena foi medido
   rodando o mesmo commit duas vezes; cenas sem WebGL têm piso **zero** e
   qualquer diferença nelas é sinal.
+- **Confundir ruído com regressão, e vice-versa — o critério é a ESTABILIDADE do
+  número, não o tamanho dele.** Rode a cena três vezes sobre o mesmo código:
+
+  | sintoma | é | o que fazer |
+  |---|---|---|
+  | passa / reprova / passa, com 1-2px | ruído do harness (documentado) | nada — não rebaseline |
+  | reprova sempre com o MESMO número | mudança real, mesmo que minúscula | achar a causa antes de aceitar |
+
+  Um diff de 88px reprovando 88 exatos três vezes não é ruído. Foi assim que se
+  descobriu que tirar um `overflow: hidden` desloca a rasterização dos SVGs
+  dentro do elemento — **mexer em `overflow`, `filter`, `mask`, `transform` ou
+  `opacity` de um ancestral de conteúdo vetorial muda o antialiasing dele**. A
+  checagem é ligar/desligar a propriedade suspeita, nunca subir tolerância.
 - **Procurar no CÓDIGO uma instabilidade que era do HARNESS.** Esta suíte
   reprovava de forma intermitente, em cenas sempre diferentes, e a investigação
   passou por duas suspeitas erradas antes de achar a certa:

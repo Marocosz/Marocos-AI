@@ -301,15 +301,6 @@
     var(--win-body-base)
   );
   --sup-borda: color-mix(in srgb, rgb(var(--accent-rgb)) var(--cfg-sup-borda, 26%), transparent);
-  /* Realce de superfície CLICÁVEL. Mistura em vez de empilhar acento
-     translúcido: a superfície é opaca de propósito, e uma camada com alpha em
-     cima dela devolveria a dependência do que está atrás que ela existe para
-     eliminar. */
-  --sup-realce: color-mix(
-    in srgb,
-    rgb(var(--accent-rgb)) var(--cfg-sup-realce, 18%),
-    var(--sup-fundo)
-  );
   /* A aresta de luz: 1px no topo da superfície, esvanecendo para a direita.
      Mesma leitura de --win-highlight, agora tingida pelo preset. */
   --sup-luz: linear-gradient(
@@ -353,6 +344,16 @@
     transparent 100%
   );
   --sup-faixa-borda: rgb(var(--accent-rgb) / var(--cfg-sup-faixa, 0.26));
+
+  /* O NÚCLEO DA LUZ QUE PERCORRE A BORDA (hover das ações).
+     De noite ela puxa para o BRANCO: acento puro não lê como luz, lê como borda
+     colorida — uma fonte de luz tem de ser mais clara que a superfície que
+     ilumina. A dose está em `VIDRO.luzDaBorda.brilho`. */
+  --sup-luz-nucleo: color-mix(
+    in srgb,
+    rgb(var(--accent-rgb)) var(--cfg-luz-brilho, 55%),
+    #ffffff
+  );
 }
 
 .theme-light {
@@ -387,11 +388,6 @@
     rgb(var(--accent-rgb)) var(--cfg-sup-borda-claro, 24%),
     transparent
   );
-  --sup-realce: color-mix(
-    in srgb,
-    rgb(var(--accent-rgb)) var(--cfg-sup-realce-claro, 16%),
-    var(--sup-fundo)
-  );
   --sup-luz: linear-gradient(
     90deg,
     rgb(var(--accent-rgb) / var(--cfg-sup-luz-claro, 0.45)),
@@ -416,6 +412,15 @@
     transparent 100%
   );
   --sup-faixa-borda: rgb(var(--accent-rgb) / var(--cfg-sup-faixa-claro, 0.2));
+
+  /* DE DIA O NÚCLEO É O ACENTO CHEIO, e a divergência é o ponto.
+     Puxar para o branco sobre um campo já pálido não acende nada — apaga: a luz
+     desapareceria no fundo em vez de brilhar contra ele. Sobre campo claro o
+     brilho lê por SATURAÇÃO, não por luminância, que é exatamente a lição que
+     `--cer-nebulosa` já pagou aqui neste arquivo ("de dia os braços são violeta
+     saturado sobre o campo pálido"). Por isso este token não usa
+     `--cfg-luz-brilho`: ele não tem para onde ir. */
+  --sup-luz-nucleo: rgb(var(--accent-rgb));
 
   /* Tile de app de dia: continua escuro (ver o motivo em :root), mas o matiz
      sai do quase-preto e vai para o violeta #2e1065 — o MESMO que o rótulo do
@@ -877,11 +882,6 @@
      não é de nenhum sistema). */
   --sup-fundo: #ffffff;
   --sup-borda: #b7b7a4;
-  /* O realce vai para o bege dos diálogos — uma cor que o Luna já tem neste
-     arquivo, em vez de um azul de seleção inventado. Card branco que afunda para
-     o bege ao passar o mouse é gesto daquele sistema; um acento translúcido não
-     seria. */
-  --sup-realce: #ece9d8;
   --sup-luz: none;
   --sup-lavagem: none;
   --filete-secao: linear-gradient(90deg, #b7b7a4, transparent);

@@ -1,6 +1,7 @@
 import { describe, it, expect } from 'vitest'
 import {
   WALLPAPER, JANELAS, CERIMONIA, MOVIMENTO, VIDRO, LAYOUT, REDE, PRESETS, getPreset,
+  PRESET_PADRAO, contarPresets,
   hexParaRgb, hueDoHex, giroDaCerimonia, corpoDoCristal, acentoProfundo,
 } from './system'
 // O registry entra aqui porque o contrato do chrome de explorador é ENTRE os
@@ -72,7 +73,10 @@ describe('config do sistema', () => {
    * configurações.
    */
   it('o preset padrão não gira a arte da cerimônia', () => {
-    expect(giroDaCerimonia(PRESETS.noite[0])).toBe(0)
+    // Pelo padrão DECLARADO, não por `noite[0]`: os dois coincidem hoje, e o dia
+    // em que deixarem de coincidir é justamente o dia em que este teste precisa
+    // falar do padrão de verdade.
+    expect(giroDaCerimonia(getPreset('dark', null))).toBe(0)
   })
 
   it('presets de outra família giram a cerimônia para o matiz deles', () => {
@@ -131,11 +135,27 @@ describe('config do sistema', () => {
     }
   })
 
-  it('getPreset cai no padrão quando o id salvo não existe mais', () => {
+  /**
+   * O PADRÃO É DECLARADO, não "o primeiro da lista" — a ordem do array é a ordem
+   * das amostras nas Configurações, e amarrar uma coisa à outra faria reordenar a
+   * grade trocar em silêncio a primeira impressão do site. Este teste é o que
+   * mantém as duas independentes.
+   */
+  it('getPreset cai no padrão declarado quando o id salvo não existe mais', () => {
+    expect(PRESET_PADRAO.dark).toBe('ametista')
+    expect(PRESET_PADRAO.light).toBe('ceu-claro')
+
     // É o caso real de um localStorage antigo depois de um preset ser removido.
-    expect(getPreset('dark', 'preset-que-nao-existe')).toBe(PRESETS.noite[0])
-    expect(getPreset('light', null)).toBe(PRESETS.dia[0])
+    expect(getPreset('dark', 'preset-que-nao-existe').id).toBe(PRESET_PADRAO.dark)
+    expect(getPreset('light', null).id).toBe(PRESET_PADRAO.light)
     expect(getPreset('dark', 'brasa').id).toBe('brasa')
+
+    // E o padrão de cada tema tem de EXISTIR na lista daquele tema, senão o
+    // fallback silencioso do `getPreset` assume e ninguém percebe.
+    for (const [tema, id] of [['dark', PRESET_PADRAO.dark], ['light', PRESET_PADRAO.light]]) {
+      const lista = tema === 'dark' ? PRESETS.noite : PRESETS.dia
+      expect(lista.some((p) => p.id === id), `${id} não está na lista de ${tema}`).toBe(true)
+    }
   })
 
   /**
@@ -143,6 +163,20 @@ describe('config do sistema', () => {
    * tem `cor`/`velocidade`, e em compensação precisa de `fundo` — sem ele o
    * wallpaper renderiza uma div vazia e a tela fica preta.
    */
+  /**
+   * DOIS LUGARES MOSTRAM ESTE NÚMERO — a ficha "Este sistema" do "Sobre este PC" e
+   * o balão de boas-vindas. Eles já discordaram (o balão dizia "Doze" quando havia
+   * dezessete), e é por isso que a contagem virou função.
+   *
+   * DISTINTO, não a soma: o XP é o MESMO objeto nas duas listas, então somar daria
+   * uma escolha a mais do que o visitante tem.
+   */
+  it('contarPresets conta escolhas distintas, não entradas de lista', () => {
+    const soma = PRESETS.noite.length + PRESETS.dia.length
+    expect(contarPresets()).toBe(soma - 1) // o -1 é o XP, compartilhado
+    expect(contarPresets()).toBe(new Set([...PRESETS.noite, ...PRESETS.dia]).size)
+  })
+
   it('todo preset sóbrio traz o fundo desenhado e dispensa os campos de shader', () => {
     const sobrios = [...PRESETS.noite, ...PRESETS.dia].filter((p) => p.sobrio)
     // 2 por tema + o XP, que aparece nos dois (e é sóbrio: o Luna era opaco).
@@ -341,9 +375,16 @@ describe('config do sistema', () => {
       duration: 0.26, duracaoReduzida: 0, ease: 'easeOut', escala: 0.9,
     })
     expect(MOVIMENTO.trocaPresetMs).toBe(420)
-    // O carrossel de stack é o único valor de movimento em SEGUNDOS, porque ele
-    // vira `animation-duration` no CSS em vez de passar pelo motion.
+    // Os dois valores de movimento em SEGUNDOS — eles viram `animation-duration`
+    // no CSS em vez de passar pelo motion.
     expect(MOVIMENTO.marqueeStackS).toBe(18)
+    expect(MOVIMENTO.luzDaBordaS).toBe(2.6)
+    expect(MOVIMENTO.pulsoStatusS).toBe(2.4)
+    // A saída é mais longa que a entrada de propósito — luz que apaga devagar lê
+    // como luz; apagar rápido lê como "sumiu". Ver a nota no config.
+    expect(MOVIMENTO.luzDaBordaEntradaS).toBe(0.18)
+    expect(MOVIMENTO.luzDaBordaSaidaS).toBe(0.5)
+    expect(MOVIMENTO.luzDaBordaSaidaS).toBeGreaterThan(MOVIMENTO.luzDaBordaEntradaS)
   })
 
   it('o chrome assenta ANTES do wallpaper, nunca depois', () => {
@@ -381,9 +422,11 @@ describe('config do sistema', () => {
       alturaTaskbar: 52,
       superficie: {
         noite: {
+          // Sem `realce`: o hover das ações do "Sobre" é só a luz na borda, sem
+          // mudança de fundo, então a dose saiu do config junto com o token. Ver a
+          // nota longa no lugar onde ela ficava.
           acento: '16%',
           borda: '26%',
-          realce: '18%',
           alfaLuz: 0.55,
           alfaLavagem: 0.14,
           alfaFilete: 0.45,
@@ -393,13 +436,20 @@ describe('config do sistema', () => {
         dia: {
           acento: '8%',
           borda: '24%',
-          realce: '16%',
           alfaLuz: 0.45,
           alfaLavagem: 0.1,
           alfaFilete: 0.4,
           alfaFaixa: 0.2,
           alfaFaixaMeio: 0.08,
         },
+      },
+      luzDaBorda: {
+        espessura: '2px',
+        halo: '6px',
+        desfoque: '7px',
+        alfaHalo: 0.5,
+        alfaBordaHover: 0.45,
+        brilho: '55%',
       },
     })
   })
@@ -422,7 +472,7 @@ describe('config do sistema', () => {
     // inteira em silêncio.
     for (const tema of ['noite', 'dia']) {
       const s = VIDRO.superficie[tema]
-      for (const chave of ['acento', 'borda', 'realce']) {
+      for (const chave of ['acento', 'borda']) {
         expect(s[chave], `${tema}.${chave}`).toMatch(/^\d+%$/)
       }
       for (const chave of ['alfaLuz', 'alfaLavagem', 'alfaFilete', 'alfaFaixa', 'alfaFaixaMeio']) {

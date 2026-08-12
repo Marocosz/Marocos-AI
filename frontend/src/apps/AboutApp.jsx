@@ -8,7 +8,7 @@ import { getOsData } from '../i18n/os'
 import { getApp, APPS } from '../os/registry'
 import { useAbrir } from '../os/NavegacaoContext'
 import { useDeviceMode } from '../os/useDeviceMode'
-import { CERIMONIA, PRESETS, acentoProfundo, corpoDoCristal } from '../config/system'
+import { CERIMONIA, contarPresets, acentoProfundo, corpoDoCristal } from '../config/system'
 import { useTheme } from '../contexts/ThemeContext'
 import './AboutApp.css'
 
@@ -81,7 +81,11 @@ const AboutApp = () => {
    */
   const sistema = getSistemaData(language, {
     apps: APPS.length,
-    presets: PRESETS.noite.length + PRESETS.dia.length,
+    /* `contarPresets()` e não a soma dos dois arrays: o XP é o MESMO objeto nas
+       duas listas, e somar daria uma escolha a mais do que o visitante tem. É a
+       mesma função que o balão de boas-vindas usa, para os dois números não
+       divergirem — eles já divergiram. */
+    presets: contarPresets(),
   })
 
   const idade = idadeEm(profile.nascimento)
@@ -135,7 +139,20 @@ const AboutApp = () => {
   const portas = ['projects', 'history', 'readme', 'assistant']
 
   return (
-    <div className="about-app">
+    /**
+     * O INTERRUPTOR DE MOVIMENTO CHEGA NUMA CLASSE SÓ, na raiz.
+     *
+     * Este app tem três coisas que se movem — o ponto de status, o carrossel de
+     * stack e a luz no hover das ações — e cada uma nasceu com o próprio jeito de
+     * obedecer ao interruptor. Um marcador na raiz é o que impede a quarta de
+     * inventar um quarto jeito.
+     *
+     * A faixa de stack ainda tem o marcador `--anima` PRÓPRIO, e não é
+     * duplicação: aquele diz "esta faixa está no modo que anda", que é uma
+     * variante de LAYOUT (linha única contra quebra de linha, lista triplicada
+     * contra lista única) decidida no JSX. Este diz "movimento desligado".
+     */
+    <div className={`about-app${isAnimated ? '' : ' about-app--sem-movimento'}`}>
       {/* --- 1. HERÓI ---
               O NOME OCUPA A LARGURA INTEIRA e começa na mesma margem esquerda que
               o resto da janela. A primeira versão punha o cristal à esquerda e o
@@ -163,11 +180,11 @@ const AboutApp = () => {
 
           <p className="about-meta">
             {/* O pulso respeita AS DUAS chaves: o interruptor de Movimento das
-                Configurações por esta classe, e o `prefers-reduced-motion` pelo
-                bloco no fim do CSS. Foi exatamente aqui que o cristal deste app
-                já errou uma vez — era o único elemento do sistema a ignorar o
-                próprio interruptor. */}
-            <span className={`about-status${isAnimated ? '' : ' about-status--parado'}`}>
+                Configurações pela classe na raiz do app, e o
+                `prefers-reduced-motion` pelo bloco no fim do CSS. Foi exatamente
+                aqui que o cristal deste app já errou uma vez — era o único
+                elemento do sistema a ignorar o próprio interruptor. */}
+            <span className="about-status">
               <span className="about-status-ponto" aria-hidden="true" />
               {profile.status}
             </span>

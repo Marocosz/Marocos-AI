@@ -55,7 +55,6 @@ export function aplicarConfigNoCss(tema = 'dark', preset = null) {
      */
     '--cfg-sup-acento': VIDRO.superficie.noite.acento,
     '--cfg-sup-borda': VIDRO.superficie.noite.borda,
-    '--cfg-sup-realce': VIDRO.superficie.noite.realce,
     '--cfg-sup-luz': String(VIDRO.superficie.noite.alfaLuz),
     '--cfg-sup-lavagem': String(VIDRO.superficie.noite.alfaLavagem),
     '--cfg-sup-filete': String(VIDRO.superficie.noite.alfaFilete),
@@ -63,7 +62,6 @@ export function aplicarConfigNoCss(tema = 'dark', preset = null) {
     '--cfg-sup-faixa-meio': String(VIDRO.superficie.noite.alfaFaixaMeio),
     '--cfg-sup-acento-claro': VIDRO.superficie.dia.acento,
     '--cfg-sup-borda-claro': VIDRO.superficie.dia.borda,
-    '--cfg-sup-realce-claro': VIDRO.superficie.dia.realce,
     '--cfg-sup-luz-claro': String(VIDRO.superficie.dia.alfaLuz),
     '--cfg-sup-lavagem-claro': String(VIDRO.superficie.dia.alfaLavagem),
     '--cfg-sup-filete-claro': String(VIDRO.superficie.dia.alfaFilete),
@@ -137,6 +135,21 @@ export function aplicarConfigNoCss(tema = 'dark', preset = null) {
     /** A volta completa do carrossel de stack do "Sobre" — ver
      *  `MOVIMENTO.marqueeStackS`. Em segundos porque é o que o `animation` lê. */
     '--cfg-marquee-stack': `${MOVIMENTO.marqueeStackS}s`,
+
+    /** A luz que percorre a borda no hover das ações — ver `VIDRO.luzDaBorda` e
+     *  `MOVIMENTO.luzDaBordaS`. */
+    '--cfg-luz-espessura': VIDRO.luzDaBorda.espessura,
+    '--cfg-luz-halo': VIDRO.luzDaBorda.halo,
+    '--cfg-luz-desfoque': VIDRO.luzDaBorda.desfoque,
+    '--cfg-luz-alfa-halo': String(VIDRO.luzDaBorda.alfaHalo),
+    '--cfg-luz-brilho': VIDRO.luzDaBorda.brilho,
+    '--cfg-luz-borda-hover': String(VIDRO.luzDaBorda.alfaBordaHover),
+    '--cfg-luz-entrada': `${MOVIMENTO.luzDaBordaEntradaS}s`,
+    '--cfg-luz-saida': `${MOVIMENTO.luzDaBordaSaidaS}s`,
+    '--cfg-luz-volta': `${MOVIMENTO.luzDaBordaS}s`,
+
+    /** O pulso do ponto de status do "Sobre" — ver `MOVIMENTO.pulsoStatusS`. */
+    '--cfg-pulso-status': `${MOVIMENTO.pulsoStatusS}s`,
   }
 
   for (const [nome, valor] of Object.entries(vars)) {
