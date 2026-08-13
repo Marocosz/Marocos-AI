@@ -187,11 +187,22 @@ const profileDataEn = {
    *
    * A lição: **ao resumir uma capacidade, o exemplo mais vistoso rouba o escopo.**
    * Chatbot é o que todo mundo imagina quando ouve "agente", então escrever a partir
-   * dele estreita a afirmação sem que o autor perceba. O texto novo abre justamente
-   * negando esse padrão, porque é aí que está a diferença.
+   * dele estreita a afirmação sem que o autor perceba.
+   *
+   * A TERCEIRA VERSÃO CORRIGIU O EXCESSO DA SEGUNDA. Ao consertar o escopo, o texto
+   * passou a NEGAR o chatbot ("produzem trabalho, não conversa") — e negar um formato
+   * que ele também entrega é tão estreito quanto ancorar nele. O dono do projeto pediu
+   * genérico, e genérico é o certo aqui: o que ele vende é conseguir escolher o
+   * formato, não um formato.
+   *
+   * Então a lista de formatos ficou em CATEGORIAS (conversacional, algorítmico, em
+   * lote, com humano no meio, embutido no produto) em vez de exemplos, e o específico
+   * migrou para a EXIGÊNCIA — a que vale para todos eles. Uma capacidade genérica sem
+   * nenhuma âncora seria marketing; a âncora é o critério, não o caso.
    *
    * O que saiu daqui não se perdeu: a métrificação de agente conversacional é o
-   * argumento central do card do Motor de Cobrança, onde ela tem contexto.
+   * argumento central do card do Motor de Cobrança, e os cinco formatos estão nomeados
+   * um a um no `profile.md` do RAG — onde quem PERGUNTA recebe o detalhe.
    *
    * E são curtos. Eles vivem numa grade de duas colunas no "Sobre este PC": quatro
    * parágrafos de seis linhas ali não são densidade, são parede.
@@ -212,9 +223,9 @@ const profileDataEn = {
   capacidades: [
     {
       id: 'agentes',
-      titulo: 'AI agents that produce work, not conversation',
+      titulo: 'AI agents in whatever shape the problem asks for',
       texto:
-        'A chatbot is the easiest shape and almost never the most useful one. Most of my agents talk to nobody: they write the query the analyst could not write, assemble the document, cluster a thousand support tickets and explain the pattern, or emit the action another system executes — which means the output has to be valid for a machine, not merely readable by a person. Where the decision matters there is a human approval gate in the middle, and where the model does not know, it says so instead of inventing.',
+        'An agent is not a format, it is a way of organising a decision — and which shape fits depends on the problem. I have built conversational ones, algorithmic ones where the model only enters at a single step, batch pipelines over volume, flows with a human approval gate in the middle, and agents embedded in a product emitting actions the interface renders. What does not change is the requirement: deterministic flow in code, output valid for a machine and not merely readable by a person, and a guard that would rather say "I do not know" than invent.',
     },
     {
       id: 'produto',
@@ -308,9 +319,9 @@ const profileDataPt = {
   capacidades: [
     {
       id: 'agentes',
-      titulo: 'Agentes de IA que produzem trabalho, não conversa',
+      titulo: 'Agentes de IA no formato que o problema pedir',
       texto:
-        'Chatbot é o formato mais fácil e quase nunca o mais útil. A maior parte dos meus agentes não fala com ninguém: eles escrevem a consulta que o analista não sabia escrever, montam o documento, agrupam mil chamados e explicam o padrão, ou emitem a ação que outro sistema executa — e para isso a saída tem de ser válida para uma máquina, não só legível para uma pessoa. Onde a decisão é séria existe aprovação humana no meio, e onde o modelo não sabe, ele diz que não sabe em vez de inventar.',
+        'Agente não é um formato, é uma forma de organizar decisão — e qual formato serve depende do problema. Já construí conversacionais, algorítmicos com o modelo entrando num passo só, em lote sobre volume de dados, com aprovação humana no meio, e embutidos num produto emitindo ação que a interface desenha. O que não muda é a exigência: fluxo determinístico em código, saída válida para uma máquina e não só legível para uma pessoa, e uma guarda que prefere dizer "não sei" a inventar.',
     },
     {
       id: 'produto',

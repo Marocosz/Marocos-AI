@@ -37,9 +37,9 @@ Python · FastAPI · LangGraph · GenAI & RAG · Machine Learning · PostgreSQL 
 
 ## O que eu sou contratado para fazer
 
-### Agentes de IA que produzem trabalho, não conversa
+### Agentes de IA no formato que o problema pedir
 
-Chatbot é o formato mais fácil e quase nunca o mais útil. A maior parte dos meus agentes não fala com ninguém: eles escrevem a consulta que o analista não sabia escrever, montam o documento, agrupam mil chamados e explicam o padrão, ou emitem a ação que outro sistema executa — e para isso a saída tem de ser válida para uma máquina, não só legível para uma pessoa. Onde a decisão é séria existe aprovação humana no meio, e onde o modelo não sabe, ele diz que não sabe em vez de inventar.
+Agente não é um formato, é uma forma de organizar decisão — e qual formato serve depende do problema. Já construí conversacionais, algorítmicos com o modelo entrando num passo só, em lote sobre volume de dados, com aprovação humana no meio, e embutidos num produto emitindo ação que a interface desenha. O que não muda é a exigência: fluxo determinístico em código, saída válida para uma máquina e não só legível para uma pessoa, e uma guarda que prefere dizer "não sei" a inventar.
 
 ### Uma pessoa do primeiro requisito até a produção
 
