@@ -170,6 +170,29 @@ const profileDataEn = {
    *   2. UMA âncora técnica concreta, para provar que não é marketing
    *   3. fecha com a consequência
    *
+   * ==================================================
+   * E A SEGUNDA CORREÇÃO DO BLOCO DE AGENTES, que ensina outra coisa.
+   *
+   * A reescrita seguindo a forma acima acertou o formato e errou o ESCOPO: ela dizia
+   * "agentes de IA que aguentam falar com cliente", com "cada conversa vira número"
+   * no fecho. Ficou toda ancorada em agente conversacional — e conversacional é
+   * MINORIA do que ele faz.
+   *
+   * O código diz isso com clareza: o hub da Supporte escreve SQL, o Scope
+   * Intelligence agrupa chamados e explica o padrão sem trocar uma palavra com
+   * ninguém, o de qualidade monta um DOCX com portas de aprovação humana entre cinco
+   * agentes, os 18 da Bússola emitem sugestão tipada que o frontend desenha como
+   * card, e o do InTec Access escreve relatório de segurança num agendador. Um único
+   * é chat de verdade.
+   *
+   * A lição: **ao resumir uma capacidade, o exemplo mais vistoso rouba o escopo.**
+   * Chatbot é o que todo mundo imagina quando ouve "agente", então escrever a partir
+   * dele estreita a afirmação sem que o autor perceba. O texto novo abre justamente
+   * negando esse padrão, porque é aí que está a diferença.
+   *
+   * O que saiu daqui não se perdeu: a métrificação de agente conversacional é o
+   * argumento central do card do Motor de Cobrança, onde ela tem contexto.
+   *
    * E são curtos. Eles vivem numa grade de duas colunas no "Sobre este PC": quatro
    * parágrafos de seis linhas ali não são densidade, são parede.
    *
@@ -189,9 +212,9 @@ const profileDataEn = {
   capacidades: [
     {
       id: 'agentes',
-      titulo: 'AI agents that survive contact with a customer',
+      titulo: 'AI agents that produce work, not conversation',
       texto:
-        'What separates a demo from an agent you can put in front of a paying customer is what it does when it does not know the answer. Mine would rather say so than invent, the decision path lives in code you can audit instead of in the model\'s mood, and every conversation becomes a number — because an agent nobody measures is a rumour, not a product.',
+        'A chatbot is the easiest shape and almost never the most useful one. Most of my agents talk to nobody: they write the query the analyst could not write, assemble the document, cluster a thousand support tickets and explain the pattern, or emit the action another system executes — which means the output has to be valid for a machine, not merely readable by a person. Where the decision matters there is a human approval gate in the middle, and where the model does not know, it says so instead of inventing.',
     },
     {
       id: 'produto',
@@ -285,9 +308,9 @@ const profileDataPt = {
   capacidades: [
     {
       id: 'agentes',
-      titulo: 'Agentes de IA que aguentam falar com cliente',
+      titulo: 'Agentes de IA que produzem trabalho, não conversa',
       texto:
-        'O que separa uma demonstração de um agente que você põe na frente de um cliente que paga é o que ele faz quando não sabe a resposta. Os meus preferem dizer que não sabem a inventar, o caminho da decisão fica em código auditável em vez de no humor do modelo, e cada conversa vira número — porque agente que ninguém mede é boato, não produto.',
+        'Chatbot é o formato mais fácil e quase nunca o mais útil. A maior parte dos meus agentes não fala com ninguém: eles escrevem a consulta que o analista não sabia escrever, montam o documento, agrupam mil chamados e explicam o padrão, ou emitem a ação que outro sistema executa — e para isso a saída tem de ser válida para uma máquina, não só legível para uma pessoa. Onde a decisão é séria existe aprovação humana no meio, e onde o modelo não sabe, ele diz que não sabe em vez de inventar.',
     },
     {
       id: 'produto',

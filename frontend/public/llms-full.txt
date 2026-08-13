@@ -37,9 +37,9 @@ Python · FastAPI · LangGraph · GenAI & RAG · Machine Learning · PostgreSQL 
 
 ## O que eu sou contratado para fazer
 
-### Agentes de IA que aguentam falar com cliente
+### Agentes de IA que produzem trabalho, não conversa
 
-O que separa uma demonstração de um agente que você põe na frente de um cliente que paga é o que ele faz quando não sabe a resposta. Os meus preferem dizer que não sabem a inventar, o caminho da decisão fica em código auditável em vez de no humor do modelo, e cada conversa vira número — porque agente que ninguém mede é boato, não produto.
+Chatbot é o formato mais fácil e quase nunca o mais útil. A maior parte dos meus agentes não fala com ninguém: eles escrevem a consulta que o analista não sabia escrever, montam o documento, agrupam mil chamados e explicam o padrão, ou emitem a ação que outro sistema executa — e para isso a saída tem de ser válida para uma máquina, não só legível para uma pessoa. Onde a decisão é séria existe aprovação humana no meio, e onde o modelo não sabe, ele diz que não sabe em vez de inventar.
 
 ### Uma pessoa do primeiro requisito até a produção
 
