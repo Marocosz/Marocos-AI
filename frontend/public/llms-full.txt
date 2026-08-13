@@ -37,21 +37,21 @@ Python · FastAPI · LangGraph · GenAI & RAG · Machine Learning · PostgreSQL 
 
 ## O que eu sou contratado para fazer
 
-### Agentes de IA que chegam em produção
+### Agentes de IA que aguentam falar com cliente
 
-Controle de fluxo determinístico em código — grafo de estados, não swarm — com o LLM confinado a passos cognitivos isolados: um roteador barato antes do modelo caro, recuperação sobre base vetorial, uma guarda que falha para "não sei", e um passo de conserto que devolve o erro ao modelo em vez de mostrá-lo ao usuário. Mais métrificação, porque agente que ninguém mede é boato.
+O que separa uma demonstração de um agente que você põe na frente de um cliente que paga é o que ele faz quando não sabe a resposta. Os meus preferem dizer que não sabem a inventar, o caminho da decisão fica em código auditável em vez de no humor do modelo, e cada conversa vira número — porque agente que ninguém mede é boato, não produto.
 
-### Produto do requisito ao deploy
+### Uma pessoa do primeiro requisito até a produção
 
-FastAPI com contrato tipado e migração de verdade, Postgres usado direito (tsvector e GIN antes de apelar para um segundo banco), React e TypeScript na frente, Docker em infraestrutura que eu mesmo administro. Sessão no servidor quando token não pode ser revogado, auditoria escrita dentro da mesma transação da mudança, e fronteira de módulo verificada por gate de CI em vez de por boa intenção.
+Você fala com uma pessoa da primeira conversa até o sistema no ar, e depois dele. Não existe a passagem de bastão onde o projeto cai: eu levanto o escopo, construo o backend e o frontend, publico em infraestrutura que eu mesmo administro, e continuo respondendo pelo que quebrar. É justamente essa última parte que a maioria dos freelances não faz.
 
-### Automação em sistema que resiste a ela
+### Automação onde o software não colabora
 
-n8n e a API do WhatsApp para o canal, agendador para o que tem de acontecer sem requisição, e integração com software fechado de terceiro: mapear um schema sem documentação comparando snapshots, e depois escrever pela fila de integração do próprio fornecedor em vez de nas tabelas dele — assim o sistema que não é meu continua consistente.
+O trabalho repetitivo quase nunca está num sistema que ajuda você a tirá-lo de lá. Eu automatizo também sobre software fechado de terceiro: mapeio o que ele guarda por fora e devolvo pelo canal que o próprio fornecedor oferece, nunca escrevendo nas tabelas dele. Você para de fazer à mão sem ter que trocar o sistema que já pagou.
 
-### Construir a ferramenta com que eu desenvolvo
+### Velocidade com IA sem a dívida técnica que ela costuma trazer
 
-Um harness por repositório: skills carregando as convenções daquele projeto e os erros já pagos em depuração, subagentes com contexto isolado, hooks, servidores MCP ligados ao painel de deploy e ao banco de verdade — e um passo de verificação que o agente não tem permissão de pular antes de afirmar que algo funciona. Ferramenta que conhece o projeto ganha de ferramenta que conhece a linguagem.
+IA deixa qualquer um mais rápido; o que separa as pessoas é quanto ela sabe do seu código. Eu monto um harness por projeto — as convenções, os erros que já custaram depuração, e uma verificação que o agente não tem permissão de pular antes de afirmar que algo funciona. Rápido deixa de significar frágil, e isso vale para o seu repositório, não só para os meus.
 
 
 ---

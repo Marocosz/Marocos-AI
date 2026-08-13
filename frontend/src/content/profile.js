@@ -141,11 +141,37 @@ const profileDataEn = {
    * meio é o que um recrutador procura primeiro — ele não contrata um repositório,
    * contrata alguém que resolve uma classe de problema.
    *
-   * CINCO, E A ORDEM É A DO MERCADO. A primeira é a que o mercado mais disputa hoje
-   * e é onde ele tem mais profundidade; a última é a que quase ninguém lista e por
-   * isso diferencia. Nenhuma delas é uma tecnologia — tecnologia é a faixa logo
-   * abaixo desta seção, e repetir a lista aqui seria dizer a mesma coisa duas vezes
-   * na mesma tela.
+   * A ORDEM É A DO MERCADO. A primeira é a que o mercado mais disputa hoje e é onde
+   * ele tem mais profundidade; a última é a que quase ninguém lista e por isso
+   * diferencia. Nenhuma delas é uma tecnologia — tecnologia é a faixa logo abaixo
+   * desta seção, e repetir a lista aqui seria dizer a mesma coisa duas vezes na mesma
+   * tela.
+   *
+   * ==================================================
+   * O BENEFÍCIO PRIMEIRO, E UMA ÂNCORA TÉCNICA — NÃO CINCO.
+   *
+   * A primeira versão destes quatro textos foi reprovada inteira pelo dono do
+   * projeto, e o diagnóstico dele estava certo: os quatro descreviam COMO a coisa é
+   * feita e nenhum dizia o que muda para quem lê. Eram listas de decisão de
+   * implementação — "grafo de estados, não swarm", "tsvector e GIN antes de apelar
+   * para um segundo banco", "sessão no servidor quando token não pode ser revogado" —
+   * empilhadas em frases de cinco orações.
+   *
+   * O erro tem nome dentro deste próprio repositório. `content/servicos.js` declara
+   * que "toda afirmação sai com recibo"; aqueles textos eram recibo SEM afirmação.
+   * Detalhe de implementação é excelente no card de um projeto, onde já existe um
+   * problema declarado que ele resolve. Numa lista de capacidades ele é ruído: o
+   * leitor não tem contexto para saber por que "roteador barato antes do modelo caro"
+   * deveria importar para ele.
+   *
+   * A forma que ficou, e que vale manter em qualquer reescrita futura:
+   *
+   *   1. abre com o que o leitor GANHA, ou com a objeção que ele já tem na cabeça
+   *   2. UMA âncora técnica concreta, para provar que não é marketing
+   *   3. fecha com a consequência
+   *
+   * E são curtos. Eles vivem numa grade de duas colunas no "Sobre este PC": quatro
+   * parágrafos de seis linhas ali não são densidade, são parede.
    *
    * CADA UMA TEM DE SER SUSTENTADA POR ALGO QUE EXISTE NO SITE. É a regra que
    * impede a seção de virar anúncio: se uma capacidade não tem projeto, jornada ou
@@ -163,27 +189,27 @@ const profileDataEn = {
   capacidades: [
     {
       id: 'agentes',
-      titulo: 'AI agents that reach production',
+      titulo: 'AI agents that survive contact with a customer',
       texto:
-        'Deterministic control flow in code — a state graph, not a swarm — with the LLM confined to isolated cognitive steps: a cheap router before an expensive model, retrieval over a vector store, a guard that fails to "I do not know", and a repair step that takes the error back to the model instead of showing it to the user. Plus instrumentation, because an agent nobody measures is a rumour.',
+        'What separates a demo from an agent you can put in front of a paying customer is what it does when it does not know the answer. Mine would rather say so than invent, the decision path lives in code you can audit instead of in the model\'s mood, and every conversation becomes a number — because an agent nobody measures is a rumour, not a product.',
     },
     {
       id: 'produto',
-      titulo: 'Product from requirement to deploy',
+      titulo: 'One person from the first requirement to production',
       texto:
-        'FastAPI with typed contracts and real migrations, Postgres used properly (tsvector and GIN before reaching for a second data store), React and TypeScript in front, Docker on infrastructure I run myself. Server-side sessions when a token cannot be revoked, audit written inside the same transaction as the change, and the module boundary enforced by a CI gate rather than by good intentions.',
+        'You talk to one person from the first conversation to the system running, and after it. There is no handoff for the project to fall through: I scope it, build the backend and the front end, deploy it on infrastructure I run myself, and stay responsible for whatever breaks. That last part is where most freelance work quietly ends.',
     },
     {
       id: 'automacao',
-      titulo: 'Automation over systems that resist it',
+      titulo: 'Automation where the software will not cooperate',
       texto:
-        'n8n and the WhatsApp Cloud API for the channel, schedulers for what has to happen without a request, and integration with closed third-party software: mapping an undocumented schema by diffing snapshots, then writing through the vendor\'s own integration queue instead of into its tables, so the system I do not own stays consistent.',
+        'The repetitive work is rarely sitting in a system that helps you remove it. I automate over closed third-party software too: I map what it stores from the outside, and write back through the channel the vendor itself provides, never into its tables. You stop doing it by hand without having to replace the system you already paid for.',
     },
     {
       id: 'harness',
-      titulo: 'Building the tooling I develop with',
+      titulo: 'AI speed without the technical debt that usually comes with it',
       texto:
-        'A harness per repository: skills carrying that project\'s conventions and the mistakes already paid for, subagents with isolated context, hooks, MCP servers wired to the real deploy panel and database — and a verification step the agent is not allowed to skip before claiming something works. Tooling that knows the project beats tooling that knows the language.',
+        'AI makes everyone faster; what separates people is how much it knows about your codebase. I build a harness per project — the conventions, the mistakes already paid for in debugging, and a verification step the agent is not allowed to skip before claiming something works. Fast stops meaning fragile, and that transfers to your repository, not just mine.',
     },
   ],
 
@@ -259,27 +285,27 @@ const profileDataPt = {
   capacidades: [
     {
       id: 'agentes',
-      titulo: 'Agentes de IA que chegam em produção',
+      titulo: 'Agentes de IA que aguentam falar com cliente',
       texto:
-        'Controle de fluxo determinístico em código — grafo de estados, não swarm — com o LLM confinado a passos cognitivos isolados: um roteador barato antes do modelo caro, recuperação sobre base vetorial, uma guarda que falha para "não sei", e um passo de conserto que devolve o erro ao modelo em vez de mostrá-lo ao usuário. Mais métrificação, porque agente que ninguém mede é boato.',
+        'O que separa uma demonstração de um agente que você põe na frente de um cliente que paga é o que ele faz quando não sabe a resposta. Os meus preferem dizer que não sabem a inventar, o caminho da decisão fica em código auditável em vez de no humor do modelo, e cada conversa vira número — porque agente que ninguém mede é boato, não produto.',
     },
     {
       id: 'produto',
-      titulo: 'Produto do requisito ao deploy',
+      titulo: 'Uma pessoa do primeiro requisito até a produção',
       texto:
-        'FastAPI com contrato tipado e migração de verdade, Postgres usado direito (tsvector e GIN antes de apelar para um segundo banco), React e TypeScript na frente, Docker em infraestrutura que eu mesmo administro. Sessão no servidor quando token não pode ser revogado, auditoria escrita dentro da mesma transação da mudança, e fronteira de módulo verificada por gate de CI em vez de por boa intenção.',
+        'Você fala com uma pessoa da primeira conversa até o sistema no ar, e depois dele. Não existe a passagem de bastão onde o projeto cai: eu levanto o escopo, construo o backend e o frontend, publico em infraestrutura que eu mesmo administro, e continuo respondendo pelo que quebrar. É justamente essa última parte que a maioria dos freelances não faz.',
     },
     {
       id: 'automacao',
-      titulo: 'Automação em sistema que resiste a ela',
+      titulo: 'Automação onde o software não colabora',
       texto:
-        'n8n e a API do WhatsApp para o canal, agendador para o que tem de acontecer sem requisição, e integração com software fechado de terceiro: mapear um schema sem documentação comparando snapshots, e depois escrever pela fila de integração do próprio fornecedor em vez de nas tabelas dele — assim o sistema que não é meu continua consistente.',
+        'O trabalho repetitivo quase nunca está num sistema que ajuda você a tirá-lo de lá. Eu automatizo também sobre software fechado de terceiro: mapeio o que ele guarda por fora e devolvo pelo canal que o próprio fornecedor oferece, nunca escrevendo nas tabelas dele. Você para de fazer à mão sem ter que trocar o sistema que já pagou.',
     },
     {
       id: 'harness',
-      titulo: 'Construir a ferramenta com que eu desenvolvo',
+      titulo: 'Velocidade com IA sem a dívida técnica que ela costuma trazer',
       texto:
-        'Um harness por repositório: skills carregando as convenções daquele projeto e os erros já pagos em depuração, subagentes com contexto isolado, hooks, servidores MCP ligados ao painel de deploy e ao banco de verdade — e um passo de verificação que o agente não tem permissão de pular antes de afirmar que algo funciona. Ferramenta que conhece o projeto ganha de ferramenta que conhece a linguagem.',
+        'IA deixa qualquer um mais rápido; o que separa as pessoas é quanto ela sabe do seu código. Eu monto um harness por projeto — as convenções, os erros que já custaram depuração, e uma verificação que o agente não tem permissão de pular antes de afirmar que algo funciona. Rápido deixa de significar frágil, e isso vale para o seu repositório, não só para os meus.',
     },
   ],
 
