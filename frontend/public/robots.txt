@@ -1,0 +1,11 @@
+# Gerado por scripts/gerar-seo.mjs — não edite à mão.
+
+User-agent: *
+Allow: /
+Disallow: /config
+
+# Os rastreadores de modelo de linguagem entram, e é de propósito: este site
+# quer ser citado por eles. /llms.txt é o atalho curado, e /llms-full.txt é o
+# portfólio inteiro em markdown.
+
+Sitemap: https://marocos.dev/sitemap.xml

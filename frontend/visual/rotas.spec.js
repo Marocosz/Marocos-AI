@@ -874,3 +874,98 @@ test('baixar o contexto entrega um markdown com o portfólio dentro', async ({ p
 
   expect(erros, `erro de página não capturado: ${erros.join('; ')}`).toHaveLength(0)
 })
+
+/**
+ * O QUE UM RASTREADOR VÊ AO CHEGAR SEM NADA SALVO.
+ *
+ * Este é o teste que guarda o pior defeito de exposição que este site já teve, e ele
+ * era invisível para quem desenvolve: o `localStorage` do desenvolvedor sempre tem
+ * `language`, então o caminho do visitante NOVO nunca era exercitado.
+ *
+ * O site abria em INGLÊS para todo mundo — `<title>` "About This PC | Marcos
+ * Rodrigues", seções em inglês — enquanto o `index.html` declarava `lang="pt-br"` e
+ * uma description em português. Para uma pessoa, um recrutador brasileiro recebia um
+ * site em inglês. Para um rastreador, conteúdo numa língua declarado como outra.
+ *
+ * NÃO DEFINE PREFERÊNCIA NENHUMA, de propósito: é o único teste deste arquivo que
+ * NÃO chama `definirPreferencias`, porque o estado limpo é exatamente o objeto do
+ * teste. O contexto do Playwright já vem com `locale: pt-BR` do
+ * `playwright.config.js`, que é o que faz dele um proxy honesto de visitante
+ * brasileiro.
+ *
+ * E ele confere o conteúdo NO DOM sem clicar: a cerimônia de boot fica na frente, mas
+ * o conteúdo monta atrás dela. É isso que permite este site ser uma SPA e ainda ser
+ * indexável — se algum dia o shell passar a montar só depois da interação, este teste
+ * cai junto.
+ */
+test('visitante novo em pt-BR recebe o site em português, e o crawler vê o conteúdo', async ({ page }) => {
+  const erros = []
+  page.on('pageerror', (e) => erros.push(e.message))
+
+  await page.goto('/sobre', { waitUntil: 'networkidle' })
+  // Sem passar da cerimônia: é assim que um rastreador chega.
+  await expect(page.locator('.about-app')).toBeVisible({ timeout: 8000 })
+
+  const head = await page.evaluate(() => ({
+    lang: document.documentElement.lang,
+    titulo: document.title,
+    canonical: document.querySelector('link[rel="canonical"]')?.getAttribute('href'),
+    desc: document.querySelector('meta[name="description"]')?.getAttribute('content'),
+    robots: document.querySelector('meta[name="robots"]')?.getAttribute('content') ?? null,
+    texto: document.body.innerText,
+  }))
+
+  // O idioma DECLARADO bate com o idioma RENDERIZADO — o defeito era exatamente a
+  // divergência entre os dois.
+  expect(head.lang).toBe('pt-br')
+  expect(head.titulo).toContain('Marcos Rodrigues')
+  expect(head.texto).toContain('Sobre este PC')
+  expect(head.texto, 'o site voltou a abrir em inglês').not.toContain('About This PC')
+
+  // Título que vende, e não o nome do app: "Sobre este PC" não é consulta de busca.
+  expect(head.titulo).toContain('desenvolvedor de IA')
+
+  // Description PRÓPRIA da rota, e não a única do index.html.
+  expect(head.desc).toContain('quatro coisas')
+  expect(head.canonical).toBe('https://marocos.dev/sobre')
+
+  // Rota boa não leva noindex.
+  expect(head.robots).toBeNull()
+
+  // E há conteúdo de verdade no DOM, não só o chrome.
+  expect(head.texto.replace(/\s+/g, ' ').trim().length).toBeGreaterThan(2000)
+
+  expect(erros, `erro de página não capturado: ${erros.join('; ')}`).toHaveLength(0)
+})
+
+/**
+ * SLUG DE PROJETO QUE NÃO EXISTE RECEBE `noindex`.
+ *
+ * Numa SPA o servidor entrega o `index.html` para qualquer caminho, então
+ * `/projetos/code-doc-generator` — projeto que saiu da lista — respondia **HTTP 200**
+ * com canônica apontando para si mesmo e sem nenhum sinal de que não era página. Para
+ * o Google isso é um soft 404: ele gasta orçamento de rastreio ali e reporta erro no
+ * Search Console. Não há como devolver 404 de verdade sem servidor; `noindex` é a
+ * única resposta possível do lado do cliente, e basta, porque o Googlebot executa JS.
+ *
+ * A SEGUNDA METADE DO TESTE é a que pega o bug sutil: a meta é global e persiste entre
+ * navegações da SPA. Sem removê-la ao sair da rota morta, visitar um slug inválido e
+ * depois navegar para uma rota boa deixaria a rota BOA fora do índice.
+ */
+test('slug de projeto inexistente recebe noindex, e a rota seguinte não herda', async ({ page, context }) => {
+  await definirPreferencias(context)
+  await page.goto('/projetos/code-doc-generator', { waitUntil: 'networkidle' })
+  await passarDaCerimonia(page)
+  await expect(page.locator('.project-detail-empty')).toBeVisible({ timeout: 8000 })
+
+  await expect
+    .poll(() => page.evaluate(() => document.querySelector('meta[name="robots"]')?.content ?? null))
+    .toBe('noindex, follow')
+
+  // Navega para uma rota que EXISTE, dentro da mesma sessão.
+  await page.goto('/projetos', { waitUntil: 'networkidle' })
+  await expect(page.locator('.projects-app-list')).toBeVisible({ timeout: 8000 })
+  await expect
+    .poll(() => page.evaluate(() => document.querySelector('meta[name="robots"]')?.content ?? null))
+    .toBeNull()
+})

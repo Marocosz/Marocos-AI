@@ -22,7 +22,7 @@ Existe uma suíte para isso. Rode-a:
 cd frontend/visual
 npm install          # 1ª vez: baixa o Chromium (só aqui, não polui o app)
 npm run build:frontend
-npm test             # 50 testes: 24 visuais + 26 funcionais
+npm test             # 52 testes: 24 visuais + 28 funcionais
 ```
 
 Falhou uma cena? Abra o relatório com `npm run report` — ele mostra referência,
@@ -37,7 +37,7 @@ falha que você não entendeu apaga a única evidência de que algo quebrou.
 | suíte | pega | não pega |
 |---|---|---|
 | `visual.spec.js` (24 cenas) | geometria, cor, espaçamento, tipografia, nos dois temas e no mobile | qualquer coisa que dependa de **tempo** |
-| `rotas.spec.js` (26 testes) | `import()` dinâmico quebrado, deep link, histórico, carga sob demanda, **e o que só existe depois de um clique** | aparência |
+| `rotas.spec.js` (28 testes) | `import()` dinâmico quebrado, deep link, histórico, carga sob demanda, **e o que só existe depois de um clique** | aparência |
 | `npm test` no `frontend/` | lógica pura (roteamento, reducer de janelas, config) | tudo que precisa de DOM |
 
 **O regressor visual é estruturalmente cego a tempo.** Ele desliga a animação
@@ -383,7 +383,7 @@ uma decisão que custou medição ou depuração:
   `opacity` de um ancestral de conteúdo vetorial muda o antialiasing dele**. A
   checagem é ligar/desligar a propriedade suspeita, nunca subir tolerância.
 
-  **Com 50 testes a suíte cheia reprova 1–4 cenas por execução, e o
+  **Com 52 testes a suíte cheia reprova 1–4 cenas por execução, e o
   conjunto MUDA a cada rodada.** Medido em 2026-08-12: uma execução reprovou
   `stack`, `stack-claro` e `servicos-claro`; as três passaram rodadas
   isoladamente; a execução seguinte reprovou só `stack` — com o diff caindo de

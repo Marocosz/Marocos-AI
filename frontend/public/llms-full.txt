@@ -1,0 +1,543 @@
+# Contexto profissional de Marcos Rodrigues
+
+> **Como usar este arquivo.** Ele é o conteúdo integral do portfólio
+> marocos.dev num arquivo só, para você jogar no seu assistente de IA e
+> perguntar o que quiser — comparar com uma vaga, checar se uma habilidade
+> específica aparece, ou pedir um resumo do jeito que você prefere ler.
+>
+> Nada aqui foi escrito para o download: é a mesma fonte que desenha as
+> janelas do site, exportada no momento em que você clicou. Então se o site
+> mudar, este arquivo muda junto.
+>
+> Existe também um agente treinado nesta trajetória em marocos.dev — ele
+> responde com a persona do Marcos e cita as fontes. Este arquivo é para
+> quando você prefere o seu próprio sistema.
+
+*Gerado em 13 de agosto de 2026 · versão do sistema 3.1.0 · https://marocos.dev*
+
+---
+
+## Identidade
+
+- **Cargo:** AI Software Engineer | Desenvolvedor Full-Stack
+- **Localização:** Uberlândia – MG
+- **Idade:** 22 anos
+- **Status:** aberto a freelance
+- **Em uma frase:** Construo sistemas com IA que chegam em produção. Este site é um deles.
+
+### Biografia
+
+Esse primeiro emprego foi suporte técnico, aos 14 anos — equipamento dos outros na minha mão e um problema que precisava ser resolvido de verdade. Depois veio a eletrônica, e depois a graduação em Gestão da Informação na UFU, que fica entre Administração e Ciência da Computação com dados no meio, concluída em agosto de 2026. Hoje sou desenvolvedor de IA e automações na Finza, num motor de cobrança com agentes conversacionais em produção — e fazendo análise de requisitos, que acabou sendo metade do trabalho: estar na reunião onde uma dor de negócio vira escopo técnico. Em paralelo sigo com freelance, assumindo o ciclo inteiro, da primeira conversa ao deploy e ao que quebra depois dele.
+
+### No dia a dia
+
+Python · FastAPI · LangGraph · GenAI & RAG · Machine Learning · PostgreSQL · Supabase · React · n8n · Docker · DevOps
+
+---
+
+## O que eu sou contratado para fazer
+
+### Agentes de IA que chegam em produção
+
+Controle de fluxo determinístico em código — grafo de estados, não swarm — com o LLM confinado a passos cognitivos isolados: um roteador barato antes do modelo caro, recuperação sobre base vetorial, uma guarda que falha para "não sei", e um passo de conserto que devolve o erro ao modelo em vez de mostrá-lo ao usuário. Mais métrificação, porque agente que ninguém mede é boato.
+
+### Produto do requisito ao deploy
+
+FastAPI com contrato tipado e migração de verdade, Postgres usado direito (tsvector e GIN antes de apelar para um segundo banco), React e TypeScript na frente, Docker em infraestrutura que eu mesmo administro. Sessão no servidor quando token não pode ser revogado, auditoria escrita dentro da mesma transação da mudança, e fronteira de módulo verificada por gate de CI em vez de por boa intenção.
+
+### Automação em sistema que resiste a ela
+
+n8n e a API do WhatsApp para o canal, agendador para o que tem de acontecer sem requisição, e integração com software fechado de terceiro: mapear um schema sem documentação comparando snapshots, e depois escrever pela fila de integração do próprio fornecedor em vez de nas tabelas dele — assim o sistema que não é meu continua consistente.
+
+### Construir a ferramenta com que eu desenvolvo
+
+Um harness por repositório: skills carregando as convenções daquele projeto e os erros já pagos em depuração, subagentes com contexto isolado, hooks, servidores MCP ligados ao painel de deploy e ao banco de verdade — e um passo de verificação que o agente não tem permissão de pular antes de afirmar que algo funciona. Ferramenta que conhece o projeto ganha de ferramenta que conhece a linguagem.
+
+
+---
+
+## Números
+
+- **7+** Serviços freelance — do requisito ao deploy
+- **4+** Anos de experiência — empregado desde 2025
+- **30+** Projetos totais — em 40 repositórios
+
+---
+
+## Trajetória profissional
+
+### 2026 — hoje — Desenvolvedor de IA e Automações
+
+*Finza*
+
+Em março de 2026 saí do estágio na Supporte e fui contratado aqui — uma subida grande, e a primeira vez que o cargo bate com o que eu de fato faço. Trabalho num motor de cobrança: frontend em React, Supabase de banco e backend, e uma frota de agentes conversacionais falando com cliente real, que eu ajudo a construir e ajudo a medir. A medição é a parte que eu não esperava que fosse a difícil. Também faço análise de requisitos, o que significa que boa parte da minha semana é reunião: entender a dor do negócio, traduzir em escopo técnico, e devolver as consequências para gente que não escreve código. A automação roda em n8n e na API do WhatsApp, e tudo sobe por um ciclo de CI/CD definido.
+
+`React` · `Supabase` · `Agentes de IA` · `n8n` · `Requisitos` · `CI/CD`
+
+### 2025 — 2026 — Desenvolvedor Full-Stack, com foco em IA
+
+*Supporte Logística · Inovação*
+
+Um estágio na área de inovação, e onde aprendi arquitetura, DevOps e boas práticas ao lado de desenvolvedores mais experientes. Começou com BI conversacional sobre dado logístico e terminou num lugar que eu não tinha planejado: fazendo machine learning de verdade. Análise de risco em áreas da empresa, pedidos de demanda agrupados por embeddings para descobrir o que as pessoas estavam realmente pedindo, e um hub interno de agentes SQL que lia a base operacional e escrevia as consultas que as outras áreas não conseguiam escrever sozinhas. Foi ali que a ciência de dados parou de ser matéria que eu tinha cursado e virou coisa que eu faço.
+
+`FastAPI` · `LangChain` · `Machine Learning` · `Text-to-SQL` · `Docker`
+
+### 2024 — A virada: IA generativa
+
+*Freelance & UFU*
+
+O ano em que parei de consumir API de IA e passei a construir com ela: APIs RESTful containerizadas com FastAPI e Docker, RAG sobre banco vetorial, engenharia de prompt. O freelance cresceu junto — cliente de verdade, problema de verdade, automação de processo que tira trabalho manual em vez de acrescentar tela.
+
+`RAG` · `LangChain` · `FastAPI` · `Docker` · `Freelance`
+
+### 2022 — 2026 — Gestão da Informação na UFU
+
+*Universidade Federal de Uberlândia*
+
+Uma graduação interdisciplinar que põe Administração e Ciência da Computação na mesma sala, apontadas para dados — Análise de Dados I a IV, Inteligência Artificial, Estrutura de Dados, Engenharia de Software, Banco de Dados e Mineração de Dados. Fechou em agosto de 2026 com um TCC do qual eu tenho orgulho de verdade: uma auditoria de caixa-preta do recomendador do Spotify, com quatro personas sintéticas construídas dentro de contas reais e estatística inferencial em cima. Fora da sala, passei quase um ano dando aula de informática para crianças no Centro Comunitário Sal da Terra, e comecei a treinar judô pela atlética.
+
+`Ciência de dados` · `Estatística` · `Python` · `Pandas` · `Ensino`
+
+### 2019 — 2021 — Técnico em Eletrônica, e o primeiro curso que dei
+
+*IFTM · Instituto Federal*
+
+Ensino médio integrado ao técnico em Eletrônica, em tempo integral — foi ali que decidi seguir como desenvolvedor. Para o PAE daquele ano, eu e alguns amigos montamos do zero um curso introdutório de eletrônica: microcontroladores, lógica no Arduino, Tinkercad, Eagle e protótipos que funcionavam. Publicamos tudo de graça no YouTube, no canal Denki3577.
+
+`Arduino` · `C++` · `Eletrônica` · `Ensino`
+
+### 2018 — Primeiro emprego, aos 14: suporte e manutenção
+
+*ServData*
+
+Formatava máquinas, fazia backup, trocava componente, consertava impressora e lidava com Windows todo santo dia. A parte técnica contou, mas o que ficou foi o senso de responsabilidade: equipamento dos outros na minha mão e um problema que precisava ser resolvido de verdade. Até hoje monto e conserto hardware.
+
+`Hardware` · `Windows` · `Suporte` · `Diagnóstico`
+
+### PRÓXIMO — Para onde estou indo
+
+*Roadmap*
+
+A matemática por baixo dos modelos — machine learning no osso, e não só a API por cima dele. Comecei esse caminho no TCC e num pipeline de fraude, e quero que ele pare de ser a parte que eu consulto. Junto disso: arquitetura de agente que sobrevive à produção, avaliação de agente como disciplina e não como hábito, e liderança técnica — o trabalho de requisitos na Finza me fez perceber que traduzir entre engenharia e negócio é habilidade que se treina de propósito, não tarefa chata.
+
+`Machine Learning` · `Avaliação de agentes` · `Arquitetura` · `Liderança`
+
+
+---
+
+## Projetos
+
+### Diário Oficial Eletrônico
+
+**Categoria:** SaaS Multi-tenant · **Contexto:** Freelance · **Último trabalho:** 2026-07-06
+
+Plataforma whitelabel multi-tenant de Diário Oficial municipal: o servidor diagrama a edição num editor de blocos, o sistema renderiza, assina com o certificado digital da própria prefeitura e publica, e qualquer cidadão pesquisa o texto integral sem login. Uma base de código atendendo vários municípios, cada um isolado por coluna.
+
+**O problema.** Diário Oficial é instrumento jurídico, então listagem de PDF escaneado é arquivo morto, não sistema de publicação. Três coisas têm de ser verdade ao mesmo tempo: o arquivo carrega validade legal, o acervo é pesquisável como texto décadas para trás, e a diagramação que o servidor vê é byte a byte a que vai ser assinada. A terceira é onde as soluções ingênuas morrem — uma pré-visualização em HTML que pagina diferente do PDF final faz do editor um mentiroso.
+
+**Como funciona.** O PDF é renderizado por Chromium headless, então o navegador que diagrama a pré-visualização é o navegador que produz o arquivo. Para buscar as próprias páginas autenticadas, o renderizador recebe um token de vida curta emitido na hora — e porque esse token acabaria dentro de um stack trace, existe um limpador com regex restrito ao charset que o remove de qualquer texto de erro antes do log. A assinatura é ICP-Brasil PAdES B-B via pyHanko, com o certificado guardado por prefeitura e o assinador resolvido por fábrica, então a suíte roda contra um assinador falso e a produção não fica sabendo. A busca textual é tsvector com índice GIN do próprio Postgres, em vez de um segundo banco.
+
+**No código:**
+
+- Guarda de SSRF no conteúdo da seção: o Chromium do servidor busca toda imagem do documento, então uma URL apontando para endereço interno viraria um GET de dentro da rede — validado no salvamento, com lista de hosts permitidos
+- Assinatura ICP-Brasil PAdES B-B via pyHanko, certificado por prefeitura, com expiração e certificado inválido como erro tipado em vez de exceção solta
+- O editor de posicionamento de calhau usa páginas reais do PDF rasterizadas como fundo, e não o render ao vivo do navegador — porque os dois paginavam diferente — com hash de conteúdo para só re-renderizar quando a edição de fato mudou
+- O token que o renderizador usa para buscar as próprias páginas é limpo de qualquer texto de erro antes do log, por regex restrito ao charset — credencial de vida curta ainda é credencial, e stack trace vai para arquivo
+- Renderizador e assinador são ambos Protocol com implementação falsa, e é isso que permite a suíte rodar sem subir Chromium nem ter um certificado de verdade
+- Importador de acervo legado, porque um diário novo começa com décadas de diários antigos
+
+**Tecnologias:** FastAPI, asyncpg, PostgreSQL, Alembic, pyHanko, Playwright, pypdf, S3/MinIO, React, TypeScript, BlockNote
+
+*Código fechado (cliente ou empresa) — descrito aqui, não publicado*
+
+### Portal Acadêmico
+
+**Categoria:** Engenharia Fullstack · **Contexto:** Freelance · **Último trabalho:** 2026-08-09
+
+Portal de solicitações para uma unidade de universidade federal. Alunos, e também pessoas sem vínculo acadêmico nenhum, abrem pedidos por formulários que a própria unidade monta; o professor decide, a secretaria decide por último, e tudo que aconteceu é recuperável. Freelance, do começo ao fim — requisitos, backend, frontend e infraestrutura.
+
+**O problema.** A unidade não quer um conjunto fixo de tipos de solicitação — quer criar tipos novos sem desenvolvedor, o que transforma o sistema num construtor de formulário com lógica condicional. E a cadeia de aprovação tem uma armadilha que máquina de estados ingênua erra: quando o professor aprova, o aluno NÃO pode ver "aprovado", porque só a secretaria concede isso. Mostrar antes cria uma expectativa que a instituição depois tem de quebrar.
+
+**Como funciona.** O status visível é derivado, nunca armazenado: estado interno não vaza, e a própria tabela de transições declara qual papel pode executar cada movimento — a permissão mora ao lado da regra em vez de numa tela. Os formulários são um construtor com oito tipos de campo, validadores de formato por campo (inclusive a aritmética real de dígito verificador de CPF) e condições de visibilidade avaliadas contra as respostas já dadas. A autenticação é sessão no servidor em Redis, e não JWT, porque token que não se revoga é a troca errada para registro acadêmico — e o chat por processo roda em SSE sobre pub/sub do Redis, com uma política em funções puras decidindo quem vê cada mensagem, para nota de staff continuar interna.
+
+**No código:**
+
+- A suíte aponta para um banco próprio, truncado antes de cada teste, com um Redis próprio limpo junto — então uma rodada de teste não consegue deixar resíduo no ambiente em que alguém está desenvolvendo
+- Fronteira de módulos verificada por import-linter como gate de CI: um módulo importa o service do outro, nunca os models nem o repository, então cruzar fronteira significa passar primitivo
+- O ciclo de vida do anexo espelha o do processo — o arquivo vive em temp/ enquanto pendente e só é movido para definitivo/ na aprovação final
+- Protocolo gerado de um alfabeto de 36 caracteres com secrets, e não por sequência: o solicitante externo consegue acompanhar o caso pelo protocolo justamente porque o próximo não é adivinhável
+- Autenticação em dois fatores com TOTP, rate limiting, CSRF por double-submit e cabeçalhos de segurança, cada um com teste próprio
+- Auditoria transacional: o log entra na mesma transação da mudança que ele descreve, ou nenhum dos dois acontece
+
+**Tecnologias:** FastAPI, SQLAlchemy 2, PostgreSQL, Alembic, Redis, Celery, structlog, React, TypeScript, i18next
+
+*Código fechado (cliente ou empresa) — descrito aqui, não publicado*
+
+### Motor de Cobrança
+
+**Categoria:** Fullstack & Automação · **Contexto:** Produto em produção · **Último trabalho:** 2026-08-12
+
+O produto em que eu trabalho todo dia na Finza. É o motor que decide o que o time de cobrança faz em seguida: ele agenda o trabalho, organiza e filtra a carteira, e gera ações a partir do que os sistemas integrados reportam — mais um conjunto de serviços feitos especificamente para o jeito daquele time operar. Os agentes conversacionais são um dos canais que ele aciona, não o objetivo dele.
+
+**O problema.** Cobrança não é problema de conversa, é problema de priorização num volume que time nenhum trabalha na mão. O dado chega de vários sistemas integrados, cada um com a própria ideia do que é um devedor, e a decisão de quem contatar hoje, por qual canal e com qual mensagem tem de sair do outro lado como ação concreta — auditável, reversível e explicável para quem perguntar por que aquela pessoa foi contatada.
+
+**Como funciona.** O motor fica entre as integrações e o time: consolida e filtra o que entra, agenda o trabalho por janela de tempo e por regra, e emite ação em vez de relatório — então o time recebe algo para fazer, e não um painel para interpretar. Em volta disso existem serviços específicos para o fluxo daquele time. Os agentes conversacionais rodam por cima, como um dos canais de execução, e porque um bot que responde mal queima um cliente que paga, toda conversa é instrumentada: a camada de métricas transforma transcrição em número que o negócio consegue discutir — é o que tira o "o bot parece estar ok" e põe uma decisão no lugar.
+
+**No código:**
+
+- Agendamento e filtragem como o núcleo: a saída é ação gerada com o motivo anexado, e não uma lista para alguém ler
+- Consolidação entre vários sistemas integrados, cada um com um formato próprio para a mesma entidade
+- Métrificação dos próprios agentes conversacionais — a conversa vira um número sobre o qual o negócio consegue agir
+- Supabase como banco e backend, frontend React, e ciclo de CI/CD definido sobre os dois, então mudar um prompt sobe revisado e reversível como qualquer mudança de código
+- Também atuo como analista de requisitos nele: as reuniões onde uma dor de negócio vira escopo técnico são minhas
+
+**Tecnologias:** React, Supabase, PostgreSQL, Edge Functions, n8n, API do WhatsApp, Agentes de IA, CI/CD
+
+*Código fechado (cliente ou empresa) — descrito aqui, não publicado*
+
+### Hub de Agentes de IA
+
+**Categoria:** Plataforma de IA · **Contexto:** Feito no trabalho · **Último trabalho:** 2026-02-05
+
+Plataforma interna de IA construída na Supporte Logística: quatro backends de agente especializados atrás de um gateway único, cada um atendendo uma área diferente. Text-to-SQL sobre a base operacional, análise semântica de chamados, redação assistida de documentos de qualidade, e documentação de robôs legados.
+
+**O problema.** Agente autônomo conversando com agente é a resposta errada dentro de uma empresa. Swarm gera loop infinito, custo imprevisível e decisão que ninguém audita — e text-to-SQL erra sozinho em torno de uma vez a cada cinco. Pior: consulta gerada é código arbitrário apontado para um banco de produção, e a falha interessante não é erro de sintaxe, é um DROP que parseia perfeitamente.
+
+**Como funciona.** O controle de fluxo mora em Python determinístico — uma máquina de estados finita — e o LLM só faz tarefa cognitiva isolada. Um roteador barato classifica a intenção em cinco categorias antes de tocar modelo caro. O SQL gerado passa então por uma guarda que o transforma em árvore sintática com sqlglot, ciente do dialeto, e caminha pela árvore recusando tipos de nó proibidos — então DELETE, DROP, UPDATE e companhia são pegos estruturalmente, e não por comparação de string. Quando o banco recusa mesmo assim, um agente corretor recebe o SQL quebrado junto com o erro real do Postgres e reescreve, então o usuário nunca vê a falha. A análise de chamados é outra disciplina inteira: chamado vira embedding, o UMAP reduz a dimensionalidade para densificar, o HDBSCAN encontra os grupos, e só então um LLM explica o que cada grupo tem em comum.
+
+**No código:**
+
+- Quatro backends de agente e um frontend React atrás de um gateway nginx, orquestrados por Docker Compose
+- Guarda de SQL por árvore sintática, e não por blacklist: o sqlglot parseia e o caminhamento recusa tipos de nó proibidos — que é a diferença entre bloquear DROP e bloquear toda forma de escrever DROP
+- Text-to-SQL que se conserta: o agente corretor recebe a consulta quebrada e o erro do banco e reescreve, então os ~20% de falha natural deixam de ser problema do usuário
+- Segurança por linha injetada no prompt: o papel do usuário e as restrições de SQL dele viajam junto com a pergunta
+- Clusterização com UMAP antes do HDBSCAN, com auto-tuning por volume de dados e refinamento recursivo de macro para micro, devolvendo hierarquia e confiança por ponto — outlier continua outlier em vez de ser forçado num grupo
+- Redação de documento como cinco agentes sequenciais (planejador, redator, revisor, crítico, finalizador) com portas de aprovação humana entre eles por WebSocket, e um mock de cada um para o fluxo ser testável sem gastar token
+
+**Tecnologias:** FastAPI, LangChain, sqlglot, Qdrant, HDBSCAN, UMAP, OpenAI, PostgreSQL, WebSocket, React, nginx, Docker
+
+*Código fechado (cliente ou empresa) — descrito aqui, não publicado*
+
+### Bússola V2
+
+**Categoria:** Fullstack & IA · **Contexto:** Pessoal · **Último trabalho:** 2026-07-21
+
+Meu sistema operacional pessoal: finanças, registros, treino e planejamento numa aplicação só, com dezoito agentes de IA em cinco domínios que leem o dado de verdade e propõem ação em vez de conversar sobre ela. É também o projeto onde eu testo ideia de arquitetura antes de ela chegar em cliente.
+
+**O problema.** Assistente que responde em texto livre é inútil dentro de uma aplicação, porque a interface não sabe desenhar um parágrafo como botão. E saída de LLM não é determinística: o mesmo prompt devolve uma lista pura numa vez e um dicionário embrulhando essa lista na seguinte. Então a parte difícil não é fazer dezoito agentes darem bom conselho — é fazê-los responder numa forma que o frontend consiga desenhar, toda vez, sem o frontend aprender a interpretar.
+
+**Como funciona.** Todo agente devolve o mesmo contrato universal: um schema Pydantic com sugestão tipada, severidade e payload de ação. Entre o modelo e o resto do sistema existe uma camada de saneamento que normaliza a variação estrutural numa lista plana, injeta o metadado que o modelo esqueceu, e valida de forma estrita — então o que estiver malformado morre ali em vez de chegar na interface. Os campos de enum passam por fuzzy matching, porque um modelo que responde "alto" onde o enum diz "ALTO" está certo em espírito e reprovaria na validação. O LLM vem de uma fábrica com retry e parsing seguro de JSON, o que faz do provider uma variável de ambiente em vez de uma reescrita.
+
+**No código:**
+
+- 18 agentes em cinco domínios, cada um com orquestrador próprio sobre uma base compartilhada
+- Contrato universal de resposta mais camada de saneamento: o frontend desenha cards e botões a partir do contrato e nunca aprende qual agente os produziu
+- Fuzzy matching de string solta de LLM para enum rígido, então resposta válida na caixa errada é aceita em vez de recusada
+- Três providers de LLM intercambiáveis atrás de uma fábrica, com retry e parsing seguro, e os imports protegidos para driver ausente não impedir a aplicação de subir
+- Cache em Redis nas respostas de IA, porque a mesma pergunta sobre o mesmo dado inalterado não merece uma segunda chamada de modelo
+- Manipulação de dinheiro tem teste próprio, porque é o único lugar da aplicação onde erro de arredondamento é bug e não detalhe
+- Um bot de Discord companheiro, com autenticação e fluxo de vínculo de conta próprios
+
+**Tecnologias:** React 19, FastAPI, LangGraph, LangChain, Pydantic, PostgreSQL, SQLAlchemy, Redis, discord.py, Docker
+
+**Repositório:** https://github.com/Marocosz/Bussola-v2
+
+### Auditoria Algorítmica do Spotify
+
+**Categoria:** Ciência de Dados & Pesquisa · **Contexto:** Acadêmico · **Último trabalho:** 2026-07-14
+
+Meu TCC em Gestão da Informação: uma auditoria de caixa-preta do recomendador do Spotify. Quatro personas sintéticas foram construídas dentro de contas reais, deixadas assentar, e então o que a plataforma recomendou de volta para elas foi medido contra o que elas receberam de estímulo. A pergunta era se a curadoria automatizada amplia o gosto musical ou homogeneíza.
+
+**O problema.** Não dá para ler o código de um recomendador, então o comportamento tem de ser inferido de fora — e qualquer diferença encontrada precisa sobreviver à objeção de que foi acaso. E no meio da pesquisa o Spotify removeu progressivamente campos da Web API, o que quebrou o método planejado para medir o que as recomendações de fato continham.
+
+**Como funciona.** Auditoria por agentes-sonda: cada persona é construída programaticamente numa conta real — playlists, curtidas, seguidos — com arquétipo contrastante e regra de seleção documentada, para o input ser variável e não gosto. Os campos removidos da API foram substituídos por enriquecimento no Last.fm e no MusicBrainz, e a remoção em si foi tratada como achado sobre a opacidade da plataforma, não como acidente. Diversidade e concentração saem de entropia de Shannon, evenness de Pielou, Gini, HHI e Jaccard, e nada disso é reportado cru: toda comparação carrega intervalo de confiança por bootstrap, teste de Mann-Whitney, rarefação para controlar tamanho de amostra desigual, e teste de permutação para estabelecer o que o acaso sozinho teria produzido.
+
+**No código:**
+
+- Os repertórios de artistas ficaram integralmente disjuntos entre as personas — Jaccard = 0, e o teste de permutação põe isso como mais segregado que o acaso, p < 0,001
+- A diversidade converge por riqueza de catálogo, não por homogeneização de entropia: a plataforma amplia a prateleira sem achatar o gosto — o que é uma resposta diferente das duas que a literatura espera
+- Viés de popularidade (+131% de ouvintes por artista) e viés de hit dentro da cauda longa (+405% de ouvintes por faixa), os dois medidos e não afirmados
+- Rarefação no pipeline porque as personas terminaram com tamanhos de amostra diferentes, e métrica de diversidade é sensível a isso — comparar cru teria fabricado um resultado
+- 28 scripts de pipeline em quatro fases, da construção das contas à geração das figuras, com o reset das contas como etapa própria para uma rodada começar limpa
+
+**Tecnologias:** Python, spotipy, pandas, NumPy, SciPy, Matplotlib, Seaborn, API do Last.fm, MusicBrainz
+
+**Repositório:** https://github.com/Marocosz/TCC
+
+### Portal de Controle de Acesso
+
+**Categoria:** Integração de Legado & IA · **Contexto:** Freelance · **Último trabalho:** 2026-06-01
+
+Portal construído sobre um sistema de catraca e ponto de terceiro. Ele lê o banco do fornecedor, acrescenta o fluxo de visitante que o produto original nunca teve, monitora os eventos de acesso ao vivo, e dispara relatórios de segurança escritos por um LLM sobre número real. Freelance, backend e frontend.
+
+**O problema.** O dado valioso estava trancado dentro de um sistema comercial fechado, sem documentação de schema, e o cliente não podia trocar de sistema. Então tudo que era útil precisava ser inferido de fora — e inferido com segurança de um jeito específico: é um banco cuja integridade outro fornecedor é responsável, e escrever direto nas tabelas dele seria sabotagem disfarçada de integração.
+
+**Como funciona.** Mapeei o schema tirando snapshots repetidos e comparando um com o outro, o que produziu um changelog de quais tabelas de fato se movem quando uma pessoa passa pela catraca. Depois a integração ficou deliberadamente assimétrica: a leitura vai direto nas tabelas e views por performance, mas toda criação, alteração e exclusão é escrita na fila de integração do próprio fornecedor com status pendente, para o gerenciador de tarefas dele aplicar a mudança pelas regras dele. O portal nunca toca as tabelas principais para escrever. Em cima disso, um agendador roda os relatórios: os KPIs são calculados do log de catraca, um LLM escreve a análise numa estrutura fixa de cinco seções, e o PDF é gerado e arquivado.
+
+**No código:**
+
+- Integração assimétrica com o legado: leitura direta por velocidade, mas escrita na fila de integração do fornecedor com status pendente, para o gerenciador de tarefas dele aplicar — o sistema fechado continua consistente
+- Schema legado mapeado por comparação de snapshots, e a ferramenta com os changelogs dela está commitada no repositório
+- Cinco jobs agendados: geração de relatório diário, semanal e mensal, varredura de retenção de 60 dias, e uma passada horária que expira solicitação de visita vencida e avisa por e-mail quem foi afetado
+- Relatório de LLM restringido por template de cinco seções com proibições explícitas de formatação, porque o modo de falha de um modelo que escreve relatório é preâmbulo e metadado inventado
+- Monitoramento de catraca ao vivo por WebSocket, com KPI diário e um log de auditoria forense separado, restrito ao papel de administrador
+- Response model do Pydantic como fronteira de segurança: o schema interno de usuário carrega o hash de senha e o público não, então um retorno descuidado não consegue vazá-lo
+
+**Tecnologias:** FastAPI, SQL Server, pyodbc, LangChain, Gemini, APScheduler, ReportLab, Nuxt 4, Vue 3, Pinia
+
+*Código fechado (cliente ou empresa) — descrito aqui, não publicado*
+
+### Fraud Sentinel
+
+**Categoria:** Machine Learning · **Contexto:** Acadêmico · **Último trabalho:** 2026-03-09
+
+Pipeline completo de machine learning para detectar fraude em abertura de conta bancária, sobre a base Bank Account Fraud publicada no NeurIPS 2022. O objetivo é pegar o máximo de fraude mantendo o falso alarme baixo o suficiente para um time humano ainda conseguir trabalhar a fila.
+
+**O problema.** Fraude é cerca de 1% da base, então um modelo que responde "legítimo" para tudo acerta 99% e não serve para nada — acurácia é a métrica errada antes de qualquer outra coisa acontecer. Mas o problema mais sutil é o limiar de decisão. É tentador escolher o corte que maximiza F1 no dado que você tem, e isso é vazamento de dados de avental branco: um limiar ajustado no conjunto de treino é otimista sobre si mesmo, e o modelo parece melhor no relatório do que jamais será em produção.
+
+**Como funciona.** CRISP-DM de ponta a ponta: análise exploratória com teste de significância e mutual information para seleção de variável, downcasting de memória para a base caber, e então oito algoritmos treinados e comparados sobre uma classe base comum — regressão logística, árvore de decisão, random forest, XGBoost, LightGBM, um perceptron multicamadas, isolation forest pelo ângulo de anomalia, e um ensemble por stacking em cima. O limiar é calculado num split de validação que o modelo não viu no treino, que é o conserto do vazamento acima, e existe um módulo separado que move o corte para atingir uma precisão-alvo — assim a restrição de negócio entra na matemática em vez de ser discutida depois.
+
+**No código:**
+
+- O módulo de limiar existe por causa de um bug real: ele estava sendo calculado com predict_proba no próprio conjunto de treino, o que deixava o F1 estimado otimista. Hoje vem de um split de validação retido
+- Oito treinadores sobre uma classe base comum, incluindo isolation forest e um ensemble por stacking
+- Ajuste por precisão-alvo: você declara a taxa de falso alarme que o time aguenta e ele acha o corte, em vez de reportar o limiar que lisonjeia o modelo
+- Simulação de produção sobre dado retido, porque métrica em split de teste não é modelo em operação
+- Log de experimento em toda rodada, então comparar dois modelos é um registro e não uma lembrança
+
+**Tecnologias:** Python, scikit-learn, XGBoost, LightGBM, CatBoost, pandas, NumPy, Matplotlib, CRISP-DM, Docker
+
+**Repositório:** https://github.com/Marocosz/fraud-sentinel
+
+### Portal do Cidadão
+
+**Categoria:** SaaS Multi-tenant · **Contexto:** Freelance · **Último trabalho:** 2026-06-14
+
+Plataforma whitelabel multi-tenant para municípios receberem solicitações de assistência social e rodarem um balcão de empregos pela internet. O cidadão usa sem criar conta, identificado por documento; o funcionário trabalha num painel administrativo restrito à própria prefeitura.
+
+**O problema.** A mesma base de código atende vários municípios, e uma única consulta que esquece o filtro de tenant põe o registro de assistência social de uma cidade na tela de outra — com dado que é sensível por lei. Além disso nem todo município compra todo módulo, então o produto tem de vender em pedaços sem gerar um build diferente por cliente.
+
+**Como funciona.** Toda entidade carrega a coluna de tenant e toda consulta filtra por ela. O frontend resolve o tenant pelo slug da URL, um middleware prende ele na requisição e recusa o que não conseguir resolver, e uma lista de slugs reservados impede um tenant de reivindicar rota administrativa. Os módulos são feature flags por tenant, ligadas pelo operador da plataforma — e existe um teste cujo trabalho inteiro é provar que desligar uma feature fecha os endpoints dela, porque flag que só esconde menu não é flag, é enfeite em cima de uma API aberta.
+
+**No código:**
+
+- Um teste dedicado provando que feature desligada está fechada na API e não apenas escondida na interface — a diferença entre uma feature flag e um enfeite
+- Isolamento por coluna mais middleware, com slugs reservados para um tenant nunca conseguir reivindicar rota administrativa
+- Quatro papéis, incluindo um operador que atravessa tenants e é o único capaz de criar município e o único que vê auditoria de todos eles
+- Identidade visual dinâmica por prefeitura — cor e logo — a partir de um build só
+- Os testes estão concentrados exatamente onde bug de multi-tenant é caro: resolução de tenant, fechamento de feature, o override que atravessa tenants e a trilha de auditoria
+
+**Tecnologias:** FastAPI, SQLAlchemy, PostgreSQL, Alembic, React, TypeScript, Zustand, Docker
+
+*Código fechado (cliente ou empresa) — descrito aqui, não publicado*
+
+### DataChat BI
+
+**Categoria:** IA & Analytics · **Contexto:** Feito no trabalho · **Último trabalho:** 2025-11-15
+
+Business intelligence conversacional para logística, construído na Supporte Logística: você pergunta em linguagem natural, o sistema escreve o SQL, executa e responde com número e gráfico. Um dashboard fica ao lado do chat, sobre o mesmo motor.
+
+**O problema.** A maior parte das perguntas de um gestor está a uma consulta de ser respondida, e a consulta nunca é escrita, porque escrever exige conhecer o schema. Mas um sistema que gera SQL para toda mensagem que chega gasta uma chamada de modelo com "bom dia" — e, pior, tenta responder "e no mês passado?" sem saber do que aquilo é continuação.
+
+**Como funciona.** A cadeia é montada em LCEL como uma master chain embrulhada em histórico de mensagem, então a memória é carregada no começo do turno e salva no fim sem o fluxo gerenciar isso. Um roteador classifica a intenção primeiro e um desvio manda a mensagem por um de dois caminhos, então conversa fiada nunca chega na cadeia de SQL. O acompanhamento funciona porque um reescritor resolve a pergunta contra o histórico antes da geração, e a sessão guarda o último SQL executado — então "e no mês passado?" é respondido modificando uma consulta que já funcionou em vez de chutar uma nova. O schema do banco é injetado em forma compacta, e os prompts vivem em módulo próprio, o que permitiu afinar o prompt de SQL sem tocar no fluxo em volta.
+
+**No código:**
+
+- Uma master chain em LCEL com histórico, roteador e desvio condicional — o caminho barato continua barato e a cadeia de SQL só vê pergunta sobre dado
+- O último SQL executado fica guardado por sessão, então o acompanhamento modifica uma consulta que funcionou em vez de regenerar do zero
+- Poda de histórico dentro da cadeia, porque conversa sem limite acaba custando mais em contexto do que a resposta vale
+- Prompts como módulo separado, afinados independentemente da cadeia que os consome
+- Duas superfícies sobre um motor: um chatbot e um dashboard
+
+**Tecnologias:** FastAPI, LangChain, LCEL, PostgreSQL, LLaMA 3, Groq, React, Docker
+
+**Repositório:** https://github.com/Marocosz/DataChat-BI
+
+### Marocos Bot 2.0
+
+**Categoria:** Automação & Comunidade · **Contexto:** Pessoal · **Último trabalho:** 2026-03-27
+
+Um bot de Discord que administra uma comunidade competitiva de League of Legends: verifica quem você diz que é contra a API da Riot, pontua cada jogador numa escala própria, balanceia as partidas personalizadas, gerencia canais de voz e permissões ao longo da partida, e mantém o ranking de tudo que aconteceu.
+
+**O problema.** Partida personalizada desanda antes de começar. Alguém superestima o elo, os times saem desequilibrados, e quem organiza passa o lobby arrastando gente entre canais de voz em vez de jogar. A parte interessante é a pontuação: o elo visível é entrada ruim para balanceamento, porque um jogador com 30 partidas e 70% de vitória não tem a mesma força de um com 400 partidas e 50% na mesma divisão.
+
+**Como funciona.** A identidade é verificada contra a API da Riot em vez de acreditada. Sobre o elo visível o bot calcula uma pontuação ajustada própria: tier, divisão e LP formam a base, a fila flexível pesa menos que a solo, e então um bônus de winrate é aplicado escalado por um K-factor que decai com o número de partidas — explosivo abaixo de 50 jogos, quase inerte depois de 200. Assim um smurf em ascensão sobe na conta e um jogador de longo prazo em 50% é avaliado pelo valor de face. O balanceamento então distribui a lista ordenada em snake draft, o que mantém o melhor jogador longe do segundo e do terceiro, e os canais de voz e permissões são gerenciados pelo bot conforme a partida percorre o ciclo de vida dela.
+
+**No código:**
+
+- Um modelo de pontuação ajustada em vez do elo visível: base de tier/divisão/LP, peso de fila, e bônus de winrate com K-factor decaindo em cinco faixas de número de partidas
+- A lógica de incerteza é o ponto — poucas partidas com winrate alto move muito a pontuação, muitas partidas move quase nada, e é isso que torna smurf e veterano comparáveis
+- Snake draft sobre a lista ordenada para dividir os times, então o mais forte fica do lado oposto ao segundo e ao terceiro
+- Validação de elo em tempo real contra a API da Riot, que é o que faz o ranking significar alguma coisa
+- 10 módulos de comando, com o lobby e o ranking como os dois mais pesados, sobre uma camada de dados própria
+
+**Tecnologias:** Python, discord.py, Riot API, PostgreSQL, AsyncIO, Docker
+
+**Repositório:** https://github.com/Marocosz/Marocos-BOT-2
+
+### faculdAIde
+
+**Categoria:** Ferramentas de IA · **Contexto:** Pessoal · **Último trabalho:** 2026-08-10
+
+Um grafo de conhecimento pessoal que se preenche sozinho. Ele é entregue como uma skill do meu agente de código: o que eu de fato fiz numa sessão é capturado como conceito de estudo, pesquisado, deduplicado contra o que já existe, e gravado de volta como nó conectado.
+
+**O problema.** Tudo que eu aprendo resolvendo um problema real evapora, porque no instante em que o problema é resolvido não sobra motivo para anotar. E qualquer sistema de nota que exige disciplina para ser alimentado não vai ser alimentado — então a captura tem de acontecer dentro do trabalho. O que cria a falha oposta: captura automática produz quarenta nós para a mesma ideia, e um grafo com quarenta duplicatas é pior que grafo nenhum.
+
+**Como funciona.** Um conceito é um arquivo JSON validado contra schema, e o grafo é derivado em vez de guardado — índices, aliases, ordem de estudo e o próprio grafo saem todos dessa fonte da verdade e ficam no gitignore, então existe exatamente um lugar onde um fato pode estar errado. Antes de qualquer coisa ser escrita, um prefiltro deduplica contra os nós existentes, que é a resposta ao problema de duplicação acima. Integridade é checagem que reprova, não aviso: link para nó que não existe falha na validação, e ciclo na ordem de estudo também.
+
+**No código:**
+
+- 38 nós de conceito, um arquivo cada, com validação de schema e integridade do grafo como checagens que reprovam em vez de avisar
+- A deduplicação, a ordenação topológica e a localização de transcrição têm teste cada uma — são os três lugares onde uma falha silenciosa corromperia o grafo em vez de quebrá-lo
+- Tudo que é derivado está no gitignore: o grafo, os índices e a ordem de estudo são saída, então não conseguem divergir da fonte
+- A skill do agente é espelhada no repositório como cópia não-ativável e sincronizada de lá, então a lógica que escreve o grafo é versionada junto com o que ela escreveu
+
+**Tecnologias:** Node.js, TypeScript, ajv, JSON Schema, Vite, Skills do Claude Code
+
+*Código fechado (cliente ou empresa) — descrito aqui, não publicado*
+
+
+---
+
+## Stack técnica
+
+### IA & Agentes
+
+O núcleo do meu trabalho: agentes orquestrados, recuperação sobre dado real, e guardas que mantêm o modelo honesto.
+
+- Python — expert nível
+- LangGraph — expert nível
+- LangChain — expert nível
+- RAG — advanced nível
+- Orquestração de agentes — advanced nível
+- Engenharia de prompt — advanced nível
+- Avaliação de agentes — intermediate nível
+
+### Machine Learning & Dados
+
+Onde eu me aprofundei em 2026: modelo de risco, clustering por densidade e estatística que sobrevive a uma banca.
+
+- scikit-learn — advanced nível
+- Gradient Boosting — advanced nível
+- pandas — advanced nível
+- Clustering — advanced nível
+- Estatística — advanced nível
+- Bancos vetoriais — advanced nível
+- Embeddings — advanced nível
+
+### Engenharia Backend
+
+API que aguenta: contrato tipado, migração de verdade e a fronteira desenhada de propósito.
+
+- FastAPI — expert nível
+- SQLAlchemy — advanced nível
+- PostgreSQL — advanced nível
+- Supabase — advanced nível
+- Redis — advanced nível
+- Celery — intermediate nível
+- MongoDB — intermediate nível
+
+### Frontend & Mobile
+
+Interface que torna a inteligência usável — na web e no celular.
+
+- React — advanced nível
+- TypeScript — advanced nível
+- JavaScript — advanced nível
+- React Native — intermediate nível
+- Tailwind CSS — advanced nível
+- Motion — advanced nível
+- WebGL — intermediate nível
+- Streamlit — expert nível
+
+### Automação & Integrações
+
+Tirar trabalho manual em vez de acrescentar tela. É a maior parte do meu dia a dia na Finza.
+
+- n8n — advanced nível
+- API do WhatsApp — advanced nível
+- REST & Webhooks — expert nível
+- Jobs agendados — advanced nível
+- ETL — advanced nível
+- Geração de relatório — advanced nível
+
+### DevOps & Verificação
+
+A VPS é minha, então subir é comigo. E mudança que eu não consigo verificar é mudança que eu não fiz.
+
+- Docker — expert nível
+- Git/GitHub — expert nível
+- Coolify — advanced nível
+- Linux & VPS — advanced nível
+- Traefik — intermediate nível
+- CI/CD — advanced nível
+- Playwright — advanced nível
+- pytest — advanced nível
+
+### Desenvolvimento com IA
+
+Não é usar um assistente — é construir um. Um harness por projeto, para a ferramenta conhecer o código.
+
+- Claude Code — expert nível
+- Skills próprias — expert nível
+- Subagentes — advanced nível
+- Hooks — advanced nível
+- MCP — advanced nível
+- Trabalho por spec — advanced nível
+- Codex — intermediate nível
+
+
+---
+
+## Serviços e infraestrutura
+
+### Hospedagem gerenciada
+
+Sua aplicação na minha VPS, com deploy, banco, certificado e monitoramento por minha conta. Você não abre terminal nenhum.
+
+*Onde isso é provado no site: este site roda nela*
+
+### Sistemas e sites sob medida
+
+Do problema ao ar. React na frente, Python atrás, e o ciclo inteiro comigo — inclusive o que quebra depois da entrega.
+
+*Onde isso é provado no site: os projetos, por dentro*
+
+### Agentes de IA e RAG
+
+Não é plugar uma API de chat. É grafo de decisão, recuperação sobre os seus dados e uma guarda que prefere dizer "não sei" a inventar.
+
+*Onde isso é provado no site: a demonstração está a um clique*
+
+### Automação e integrações
+
+O trabalho repetitivo que hoje é feito à mão vira integração entre os sistemas que você já usa — n8n, WhatsApp, APIs e rotinas que rodam sem ninguém apertar nada. Inclusive sobre sistema fechado, lendo por fora o que ele não exporta.
+
+*Onde isso é provado no site: é o que faço no dia a dia*
+
+### Como a entrega funciona
+
+1. **Conversa** — Você me manda o problema, não um documento de requisitos. Na primeira conversa eu digo se dá para fazer, quanto tempo pensa levar — e digo também quando o trabalho não for para mim.
+2. **Escopo e proposta** — Volto com o que entra, o que fica de fora, o prazo e o preço. Por escrito, antes de qualquer linha de código, para ninguém descobrir surpresa no meio do caminho.
+3. **Construção** — Repositório aberto desde o primeiro commit e uma versão de teste no ar bem antes do fim. Você acompanha o progresso em vez de esperar uma entrega no escuro.
+4. **No ar** — Deploy na infraestrutura, HTTPS, domínio apontado e monitoramento ligado. Entregar é o projeto rodando na internet, não um arquivo compactado no seu e-mail.
+5. **Depois** — O que quebrar continua sendo meu. Você fala comigo direto — sem abrir chamado, sem fila de atendimento e sem alguém que nunca leu o código tentando adivinhar o que houve.
+
+### A máquina
+
+- **Aplicações no ar:** 10
+- **Banco:** PostgreSQL gerenciado
+- **Orquestração:** Docker + Coolify
+- **Proxy:** Traefik · HTTPS automático
+- **Deploy:** Contínuo, a partir do git
+- **Backup:** Automático, com retenção
+- **Suporte:** Direto comigo
+
+---
+
+## Contato
+
+- **EMAIL:** marcosrodriguesepro@gmail.com — mailto:marcosrodriguesepro@gmail.com
+- **LINKEDIN:** /in/marcosrodriguesptc — https://linkedin.com/in/marcosrodriguesptc
+- **GITHUB:** /marocosz — https://github.com/marocosz
+- **DISCORD:** @marocos — https://discord.com/users/marocos

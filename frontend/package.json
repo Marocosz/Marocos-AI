@@ -9,7 +9,9 @@
     "lint": "eslint .",
     "preview": "vite preview",
     "test": "vitest run",
-    "test:watch": "vitest"
+    "test:watch": "vitest",
+    "seo": "node scripts/gerar-seo.mjs",
+    "prebuild": "node scripts/gerar-seo.mjs"
   },
   "dependencies": {
     "@react-three/drei": "^10.7.7",

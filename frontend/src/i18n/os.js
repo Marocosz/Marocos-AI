@@ -396,20 +396,60 @@ const osContentEn = {
      */
     acao: { titulo: 'Send me the problem', sub: 'The channels are in the terminal' },
   },
+  /**
+   * O TÍTULO DA ABA VENDE, O DA JANELA NOMEIA — e esta regra estava escrita aqui,
+   * aplicada a UMA rota, enquanto todas as outras usavam o nome do app.
+   *
+   * "About This PC", "Version History" e "Device Manager" são a metáfora do sistema
+   * operacional, e ela é excelente DENTRO da janela. Como título de resultado de
+   * busca, não corresponde a consulta nenhuma: ninguém pesquisa "About This PC" para
+   * encontrar um desenvolvedor.
+   *
+   * A generalização veio depois de uma auditoria (13/08/2026) mostrar que o comentário
+   * abaixo — escrito para a janela de Serviços — descrevia uma decisão certa que nunca
+   * saiu daquela linha. Agora todas carregam a proposta; `os.windows` continua com os
+   * nomes de app, e é ele que a barra de título e a taskbar leem.
+   *
+   * O NOME VEM PRIMEIRO em quase todas, porque a busca por "Marcos Rodrigues" é a que
+   * mais importa acertar e o Google trunca o fim do título. As exceções são as rotas
+   * cuja INTENÇÃO é o assunto, e não a pessoa.
+   */
   head: {
-    about: 'About This PC | Marcos Rodrigues',
-    projects: 'Projects | Marcos Rodrigues',
-    project: '%s | Projects | Marcos Rodrigues',
-    history: 'Career Timeline | Marcos Rodrigues',
-    devices: 'Tech Stack | Marcos Rodrigues',
-    /* O título da ABA vende, o da JANELA nomeia. "Services" é o app; quem procura
-       isto no Google digita o serviço, não o nome do programa. */
-    services: 'Freelance & Hosting | Marcos Rodrigues',
-    terminal: 'Contact | Marcos Rodrigues',
-    assistant: 'Talk to Virtual Marcos | Marcos Rodrigues',
-    readme: 'About this portfolio | Marcos Rodrigues',
-    contexto: 'Download my context | Marcos Rodrigues',
-    settings: 'Settings | Marcos Rodrigues',
+    about: 'Marcos Rodrigues — AI & automation developer',
+    projects: 'Projects — Marcos Rodrigues',
+    project: '%s — project by Marcos Rodrigues',
+    history: 'Career timeline — Marcos Rodrigues',
+    devices: 'Tech stack — Marcos Rodrigues',
+    /* A que já estava certa: quem procura isto no Google digita o serviço, não o
+       nome do programa. */
+    services: 'Freelance developer & managed hosting — Marcos Rodrigues',
+    terminal: 'Contact Marcos Rodrigues',
+    assistant: 'Ask my AI agent — Marcos Rodrigues',
+    readme: 'How this site is built — Marcos Rodrigues',
+    contexto: 'Download my full context for your AI — Marcos Rodrigues',
+    settings: 'Settings — Marcos Rodrigues',
+  },
+
+  /**
+   * A DESCRIPTION POR ROTA. Antes existia uma só, no `index.html`, para o site
+   * inteiro — e era a headline de LinkedIn que `content/profile.js` registra ter
+   * descartado. Ver a nota em `os/useDocumentHead.js`.
+   *
+   * `raiz` é o fallback, usado quando nenhuma janela está em foco. Cada uma fica
+   * abaixo de ~155 caracteres, que é o que o Google exibe antes de cortar.
+   */
+  headDesc: {
+    raiz: 'AI and automation developer in Brazil. I build agents that reach production, and I own the whole cycle — from the requirement to the deploy.',
+    about: 'Who I am, the four things I get hired for, and how I got from technical support at 14 to building AI agents in production.',
+    projects: 'Twelve projects ordered by complexity, each led by the hard problem it solves and the engineering decision behind it.',
+    history: 'From fixing printers at 14 to an AI and automation developer. The whole trajectory in order, with the gaps visible.',
+    devices: 'The stack by area — AI and agents, machine learning, backend, frontend, automation, DevOps — with a declared level per technology.',
+    services: 'Custom systems, AI agents, automation and managed hosting on my own VPS. From the problem to production, including what breaks after.',
+    terminal: 'E-mail, LinkedIn, GitHub and Discord. Open to freelance work in AI, automation and full-stack development.',
+    assistant: 'An AI agent over my real career data. It answers in my voice, cites its sources, and would rather say I do not know than invent.',
+    readme: 'A window manager, a WebGL wallpaper and a LangGraph agent, with no UI framework under them — and the method used to build it.',
+    contexto: 'Download this entire portfolio as one markdown or JSON file, and ask your own AI whatever you want to know.',
+    settings: 'Theme, language and motion preferences for this site.',
   },
   mobile: {
     back: 'Back',
@@ -917,19 +957,37 @@ const osContentPt = {
     /** Ver a nota no bloco em inglês: diverge do botão do "Sobre" de propósito. */
     acao: { titulo: 'Me manda o problema', sub: 'Os canais estão no terminal' },
   },
+  /** Ver a nota longa no bloco em inglês: a aba vende, a janela nomeia — e a regra
+   *  estava escrita para uma rota só. */
   head: {
-    about: 'Sobre este PC | Marcos Rodrigues',
-    projects: 'Projetos | Marcos Rodrigues',
-    project: '%s | Projetos | Marcos Rodrigues',
-    history: 'Trajetória | Marcos Rodrigues',
-    devices: 'Stack Técnica | Marcos Rodrigues',
-    /** Ver a nota no bloco em inglês: a aba vende, a janela nomeia. */
-    services: 'Freelance e Hospedagem | Marcos Rodrigues',
-    terminal: 'Contato | Marcos Rodrigues',
-    assistant: 'Converse com o Marcos Virtual | Marcos Rodrigues',
-    readme: 'Sobre este portfólio | Marcos Rodrigues',
-    contexto: 'Baixar meu contexto | Marcos Rodrigues',
-    settings: 'Configurações | Marcos Rodrigues',
+    about: 'Marcos Rodrigues — desenvolvedor de IA e automações',
+    projects: 'Projetos — Marcos Rodrigues',
+    project: '%s — projeto de Marcos Rodrigues',
+    history: 'Trajetória — Marcos Rodrigues',
+    devices: 'Stack técnica — Marcos Rodrigues',
+    /* A que já estava certa: quem procura isto no Google digita o serviço, não o
+       nome do programa. */
+    services: 'Desenvolvedor freelance e hospedagem gerenciada — Marcos Rodrigues',
+    terminal: 'Contato — Marcos Rodrigues',
+    assistant: 'Pergunte ao meu agente de IA — Marcos Rodrigues',
+    readme: 'Como este site é feito — Marcos Rodrigues',
+    contexto: 'Baixe meu contexto completo para a sua IA — Marcos Rodrigues',
+    settings: 'Configurações — Marcos Rodrigues',
+  },
+
+  /** Ver a nota no bloco em inglês: uma description por rota, e `raiz` é o fallback. */
+  headDesc: {
+    raiz: 'Desenvolvedor de IA e automações. Construo agentes que chegam em produção e assumo o ciclo inteiro — do requisito ao deploy e ao que quebra depois.',
+    about: 'Quem eu sou, as quatro coisas pelas quais eu sou contratado, e como saí do suporte técnico aos 14 anos para construir agentes de IA em produção.',
+    projects: 'Doze projetos ordenados por complexidade, cada um puxado pelo problema difícil que resolve e pela decisão de engenharia por trás dele.',
+    history: 'De consertar impressora aos 14 anos a desenvolvedor de IA e automações. A trajetória inteira em ordem, com os vãos à vista.',
+    devices: 'A stack por área — IA e agentes, machine learning, backend, frontend, automação, DevOps — com nível declarado por tecnologia.',
+    services: 'Sistemas sob medida, agentes de IA, automação e hospedagem gerenciada na minha VPS. Do problema ao ar, inclusive o que quebra depois.',
+    terminal: 'E-mail, LinkedIn, GitHub e Discord. Aberto a freelance em IA, automação e desenvolvimento full-stack.',
+    assistant: 'Um agente de IA sobre a minha trajetória real. Ele responde com a minha voz, cita as fontes, e prefere dizer não sei a inventar.',
+    readme: 'Um gerenciador de janelas, um papel de parede em WebGL e um agente LangGraph, sem framework de UI por baixo — e o método usado para construir.',
+    contexto: 'Baixe este portfólio inteiro como um arquivo markdown ou JSON e pergunte à sua própria IA o que você quiser saber.',
+    settings: 'Preferências de tema, idioma e movimento deste site.',
   },
   mobile: {
     back: 'Voltar',

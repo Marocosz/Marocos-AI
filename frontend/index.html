@@ -1,4 +1,19 @@
 <!doctype html>
+<!--
+  `lang` É O PADRÃO, E O JAVASCRIPT O CORRIGE.
+
+  Ele diz `pt-br` porque português passou a ser o idioma padrão do site (ver
+  `src/contexts/idiomaInicial.js`), então este valor está certo para a maioria dos
+  visitantes desde o primeiro byte — antes de o React montar.
+
+  Quando o visitante prefere inglês, `useDocumentHead` reescreve este atributo no
+  mesmo efeito que troca título e canônica. Isto aqui é o palpite honesto; o hook é a
+  verdade.
+
+  Antes desta mudança o atributo era `pt-br` FIXO e o site abria em INGLÊS por padrão
+  — conteúdo numa língua declarado como outra, o que confunde leitor de tela e reduz
+  relevância nas duas línguas para um rastreador.
+-->
 <html lang="pt-br">
   <head>
     <meta charset="UTF-8" />
@@ -11,53 +26,88 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
     <!-- Primários SEO -->
-    <title>Marcos Rodrigues — AI Software Engineer | Full-Stack Developer</title>
-    <meta
-      name="title"
-      content="Marcos Rodrigues — AI Software Engineer | Full-Stack Developer"
-    />
+    <title>Marcos Rodrigues — desenvolvedor de IA e automações</title>
+
+    <!--
+      A DESCRIPTION AQUI É A DA RAIZ, e as rotas internas têm a sua própria
+      (`os.headDesc` em `src/i18n/os.js`, escrita por `useDocumentHead`).
+
+      A anterior dizia "Especialista em transformar dados em inteligência através de
+      Agentes de IA, arquiteturas escaláveis e automação estratégica". Era exatamente a
+      frase que `src/content/profile.js` registra ter removido do site, com este
+      veredito: "era headline de LinkedIn: verdadeira para umas cinquenta mil pessoas e
+      verificável por nenhuma". Ela sobreviveu no lugar mais visível de todos — o texto
+      embaixo do link no resultado de busca — porque ninguém reabre o index.html ao
+      reescrever conteúdo.
+
+      Esta é a voz que o site usa hoje, e diz o que ele faz em vez de adjetivar.
+
+      `keywords` SAIU. Google e Bing ignoram a tag desde 2009; manter uma lista de
+      dezessete termos ali dava a impressão de que alguma coisa dependia dela.
+    -->
     <meta
       name="description"
-      content="Especialista em transformar dados em inteligência através de Agentes de IA, arquiteturas escaláveis e automação estratégica. Portfólio de Marcos Rodrigues, AI Software Engineer focado em Python, LLMs e DevOps."
-    />
-    <meta
-      name="keywords"
-      content="Marcos Rodrigues, AI Software Engineer, Desenvolvedor Full-Stack, Python, FastAPI, LangChain, Agentes de IA, RAG, GenAI, Docker, PostgreSQL, React, Data Science, DevOps, Automação, Freelance, Hospedagem VPS"
+      content="Desenvolvedor de IA e automações. Construo agentes que chegam em produção e assumo o ciclo inteiro — do requisito ao deploy e ao que quebra depois."
     />
     <meta name="author" content="Marcos Rodrigues" />
 
-    <!-- Open Graph / Facebook -->
+    <!-- Open Graph / Facebook / WhatsApp / LinkedIn -->
     <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="marocos.dev" />
+    <meta property="og:locale" content="pt_BR" />
+    <meta property="og:locale:alternate" content="en_US" />
     <meta property="og:url" content="https://marocos.dev/" />
     <meta
       property="og:title"
-      content="Marcos Rodrigues — AI Software Engineer | Full-Stack Developer"
+      content="Marcos Rodrigues — desenvolvedor de IA e automações"
     />
     <meta
       property="og:description"
-      content="Desenvolvedor focado em IA e Engenharia de Software. Especialista em integrar LLMs com processos de negócio robustos e escaláveis."
+      content="Agentes de IA que chegam em produção, automação sobre sistemas legados, e o ciclo inteiro do requisito ao deploy."
     />
+    <!--
+      A IMAGEM DE PRÉVIA PESAVA 2 MB, e o sintoma disso não é lentidão: é AUSÊNCIA.
+      Quando o WhatsApp ou o LinkedIn desistem de baixar a imagem, o link aparece sem
+      prévia nenhuma — e é justamente o link que se manda para um recrutador.
+
+      Além do peso, as dimensões anunciadas estavam erradas: o arquivo antigo era
+      5000x1250 (4:1) declarado como 1200x630 (1,9:1). Plataforma que usa a dimensão
+      declarada para reservar espaço recortava a arte no lugar errado.
+
+      `og-marcos-rodrigues.jpg` tem 1200x630 de verdade e 28 KB. A arte de 4:1 foi
+      centralizada e as faixas de cima e de baixo preenchidas estendendo a primeira e
+      a última linha dela — sem emenda visível, porque o gradiente do banner varia na
+      horizontal e é constante na vertical.
+
+      JPEG e não WebP de propósito: o suporte a WebP nos rastreadores de rede social
+      ainda é irregular, e uma prévia que não aparece é pior que uma um pouco maior.
+    -->
     <meta
       property="og:image"
-      content="https://marocos.dev/banner-marcos-developer.png"
+      content="https://marocos.dev/og-marcos-rodrigues.jpg"
     />
+    <meta property="og:image:type" content="image/jpeg" />
     <meta property="og:image:width" content="1200" />
     <meta property="og:image:height" content="630" />
+    <meta
+      property="og:image:alt"
+      content="Marcos Rodrigues — desenvolvedor de IA e automações. Um notebook estilizado sobre fundo roxo, com a frase: driven by curiosity and focused on constant evolution in a changing world."
+    />
 
     <!-- Twitter -->
-    <meta property="twitter:card" content="summary_large_image" />
-    <meta property="twitter:url" content="https://marocos.dev/" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:url" content="https://marocos.dev/" />
     <meta
-      property="twitter:title"
-      content="Marcos Rodrigues — AI Software Engineer | Full-Stack Developer"
+      name="twitter:title"
+      content="Marcos Rodrigues — desenvolvedor de IA e automações"
     />
     <meta
-      property="twitter:description"
-      content="Transformando dados em inteligência com Agentes de IA e automação estratégica."
+      name="twitter:description"
+      content="Agentes de IA que chegam em produção, automação sobre sistemas legados, e o ciclo inteiro do requisito ao deploy."
     />
     <meta
-      property="twitter:image"
-      content="https://marocos.dev/banner-marcos-developer.png"
+      name="twitter:image"
+      content="https://marocos.dev/og-marcos-rodrigues.jpg"
     />
 
     <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -67,6 +117,21 @@
       rel="stylesheet"
     />
 
+    <!--
+      DADOS ESTRUTURADOS.
+
+      O `knowsAbout` anterior listava cinco itens e parou em fevereiro de 2026: sem
+      machine learning, sem LangGraph, sem n8n, sem Supabase. E faltavam justamente os
+      campos que o Google usa para montar um painel sobre uma PESSOA — onde trabalha,
+      onde estudou, onde está.
+
+      `knowsAbout` está alinhado com as áreas de `src/content/tech.js`, e não com a
+      lista completa de tecnologias: o campo descreve DOMÍNIO de conhecimento, e
+      enumerar quarenta ferramentas ali dilui em vez de precisar.
+
+      `worksFor` sem `sameAs` de propósito — a Finza é o empregador e o site não é o
+      lugar de linkar a empresa dele.
+    -->
     <script type="application/ld+json">
       {
         "@context": "https://schema.org",
@@ -74,13 +139,41 @@
         "name": "Marcos Rodrigues",
         "alternateName": ["Marocos", "Marocos Dev"],
         "url": "https://marocos.dev",
-        "image": "https://marocos.dev/banner-marcos-developer.png",
-        "jobTitle": "AI Software Engineer | Full-Stack Developer",
+        "image": "https://marocos.dev/og-marcos-rodrigues.jpg",
+        "jobTitle": "AI Software Engineer | Desenvolvedor Full-Stack",
+        "description": "Desenvolvedor de IA e automações. Construo agentes que chegam em produção e assumo o ciclo inteiro, do requisito ao deploy.",
+        "email": "mailto:marcosrodriguesepro@gmail.com",
+        "address": {
+          "@type": "PostalAddress",
+          "addressLocality": "Uberlândia",
+          "addressRegion": "MG",
+          "addressCountry": "BR"
+        },
+        "worksFor": {
+          "@type": "Organization",
+          "name": "Finza"
+        },
+        "alumniOf": {
+          "@type": "CollegeOrUniversity",
+          "name": "Universidade Federal de Uberlândia",
+          "sameAs": "https://ufu.br/"
+        },
+        "knowsLanguage": ["pt-BR", "en"],
         "knowsAbout": [
+          "Inteligência Artificial",
+          "Agentes de IA",
+          "Retrieval-Augmented Generation",
+          "Machine Learning",
           "Python",
-          "Artificial Intelligence",
-          "React",
           "FastAPI",
+          "LangGraph",
+          "React",
+          "TypeScript",
+          "PostgreSQL",
+          "Supabase",
+          "n8n",
+          "Automação de processos",
+          "Docker",
           "DevOps"
         ],
         "sameAs": [

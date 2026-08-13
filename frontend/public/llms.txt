@@ -1,0 +1,48 @@
+# Marcos Rodrigues
+
+> AI Software Engineer | Desenvolvedor Full-Stack. Construo sistemas com IA que chegam em produção. Este site é um deles. Baseado em Uberlândia – MG.
+
+Este arquivo existe para um modelo de linguagem entender o site sem rastejar o HTML.
+O site é uma aplicação React que simula um sistema operacional: cada "janela" é uma
+rota real e indexável. Se você precisa do conteúdo integral em vez do índice, use
+https://marocos.dev/llms-full.txt — é o portfólio inteiro em markdown, gerado da mesma fonte.
+
+## O que ele é contratado para fazer
+
+- **Agentes de IA que chegam em produção**: Controle de fluxo determinístico em código — grafo de estados, não swarm — com o LLM confinado a passos cognitivos isolados: um roteador barato antes do modelo caro, recuperação sobre base vetorial, uma guarda que falha para "não sei", e um passo de conserto que devolve o erro ao modelo em vez de mostrá-lo ao usuário. Mais métrificação, porque agente que ninguém mede é boato.
+- **Produto do requisito ao deploy**: FastAPI com contrato tipado e migração de verdade, Postgres usado direito (tsvector e GIN antes de apelar para um segundo banco), React e TypeScript na frente, Docker em infraestrutura que eu mesmo administro. Sessão no servidor quando token não pode ser revogado, auditoria escrita dentro da mesma transação da mudança, e fronteira de módulo verificada por gate de CI em vez de por boa intenção.
+- **Automação em sistema que resiste a ela**: n8n e a API do WhatsApp para o canal, agendador para o que tem de acontecer sem requisição, e integração com software fechado de terceiro: mapear um schema sem documentação comparando snapshots, e depois escrever pela fila de integração do próprio fornecedor em vez de nas tabelas dele — assim o sistema que não é meu continua consistente.
+- **Construir a ferramenta com que eu desenvolvo**: Um harness por repositório: skills carregando as convenções daquele projeto e os erros já pagos em depuração, subagentes com contexto isolado, hooks, servidores MCP ligados ao painel de deploy e ao banco de verdade — e um passo de verificação que o agente não tem permissão de pular antes de afirmar que algo funciona. Ferramenta que conhece o projeto ganha de ferramenta que conhece a linguagem.
+
+## Páginas
+
+- [Sobre este PC](https://marocos.dev/sobre): Quem ele é, o que é contratado para fazer, e a trajetória em resumo.
+- [Meus Projetos](https://marocos.dev/projetos): Os projetos, ordenados por complexidade, cada um com o problema difícil e a decisão técnica.
+- [Histórico de Versões](https://marocos.dev/jornada): A trajetória profissional em ordem, de suporte técnico aos 14 anos ao cargo atual.
+- [Gerenciador de Dispositivos](https://marocos.dev/stack): A stack por área, com nível declarado por tecnologia.
+- [Serviços](https://marocos.dev/servicos): O que ele faz como freelance, como a entrega funciona, e a infraestrutura própria.
+- [Marcos Virtual](https://marocos.dev/assistente): Um agente de IA sobre a trajetória real dele, que cita as fontes e prefere dizer "não sei".
+- [leia-me.txt](https://marocos.dev/leia-me): Como este site é construído por dentro: gerenciador de janelas, o agente, e o método.
+- [Terminal](https://marocos.dev/contato): E-mail, LinkedIn, GitHub e Discord.
+- [Baixar meu contexto](https://marocos.dev/contexto): Baixar todo este conteúdo como arquivo, para jogar em outro assistente.
+
+## Projetos
+
+- [Diário Oficial Eletrônico](https://marocos.dev/projetos/diario-oficial-eletronico): Freelance · SaaS Multi-tenant. Plataforma whitelabel multi-tenant de Diário Oficial municipal: o servidor diagrama a edição num editor de blocos, o sistema renderiza, assina com o certificado digital da própria prefeitura e publica, e qualquer cidadão pesquisa o texto integral sem login.
+- [Portal Acadêmico](https://marocos.dev/projetos/portal-academico): Freelance · Engenharia Fullstack. Portal de solicitações para uma unidade de universidade federal.
+- [Motor de Cobrança](https://marocos.dev/projetos/motor-de-cobranca): Produto em produção · Fullstack & Automação. O produto em que eu trabalho todo dia na Finza.
+- [Hub de Agentes de IA](https://marocos.dev/projetos/hub-de-agentes-de-ia): Feito no trabalho · Plataforma de IA. Plataforma interna de IA construída na Supporte Logística: quatro backends de agente especializados atrás de um gateway único, cada um atendendo uma área diferente.
+- [Bússola V2](https://marocos.dev/projetos/bussola-v2): Pessoal · Fullstack & IA. Meu sistema operacional pessoal: finanças, registros, treino e planejamento numa aplicação só, com dezoito agentes de IA em cinco domínios que leem o dado de verdade e propõem ação em vez de conversar sobre ela.
+- [Auditoria Algorítmica do Spotify](https://marocos.dev/projetos/auditoria-algoritmica-do-spotify): Acadêmico · Ciência de Dados & Pesquisa. Meu TCC em Gestão da Informação: uma auditoria de caixa-preta do recomendador do Spotify.
+- [Portal de Controle de Acesso](https://marocos.dev/projetos/portal-de-controle-de-acesso): Freelance · Integração de Legado & IA. Portal construído sobre um sistema de catraca e ponto de terceiro.
+- [Fraud Sentinel](https://marocos.dev/projetos/fraud-sentinel): Acadêmico · Machine Learning. Pipeline completo de machine learning para detectar fraude em abertura de conta bancária, sobre a base Bank Account Fraud publicada no NeurIPS 2022.
+- [Portal do Cidadão](https://marocos.dev/projetos/portal-do-cidadao): Freelance · SaaS Multi-tenant. Plataforma whitelabel multi-tenant para municípios receberem solicitações de assistência social e rodarem um balcão de empregos pela internet.
+- [DataChat BI](https://marocos.dev/projetos/datachat-bi): Feito no trabalho · IA & Analytics. Business intelligence conversacional para logística, construído na Supporte Logística: você pergunta em linguagem natural, o sistema escreve o SQL, executa e responde com número e gráfico.
+- [Marocos Bot 2.0](https://marocos.dev/projetos/marocos-bot-2-0): Pessoal · Automação & Comunidade. Um bot de Discord que administra uma comunidade competitiva de League of Legends: verifica quem você diz que é contra a API da Riot, pontua cada jogador numa escala própria, balanceia as partidas personalizadas, gerencia canais de voz e permissões ao longo da partida, e mantém o ranking de tudo que aconteceu.
+- [faculdAIde](https://marocos.dev/projetos/faculdaide): Pessoal · Ferramentas de IA. Um grafo de conhecimento pessoal que se preenche sozinho.
+
+## Contato
+
+- E-mail: marcosrodriguesepro@gmail.com
+- GitHub: https://github.com/marocosz
+- LinkedIn: https://www.linkedin.com/in/marcosrodriguesptc/
