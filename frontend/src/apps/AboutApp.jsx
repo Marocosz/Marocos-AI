@@ -1,12 +1,13 @@
 import React, { Suspense, lazy, useState, useEffect } from 'react'
-import { ArrowRight, ChevronRight } from 'lucide-react'
+import { ArrowRight, ChevronRight, FileText } from 'lucide-react'
 import { useLanguage } from '../contexts/LanguageContext'
 import { getProfileData, idadeEm } from '../content/profile'
 import { getContactData } from '../content/contact'
 import { getSistemaData } from '../content/sistema'
-/* Só para CONTAR os projetos na porta correspondente — ver a nota em `portas`. A
-   resposta dizia "Cinco projetos" em literal, e eram catorze. */
+/* Para CONTAR os projetos na porta correspondente e para resolver os três
+   recomendados. A resposta dizia "Cinco projetos" em literal, e eram catorze. */
 import { getProjectsData } from '../content/projects'
+import { projectSlug } from './projectSlug'
 import { getOsData } from '../i18n/os'
 import { getApp, APPS } from '../os/registry'
 import { useAbrir } from '../os/NavegacaoContext'
@@ -96,7 +97,25 @@ const AboutApp = () => {
   /* Derivado, e não escrito: a resposta da porta de projetos dizia "Cinco projetos"
      e eram catorze. O idioma não altera a contagem, mas os dados são por idioma —
      então lê do mesmo lugar que a janela de Projetos vai ler. */
-  const totalDeProjetos = getProjectsData(language).items.length
+  const projetos = getProjectsData(language)
+  const totalDeProjetos = projetos.items.length
+
+  /**
+   * OS TRÊS RECOMENDADOS, resolvidos de id para projeto.
+   *
+   * `profile.recomendados` guarda só a decisão editorial (quais três, e o porquê de
+   * cada um); título, categoria e slug vêm de `content/projects.js`. Ver a nota longa
+   * lá — a curta é que escrever o título aqui criaria a quinta cópia dele.
+   *
+   * `filter(Boolean)` porque id que não resolve deve SUMIR da seção, não renderizar
+   * uma linha quebrada: se alguém remover um projeto recomendado, a janela continua
+   * correta enquanto o teste aponta o problema. */
+  const recomendados = profile.recomendados
+    .map(({ id, porque }) => {
+      const projeto = projetos.items.find((p) => p.id === id)
+      return projeto ? { projeto, porque } : null
+    })
+    .filter(Boolean)
 
   /**
    * A LISTA DA FAIXA — triplicada quando ela anda, única quando ela para.
@@ -318,7 +337,63 @@ const AboutApp = () => {
         </ul>
       </section>
 
-      {/* --- 4. STACK: o carrossel, de volta por decisão do dono do projeto ---
+      {/* --- 4. OS TRÊS PARA COMEÇAR: a prova, logo depois da afirmação ---
+              Vem imediatamente abaixo das capacidades de propósito. Aquele bloco
+              AFIRMA, e uma afirmação sem alvo clicável obriga o visitante a ir procurar
+              a prova numa lista de doze — o que é justamente a fricção que faz alguém
+              fechar a aba.
+
+              REUSA A LINHA DAS PORTAS DO GUIA (`.about-guide` / `.about-door`), e não é
+              economia: é a mesma interação. Ícone, texto em duas alturas, chevron,
+              filete entre as linhas, e clicar abre uma janela. Inventar um card aqui
+              faria a mesma ação parecer duas coisas diferentes na mesma tela.
+
+              A ESCOLHA DE QUAIS TRÊS mora em `content/profile.js`, com o porquê de cada
+              um e o de cada ausente. Aqui só se resolve id -> projeto. */}
+      {recomendados.length > 0 && (
+        <section className="about-secao">
+          <p className="about-eyebrow about-secao-eyebrow">{os.about.recLabel}</p>
+          {/* `%d` vem de `recomendados.length` — ver a nota em `i18n/os.js`. */}
+          <h3 className="about-headline">
+            {os.about.recHeadline.replace('%d', String(recomendados.length))}
+          </h3>
+          {/* MODIFICADOR OBRIGATÓRIO, e ele nasceu de um teste reprovando.
+                  Esta lista reusa `.about-guide` e `.about-door` do guia — reuso certo,
+                  é a mesma interação. Mas com as DUAS listas usando as duas classes,
+                  nenhuma das duas fica endereçável: o teste funcional que afirmava
+                  "cinco portas no guia" passou a contar oito, e não havia seletor capaz
+                  de separá-las. O modificador é o que devolve essa capacidade — para o
+                  teste hoje, e para o CSS no dia em que uma das duas precisar divergir. */}
+          <ul className="about-guide about-guide--rec">
+            {recomendados.map(({ projeto, porque }) => (
+              <li key={projeto.id}>
+                <button
+                  type="button"
+                  className="about-door"
+                  onClick={() => abrir?.('project', { slug: projectSlug(projeto.title) })}
+                  disabled={!abrir}
+                >
+                  <FileText size={17} className="about-door-icon" aria-hidden="true" />
+                  <span className="about-door-text">
+                    {/* O NOME NA LINHA DE CIMA e o motivo embaixo — a mesma hierarquia
+                        da porta do guia, onde a pergunta fica em cima e a resposta
+                        embaixo. A categoria entra junto do nome porque ela diz de que
+                        TIPO é o projeto, o que é metade da recomendação. */}
+                    <span className="about-door-question">
+                      {projeto.title}
+                      <span className="about-rec-cat">{projeto.category}</span>
+                    </span>
+                    <span className="about-door-answer">{porque}</span>
+                  </span>
+                  <ChevronRight size={16} className="about-door-seta" aria-hidden="true" />
+                </button>
+              </li>
+            ))}
+          </ul>
+        </section>
+      )}
+
+      {/* --- 5. STACK: o carrossel, de volta por decisão do dono do projeto ---
               Ele já existiu aqui e saiu numa passada anterior. Voltou, e com dois
               consertos: o laço fecha sem salto (ver o CSS) e ele obedece ao
               interruptor de Movimento, que a versão antiga ignorava.
@@ -341,7 +416,7 @@ const AboutApp = () => {
         </ul>
       </div>
 
-      {/* --- 5. O CORPO, EM DUAS COLUNAS QUANDO HÁ LARGURA ---
+      {/* --- 6. O CORPO, EM DUAS COLUNAS QUANDO HÁ LARGURA ---
               E a divisão tem significado, não é só simetria quebrada: a coluna
               larga é a VOZ HUMANA (o que ele escreveu, as perguntas que ele
               imagina) e o trilho estreito é a VOZ DA MÁQUINA (números e registro

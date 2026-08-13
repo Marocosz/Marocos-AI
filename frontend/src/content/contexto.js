@@ -5,6 +5,16 @@ import { getTechData } from './tech'
 import { getServicosData } from './servicos'
 import { getContactData } from './contact'
 import { SISTEMA } from './sistema'
+/**
+ * `projectSlug` vive em `apps/` e é importado aqui, o que inverte a direção usual
+ * (conteúdo não deve depender de app). A exceção se justifica e é contida: ele é uma
+ * função PURA sem React nem dependência de componente, e mora ali por causa da regra
+ * de fast refresh do eslint — não por pertencer à camada de app. Ver o cabeçalho dele.
+ *
+ * A alternativa era duplicar a regra título -> slug aqui, e slug duplicado é link
+ * quebrado esperando a primeira renomeação.
+ */
+import { projectSlug } from '../apps/projectSlug'
 
 /**
  * O CONTEXTO PARA LEVAR EMBORA.
@@ -100,6 +110,7 @@ const CABECALHO = {
     identidade: 'Identidade',
     resumo: 'O que eu sou contratado para fazer',
     trajetoria: 'Trajetória profissional',
+    recomendados: 'Comece por estes três',
     projetos: 'Projetos',
     stack: 'Stack técnica',
     servicos: 'Serviços e infraestrutura',
@@ -127,6 +138,7 @@ const CABECALHO = {
       maquina: 'A máquina',
       prova: 'Onde isso é provado no site',
       nivel: 'nível',
+      porqueEste: 'Por que este',
     },
   },
   en: {
@@ -150,6 +162,7 @@ const CABECALHO = {
     identidade: 'Identity',
     resumo: 'What I get hired for',
     trajetoria: 'Professional journey',
+    recomendados: 'Start with these three',
     projetos: 'Projects',
     stack: 'Tech stack',
     servicos: 'Services and infrastructure',
@@ -177,6 +190,7 @@ const CABECALHO = {
       maquina: 'The machine',
       prova: 'Where the site proves this',
       nivel: 'level',
+      porqueEste: 'Why this one',
     },
   },
 }
@@ -226,6 +240,31 @@ export const montarContexto = (lang, hoje = new Date()) => {
       tags,
       ...(futuro ? { ehRoadmap: true } : {}),
     })),
+    /**
+     * OS TRÊS RECOMENDADOS, e eles entram no arquivo por um motivo específico.
+     *
+     * Quem baixa este contexto joga tudo numa IA e pergunta. Sem curadoria, o modelo
+     * trata doze projetos como doze itens equivalentes e responde "quais são os
+     * projetos dele" listando todos — o que é verdade e não ajuda. Com esta seção, a
+     * pergunta "por onde eu começo" tem resposta, e ela é a MESMA que o site dá na
+     * janela "Sobre este PC".
+     *
+     * Vem ANTES da lista completa no markdown, de propósito: funciona como índice
+     * dela.
+     */
+    recomendados: perfil.recomendados
+      .map(({ id, porque }) => {
+        const p = projetos.items.find((item) => item.id === id)
+        return p
+          ? {
+              titulo: p.title,
+              categoria: p.category,
+              porque,
+              url: `https://marocos.dev/projetos/${projectSlug(p.title)}`,
+            }
+          : null
+      })
+      .filter(Boolean),
     projetos: projetos.items.map((p) => ({
       titulo: p.title,
       categoria: p.category,
@@ -298,6 +337,18 @@ export const contextoEmMarkdown = (lang, hoje = new Date()) => {
        porque é ele que faz cada tag virar código inline no markdown. */
     const cerca = '`'
     linhas.push(cerca + e.tags.join(`${cerca} · ${cerca}`) + cerca, '')
+  }
+
+  linhas.push(secao(t.recomendados))
+  linhas.push(
+    lang === 'pt'
+      ? 'Se for para olhar só três, estes três — escolhidos porque cobrem disciplinas diferentes, não porque são os maiores.'
+      : 'If you are only going to look at three, these — chosen because they cover different disciplines, not because they are the biggest.',
+    '',
+  )
+  for (const rec of c.recomendados) {
+    linhas.push(`### ${rec.titulo}`, '', `**${rec.categoria}** · ${rec.url}`, '')
+    linhas.push(`**${r.porqueEste}:** ${rec.porque}`, '')
   }
 
   linhas.push(secao(t.projetos))

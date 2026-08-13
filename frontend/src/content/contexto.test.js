@@ -81,6 +81,44 @@ describe('contexto para download', () => {
       }
     })
 
+    it(`${lang}: leva os três recomendados, com link que resolve`, () => {
+      // A curadoria é o que dá ao arquivo uma resposta para "por onde eu começo". Sem
+      // ela, um modelo trata doze projetos como doze itens equivalentes — verdade que
+      // não ajuda ninguém.
+      const c = montarContexto(lang, HOJE)
+      expect(c.recomendados).toHaveLength(3)
+
+      const titulos = new Set(c.projetos.map((p) => p.titulo))
+      for (const r of c.recomendados) {
+        expect(titulos.has(r.titulo), `recomendado fora da lista: ${r.titulo}`).toBe(true)
+        expect(r.url).toMatch(/^https:\/\/marocos\.dev\/projetos\/[a-z0-9-]+$/)
+        expect(r.porque, `recomendado sem motivo: ${r.titulo}`).toBeTruthy()
+      }
+    })
+
+    it(`${lang}: o markdown põe os recomendados ANTES da lista completa`, () => {
+      // A ordem é o que faz a seção funcionar como índice da lista, e não como uma
+      // segunda lista competindo com ela.
+      const md = contextoEmMarkdown(lang, HOJE)
+      const c = montarContexto(lang, HOJE)
+
+      const cabecalhoRec = lang === 'pt' ? '## Comece por estes três' : '## Start with these three'
+      const cabecalhoProjetos = lang === 'pt' ? '## Projetos' : '## Projects'
+
+      const posRec = md.indexOf(cabecalhoRec)
+      const posProjetos = md.indexOf(cabecalhoProjetos)
+      expect(posRec, 'seção de recomendados ausente do markdown').toBeGreaterThan(-1)
+      expect(posProjetos, 'seção de projetos ausente do markdown').toBeGreaterThan(-1)
+      expect(posRec, 'os recomendados caíram depois da lista completa').toBeLessThan(posProjetos)
+
+      // E o link de cada um está dentro da seção, não solto em outro lugar.
+      for (const rec of c.recomendados) {
+        const pos = md.indexOf(rec.url)
+        expect(pos, `link do recomendado fora da seção: ${rec.titulo}`).toBeGreaterThan(posRec)
+        expect(pos).toBeLessThan(posProjetos)
+      }
+    })
+
     it(`${lang}: o json é válido e carrega as mesmas seções`, () => {
       const json = JSON.parse(contextoEmJson(lang, HOJE))
       const objeto = montarContexto(lang, HOJE)
@@ -91,6 +129,7 @@ describe('contexto para download', () => {
         'capacidades',
         'numeros',
         'trajetoria',
+        'recomendados',
         'projetos',
         'stack',
         'servicos',

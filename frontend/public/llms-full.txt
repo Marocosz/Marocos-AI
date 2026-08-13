@@ -125,6 +125,31 @@ A matemática por baixo dos modelos — machine learning no osso, e não só a A
 
 ---
 
+## Comece por estes três
+
+Se for para olhar só três, estes três — escolhidos porque cobrem disciplinas diferentes, não porque são os maiores.
+
+### Hub de Agentes de IA
+
+**Plataforma de IA** · https://marocos.dev/projetos/hub-de-agentes-de-ia
+
+**Por que este:** Quatro backends de agente atrás de um gateway só. É onde mora o argumento do fluxo determinístico: roteador barato antes do modelo caro, guarda que transforma o SQL em árvore sintática antes de tocar o banco, e um agente corretor que devolve o erro ao modelo.
+
+### Diário Oficial Eletrônico
+
+**SaaS Multi-tenant** · https://marocos.dev/projetos/diario-oficial-eletronico
+
+**Por que este:** Plataforma multi-tenant onde a saída é documento com validade legal: assinatura digital ICP-Brasil, PDF renderizado pelo mesmo navegador que desenha a pré-visualização, e uma guarda de SSRF porque esse navegador busca toda imagem do documento.
+
+### Auditoria Algorítmica do Spotify
+
+**Ciência de Dados & Pesquisa** · https://marocos.dev/projetos/auditoria-algoritmica-do-spotify
+
+**Por que este:** Meu TCC, e o que mostra método em vez de código: quatro personas sintéticas construídas em contas reais, e todo achado passando por bootstrap, Mann-Whitney, rarefação e teste de permutação antes de ser afirmado.
+
+
+---
+
 ## Projetos
 
 ### Diário Oficial Eletrônico

@@ -248,6 +248,64 @@ const profileDataEn = {
   ],
 
   /**
+   * OS TRÊS PARA COMEÇAR — a prova logo depois da afirmação.
+   * ==================================================
+   * O bloco de capacidades acima AFIRMA. Este nomeia três projetos que sustentam a
+   * afirmação e leva o visitante direto a eles, sem passar pela lista de doze.
+   *
+   * A razão de existir é o custo de atenção: a janela de Projetos é honesta e completa,
+   * mas doze linhas obrigam quem chegou agora a escolher sem critério. Três com um
+   * motivo escrito ao lado transformam a escolha em recomendação.
+   *
+   * ==================================================
+   * A ESCOLHA É POR COBERTURA DE CAPACIDADE, NÃO POR ORGULHO.
+   *
+   * Os três não são os que ele mais gosta nem os maiores: são os que juntos cobrem
+   * disciplinas DIFERENTES. Três projetos excelentes do mesmo tipo provariam uma
+   * habilidade três vezes e as outras nenhuma.
+   *
+   *   hub-de-agentes-de-ia   arquitetura de agente — a capacidade nº 1
+   *   diario-oficial         produto ponta a ponta com exigência legal — a nº 2
+   *   auditoria-do-spotify   dados, estatística e método — a disciplina que
+   *                          nenhum dos outros dois mostra
+   *
+   * Ficaram de fora, e vale saber por que: o Portal Acadêmico é tecnicamente
+   * comparável ao Diário Oficial e provaria a MESMA coisa; o Fraud Sentinel disputa
+   * com o TCC a vaga de dados e perde por ser sobre base pública, enquanto o TCC é
+   * pesquisa própria com método declarado; e o faculdAIde é o melhor exemplo de
+   * harness, mas é o menor projeto da lista e abrir por ele daria a impressão errada
+   * de escala.
+   *
+   * ==================================================
+   * SÓ O `id` E O `porque` MORAM AQUI.
+   *
+   * Título, categoria e slug vêm de `content/projects.js` em runtime — este bloco
+   * guarda a decisão EDITORIAL (quais três, e por quê) e nada mais. Escrever o título
+   * aqui criaria a quinta cópia dele, e a primeira a divergir seria esta, porque é a
+   * que ninguém relê.
+   *
+   * `id` e não slug: o slug é derivado do título e muda quando o título muda; o id é a
+   * identidade estável. Há teste garantindo que os três resolvem.
+   */
+  recomendados: [
+    {
+      id: 6,
+      porque:
+        'Four agent backends behind one gateway. It is where the argument for deterministic control flow lives: a cheap router before the expensive model, a SQL guard that parses the query into a syntax tree, and a fixer agent that takes the database error back to the model.',
+    },
+    {
+      id: 3,
+      porque:
+        'A multi-tenant platform where the output is a legal document: ICP-Brasil digital signature, PDF rendered by the same browser that draws the preview, and an SSRF guard because that browser fetches every image in the document.',
+    },
+    {
+      id: 5,
+      porque:
+        'My thesis, and the one that shows method rather than code: four synthetic personas built inside real accounts, and every finding carried through bootstrap, Mann-Whitney, rarefaction and a permutation test before being stated.',
+    },
+  ],
+
+  /**
    * Ver o histórico no cabeçalho do arquivo antes de mexer: estes três já saíram
    * uma vez e voltaram por decisão do dono do projeto.
    *
@@ -340,6 +398,26 @@ const profileDataPt = {
       titulo: 'Velocidade com IA sem a dívida técnica que ela costuma trazer',
       texto:
         'IA deixa qualquer um mais rápido; o que separa as pessoas é quanto ela sabe do seu código. Eu monto um harness por projeto — as convenções, os erros que já custaram depuração, e uma verificação que o agente não tem permissão de pular antes de afirmar que algo funciona. Rápido deixa de significar frágil, e isso vale para o seu repositório, não só para os meus.',
+    },
+  ],
+
+  /** Ver a nota longa no bloco em inglês: a escolha é por cobertura de capacidade, e
+   *  só o `id` e o `porque` moram aqui. */
+  recomendados: [
+    {
+      id: 6,
+      porque:
+        'Quatro backends de agente atrás de um gateway só. É onde mora o argumento do fluxo determinístico: roteador barato antes do modelo caro, guarda que transforma o SQL em árvore sintática antes de tocar o banco, e um agente corretor que devolve o erro ao modelo.',
+    },
+    {
+      id: 3,
+      porque:
+        'Plataforma multi-tenant onde a saída é documento com validade legal: assinatura digital ICP-Brasil, PDF renderizado pelo mesmo navegador que desenha a pré-visualização, e uma guarda de SSRF porque esse navegador busca toda imagem do documento.',
+    },
+    {
+      id: 5,
+      porque:
+        'Meu TCC, e o que mostra método em vez de código: quatro personas sintéticas construídas em contas reais, e todo achado passando por bootstrap, Mann-Whitney, rarefação e teste de permutação antes de ser afirmado.',
     },
   ],
 

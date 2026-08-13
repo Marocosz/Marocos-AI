@@ -1209,3 +1209,39 @@
     animation-play-state: paused;
   }
 }
+
+/* --------------------------------------------------
+   A CATEGORIA DO PROJETO RECOMENDADO
+
+   Vive na MESMA linha do nome, e não abaixo: a linha de baixo já é o motivo da
+   recomendação, e empilhar três alturas de texto transformaria a porta numa ficha.
+
+   Mono e caixa alta porque é classificação do sistema, não frase que uma pessoa
+   escreveu — a mesma voz da ficha técnica e do metadado da Jornada.
+
+   `flex-shrink: 0` no separador e `min-width: 0` no conjunto: em janela estreita quem
+   corta é o NOME (que tem `TextoCortado` na lista de Projetos, mas aqui é texto
+   simples), nunca a categoria pela metade.
+   -------------------------------------------------- */
+.about-rec-cat {
+  font-family: 'Courier New', monospace;
+  font-size: 0.62rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--text-secondary);
+  opacity: 0.85;
+  white-space: nowrap;
+}
+
+/* O separador é um filete vertical desenhado com borda, e não um caractere: "·" herda
+   a fonte e o peso do texto ao lado, e em mono ele fica desalinhado da linha de base
+   do nome em Poppins. */
+.about-rec-cat::before {
+  content: '';
+  display: inline-block;
+  width: 1px;
+  height: 0.85em;
+  margin: 0 8px -0.1em 9px;
+  background: var(--card-border);
+}

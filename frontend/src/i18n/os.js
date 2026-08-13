@@ -143,6 +143,16 @@ const osContentEn = {
     /** `%d` vem de `profile.capacidades.length`. Escrever "Five" aqui seria repetir,
      *  no mesmo commit, o defeito que este arquivo já consertou cinco vezes. */
     forteHeadline: '%d things I get hired for.',
+    /**
+     * O CABEÇALHO DOS TRÊS RECOMENDADOS. Ele vem logo depois das capacidades porque
+     * aquele bloco afirma e este prova — e ganha headline pela regra de corte do
+     * projeto: uma recomendação É uma afirmação.
+     *
+     * O NÚMERO É INTERPOLADO, de `recomendados.length`. Escrever "três" aqui seria o
+     * sexto caso da mesma classe de defeito neste arquivo.
+     */
+    recLabel: 'Start here',
+    recHeadline: 'If you only open %d, open these.',
     stackLabel: 'Day to day',
     bioLabel: 'Who writes this',
     /**
@@ -816,6 +826,10 @@ const osContentPt = {
     forteLabel: 'O que eu faço',
     /** `%d` vem de `profile.capacidades.length` — ver a nota no bloco em inglês. */
     forteHeadline: '%d coisas pelas quais eu sou contratado.',
+    /** Ver a nota no bloco em inglês: vem depois das capacidades porque aquele bloco
+     *  afirma e este prova, e o número vem de `recomendados.length`. */
+    recLabel: 'Comece por aqui',
+    recHeadline: 'Se você abrir só %d, abra estes.',
     stackLabel: 'No dia a dia',
     bioLabel: 'Quem escreve isto',
     /** Ver a nota no bloco em inglês: headline só onde há afirmação. */

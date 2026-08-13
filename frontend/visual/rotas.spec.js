@@ -287,15 +287,22 @@ test('as portas do guia abrem os apps que prometem, em janela nova', async ({ pa
   // A quinta é a de Serviços, e ela tem o mesmo motivo de existir que a do
   // assistente teve: é a única janela do portfólio cujo trabalho é converter, e
   // ela não era porta nenhuma.
-  await expect(page.locator('.about-door')).toHaveCount(5)
+  //
+  // O SELETOR PRECISOU FICAR MAIS ESPECÍFICO, e vale registrar por quê: a seção "Comece
+  // por aqui" reusa `.about-guide` e `.about-door` — reuso correto, é a mesma interação
+  // — e com isso `.about-door` puro passou a contar oito. Duas listas com as MESMAS duas
+  // classes deixam ambas inendereçáveis, então a nova ganhou o modificador
+  // `--rec` e este teste exclui ele.
+  const portasDoGuia = page.locator('.about-guide:not(.about-guide--rec) .about-door')
+  await expect(portasDoGuia).toHaveCount(5)
   await expect(
-    page.locator('.about-door', { hasText: 'Consigo perguntar direto a ele?' }),
+    portasDoGuia.filter({ hasText: 'Consigo perguntar direto a ele?' }),
   ).toHaveCount(1)
   await expect(
-    page.locator('.about-door', { hasText: 'E se eu precisar contratar?' }),
+    portasDoGuia.filter({ hasText: 'E se eu precisar contratar?' }),
   ).toHaveCount(1)
 
-  await page.locator('.about-door', { hasText: 'Ele sabe construir?' }).click()
+  await portasDoGuia.filter({ hasText: 'Ele sabe construir?' }).click()
   await expect(page.locator('.projects-app-list')).toBeVisible({ timeout: 8000 })
 
   // Duas janelas: o guia continua aberto atrás. É o ponto da decisão.
@@ -968,4 +975,58 @@ test('slug de projeto inexistente recebe noindex, e a rota seguinte não herda',
   await expect
     .poll(() => page.evaluate(() => document.querySelector('meta[name="robots"]')?.content ?? null))
     .toBeNull()
+})
+
+/**
+ * OS TRÊS RECOMENDADOS ABREM O PROJETO CERTO.
+ *
+ * A seção nasceu de uma constatação simples: as capacidades AFIRMAM, e uma afirmação
+ * sem alvo clicável manda o visitante procurar a prova numa lista de doze. Três linhas
+ * com o motivo ao lado resolvem — mas só se o clique for para o lugar certo.
+ *
+ * E é aqui que o teste ganha valor, porque o caminho tem um ponto de quebra silencioso:
+ * a seção guarda IDS em `profile.recomendados` e resolve título e slug em
+ * `content/projects.js`. Se um projeto recomendado for renomeado, o slug muda; se for
+ * removido, o id não resolve. Nos dois casos o app continua renderizando — no primeiro
+ * com o link novo (certo), no segundo com uma linha a menos (`filter(Boolean)`). O que
+ * NÃO pode acontecer em silêncio é a contagem cair, e é o que a primeira asserção pega.
+ */
+test('os três recomendados do Sobre abrem o projeto que nomeiam', async ({ page, context }) => {
+  await definirPreferencias(context)
+  const erros = []
+  page.on('pageerror', (e) => erros.push(e.message))
+
+  await page.goto('/sobre', { waitUntil: 'networkidle' })
+  await passarDaCerimonia(page)
+  await expect(page.locator('.about-app')).toBeVisible({ timeout: 8000 })
+
+  // TRÊS, e a contagem importa: um id que deixou de resolver desaparece da lista sem
+  // erro nenhum, então a ausência só é detectável contando.
+  const linhas = page.locator('.about-guide--rec .about-door')
+  await expect(linhas).toHaveCount(3)
+
+  // O texto da primeira linha é o TÍTULO do projeto, vindo de content/projects.js — e
+  // é ele que precisa casar com a janela que abre.
+  const primeira = linhas.first()
+  const titulo = (await primeira.locator('.about-door-question').textContent()).trim()
+
+  await primeira.click()
+
+  // Abre o DETALHE do projeto numa janela nova, e o guia continua atrás: mesma decisão
+  // das portas (`useAbrir`, não `useIrPara`) — quem foi ver um projeto ainda pode
+  // querer os outros dois.
+  await expect(page.locator('.project-detail-title')).toBeVisible({ timeout: 8000 })
+  await expect(page.locator('.about-app')).toHaveCount(1)
+  await expect(page.locator('.marocos-window')).toHaveCount(2)
+
+  // E é o projeto CERTO: o título da janela de detalhe começa com o nome que a linha
+  // prometeu. `startsWith` porque a linha carrega nome + categoria no mesmo elemento.
+  const nomeNoDetalhe = (await page.locator('.project-detail-title').textContent()).trim()
+  expect(titulo.startsWith(nomeNoDetalhe)).toBe(true)
+
+  // A rota acompanhou — é o que prova que o slug resolveu, e não que o app abriu uma
+  // janela vazia.
+  expect(page.url()).toContain('/projetos/')
+
+  expect(erros, `erro de página não capturado: ${erros.join('; ')}`).toHaveLength(0)
 })
