@@ -22,7 +22,7 @@ Existe uma suíte para isso. Rode-a:
 cd frontend/visual
 npm install          # 1ª vez: baixa o Chromium (só aqui, não polui o app)
 npm run build:frontend
-npm test             # 40 testes: 21 visuais + 19 funcionais
+npm test             # 50 testes: 24 visuais + 26 funcionais
 ```
 
 Falhou uma cena? Abra o relatório com `npm run report` — ele mostra referência,
@@ -36,8 +36,8 @@ falha que você não entendeu apaga a única evidência de que algo quebrou.
 
 | suíte | pega | não pega |
 |---|---|---|
-| `visual.spec.js` (21 cenas) | geometria, cor, espaçamento, tipografia, nos dois temas e no mobile | qualquer coisa que dependa de **tempo** |
-| `rotas.spec.js` (19 testes) | `import()` dinâmico quebrado, deep link, histórico, carga sob demanda, **e o que só existe depois de um clique** | aparência |
+| `visual.spec.js` (24 cenas) | geometria, cor, espaçamento, tipografia, nos dois temas e no mobile | qualquer coisa que dependa de **tempo** |
+| `rotas.spec.js` (26 testes) | `import()` dinâmico quebrado, deep link, histórico, carga sob demanda, **e o que só existe depois de um clique** | aparência |
 | `npm test` no `frontend/` | lógica pura (roteamento, reducer de janelas, config) | tudo que precisa de DOM |
 
 **O regressor visual é estruturalmente cego a tempo.** Ele desliga a animação
@@ -56,7 +56,7 @@ teto de medida e número de colunas, e é o único guarda desse eixo.
 
 **`npm run build` não pega import dinâmico quebrado.** Ele compila com o
 caminho errado e falha só em runtime. É para isso que existe o `rotas.spec.js`
-— os nove apps, o cristal e o markdown do assistente são todos carregados por
+— os onze apps, o cristal e o markdown do assistente são todos carregados por
 `import()`.
 
 ## A regra que vale antes de todas as outras
@@ -100,15 +100,35 @@ dia.length` daria uma escolha a mais do que o visitante tem.
 
 ### Número na interface não se escreve à mão
 
-Este projeto já teve **três** números literais envelhecerem em texto visível: "36
-testes" no leia-me (eram 38), "Doze papéis de parede" no balão (eram dezessete) e o
-"8º período" depois da formatura. O padrão é sempre o mesmo — o texto foi escrito
-certo, a coisa contada cresceu, e ninguém releu a frase.
+Este projeto já teve **cinco** números literais envelhecerem em texto visível: "36
+testes" no leia-me (eram 38), "Doze papéis de parede" no balão (eram dezessete), o
+"8º período" depois da formatura, "21 cenas visuais" no CORPO da mesma seção do
+leia-me cujo TÍTULO já era derivado, e "Sete anos em seis faixas" na legenda da
+Jornada. O padrão é sempre o mesmo — o texto foi escrito certo, a coisa contada
+cresceu, e ninguém releu a frase.
+
+O quarto caso ensina uma variação que vale registrar: **derivar metade de uma frase
+é pior que não derivar nenhuma**, porque a metade protegida faz a outra parecer
+protegida também. Ao consertar um número, releia o parágrafo inteiro.
+
+O quinto ensina a pior de todas: **uma frase pode envelhecer nas DUAS pontas ao mesmo
+tempo.** "Sete anos em seis faixas" ficou errada nos dois números de uma vez — a
+carreira passou de sete para oito anos e a lista de seis para sete faixas, e a frase
+continuou parecendo plausível justamente porque estava internamente coerente. Não
+existe "o número mais seguro da frase": derive todos, ou nenhum é confiável.
 
 A regra: **quantidade na interface vem de uma fonte única.** Derive em runtime
-quando der (`APPS.length`, `contarPresets()`, `idadeEm()`); quando não der, ponha a
-constante num lugar só e interpole com `%d` nos textos do `i18n` — `content/sistema.js`
-é o exemplo, e ele carrega no comentário COMO reconferir o valor.
+quando der (`APPS.length`, `contarPresets()`, `idadeEm()`, `items.length`,
+`portas.length`); quando não der, ponha a constante num lugar só e interpole com `%d`
+nos textos do `i18n`.
+
+**E há uma resposta melhor que derivar: não exibir.** `SISTEMA.testes`, `SISTEMA.cenas`
+e `SISTEMA.shaders` existiam, eram derivados com cuidado e tinham procedimento de
+reconferência escrito ao lado — toda essa engenharia protegendo a exibição de números
+que não interessam a quem lê o site. O dono do projeto mandou tirar ("isso não é algo
+importante"), e estava certo: "46 testes" e "2 shaders" são orgulho de quem escreveu,
+não informação para quem contrata. **A suíte continua obrigatória; o troféu na parede
+saiu.** Antes de derivar um número, pergunte se ele deveria estar na tela.
 
 ## A linguagem visual
 
@@ -209,9 +229,21 @@ camada errada é o erro mais comum:
   do app e consulte nos descendentes — `apps/AboutApp.css` é o exemplo, e usa
   `cqi` para o nome do herói acompanhar a janela em vez do monitor.
 
-- **Texto tem medida.** Janela maximizada numa tela grande passa de 160 caracteres
-  por linha. Prosa leva `max-width` em `ch`, e a raiz do app leva teto de largura
-  com `margin-inline: auto` — maximizar tem de **reorganizar**, não esticar.
+- **Texto tem medida, e ela mora no CONTAINER — nunca no parágrafo.** Janela
+  maximizada numa tela grande passa de 160 caracteres por linha, então a raiz do app
+  leva teto de largura com `margin-inline: auto`: maximizar tem de **reorganizar**,
+  não esticar.
+
+  **Não ponha `max-width` em `ch` nos blocos de texto.** Já foi feito e foi
+  desfeito: com um teto na raiz E outro em cada parágrafo, o de dentro é sempre
+  menor, e o texto passa a parar antes da borda do próprio container — sobra à
+  direita em toda a interface (medido: 160px na legenda da Jornada, 56px na resposta
+  das portas do "Sobre"). Um limite só, e o parágrafo preenche o espaço que recebeu.
+
+  O teto da raiz é dimensionado pelo que o app É: `1040px` quando há colunas ou
+  grade (Sobre, Jornada, Stack), `900px` quando há prosa junto de cards (detalhe de
+  projeto), `780px` quando é prosa do começo ao fim (leia-me). Lista de explorador
+  fica de fora e é full-bleed.
 
 - **Superfície de conteúdo** é `--card-bg` + `--card-border` — não uma receita
   de vidro nova. É o que o chrome de explorador usa nas três superfícies dele, e
@@ -274,7 +306,7 @@ do herói (acompanha a JANELA, por `cqi` — ver os container queries acima) ·
 frontend/src/
   config/system.js    valores de ajuste do sistema (+ cssBridge.js, que os leva ao CSS)
   os/                 shell/ desktop/ mobile/ boot/ hooks/ + registry, rotas, windowManager
-  apps/               os 9 apps, carregados por lazy()
+  apps/               os 11 apps, carregados por lazy()
   ui/                 componentes compartilhados
   wallpaper/ brand/
   content/            dados do portfólio      i18n/ strings de interface
@@ -290,6 +322,9 @@ uma decisão que custou medição ou depuração:
 | se você for mexer em | leia primeiro |
 |---|---|
 | qualquer valor visual | o cabeçalho de `config/system.js` — inclusive o que ele diz que **não** mora lá |
+| texto que corta com reticências | `ui/TextoCortado.jsx` — ele mede o corte e só então mostra o balão, e `focavel={false}` é obrigatório quando ele está dentro de um botão |
+| balão de qualquer tipo | `ui/useBalao.jsx` — as três armadilhas de posicionamento, e por que o CSS dele mora em `DicaBalao.css` |
+| ícone de app | `ui/xpIcons.jsx` — o fallback para o lucide entra por PROP, e o porquê |
 | CSS de componente novo | `ui/AppIconButton.css` — o hack global de tema claro de `index.css`, e por que a variante `--tile` precisa **vencê-lo** com seletor composto enquanto a `--plana` precisa **herdar** com `color: inherit` |
 | custom property nova | `config/cssBridge.js` — por que todo `var(--cfg-*)` precisa de fallback |
 | chrome de janela, navegação entre apps | `os/windowManager.js` — a chave é id de INSTÂNCIA, não o appId, e as três portas (`OPEN` de fora, `NAVIGATE` de dentro, `EXTERNAL_ROUTE` do voltar do navegador) |
@@ -317,13 +352,56 @@ uma decisão que custou medição ou depuração:
   | sintoma | é | o que fazer |
   |---|---|---|
   | passa / reprova / passa, com 1-2px | ruído do harness (documentado) | nada — não rebaseline |
-  | reprova sempre com o MESMO número | mudança real, mesmo que minúscula | achar a causa antes de aceitar |
+  | reprova sempre com o MESMO número | **suspeita**, não veredito — meça a MAGNITUDE | ver o critério decisivo abaixo |
 
-  Um diff de 88px reprovando 88 exatos três vezes não é ruído. Foi assim que se
+  **O CRITÉRIO DECISIVO É A MAGNITUDE POR PIXEL, não a contagem.** A regra antiga
+  ("mesmo número = regressão") deu falso positivo em 2026-08-13: quatro cenas
+  reprovaram com números IDÊNTICOS em duas execuções cheias — `projetos` 36px,
+  `servicos` 1px, `stack` 1px, `stack-claro` 67px — e passaram todas isoladas. Pela
+  tabela isso seria regressão; medindo, não era:
+
+  ```bash
+  python -c "
+  from PIL import Image, ImageChops
+  a=Image.open('test-results/visual-X-X/X-actual.png').convert('RGB')
+  e=Image.open('test-results/visual-X-X/X-expected.png').convert('RGB')
+  d=ImageChops.difference(a,e); px=d.load(); w,h=a.size
+  print('bbox', d.getbbox(), 'delta max', max(max(px[x,y]) for y in range(h) for x in range(w)))"
+  ```
+
+  Deu **delta máximo de 5 níveis em 255** (2%), em caixas de 14×15px. Mudança de
+  conteúdo move pixel em centenas de níveis; antialiasing move em unidades. A
+  contagem é estável porque o jitter é determinístico dada a mesma contenção de CPU —
+  o que explica os dois fatos ao mesmo tempo (mesmo número, e passa sozinha).
+
+  Então: **`delta max` ≤ ~10 é jitter, não importa a contagem nem a estabilidade
+  dela.** Acima disso, procure a causa.
+
+  Um diff de 88px com delta ALTO não é ruído. Foi assim que se
   descobriu que tirar um `overflow: hidden` desloca a rasterização dos SVGs
   dentro do elemento — **mexer em `overflow`, `filter`, `mask`, `transform` ou
   `opacity` de um ancestral de conteúdo vetorial muda o antialiasing dele**. A
   checagem é ligar/desligar a propriedade suspeita, nunca subir tolerância.
+
+  **Com 50 testes a suíte cheia reprova 1–4 cenas por execução, e o
+  conjunto MUDA a cada rodada.** Medido em 2026-08-12: uma execução reprovou
+  `stack`, `stack-claro` e `servicos-claro`; as três passaram rodadas
+  isoladamente; a execução seguinte reprovou só `stack` — com o diff caindo de
+  **336 para 1 pixel entre as tentativas da mesma cena, no mesmo código**. Um
+  teste FUNCIONAL (`o Sobre maximizado`) entra no mesmo padrão.
+
+  Medido de novo em 2026-08-13, com a suíte em 50 e logo DEPOIS de um rebaseline
+  legítimo — que é o momento em que o ruído mais assusta, porque a tentação é achar
+  que o rebaseline não pegou. A execução cheia reprovou `projetos` (36px),
+  `servicos` (1px), `stack` (1px) e `stack-claro` (67px); **as quatro passaram
+  isoladas**, e `stack` passou três vezes seguidas. Diff de 1 pixel é a assinatura
+  do ruído, e rebaselinar sobre ele só troca uma referência boa por outra igualmente
+  arbitrária.
+
+  É a mesma causa do `workers: 1`: aqui não há GPU, e a suíte cresceu sobre a
+  mesma máquina. **O sinal de ruído é o conjunto instável, não o tamanho do
+  diff** — quando as mesmas cenas reprovam com os mesmos números, é regressão.
+  Rodar a cena isolada é o teste decisivo, e é barato.
 - **Procurar no CÓDIGO uma instabilidade que era do HARNESS.** Esta suíte
   reprovava de forma intermitente, em cenas sempre diferentes, e a investigação
   passou por duas suspeitas erradas antes de achar a certa:
@@ -349,6 +427,28 @@ uma decisão que custou medição ou depuração:
 
   **Não rode outra coisa pesada na máquina enquanto a suíte roda**, pelo mesmo
   motivo: um `npm run build` em paralelo disputa a mesma CPU.
+- **Deixar o CSS de um componente compartilhado importado por quem NÃO emite a
+  classe.** O Vite divide CSS por chunk, então este erro é invisível em
+  desenvolvimento (onde tudo vem junto) e só aparece no build, numa rota específica.
+
+  Foi o que aconteceu com o balão: as regras `.dica-balao*` moravam em `ui/Dica.css`,
+  importado por `ui/Dica.jsx`. Quando o `ui/TextoCortado.jsx` passou a emitir as
+  mesmas classes, a rota `/stack` — que não renderiza a `Dica` — recebia o balão SEM
+  posicionamento nenhum: ele virava texto solto no fim da div de tema. O sintoma
+  relatado foi "o balão não funciona".
+
+  A regra: **o CSS acompanha quem EMITE a classe, não quem a inventou primeiro.** Ao
+  extrair um mecanismo para ser reusado, o CSS dele sai junto — hoje em
+  `ui/DicaBalao.css`, importado pelo `useBalao`.
+
+- **Confiar num fallback que o comentário promete e o código não faz.**
+  `AppIconButton` dizia "app sem ícone XP cai no lucide — o `??` abaixo cobre", e não
+  havia `??` nenhum: era `usaXp ? <IconeXp/> : <Lucide/>`, e `IconeXp` devolvia `null`.
+  O defeito ficou latente por nove apps, porque todos tinham ícone desenhado, e
+  apareceu no décimo do pior jeito possível: **um ícone invisível na área de trabalho
+  no preset XP** — ninguém procura o que não está lá. Comentário não é teste; se ele
+  descreve um fallback, siga o caminho do código até ver o fallback acontecer.
+
 - **Editar o literal no componente** em vez do `config/system.js`, deixando a
   configuração inerte — a chave passa a existir sem fazer nada.
 - **Tentar neutralizar o tema token por token.** O preset XP precisa renderizar
@@ -369,9 +469,38 @@ uma decisão que custou medição ou depuração:
   desktop, o menu Iniciar e a home mobile são chrome presente em quase toda
   cena, então um app a mais mexe em todas. É esperado — mas **confira diff por
   diff antes de aceitar**: o único pixel diferente deve ser o ícone novo, e
-  nenhum dos existentes pode ter mudado de posição. Note também que
-  `rotas.spec.js` fala em "nove rotas" no texto e no comentário; se o número de
-  apps mudar, decida conscientemente se aquele spec muda de escopo.
+  nenhum dos existentes pode ter mudado de posição.
+
+  **E a conta é maior do que "a grade de ícones": a lateral do explorador é
+  DERIVADA do registry** (`APPS.filter(a => a.explorer && !a.dynamic)`), então um
+  app com `explorer: true` aparece sozinho na lateral de todos os outros. Medido
+  na entrada da janela de Serviços: ~18 das 23 cenas mudaram. Medido de novo na entrada
+  da janela de Contexto: **22 das 24**.
+
+  Um app novo também obriga a acertar a CONTAGEM em quatro lugares que o texto
+  cita: o cabeçalho e o `test.describe` de `rotas.spec.js`, `visual/README.md`, esta
+  skill, e as frases de "N apps" em `registry.js`, `ExplorerChrome.jsx`,
+  `windowManager.js` e `AssistantMarkdown.jsx`. (`content/sistema.js` saiu da lista:
+  `testes`, `cenas` e `shaders` foram removidos do site — ver a nota sobre não
+  exibir números na seção de contagens.)
+
+  **E há três lugares que a contagem não cobre, cada um com um sintoma silencioso:**
+
+  1. `ui/xpIcons.jsx` — app sem desenho XP cai no lucide, e o fallback funciona
+     porque ele entra por prop. Antes de 2026-08-13 não funcionava: o app aparecia
+     **sem ícone nenhum** no preset XP.
+  2. `i18n/os.js` → `iconLabels` — título longo quebra em duas linhas como legenda de
+     ícone, e uma coluna com alturas diferentes deixa de ser grade. Título com mais de
+     ~14 caracteres precisa de entrada ali.
+  3. `PROGRAMAS` em `ExplorerChrome.jsx` é `APPS.filter(a => !a.explorer && a.inStartMenu)`
+     — ou seja, um app SEM chrome de explorador aparece na lateral de todos os que
+     têm. Não existe app invisível para a lateral: `explorer: true` põe no primeiro
+     grupo, `false` põe no segundo.
+
+  E **um app com `explorer: true` reprova o `config/system.test.js` até alguém
+  declarar a área útil dele** no mapa `ANTES` daquele teste. Isso é de propósito:
+  força a escolher o tamanho de CONTEÚDO em vez de chutar o tamanho da janela e
+  deixar o chrome comer a diferença em silêncio.
 
 ## Quando esta skill fica desatualizada
 

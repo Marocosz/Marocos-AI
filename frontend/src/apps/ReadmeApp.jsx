@@ -2,7 +2,6 @@ import React from 'react'
 import { Github } from 'lucide-react'
 import { useLanguage } from '../contexts/LanguageContext'
 import { getOsData } from '../i18n/os'
-import { SISTEMA } from '../content/sistema'
 import './ReadmeApp.css'
 
 const REPO = 'https://github.com/Marocosz/Marocos-AI'
@@ -30,16 +29,19 @@ const ReadmeApp = () => {
     <div className="readme-app">
       <p className="readme-lead">{t.lead}</p>
 
-      {/* O `%d` de um dos títulos é o número de testes da suíte, e ele vem de
-          `content/sistema.js` — a mesma constante que a ficha "Este sistema" do
-          "Sobre este PC" exibe. Era literal aqui, dizia 36, e a suíte já tinha
-          38: uma frase que envelheceu sozinha. O `replace` não faz nada nos
-          outros títulos, que não têm marcador. */}
+      {/* OS DOIS `replace` DE `%d` SAÍRAM DAQUI, e a razão é de conteúdo: a seção
+          que os usava — "E %d testes olham para tudo isso" — foi removida junto com
+          a do shader, por decisão do dono do projeto ("isso não é algo
+          importante"). Com ela saíram `SISTEMA.testes` e `SISTEMA.cenas`, e este
+          componente voltou a ser o que devia ser: um mapeador de seções.
+
+          Fica registrado o que aquele código protegia, porque a lição não morre com
+          o texto: aquelas duas frases envelheceram erradas duas vezes, e foi por
+          isso que os números passaram a ser derivados. Se algum dia voltar um número
+          a este app, ele volta derivado. */}
       {t.sections.map((secao) => (
         <section className="readme-section" key={secao.title}>
-          <h3 className="readme-section-title">
-            {secao.title.replace('%d', SISTEMA.testes)}
-          </h3>
+          <h3 className="readme-section-title">{secao.title}</h3>
           <p className="readme-section-body">{secao.body}</p>
         </section>
       ))}

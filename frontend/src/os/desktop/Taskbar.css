@@ -118,11 +118,9 @@
   font-size: 0.78rem;
 }
 
-.taskbar-window-label {
-  overflow: hidden;
-  white-space: nowrap;
-  text-overflow: ellipsis;
-}
+/* O trio de corte vem de `ui/TextoCortado.css` — este rótulo é um `TextoCortado`, e
+   o balão dele mostra o título inteiro no hover. Não sobrou declaração própria: a
+   tipografia já vem do botão. */
 
 /* Minimizada continua listada, mas apagada. */
 .taskbar-window-btn.minimized {

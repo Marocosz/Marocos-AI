@@ -14,6 +14,22 @@
   display: flex;
   flex-direction: column;
   gap: 20px;
+  /**
+   * A MEDIDA MORA AQUI, NO CONTAINER — e não em cada parágrafo.
+   *
+   * Houve uma versão com `max-width` em `ch` em cada bloco de texto, por cima deste teto.
+   * Dois limites para a mesma coisa, e o de dentro sempre menor: o resultado era texto
+   * parando antes da borda do próprio container, com sobra à direita em toda a página.
+   * O dono do projeto apontou, e ele está certo — o parágrafo tem de preencher o espaço
+   * que recebeu.
+   *
+   * 780px e não os 1040 dos outros apps porque este é o único que é PROSA DO COMEÇO AO
+   * FIM: sem colunas, sem cards, sem grade. 1040px a 0,88rem dariam ~118 caracteres por
+   * linha. Aqui o container É a medida, então ele tem de ter o tamanho de uma medida.
+   */
+  max-width: 780px;
+  margin-inline: auto;
+  width: 100%;
 }
 
 /* A abertura carrega o argumento inteiro; quem parar aqui já entendeu. */
@@ -33,22 +49,39 @@
   gap: 6px;
 }
 
-/* Mesma receita de `.about-section-title`: é o sistema se descrevendo. */
+/**
+ * O TÍTULO DE SEÇÃO É A VOZ DA MÁQUINA — mono, caixa alta, e INTEIRO no acento.
+ *
+ * Continua em mono porque aqui o título nomeia um subsistema: é o sistema se
+ * descrevendo, não uma pessoa falando. O que mudou foi a cor.
+ *
+ * Ele estava em `--text-secondary` com só o `// ` no acento — a receita antiga, de antes
+ * de o "Sobre este PC" adotar a do `ui/AppHeader`, que põe o eyebrow inteiro no acento.
+ * Este era o último app na receita velha, e duas grafias do mesmo elemento em janelas
+ * vizinhas é o tipo de coisa que ninguém nota isolada e incomoda no conjunto.
+ *
+ * Estar no acento também é o que faz estes títulos seguirem o preset: escolher Brasa
+ * repinta todos, o que antes só acontecia com os dois caracteres do prefixo.
+ */
 .readme-section-title {
   margin: 0;
   font-family: 'Courier New', monospace;
+  /* 'Courier New' só tem 400 e 700 (fonte de sistema, sem @font-face) e o index.css tem
+     font-synthesis: none — 700 é o negrito real, não sintetizado. */
   font-size: 0.75rem;
   font-weight: 700;
-  letter-spacing: 0.08em;
+  letter-spacing: 2px;
   text-transform: uppercase;
-  color: var(--text-secondary);
-}
-
-.readme-section-title::before {
-  content: '// ';
   color: var(--accent-color);
 }
 
+/* Sem cor própria: o título inteiro já é acento, e um override aqui só criaria um
+   segundo lugar para trocar a mesma cor. */
+.readme-section-title::before {
+  content: '// ';
+}
+
+/* Sem `max-width` próprio: quem limita a linha é o container (ver `.readme-app`). */
 .readme-section-body {
   margin: 0;
   font-size: 0.88rem;

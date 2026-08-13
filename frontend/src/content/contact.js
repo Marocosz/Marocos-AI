@@ -1,4 +1,8 @@
 import { Mail, Linkedin, Github, MessageSquare } from 'lucide-react';
+/* A VERSÃO VEM DE FONTE ÚNICA. Ela estava escrita à mão nos dois banners abaixo, e
+   `content/sistema.js` carregava o comentário "o mesmo do banner do terminal" — que
+   é a descrição de um defeito, não de um contrato. Ver a nota lá. */
+import { SISTEMA } from './sistema';
 
 const contactDataItems = [
   {
@@ -56,23 +60,24 @@ const contactPageContentEn = {
   title: "Let's Talk",
   description: "Below are the best channels to find me. Run the command or click the links.",
   /**
-   * `vps` PROVA DEVOPS EM VEZ DE VENDER HOSPEDAGEM.
+   * O BLOCO `hosting` SAIU DAQUI, e a história dele vale a nota.
    *
-   * Eram 55 palavras de anúncio ("Perfect for small to medium projects that
-   * need reliable, custom hosting...") no meio de um app de CONTATO, com quatro
-   * bullets de folheto. O fato por baixo é bom e some no discurso: ele mantém a
-   * própria infra, e o site que o visitante está usando roda nela.
+   * Ele começou como 55 palavras de anúncio ("Perfect for small to medium
+   * projects that need reliable, custom hosting...") com quatro bullets de
+   * folheto, no meio de um app de CONTATO. Foi cortado para quatro linhas que
+   * provavam devops em vez de vender hospedagem — e o corte estava certo, mas a
+   * conclusão que faltava era outra: o texto não era ruim, estava no lugar
+   * errado.
+   *
+   * Agora existe o lugar. Ele vive em `content/servicos.js`, que alimenta a
+   * janela de Serviços E a manchete que o comando `vps` do terminal imprime.
+   * FONTE ÚNICA de propósito: com o texto nos dois arquivos, a ficha da janela e
+   * a saída do terminal diriam a mesma coisa e divergiriam na primeira edição.
    */
-  hosting: {
-    badge: "INFRASTRUCTURE",
-    title: "I run my own VPS — this site is on it.",
-    description: "Docker, Traefik with automatic HTTPS, continuous deploy from git, and every container I put there. I also host projects for clients.",
-    features: ["Docker", "Traefik", "CI/CD", "Linux"]
-  },
   terminal: {
     title: "visitor@portfolio: ~",
     prompt: "visitor@portfolio:~$",
-    version: "Marocos OS [Version 3.0.1]",
+    version: `Marocos OS [Version ${SISTEMA.versao}]`,
     copyright: "(c) 2026 Marcos Rodrigues. All rights reserved.",
     systemCheck: "System check: OK. Loading shell...",
     logs: [
@@ -89,16 +94,11 @@ const contactPageContentPt = {
   sectionLabel: "06. / CONECTAR",
   title: "Vamos Conversar",
   description: "Abaixo estão os melhores canais para me encontrar. Execute o comando ou clique nos links.",
-  hosting: {
-    badge: "INFRAESTRUTURA",
-    title: "Rodo minha própria VPS — este site está nela.",
-    description: "Docker, Traefik com HTTPS automático, deploy contínuo a partir do git, e cada container que eu subo lá. Também hospedo projetos de clientes.",
-    features: ["Docker", "Traefik", "CI/CD", "Linux"]
-  },
+  /** Ver a nota no bloco em inglês: `hosting` mudou para `content/servicos.js`. */
   terminal: {
     title: "visitante@portfolio: ~",
     prompt: "visitante@portfolio:~$",
-    version: "Marocos OS [Versão 3.0.1]",
+    version: `Marocos OS [Versão ${SISTEMA.versao}]`,
     copyright: "(c) 2026 Marcos Rodrigues. Todos os direitos reservados.",
     systemCheck: "Verificação do sistema: OK. Carregando shell...",
     logs: [

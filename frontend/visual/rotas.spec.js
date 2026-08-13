@@ -1,5 +1,5 @@
 /**
- * VERIFICAÇÃO FUNCIONAL DAS NOVE ROTAS E DO CARREGAMENTO SOB DEMANDA
+ * VERIFICAÇÃO FUNCIONAL DAS ONZE ROTAS E DO CARREGAMENTO SOB DEMANDA
  * ==================================================
  * O regressor visual (`visual.spec.js`) fotografa cenas — e uma janela cujo
  * `import()` dinâmico apontou para o caminho errado aparece nas fotos como
@@ -10,10 +10,10 @@
  * falha em runtime, quando alguém navega até ali.
  *
  * Este spec é o que fecha esse buraco: entra por DEEP LINK em cada uma das
- * nove rotas do registry (`os/registry.js`) e prova, com Chromium real, que
+ * onze rotas do registry (`os/registry.js`) e prova, com Chromium real, que
  * a janela certa abriu, com o título certo na taskbar, e o CORPO do app
  * renderizou CONTEÚDO — não só que o seletor existe, mas que o chunk lazy
- * resolveu e o Suspense entregou algo de verdade. Além das nove rotas,
+ * resolveu e o Suspense entregou algo de verdade. Além das onze rotas,
  * cobre quatro comportamentos que dependiam de resolução SÍNCRONA antes do
  * refactor para `React.lazy`:
  *
@@ -55,7 +55,7 @@ import { setTimeout as esperar } from 'node:timers/promises'
 import { DESKTOP } from './cenas.js'
 import { mockarChat } from './mocks.js'
 
-// Nenhuma cena deste spec usa viewport mobile — as nove rotas e os quatro
+// Nenhuma cena deste spec usa viewport mobile — as onze rotas e os quatro
 // comportamentos abaixo só foram exercitados em desktop no rascunho
 // original, e é onde o bug de import quebrado que motivou este spec foi
 // encontrado. `DESKTOP` já é o padrão em `playwright.config.js`; declarado
@@ -91,7 +91,7 @@ async function passarDaCerimonia(page) {
 }
 
 /**
- * As nove rotas do registry, com o que cada uma precisa provar:
+ * As onze rotas do registry, com o que cada uma precisa provar:
  *   titulo        texto esperado no botão ativo da taskbar
  *   seletorCorpo  seletor que só existe se o CORPO do app renderizou
  *   paiSeletor    (só a rota dinâmica) seletor da janela pai, que deve estar
@@ -117,9 +117,11 @@ const ROTAS = [
   { rota: '/leia-me', titulo: 'leia-me.txt', seletorCorpo: '.readme-app' },
   { rota: '/jornada', titulo: 'Histórico de Versões', seletorCorpo: '.history-app' },
   { rota: '/stack', titulo: 'Gerenciador de Dispositivos', seletorCorpo: '.devices-app' },
+  { rota: '/servicos', titulo: 'Serviços', seletorCorpo: '.services-app' },
+  { rota: '/contexto', titulo: 'Baixar meu contexto', seletorCorpo: '.contexto-app' },
 ]
 
-test.describe('deep link nas nove rotas', () => {
+test.describe('deep link nas onze rotas', () => {
   for (const rota of ROTAS) {
     test(`${rota.rota} abre a janela certa, com título e corpo preenchidos`, async ({ page, context }) => {
       await definirPreferencias(context)
@@ -277,13 +279,20 @@ test('as portas do guia abrem os apps que prometem, em janela nova', async ({ pa
   await page.goto('/sobre', { waitUntil: 'networkidle' })
   await passarDaCerimonia(page)
   await expect(page.locator('.about-app')).toBeVisible({ timeout: 8000 })
-  // Quatro, e QUAIS quatro importa: projetos, jornada, leia-me e o Marcos
-  // Virtual. O terminal saiu do guia e virou o botão de ação do topo (ver o teste
-  // logo abaixo), então o número continuar 4 é coincidência — ele não prova que o
-  // conjunto está certo, e é a asserção seguinte que cobre o assistente.
-  await expect(page.locator('.about-door')).toHaveCount(4)
+  // CINCO, e QUAIS cinco importa: projetos, jornada, leia-me, o Marcos Virtual e
+  // os Serviços. O terminal saiu do guia e virou o botão de ação do topo (ver o
+  // teste logo abaixo), então o NÚMERO nunca provou que o conjunto está certo — é
+  // por isso que há uma asserção nominal por porta que entrou depois.
+  //
+  // A quinta é a de Serviços, e ela tem o mesmo motivo de existir que a do
+  // assistente teve: é a única janela do portfólio cujo trabalho é converter, e
+  // ela não era porta nenhuma.
+  await expect(page.locator('.about-door')).toHaveCount(5)
   await expect(
     page.locator('.about-door', { hasText: 'Consigo perguntar direto a ele?' }),
+  ).toHaveCount(1)
+  await expect(
+    page.locator('.about-door', { hasText: 'E se eu precisar contratar?' }),
   ).toHaveCount(1)
 
   await page.locator('.about-door', { hasText: 'Ele sabe construir?' }).click()
@@ -333,9 +342,20 @@ test.describe('em tela grande', () => {
     expect(app.width).toBeLessThanOrEqual(1040)
     expect(app.x).toBeGreaterThan(300)
 
-    // ~64ch de medida. O limite generoso (700) é para o teste falhar quando a
-    // medida DESAPARECER, não a cada ajuste de escala tipográfica.
-    expect(bio.width).toBeLessThanOrEqual(700)
+    /**
+     * A MEDIDA VEM DO CONTAINER, não de um `max-width` no parágrafo.
+     *
+     * Este teste já afirmou `<= 700`, que era o `max-width: 64ch` do `.about-bio`. Aquele
+     * teto saiu: com um limite na raiz E outro no parágrafo, o de dentro sempre vence e o
+     * texto para antes da borda do próprio container — sobra à direita em toda a
+     * interface, que foi o que o dono do projeto apontou.
+     *
+     * Hoje quem limita é a COLUNA: com a raiz em 1040 e o trilho em 300 mais 28 de vão, a
+     * coluna da esquerda fica em ~712. O limite generoso continua sendo generoso de
+     * propósito — ele existe para pegar a medida DESAPARECER (prosa ocupando os 1040
+     * inteiros ou mais), não para vigiar ajuste de layout.
+     */
+    expect(bio.width).toBeLessThanOrEqual(780)
 
     // Duas colunas: a larga da voz humana e o trilho da voz da máquina.
     const colunas = await page
@@ -366,8 +386,11 @@ test('abrir uma pasta da stack lista as tecnologias', async ({ page, context }) 
   await passarDaCerimonia(page)
   await expect(page.locator('.devices-app')).toBeVisible({ timeout: 8000 })
 
-  // Em repouso: quatro pastas, nenhum item renderizado.
-  await expect(page.locator('.devices-pasta')).toHaveCount(4)
+  // Em repouso: sete pastas, nenhum item renderizado. Eram quatro até a passada de
+  // conteúdo que acrescentou Machine Learning & Dados, Automação & Integrações e
+  // Desenvolvimento com IA — as três descrevem trabalho que o site não registrava
+  // em superfície nenhuma.
+  await expect(page.locator('.devices-pasta')).toHaveCount(7)
   await expect(page.locator('.devices-item')).toHaveCount(0)
 
   const primeira = page.locator('.devices-pasta').first()
@@ -375,8 +398,8 @@ test('abrir uma pasta da stack lista as tecnologias', async ({ page, context }) 
 
   await primeira.locator('.devices-cabeca').click()
 
-  // A categoria de IA tem seis tecnologias.
-  await expect(primeira.locator('.devices-item')).toHaveCount(6)
+  // A categoria de IA tem sete tecnologias.
+  await expect(primeira.locator('.devices-item')).toHaveCount(7)
   await expect(primeira).toHaveClass(/devices-pasta--aberta/)
 
   /**
@@ -434,6 +457,97 @@ test('o botão de contato do Sobre abre o terminal', async ({ page, context }) =
 })
 
 /**
+ * AS PROVAS DOS SERVIÇOS LEVAM MESMO AONDE PROMETEM.
+ *
+ * A janela de Serviços é construída sobre uma regra: nenhum serviço reconta o que
+ * outra janela já conta — cada um tem um resumo e uma PORTA para a prova. Se
+ * essas portas quebrarem, a página deixa de ser "vende provando" e vira um
+ * folheto com quatro afirmações e nenhum recibo, e a foto do regressor mostraria
+ * exatamente a mesma coisa bonita no lugar.
+ *
+ * A CONTAGEM DOS NÓS DO FLUXOGRAMA ENTRA JUNTO porque ela é derivada dos dados
+ * (`content/servicos.js`), tanto no texto do cabeçalho quanto no número de
+ * colunas do CSS (`grid-auto-flow: column`). Uma etapa sumindo é uma regressão de
+ * conteúdo que nada mais acusaria.
+ */
+test('as provas dos serviços abrem as janelas que prometem', async ({ page, context }) => {
+  await definirPreferencias(context)
+  const erros = []
+  page.on('pageerror', (e) => erros.push(e.message))
+
+  await page.goto('/servicos', { waitUntil: 'networkidle' })
+  await passarDaCerimonia(page)
+  await expect(page.locator('.services-app')).toBeVisible({ timeout: 8000 })
+
+  await expect(page.locator('.services-card')).toHaveCount(4)
+  await expect(page.locator('.services-etapa')).toHaveCount(5)
+  await expect(page.locator('.services-monitor')).toBeVisible()
+
+  /**
+   * O ZIGUE-ZAGUE É GEOMETRIA, e geometria a foto até pega — mas ela não distingue
+   * "alternou" de "todas caíram do mesmo lado por acaso do container query". Esta
+   * asserção fixa a promessa: a etapa 1 fica à ESQUERDA do trilho e a 2 à direita.
+   *
+   * É também o guarda do `nth-child(even)`: no dia em que alguém acrescentar uma
+   * etapa no meio da lista, os lados se reordenam sozinhos — e se alguém trocar a
+   * regra por uma classe no dado, este teste avisa.
+   */
+  const ladoDe = async (indice) => {
+    const caixa = await page
+      .locator('.services-etapa')
+      .nth(indice)
+      .locator('.services-etapa-corpo')
+      .boundingBox()
+    return caixa.x
+  }
+  expect(await ladoDe(0)).toBeLessThan(await ladoDe(1))
+  expect(await ladoDe(2)).toBeLessThan(await ladoDe(1))
+
+  // A hospedagem aponta para o leia-me, e o argumento é esse: "este site roda
+  // nela". É a única das quatro cuja prova é a máquina em que o visitante está.
+  await page.locator('.services-card', { hasText: 'Hospedagem gerenciada' }).click()
+  await expect(page.locator('.readme-app')).toBeVisible({ timeout: 8000 })
+
+  // Abre AO LADO, não troca o conteúdo — a lista é um mapa, e quem foi ver uma
+  // prova ainda pode querer as outras três. Mesma regra das portas do guia.
+  await expect(page.locator('.marocos-window')).toHaveCount(2)
+  await expect(page.locator('.services-app')).toHaveCount(1)
+
+  expect(erros, `erro de página não capturado: ${erros.join('; ')}`).toHaveLength(0)
+})
+
+/**
+ * O BOTÃO DE AÇÃO DOS SERVIÇOS ABRE O TERMINAL.
+ *
+ * Teste separado do de cima de propósito, e não por organização: depois do
+ * primeiro clique a janela de Serviços PERDE O FOCO para a que abriu, e o
+ * primeiro clique numa janela desfocada só a traz para a frente — nenhum controle
+ * dentro dela dispara (ver o bloco sobre `aoApontar`/`aoClicar` em
+ * `os/desktop/Window.jsx`). Juntar as duas asserções num teste só exigiria um
+ * clique duplo que existe por causa do gerenciador de janelas, não por causa
+ * desta janela, e isso confunde quem for ler a falha.
+ *
+ * A página inteira existe para gerar contato, e ela deliberadamente NÃO repete
+ * canal nenhum — os endereços continuam morando no terminal. Se este botão
+ * quebrar, o único caminho de contato da janela some e nada mais reclama.
+ */
+test('o botão de ação dos Serviços abre o terminal', async ({ page, context }) => {
+  await definirPreferencias(context)
+  const erros = []
+  page.on('pageerror', (e) => erros.push(e.message))
+
+  await page.goto('/servicos', { waitUntil: 'networkidle' })
+  await passarDaCerimonia(page)
+  await expect(page.locator('.services-app')).toBeVisible({ timeout: 8000 })
+
+  await page.locator('.services-acao').click()
+  await expect(page.locator('.terminal-app')).toBeVisible({ timeout: 8000 })
+  await expect(page.locator('.services-app')).toHaveCount(1)
+
+  expect(erros, `erro de página não capturado: ${erros.join('; ')}`).toHaveLength(0)
+})
+
+/**
  * O TERMINAL ENTREGA OS CANAIS SEM NINGUÉM DIGITAR.
  *
  * É o app de CONTATO do portfólio, e durante muito tempo ele exigiu adivinhar a
@@ -461,6 +575,30 @@ test('o terminal já abre com os canais de contato na tela', async ({ page, cont
   await expect(atalhos.first()).toBeVisible()
   await atalhos.filter({ hasText: 'whoami' }).click()
   await expect(page.locator('.terminal-output')).toContainText('marcos')
+
+  /**
+   * O `vps` LÊ DE OUTRO ARQUIVO AGORA, e este é o único caminho do terminal que
+   * nenhuma foto alcança: o comando só produz saída depois de alguém digitá-lo.
+   *
+   * Ele deixou de imprimir a ficha da infraestrutura (que virou a seção "A
+   * máquina" da janela de Serviços) e passou a ler a manchete de
+   * `content/servicos.js`. Se aquele import quebrar, o comando derruba a
+   * subárvore e a janela fica preta — exatamente o defeito que o grupo "Rede" do
+   * chrome de explorador já causou uma vez, e pelo mesmo motivo: código que só
+   * roda depois de uma interação.
+   */
+  await page.locator('.terminal-input').fill('vps')
+  await page.locator('.terminal-input').press('Enter')
+  await expect(page.locator('.terminal-output')).toContainText('INFRAESTRUTURA')
+
+  /**
+   * E O PONTEIRO É UM COMANDO DE VERDADE, não um "clique aqui" decorativo: ele
+   * reusa o bloco de chips clicáveis, então clicar nele executa `servicos` e abre
+   * a janela. `.last()` porque o boot já imprimiu um chip com esse nome mais
+   * acima — o do `vps` é o mais recente.
+   */
+  await page.locator('.terminal-cmd-chip').filter({ hasText: 'servicos' }).last().click()
+  await expect(page.locator('.services-app')).toBeVisible({ timeout: 8000 })
 })
 
 /**
@@ -593,4 +731,146 @@ test('react-markdown carrega só sob demanda (estado vazio -> resposta)', async 
     chunksDeMarkdown.length,
     'chunk do react-markdown nunca foi baixado, mesmo depois da resposta',
   ).toBeGreaterThan(0)
+})
+
+/**
+ * O BALÃO DE TEXTO CORTADO APARECE, E APARECE ESTILIZADO.
+ *
+ * ESTE TESTE EXISTE POR CAUSA DE UM BUG QUE SÓ SE MANIFESTAVA NO BUILD, e é o
+ * primeiro deste arquivo a cobrir `:hover` — a suíte inteira era cega a estado de
+ * ponteiro até aqui.
+ *
+ * O `TextoCortado` emite as classes `.dica-balao*`, e as regras delas moravam em
+ * `ui/Dica.css`, importado por `ui/Dica.jsx`. Como o Vite divide CSS por chunk e a
+ * `Dica` só é renderizada pelas Configurações, a rota `/stack` recebia o balão SEM
+ * NENHUMA regra: sem `position: fixed`, sem `opacity`, sem `z-index`. Ele montava
+ * como texto solto no fim da div de tema. Em desenvolvimento o CSS vem todo junto e
+ * o defeito não aparece — o que faz dele exatamente a classe de bug que precisa de
+ * um teste, e não de uma conferência no navegador.
+ *
+ * Por isso a asserção não é "o balão existe": é que ele está POSICIONADO
+ * (`position: fixed`, que só vem do CSS certo) e VISÍVEL. A primeira parte é o que
+ * reprova se alguém mover o CSS de volta para o lugar errado.
+ *
+ * E o alvo é escolhido MEDINDO, não pelo nome: o teste procura o primeiro chip cujo
+ * texto de fato transbordou. Fixar um nome de tecnologia aqui faria o teste quebrar
+ * na primeira vez que a Stack fosse editada, por um motivo sem relação com o balão.
+ */
+test('o texto cortado da Stack revela o nome inteiro num balão', async ({ page, context }) => {
+  await definirPreferencias(context)
+  const erros = []
+  page.on('pageerror', (e) => erros.push(e.message))
+
+  await page.goto('/stack', { waitUntil: 'networkidle' })
+  await passarDaCerimonia(page)
+  await expect(page.locator('.devices-app')).toBeVisible({ timeout: 8000 })
+
+  // As pastas nascem fechadas: os chips só existem depois do clique.
+  await page.locator('.devices-pasta').first().locator('.devices-cabeca').click()
+  await expect(page.locator('.devices-item').first()).toBeVisible({ timeout: 8000 })
+
+  const nomes = page.locator('.devices-item .texto-cortado')
+  await expect(nomes.first()).toBeVisible()
+
+  // O componente marca com uma classe o que ele MEDIU como cortado. Se nenhum chip
+  // desta pasta transbordou, não há o que este teste possa provar — e falhar aqui
+  // seria falhar por causa da largura da janela, não do balão.
+  const cortados = page.locator('.devices-item .texto-cortado--cortado')
+  const total = await cortados.count()
+  expect(total, 'nenhum nome da primeira pasta ficou cortado nesta largura').toBeGreaterThan(0)
+
+  const alvo = cortados.first()
+  const textoCompleto = (await alvo.textContent())?.trim()
+
+  await alvo.hover()
+
+  const balao = page.locator('.dica-balao--visivel')
+  await expect(balao).toHaveCount(1)
+  await expect(balao).toHaveText(textoCompleto)
+
+  // A PARTE QUE PEGA O BUG: `position: fixed` vem só do CSS do balão. Sem ele, o
+  // elemento existe, tem o texto certo, e aparece como lixo no fim da página.
+  await expect(balao).toHaveCSS('position', 'fixed')
+
+  // E ele desaparece ao sair — balão que fica preso cobre o conteúdo.
+  await page.mouse.move(0, 0)
+  await expect(page.locator('.dica-balao--visivel')).toHaveCount(0)
+
+  expect(erros, `erro de página não capturado: ${erros.join('; ')}`).toHaveLength(0)
+})
+
+/**
+ * O DOWNLOAD DO CONTEXTO ENTREGA UM ARQUIVO DE VERDADE.
+ *
+ * É o único lugar do portfólio onde um clique produz um ARTEFATO — um arquivo que
+ * sai daqui e vai para a máquina de outra pessoa. Nada em `npm run build`, no lint
+ * ou no regressor visual chega perto disso: a foto mostra o botão, e o botão pode
+ * estar gerando um arquivo vazio, com o nome errado, ou nenhum arquivo.
+ *
+ * `waitForEvent('download')` é o que fecha esse buraco. E as asserções são as três
+ * coisas que podem quebrar em silêncio: o nome (que carrega idioma e data, para dois
+ * downloads não ficarem indistinguíveis na pasta de quem baixou), o TAMANHO (um
+ * corpus de dezenas de KB — se vier com centenas de bytes, algum módulo de conteúdo
+ * deixou de ser importado) e o CONTEÚDO (o cabeçalho do markdown e o nome de um
+ * projeto que só existe se a lista foi de fato percorrida).
+ */
+test('baixar o contexto entrega um markdown com o portfólio dentro', async ({ page, context }) => {
+  await definirPreferencias(context)
+  const erros = []
+  page.on('pageerror', (e) => erros.push(e.message))
+
+  await page.goto('/contexto', { waitUntil: 'networkidle' })
+  await passarDaCerimonia(page)
+  await expect(page.locator('.contexto-app')).toBeVisible({ timeout: 8000 })
+
+  // O DOWNLOAD NASCE FECHADO, e é decisão de produto: com os dois caminhos abertos
+  // ao mesmo tempo eles competem, e o download ganha sempre porque é mais barato que
+  // formular uma pergunta. Se algum dia os botões voltarem a aparecer na abertura, é
+  // uma mudança que alguém tem de tomar de propósito — e é aqui que ela aparece.
+  await expect(page.locator('.contexto-baixar')).toHaveCount(0)
+
+  // O AGENTE VEM PRIMEIRO NA TELA, acima da alternativa.
+  const porta = page.locator('.contexto-porta')
+  const escolha = page.locator('.contexto-prefiro')
+  const yPorta = (await porta.boundingBox()).y
+  const yEscolha = (await escolha.boundingBox()).y
+  expect(yPorta, 'a alternativa subiu acima da recomendação do agente').toBeLessThan(yEscolha)
+
+  // O QUE TEM DENTRO aparece ANTES da escolha: quem não decidiu precisa saber o que o
+  // arquivo tem para poder decidir. O portão guarda o download, não a informação.
+  await expect(page.locator('.contexto-dentro li').first()).toBeVisible()
+
+  // E o portão é UM clique — sem formulário, sem e-mail.
+  await escolha.click()
+  const primeiroBotao = page.locator('.contexto-baixar').first()
+  await expect(primeiroBotao).toBeVisible()
+
+  const [download] = await Promise.all([
+    page.waitForEvent('download'),
+    primeiroBotao.click(),
+  ])
+
+  expect(download.suggestedFilename()).toMatch(
+    /^marcos-rodrigues-contexto-pt-\d{4}-\d{2}-\d{2}\.md$/,
+  )
+
+  const caminho = await download.path()
+  const { readFile } = await import('node:fs/promises')
+  const conteudo = await readFile(caminho, 'utf8')
+
+  // Dezenas de KB: o corpus inteiro. Centenas de bytes significaria que só o
+  // cabeçalho foi gerado.
+  expect(conteudo.length, 'o arquivo baixado veio pequeno demais').toBeGreaterThan(10_000)
+  expect(conteudo).toContain('# Contexto profissional de Marcos Rodrigues')
+  expect(conteudo).toContain('## Projetos')
+  expect(conteudo).toContain('Diário Oficial Eletrônico')
+  // E NÃO carrega a data de nascimento — a mesma garantia que o teste unitário faz,
+  // conferida aqui no artefato final, depois de passar pelo Blob e pelo disco.
+  expect(conteudo, 'o arquivo baixado contém a data de nascimento').not.toContain('2003-12-14')
+
+  // O clique tem retorno visível: sem isso, quem tem a barra de downloads escondida
+  // acha que nada aconteceu e clica de novo.
+  await expect(page.locator('.contexto-confirmado')).not.toBeEmpty()
+
+  expect(erros, `erro de página não capturado: ${erros.join('; ')}`).toHaveLength(0)
 })

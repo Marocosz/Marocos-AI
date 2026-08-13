@@ -3,10 +3,14 @@ import React from 'react'
 /**
  * OS ÍCONES DO MODO XP
  * ==================================================
- * Sete ícones desenhados no ESTILO do Windows XP — volume, brilho no topo,
- * contorno escuro e cor saturada — e não cópias da arte da Microsoft. A
- * diferença importa por dois motivos: os arquivos originais são material
- * protegido, e o argumento do site inteiro é que aqui tudo é feito à mão.
+ * Ícones desenhados no ESTILO do Windows XP — volume, brilho no topo, contorno
+ * escuro e cor saturada — e não cópias da arte da Microsoft. A diferença importa
+ * por dois motivos: os arquivos originais são material protegido, e o argumento
+ * do site inteiro é que aqui tudo é feito à mão.
+ *
+ * (Esta linha dizia "Sete ícones" e já estava errada com oito na tela — mais um
+ * caso do número escrito à mão que envelhece porque ninguém relê a frase. A
+ * contagem saiu: o mapa no fim do arquivo é a lista, e ela não tem como mentir.)
  *
  * SÃO SVG, E NÃO PNG, pelo mesmo motivo que o resto do sistema é: escalam sem
  * borrar (o mesmo ícone serve o tile de 48px da área de trabalho e os 20px da
@@ -259,6 +263,94 @@ const Painel = ({ size = 32 }) => (
 )
 
 /**
+ * Serviços — o rack, com os dois módulos e a luz verde de "em execução".
+ *
+ * Gabinete claro (o mesmo par de tons da caixa do Meu Computador, que é o que
+ * mantém os dois no mesmo conjunto) contra dois módulos escuros. O verde é o
+ * MESMO `#7cbb00` do pontinho de online do Contato e da bandeirinha do preset —
+ * aqui ele diz literalmente o que a janela diz: está em execução.
+ */
+const Servidor = ({ size = 32 }) => (
+  <Svg size={size} titulo="Serviços">
+    <defs>
+      <linearGradient id="xpServCaixa" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0%" stopColor="#f2f0e6" />
+        <stop offset="100%" stopColor="#b9b5a2" />
+      </linearGradient>
+      <linearGradient id="xpServModulo" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0%" stopColor="#6b6f76" />
+        <stop offset="45%" stopColor="#3b3f46" />
+        <stop offset="100%" stopColor="#212429" />
+      </linearGradient>
+    </defs>
+    {/* o gabinete */}
+    <rect x="6" y="3" width="20" height="25" rx="2.2" fill="url(#xpServCaixa)" stroke="#6f6b5c" strokeWidth="1" />
+    <path d="M7.4 4.1h17.2v1.4H7.4z" fill="#ffffff" opacity="0.5" />
+
+    {/* módulo de cima */}
+    <rect x="8.6" y="6.4" width="14.8" height="8" rx="1.1" fill="url(#xpServModulo)" stroke="#15171a" strokeWidth="0.9" />
+    <path d="M9.4 7.2h13.2v2.4H9.4z" fill="#ffffff" opacity="0.16" />
+    <path d="M10.4 12.4h6.4" stroke="#c9ccd2" strokeWidth="0.9" strokeLinecap="round" opacity="0.7" />
+    <circle cx="21" cy="12.4" r="1.1" fill="#7cbb00" stroke="#4a7300" strokeWidth="0.5" />
+
+    {/* módulo de baixo */}
+    <rect x="8.6" y="16.2" width="14.8" height="8" rx="1.1" fill="url(#xpServModulo)" stroke="#15171a" strokeWidth="0.9" />
+    <path d="M9.4 17h13.2v2.4H9.4z" fill="#ffffff" opacity="0.16" />
+    <path d="M10.4 22.2h6.4" stroke="#c9ccd2" strokeWidth="0.9" strokeLinecap="round" opacity="0.7" />
+    <circle cx="21" cy="22.2" r="1.1" fill="#7cbb00" stroke="#4a7300" strokeWidth="0.5" />
+
+    {/* os pés do rack */}
+    <path d="M9 29h3M20 29h3" stroke="#6f6b5c" strokeWidth="1.4" strokeLinecap="round" />
+  </Svg>
+)
+
+/**
+ * Baixar o contexto — a caixa aberta com o documento saindo dela.
+ *
+ * A metáfora tinha de dizer DUAS coisas ao mesmo tempo: que há um pacote (o
+ * portfólio inteiro) e que ele SAI daqui (o download). Uma seta para baixo sozinha
+ * seria o ícone genérico de download de qualquer site; uma caixa fechada não diria
+ * que algo é entregue. A caixa aberta com a folha emergindo resolve as duas, e é
+ * vocabulário que o XP de verdade usava (o ícone de "extrair" dos arquivos zipados).
+ *
+ * O papelão reusa o par de tons do gabinete do Meu Computador e do rack de Serviços,
+ * que é o que mantém os ícones no mesmo conjunto em vez de virarem uma coleção. A
+ * folha é branca com dobra, igual à do ícone de Texto — o mesmo objeto, então o mesmo
+ * desenho.
+ */
+const CaixaAberta = ({ size = 32 }) => (
+  <Svg size={size} titulo="Baixar meu contexto">
+    <defs>
+      <linearGradient id="xpCtxCaixa" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0%" stopColor="#e8dcc0" />
+        <stop offset="100%" stopColor="#b08d5a" />
+      </linearGradient>
+      <linearGradient id="xpCtxAba" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0%" stopColor="#f2e9d4" />
+        <stop offset="100%" stopColor="#c7a771" />
+      </linearGradient>
+    </defs>
+
+    {/* a folha, ATRÁS da frente da caixa: é o que faz ela parecer saindo de dentro
+        em vez de apoiada na frente */}
+    <path d="M11 3.2h7.6l3.4 3.4v9.4H11z" fill="#ffffff" stroke="#8a8f98" strokeWidth="0.9" />
+    <path d="M18.6 3.2l3.4 3.4h-3.4z" fill="#d7dae0" stroke="#8a8f98" strokeWidth="0.7" />
+    <path d="M13 8h6M13 10.4h6M13 12.8h4" stroke="#9aa0a8" strokeWidth="0.9" strokeLinecap="round" />
+
+    {/* as duas abas abertas */}
+    <path d="M4.6 15.6l6.2-2.2 1 2.6-6 2.2z" fill="url(#xpCtxAba)" stroke="#7d6437" strokeWidth="0.9" />
+    <path d="M27.4 15.6l-6.2-2.2-1 2.6 6 2.2z" fill="url(#xpCtxAba)" stroke="#7d6437" strokeWidth="0.9" />
+
+    {/* o corpo da caixa */}
+    <path d="M5.4 17.4h21.2v9.4a1.6 1.6 0 0 1-1.6 1.6H7a1.6 1.6 0 0 1-1.6-1.6z" fill="url(#xpCtxCaixa)" stroke="#7d6437" strokeWidth="1" />
+    {/* o brilho superior, que é o que dá volume no vocabulário do XP */}
+    <path d="M6.4 18.3h19.2v1.5H6.4z" fill="#ffffff" opacity="0.45" />
+    {/* a fita central */}
+    <path d="M15 17.4h2v11h-2z" fill="#9a7a45" opacity="0.55" />
+  </Svg>
+)
+
+/**
  * O MAPA. Chaveado pelo `id` do app do registry, e não pela ordem — mesma regra
  * dos rótulos de ícone em `i18n/os.js`.
  *
@@ -271,9 +363,11 @@ const ICONES_XP = {
   project: Texto,
   history: PastaRelogio,
   devices: Chip,
+  services: Servidor,
   terminal: Prompt,
   assistant: Contato,
   readme: Texto,
+  contexto: CaixaAberta,
   settings: Painel,
 }
 
@@ -283,11 +377,24 @@ const ICONES_XP = {
  * também um utilitário comum, senão o recarregamento a quente do Vite deixa de
  * funcionar para o arquivo inteiro.
  *
- * Devolve `null` para app sem ícone próprio, e quem chama decide o fallback.
+ * O FALLBACK ENTRA POR PROP, e isto conserta um defeito que ficou latente por nove
+ * apps. A versão anterior devolvia `null` para app sem ícone próprio e deixava "quem
+ * chama decidir o fallback" — mas quem chamava não conseguia decidir nada: dentro de
+ * um ternário `usaXp ? <IconeXp/> : <Lucide/>`, o ramo do XP já tinha sido escolhido
+ * quando o `null` aparecia, e no preset XP o app renderizava NADA. Apareceu no décimo
+ * app, do pior jeito possível: um ícone invisível na área de trabalho.
+ *
+ * Resolver aqui dentro, e não exportando um `temIconeXp`, é o que respeita a regra de
+ * fast refresh acima — a decisão fica no componente, que é o que este módulo pode
+ * exportar.
  */
-const IconeXp = ({ appId, size = 32 }) => {
+const IconeXp = ({ appId, size = 32, Fallback = null, espessuraFallback = 2 }) => {
   const Icone = ICONES_XP[appId]
-  return Icone ? <Icone size={size} /> : null
+  if (Icone) return <Icone size={size} />
+  /* O lucide vem MENOR que o desenho XP: os ícones daquela era têm volume e
+     preenchem o quadro, e um glifo de traço no mesmo tamanho fica desproporcional ao
+     lado deles. O `- 8` desfaz o `+ 8` que o chamador aplica para o desenho. */
+  return Fallback ? <Fallback size={size - 8} strokeWidth={espessuraFallback} /> : null
 }
 
 export default IconeXp

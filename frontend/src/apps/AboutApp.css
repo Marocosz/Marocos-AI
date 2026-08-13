@@ -31,8 +31,15 @@
    sobre a largura REAL do conteúdo.
 
    É também o que resolve o texto esticado em tela cheia: o corpo tem teto de
-   largura e centraliza, a prosa tem medida em `ch`, e a partir de 720px de
-   conteúdo o corpo vira duas colunas em vez de uma linha de 200 caracteres.
+   largura e centraliza, e a partir de 720px de conteúdo vira duas colunas em vez
+   de uma linha de 200 caracteres.
+
+   A MEDIDA MORA NO CONTAINER, NÃO NO PARÁGRAFO. Houve uma versão com `max-width`
+   em `ch` em cada bloco de texto, por cima do teto do corpo — dois limites para a
+   mesma coisa, e o de dentro sempre menor. O resultado era texto parando antes da
+   borda do container, com sobra à direita em toda a interface. Quem dá a medida
+   aqui são o teto de 1040px e a coluna de duas frentes; o parágrafo preenche o
+   espaço que recebeu.
 
    Sem `backdrop-filter` em lugar nenhum — o chrome da janela já borra o que está
    atrás, e filtro sobre filtro é o custo que `Window.css` documenta ter derrubado
@@ -48,7 +55,18 @@
 
   display: flex;
   flex-direction: column;
-  gap: 20px;
+  /**
+   * O AR ENTRE OS BLOCOS É DECISÃO, e não sobra.
+   *
+   * Era 20px, com 14 de padding de seção e 6 de gap interno. O dono do projeto leu
+   * esta janela junto da de Serviços e disse que o conteúdo estava "muito
+   * grudado" — herói, ação, faixa e as duas colunas se tocavam, e o filete de
+   * seção não tinha respiro suficiente de cada lado para separar de verdade.
+   *
+   * Os dois apps subiram juntos, no mesmo commit: dois apps com o mesmo defeito
+   * não se consertam um de cada vez, senão o segundo vira dívida esquecida.
+   */
+  gap: 30px;
 
   /**
    * O TETO DE MEDIDA, e é ele que responde "em tela cheia numa tela grande os
@@ -117,8 +135,10 @@
   position: relative;
   display: flex;
   flex-direction: column;
-  gap: 6px;
-  padding-top: 14px;
+  /* Ver a nota de AR em `.about-app`: eram 6 e 14. O padding maior é o que dá ao
+     filete espaço para ler como separador em vez de sublinhado do bloco de cima. */
+  gap: 10px;
+  padding-top: 26px;
 }
 
 .about-secao::before {
@@ -127,6 +147,119 @@
   inset: 0 0 auto;
   height: 1px;
   background: var(--filete-secao);
+}
+
+/* ==================================================
+   O QUE ELE FAZ — as cinco capacidades, o segundo bloco da janela
+
+   SEM PREENCHIMENTO NENHUM, e a regra é a mais caramente aprendida deste app:
+   PREENCHIMENTO É AÇÃO. Cinco itens de mesma largura com fundo e borda em
+   sequência é literalmente o desenho que custou o redesenho desta janela ("parece
+   um site qualquer, fundos chapados dos itens"). As duas únicas superfícies
+   preenchidas aqui continuam sendo as duas ações — o botão de contato e a porta do
+   assistente.
+
+   QUEM ESTRUTURA É O FILETE E O MARCADOR. Cada item tem um traço curto de acento
+   antes do título, e os itens são separados pelo filete que esvanece — a mesma
+   receita de `.about-secao::before`, e pelo mesmo motivo: separador que corta de
+   lado a lado transforma a lista numa tabela.
+   ================================================== */
+
+/**
+ * DUAS COLUNAS QUANDO HÁ LARGURA, e por `@container` — nunca `@media`.
+ *
+ * A janela é o container; a viewport não diz nada sobre a largura que este app
+ * recebeu. Com `@media`, uma janela estreita numa tela grande manteria as duas
+ * colunas com 40 caracteres por linha, e uma janela maximizada num monitor pequeno
+ * colapsaria sem precisar.
+ *
+ * 620px é onde duas colunas ainda dão medida de leitura aceitável para um texto de
+ * ~200 caracteres. Abaixo disso, uma coluna.
+ */
+.about-fortes {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 2px 28px;
+}
+
+@container (min-width: 620px) {
+  .about-fortes {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  /* O ÚLTIMO ITEM OCUPA A LINHA INTEIRA quando a lista tem contagem ímpar. Hoje são
+     quatro e a regra não faz nada — ela é guarda, não conserto: com cinco, o quinto
+     ficaria sozinho num vão de metade da largura, e item órfão lê como erro de
+     layout. `:nth-child(odd):last-child` acerta exatamente esse caso e é inerte
+     quando a contagem é par, então acrescentar ou remover uma capacidade não obriga
+     ninguém a mexer no CSS. */
+  .about-fortes > li:nth-child(odd):last-child {
+    grid-column: 1 / -1;
+  }
+}
+
+.about-forte-item {
+  position: relative;
+  padding: 14px 0 14px 14px;
+}
+
+/* O TRAÇO DE ACENTO, vertical e curto: ele marca o começo do item sem preencher
+   nada, e é o que dá ao bloco a espinha que a ausência de fundo tira. Alinhado com
+   a altura do TÍTULO, não do item inteiro — um traço da altura do parágrafo
+   pareceria uma citação. */
+.about-forte-item::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 15px;
+  width: 2px;
+  height: 0.95em;
+  border-radius: 1px;
+  background: var(--accent-color);
+}
+
+/* O FILETE SEPARA, e só entre itens — nunca acima do primeiro nem abaixo do
+   último, senão ele deixa de ser divisor e passa a ser moldura. Em duas colunas o
+   `+ li` acerta o item da direita da primeira linha também, o que é correto: ali o
+   filete lê como topo da célula.
+
+   `background` e não `border-top`, porque `--filete-secao` é um GRADIENTE (ele
+   esvanece para a direita) e gradiente não é valor válido para cor de borda —
+   `border-top: 1px solid var(--filete-secao)` compila e não desenha nada. */
+.about-forte-item + li::after {
+  content: '';
+  position: absolute;
+  inset: 0 0 auto;
+  height: 1px;
+  background: var(--filete-secao);
+}
+
+@container (min-width: 620px) {
+  /* Em duas colunas, os DOIS primeiros itens abrem a lista — então o segundo
+     também não leva filete. */
+  .about-fortes > li:nth-child(2)::after {
+    display: none;
+  }
+}
+
+.about-forte-titulo {
+  margin: 0 0 5px;
+  /* Título de card na escala do projeto. Poppins, porque é texto que uma pessoa
+     escreveu — a voz da máquina é o eyebrow acima da seção. */
+  font-size: 1.02rem;
+  font-weight: 700;
+  line-height: 1.3;
+  letter-spacing: -0.2px;
+  color: var(--text-primary);
+}
+
+.about-forte-texto {
+  margin: 0;
+  font-size: 0.85rem;
+  line-height: 1.65;
+  color: var(--text-secondary);
 }
 
 /* ==================================================
@@ -175,7 +308,8 @@
   min-width: 0;
   display: flex;
   flex-direction: column;
-  gap: 9px;
+  /* Ver a nota de AR em `.about-app`: era 9. */
+  gap: 12px;
 }
 
 /**
@@ -261,12 +395,10 @@
   background-clip: text;
 }
 
-/* A medida em `ch` é o que impede a frase de esticar quando a janela cresce. Em
-   tipo grande o limite é mais curto: linha longa cansa mais rápido quanto maior
-   a letra. */
+/* Sem `max-width` próprio: quem limita a linha é a coluna do herói, que já divide
+   espaço com o cristal. Ver a nota sobre medida no cabeçalho do arquivo. */
 .about-destaque {
   margin: 0;
-  max-width: 34ch;
   font-size: 1.05rem;
   font-weight: 700;
   line-height: 1.45;
@@ -352,7 +484,8 @@
    * Isolado por eliminação: com os pseudo-elementos desligados o diff continuava
    * 88; com o `overflow` de volta ele ia a zero.
    */
-  padding: 13px 15px;
+  /* Ver a nota de AR em `.about-app`: era 13px 15px. */
+  padding: 15px 16px;
   text-align: left;
   font-family: inherit;
   border-radius: var(--win-control-radius);
@@ -581,14 +714,15 @@
 .about-corpo {
   display: flex;
   flex-direction: column;
-  gap: 20px;
+  /* Ver a nota de AR em `.about-app`: eram 20 e 18. */
+  gap: 28px;
 }
 
 .about-coluna,
 .about-trilho {
   display: flex;
   flex-direction: column;
-  gap: 18px;
+  gap: 26px;
   min-width: 0;
 }
 
@@ -596,7 +730,9 @@
   .about-corpo {
     display: grid;
     grid-template-columns: minmax(0, 1fr) minmax(220px, 268px);
-    gap: 28px;
+    /* O vão entre as duas colunas é o único que já era generoso; ele subiu junto
+       para manter a proporção com os vãos verticais, que dobraram. */
+    gap: 36px;
   }
 
   .about-trilho {
@@ -612,7 +748,6 @@
   /* A MEDIDA, em caracteres e não em pixels: 64ch acompanha o tamanho da fonte,
      então continua sendo ~64 caracteres se alguém mexer na escala. É o número em
      que o olho ainda encontra o começo da linha seguinte sem procurar. */
-  max-width: 64ch;
   font-size: 0.86rem;
   line-height: 1.65;
   color: var(--text-secondary);
@@ -675,7 +810,8 @@
   width: 100%;
   /* O horizontal é o mesmo `--guia-recuo` do divisor, de propósito — ver a nota em
      `.about-guide`. */
-  padding: 13px var(--guia-recuo, 10px);
+  /* Ver a nota de AR em `.about-app`: era 13px. */
+  padding: 15px var(--guia-recuo, 10px);
   text-align: left;
   font-family: inherit;
   border: 1px solid transparent;
@@ -732,7 +868,6 @@
 }
 
 .about-door-answer {
-  max-width: 58ch;
   font-size: 0.75rem;
   line-height: 1.45;
   color: var(--text-secondary);
@@ -769,7 +904,8 @@
   grid-template-columns: auto minmax(0, 1fr);
   align-items: baseline;
   column-gap: 11px;
-  padding: 9px 0;
+  /* Ver a nota de AR em `.about-app`: era 9px. */
+  padding: 11px 0;
   border-top: 1px solid var(--sup-borda);
 }
 
@@ -833,7 +969,8 @@
   align-items: baseline;
   gap: 8px;
   min-width: 0;
-  padding: 4px 0;
+  /* Ver a nota de AR em `.about-app`: era 4px. */
+  padding: 6px 0;
 }
 
 .about-ficha-row dt {

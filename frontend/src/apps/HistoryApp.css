@@ -93,7 +93,6 @@
 
 .history-legenda {
   margin: 0;
-  max-width: 60ch;
   font-size: 0.82rem;
   line-height: 1.5;
   color: var(--text-secondary);
@@ -298,10 +297,10 @@
   color: var(--text-secondary);
 }
 
-/* Medida em `ch`: é o que impede a descrição de esticar quando a janela cresce. */
+/* Sem `max-width` próprio: quem limita a linha é a coluna do corpo, que a partir de
+   760px de conteúdo divide espaço com o trilho da lista de faixas. */
 .history-desc {
   margin: 5px 0 0;
-  max-width: 64ch;
   font-size: 0.84rem;
   line-height: 1.6;
   color: var(--text-secondary);
@@ -583,14 +582,13 @@
   white-space: nowrap;
 }
 
+/* O trio de corte vem de `ui/TextoCortado.css` — este elemento é um
+   `TextoCortado`. Aqui fica só a tipografia. */
 .history-faixa-titulo {
   font-size: 0.78rem;
   font-weight: 700;
   line-height: 1.25;
   color: var(--text-primary);
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
 }
 
 .history-faixa-agora {

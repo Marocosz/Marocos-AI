@@ -6,6 +6,7 @@ import { getOsData } from '../i18n/os'
 import { useWindowActions } from '../os/WindowManagerContext'
 import { useIrPara } from '../os/NavegacaoContext'
 import { projectSlug } from './projectSlug'
+import TextoCortado from '../ui/TextoCortado'
 import './ProjectsApp.css'
 
 /**
@@ -109,12 +110,19 @@ const ProjectsApp = () => {
             >
               <span className="projects-col projects-col--nome">
                 <FileText size={18} strokeWidth={1.75} className="projects-app-item-icon" />
-                <span className="projects-app-item-title">{project.title}</span>
+                {/* Nome e tipo revelam o texto inteiro num balão quando a coluna
+                    corta — "Auditoria Algorítmica do Spotify" e "Ciência de Dados
+                    & Pesquisa" não caberiam numa janela restaurada. As colunas de
+                    data e tamanho ficam de fora: elas têm largura fixa e o
+                    conteúdo é curto por construção. */}
+                <TextoCortado texto={project.title} className="projects-app-item-title" focavel={false} />
               </span>
               <span className="projects-col projects-col--data">
                 {formatarData(project.data, language)}
               </span>
-              <span className="projects-col projects-col--tipo">{project.category}</span>
+              <span className="projects-col projects-col--tipo">
+                <TextoCortado texto={project.category} focavel={false} />
+              </span>
               <span className="projects-col projects-col--tamanho">
                 {formatarTamanho(project.bytes, language)}
               </span>

@@ -371,7 +371,6 @@
 .devices-desc {
   margin: 0;
   padding: 0 15px;
-  max-width: 68ch;
   font-size: 0.8rem;
   line-height: 1.55;
   color: var(--text-secondary);
@@ -406,13 +405,14 @@
   box-shadow: 0 0 8px currentColor;
 }
 
+/* O TRIO DE CORTE SAIU DAQUI — `overflow`, `text-overflow` e `white-space` moram
+   agora em `ui/TextoCortado.css`, junto do `min-width: 0` que faltava e que era o
+   motivo real de a coluna ceder em vez de o texto ceder. Aqui fica só a
+   tipografia. */
 .devices-item-nome {
   font-size: 0.78rem;
   font-weight: 700;
   color: var(--text-primary);
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
 }
 
 .devices-item-nivel {

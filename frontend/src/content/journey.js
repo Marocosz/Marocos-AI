@@ -45,24 +45,42 @@
 
 const journeyDataEn = [
   {
-    id: "step-now",
+    id: "step-finza",
     /**
      * `ano` É O ANO DE INÍCIO, e é ele que posiciona o marcador na barra.
      *
-     * Existe separado de `date` porque `date` é string de EXIBIÇÃO ("2025 — now",
+     * Existe separado de `date` porque `date` é string de EXIBIÇÃO ("2026 — now",
      * "PRÓXIMO"): derivar posição dela seria fazer cirurgia em texto traduzido, e
      * quebraria na primeira vez que alguém mudasse o travessão. Início e não fim
      * porque a pergunta que a posição responde é "quando isto começou".
      */
+    ano: 2026,
+    date: "2026 — now",
+    hash: "a7f3d18",
+    type: "release",
+    title: "AI & Automation Developer",
+    org: "Finza",
+    description:
+      "In March 2026 I left the internship at Supporte and was hired here — a big step up, and the first time the title matched what I actually do. I work on a collections engine: a React front end, Supabase for database and backend, and a fleet of conversational agents talking to real customers, which I help build and help measure. The measurement is the part I did not expect to be the hard part. I also do requirements analysis, which means most of my week is meetings: understanding a business pain, translating it into technical scope, and explaining the trade-offs back to people who do not write code. Automation runs on n8n and the WhatsApp Cloud API, and the whole thing ships through a defined CI/CD cycle.",
+    tags: ["React", "Supabase", "AI Agents", "n8n", "Requirements", "CI/CD"],
+  },
+  {
+    id: "step-now",
     ano: 2025,
-    date: "2025 — now",
+    /**
+     * INTERVALO FECHADO. Esta entrada dizia "2025 — hoje" e virou FALSA em março
+     * de 2026, quando ele saiu para a Finza. Ficou oito meses errada, o que é o
+     * argumento inteiro para a spec desta fase existir: mentir sobre o emprego
+     * atual é o primeiro fato que um recrutador confere.
+     */
+    date: "2025 — 2026",
     hash: "f4c1a09",
     type: "release",
-    title: "Full Stack Developer & AI",
+    title: "Full-Stack Developer, focused on AI",
     org: "Supporte Logística · Innovation",
     description:
-      "Since August 2025 I have been on the innovation team, building full stack solutions with a focus on AI. It is where I learn architecture, DevOps and good practices alongside more experienced developers — and where I see how a technical decision plays out inside a company. In parallel I keep freelancing, owning the whole cycle: understanding the problem, designing the solution, backend, frontend, deploy and what comes after it.",
-    tags: ["FastAPI", "React", "Docker", "LangChain", "DevOps"],
+      "An internship on the innovation team, and where I learned architecture, DevOps and good practice alongside more experienced developers. It started with conversational BI over logistics data and ended somewhere I did not plan: doing machine learning for real. Risk analysis across company areas, demand requests clustered by embeddings to find out what people were actually asking for, and an internal hub of SQL agents that read the operational database and wrote the queries other departments could not write themselves. That is where the data science stopped being a subject I had taken and became something I do.",
+    tags: ["FastAPI", "LangChain", "Machine Learning", "Text-to-SQL", "Docker"],
   },
   {
     id: "step-ai",
@@ -87,8 +105,8 @@ const journeyDataEn = [
     title: "Information Management at UFU",
     org: "Federal University of Uberlândia",
     description:
-      "An interdisciplinary degree that puts Administration and Computer Science in the same room, pointed at data — Data Analysis I through IV, Artificial Intelligence, Data Structures, Software Engineering, Databases and Data Mining. Graduated in August 2026. Outside the classroom, I spent almost a year teaching computer classes to children at the Sal da Terra community centre, and started judo through the university athletic association.",
-    tags: ["Data Science", "SQL", "Python", "Pandas", "Teaching"],
+      "An interdisciplinary degree that puts Administration and Computer Science in the same room, pointed at data — Data Analysis I through IV, Artificial Intelligence, Data Structures, Software Engineering, Databases and Data Mining. It closed in August 2026 with a thesis I am genuinely proud of: a black-box audit of Spotify's recommender, with four synthetic personas built inside real accounts and inferential statistics on top. Outside the classroom, I spent almost a year teaching computer classes to children at the Sal da Terra community centre, and started judo through the university athletic association.",
+    tags: ["Data Science", "Statistics", "Python", "Pandas", "Teaching"],
   },
   {
     id: "step-iftm",
@@ -132,24 +150,38 @@ const journeyDataEn = [
     title: "Where I Am Heading",
     org: "Roadmap",
     description:
-      "Going deeper on what I already do daily: RAG, agents and multi-agent orchestration, and system architecture that survives contact with production. I also want the mathematics underneath the models — machine learning at bare metal, not just the API on top of it — and technical leadership skills.",
-    tags: ["RAG", "Agents", "Architecture", "Machine Learning"],
+      "The mathematics underneath the models — machine learning at bare metal, not just the API on top of it. I started down that road with the thesis and with a fraud pipeline, and I want it to stop being the part I look up. Alongside it: agent architecture that survives production, evaluation of agents as a discipline rather than a habit, and technical leadership — the requirements work at Finza made me realise that translating between engineering and business is a skill you can get deliberately better at, not just a chore.",
+    tags: ["Machine Learning", "Agent Evals", "Architecture", "Leadership"],
   },
 ];
 
 const journeyDataPt = [
   {
-    id: "step-now",
+    id: "step-finza",
     /** Ver a nota na versão em inglês: `ano` é o de início, e posiciona o marcador. */
+    ano: 2026,
+    date: "2026 — hoje",
+    hash: "a7f3d18",
+    type: "release",
+    title: "Desenvolvedor de IA e Automações",
+    org: "Finza",
+    description:
+      "Em março de 2026 saí do estágio na Supporte e fui contratado aqui — uma subida grande, e a primeira vez que o cargo bate com o que eu de fato faço. Trabalho num motor de cobrança: frontend em React, Supabase de banco e backend, e uma frota de agentes conversacionais falando com cliente real, que eu ajudo a construir e ajudo a medir. A medição é a parte que eu não esperava que fosse a difícil. Também faço análise de requisitos, o que significa que boa parte da minha semana é reunião: entender a dor do negócio, traduzir em escopo técnico, e devolver as consequências para gente que não escreve código. A automação roda em n8n e na API do WhatsApp, e tudo sobe por um ciclo de CI/CD definido.",
+    tags: ["React", "Supabase", "Agentes de IA", "n8n", "Requisitos", "CI/CD"],
+  },
+  {
+    id: "step-now",
     ano: 2025,
-    date: "2025 — hoje",
+    /** Ver a nota na versão em inglês: intervalo fechado, e esta entrada passou
+     *  oito meses dizendo "hoje" depois de deixar de ser verdade. */
+    date: "2025 — 2026",
     hash: "f4c1a09",
     type: "release",
-    title: "Desenvolvedor Full Stack & IA",
+    title: "Desenvolvedor Full-Stack, com foco em IA",
     org: "Supporte Logística · Inovação",
     description:
-      "Desde agosto de 2025 estou na área de inovação, construindo soluções full stack com foco em IA. É onde aprendo arquitetura, DevOps e boas práticas ao lado de desenvolvedores mais experientes — e onde vejo uma decisão técnica render consequência dentro de uma empresa. Em paralelo sigo com freelance, assumindo o ciclo inteiro: entender o problema, desenhar a solução, backend, frontend, deploy e o que vem depois dele.",
-    tags: ["FastAPI", "React", "Docker", "LangChain", "DevOps"],
+      "Um estágio na área de inovação, e onde aprendi arquitetura, DevOps e boas práticas ao lado de desenvolvedores mais experientes. Começou com BI conversacional sobre dado logístico e terminou num lugar que eu não tinha planejado: fazendo machine learning de verdade. Análise de risco em áreas da empresa, pedidos de demanda agrupados por embeddings para descobrir o que as pessoas estavam realmente pedindo, e um hub interno de agentes SQL que lia a base operacional e escrevia as consultas que as outras áreas não conseguiam escrever sozinhas. Foi ali que a ciência de dados parou de ser matéria que eu tinha cursado e virou coisa que eu faço.",
+    tags: ["FastAPI", "LangChain", "Machine Learning", "Text-to-SQL", "Docker"],
   },
   {
     id: "step-ai",
@@ -173,8 +205,8 @@ const journeyDataPt = [
     title: "Gestão da Informação na UFU",
     org: "Universidade Federal de Uberlândia",
     description:
-      "Uma graduação interdisciplinar que põe Administração e Ciência da Computação na mesma sala, apontadas para dados — Análise de Dados I a IV, Inteligência Artificial, Estrutura de Dados, Engenharia de Software, Banco de Dados e Mineração de Dados. Formado em agosto de 2026. Fora da sala, passei quase um ano dando aula de informática para crianças no Centro Comunitário Sal da Terra, e comecei a treinar judô pela atlética.",
-    tags: ["Ciência de dados", "SQL", "Python", "Pandas", "Ensino"],
+      "Uma graduação interdisciplinar que põe Administração e Ciência da Computação na mesma sala, apontadas para dados — Análise de Dados I a IV, Inteligência Artificial, Estrutura de Dados, Engenharia de Software, Banco de Dados e Mineração de Dados. Fechou em agosto de 2026 com um TCC do qual eu tenho orgulho de verdade: uma auditoria de caixa-preta do recomendador do Spotify, com quatro personas sintéticas construídas dentro de contas reais e estatística inferencial em cima. Fora da sala, passei quase um ano dando aula de informática para crianças no Centro Comunitário Sal da Terra, e comecei a treinar judô pela atlética.",
+    tags: ["Ciência de dados", "Estatística", "Python", "Pandas", "Ensino"],
   },
   {
     id: "step-iftm",
@@ -210,8 +242,8 @@ const journeyDataPt = [
     title: "Para onde estou indo",
     org: "Roadmap",
     description:
-      "Aprofundar o que já faço todo dia: RAG, agentes e orquestração multi-agente, e arquitetura de sistema que sobrevive ao contato com produção. Quero também a matemática por baixo dos modelos — machine learning no osso, não só a API por cima dele — e habilidade de liderança técnica.",
-    tags: ["RAG", "Agentes", "Arquitetura", "Machine Learning"],
+      "A matemática por baixo dos modelos — machine learning no osso, e não só a API por cima dele. Comecei esse caminho no TCC e num pipeline de fraude, e quero que ele pare de ser a parte que eu consulto. Junto disso: arquitetura de agente que sobrevive à produção, avaliação de agente como disciplina e não como hábito, e liderança técnica — o trabalho de requisitos na Finza me fez perceber que traduzir entre engenharia e negócio é habilidade que se treina de propósito, não tarefa chata.",
+    tags: ["Machine Learning", "Avaliação de agentes", "Arquitetura", "Liderança"],
   },
 ];
 
@@ -227,10 +259,23 @@ const journeyDataPt = [
  * decisão de `idadeEm()` em `profile.js` — função que lê o relógio não tem teste
  * determinístico, e esta é a conta que não pode estar errada.
  *
- * O FIM DA BARRA É O ANO ATUAL, não o ano da última entrada. Assim a última posição
- * real recua um pouco a cada ano que passa, e sobra o vão até hoje — que é a leitura
- * honesta: a trajetória continua acontecendo. Se o fim fosse a última entrada, ela
- * ficaria colada em 100% e a barra pareceria terminada.
+ * O FIM DA BARRA É O ANO SEGUINTE AO ATUAL, e o `+ 1` é um CONSERTO, não um
+ * arredondamento.
+ *
+ * A versão anterior usava `max(anoAtual, ...anos)`, com o argumento de que o fim da
+ * barra é hoje e por isso a última posição real recua a cada ano que passa, sobrando
+ * o vão até o presente — a trajetória continua acontecendo. O argumento era bom e a
+ * fórmula tinha um buraco que só apareceu quando a primeira entrada do ANO CORRENTE
+ * foi criada: para a Finza, em 2026, `entrada.ano === fim`, a conta dá **100**, e o
+ * marcador dela cai exatamente sobre o marcador vazado do roadmap. Os dois se
+ * sobrepõem, e aí a barra perde a única distinção que ela existe para desenhar — o
+ * que já aconteceu contra o que se pretende.
+ *
+ * Com `anoAtual + 1` a extensão inclui um ano de futuro: nenhuma entrada real
+ * alcança 100, e sempre sobra vão até o roadmap. A intenção antiga fica preservada,
+ * agora com uma folga que a entrada do ano corrente não consome. Há teste guardando
+ * os dois lados — as posições proporcionais, e o fato de nenhuma entrada real chegar
+ * à posição do marcador de futuro.
  *
  * LIMITE ACEITO: duas entradas no mesmo ano se sobrepõem na barra. Não acontece hoje,
  * e forçar espaçamento mínimo faria a barra mentir sobre o tempo — que é a única
@@ -242,7 +287,7 @@ export const posicaoNaLinha = (entradas, entrada, anoAtual) => {
 
   const anos = entradas.filter((e) => !e.futuro).map((e) => e.ano);
   const inicio = Math.min(...anos);
-  const fim = Math.max(anoAtual, ...anos);
+  const fim = Math.max(anoAtual + 1, ...anos);
 
   // Uma entrada só, ou todas no mesmo ano: não há extensão para dividir.
   if (fim === inicio) return 0;
@@ -268,11 +313,19 @@ const journeyPageContentEn = {
   sectionLabel: "04. / PROFESSIONAL JOURNEY",
   title: "Version History",
   /**
-   * O anterior dizia "Most recent first, like any log worth reading" — virou FALSO
-   * quando a barra passou a ser cronológica. Este aponta para o que ela faz de
-   * diferente: os vãos.
+   * DOIS NÚMEROS INTERPOLADOS, e os dois já estiveram errados nesta mesma frase.
+   *
+   * Ela dizia "Most recent first, like any log worth reading", virou FALSA quando a
+   * barra passou a ser cronológica, foi reescrita para "Seven years in six tracks" —
+   * e envelheceu nas DUAS pontas: a sétima faixa entrou e o oitavo ano virou.
+   *
+   * Agora `%a` é `anoAtual - o ano da primeira entrada` e `%b` é `items.length`, os
+   * dois derivados no `HistoryApp` pela mesma receita do `contador` logo abaixo. É a
+   * quinta vez que este projeto conserta um número escrito à mão em texto visível, e
+   * a regra que sobrou dessas cinco é a mesma: quantidade na interface vem de fonte
+   * única.
    */
-  subtitle: "Seven years in six tracks. The gaps between them count too.",
+  subtitle: "%a years in %b tracks. The gaps between them count too.",
   /** Curto porque cabe na capa e na ponta direita da barra. */
   proximoCurto: "NEXT",
   /**
@@ -297,8 +350,9 @@ const journeyPageContentEn = {
 const journeyPageContentPt = {
   sectionLabel: "04. / JORNADA PROFISSIONAL",
   title: "Histórico de Versões",
-  /** Ver a nota no bloco em inglês: o anterior virou falso com a barra cronológica. */
-  subtitle: "Sete anos em seis faixas. Os vãos entre elas também contam.",
+  /** Ver a nota no bloco em inglês: os dois números são interpolados, porque esta
+   *  frase já envelheceu nas duas pontas. */
+  subtitle: "%a anos em %b faixas. Os vãos entre elas também contam.",
   proximoCurto: "PRÓXIMO",
   /** Ver a nota no bloco em inglês: `linhaLabel` saiu com os marcadores. */
   faixasLabel: "Faixas",

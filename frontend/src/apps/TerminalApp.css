@@ -140,22 +140,11 @@
 
 .terminal-kv-value { color: #ddd; }
 
-/* --- TAGS (features do vps) --- */
-.terminal-tags {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.5rem;
-  margin: 0.4rem 0 0.6rem;
-}
-
-.terminal-tag {
-  font-size: 0.78rem;
-  color: #ddd;
-  background: rgba(255, 255, 255, 0.05);
-  border: 1px solid rgba(255, 255, 255, 0.12);
-  padding: 0.3rem 0.6rem;
-  border-radius: 5px;
-}
+/* As TAGS do `vps` (Docker, Traefik, CI/CD, Linux) saíram daqui junto com o
+   `case 'tags'` do JSX: elas viraram linhas da ficha "A máquina" na janela de
+   Serviços, que é onde a infraestrutura passou a ser descrita por inteiro. Sem
+   consumidor, a regra ia junto — CSS órfão é o que a próxima pessoa tenta manter
+   em sincronia sem saber que nada o usa. */
 
 /* --- COMANDOS CLICÁVEIS (impressos no boot) ---
    Digitar não pode ser o pedágio para descobrir o que existe. Estes são os
@@ -466,8 +455,5 @@
   border-bottom-color: var(--term-linha);
 }
 
-[data-app='terminal'] .terminal-tag {
-  color: var(--term-fg);
-  background: var(--term-superficie);
-  border-color: var(--term-linha);
-}
+/* (a regra de `.terminal-tag` neste bloco saiu junto com a própria tag — ver a
+   nota acima, na seção onde ela morava) */

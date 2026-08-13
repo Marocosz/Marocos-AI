@@ -167,6 +167,12 @@ export function aplicarConfigNoCss(tema = 'dark', preset = null) {
     /** O player da Jornada: o passeio automático e a troca entre entradas. */
     '--cfg-jornada-passeio': `${MOVIMENTO.jornadaPasseioS}s`,
     '--cfg-jornada-troca': `${MOVIMENTO.jornadaTrocaS}s`,
+
+    /** O pulso que percorre o trilho do fluxograma de Serviços — ver
+     *  `MOVIMENTO.pipelineServicosS`. O ponto de "em execução" de cada serviço
+     *  NÃO tem valor próprio: ele reusa `--cfg-pulso-status`, porque é o mesmo
+     *  pulso e o mesmo significado do "aberto a freelance" do "Sobre este PC". */
+    '--cfg-pipeline-servicos': `${MOVIMENTO.pipelineServicosS}s`,
   }
 
   for (const [nome, valor] of Object.entries(vars)) {

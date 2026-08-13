@@ -11,6 +11,7 @@ import { resolveRoute, buildRoute } from '../routes'
 import { useLanguage } from '../../contexts/LanguageContext'
 import { getOsData } from '../../i18n/os'
 import { getContactData } from '../../content/contact'
+import TextoCortado from '../../ui/TextoCortado'
 import './ExplorerChrome.css'
 
 /**
@@ -18,7 +19,7 @@ import './ExplorerChrome.css'
  * --------------------------------------------------
  * A moldura de navegação em volta do app, desenhada em cima do Explorer do
  * Windows 11: linha de navegação, barra de comandos, lateral em três grupos e
- * barra de status. Envolve seis dos nove apps — Terminal, Marcos Virtual e
+ * barra de status. Envolve sete dos onze apps — Terminal, Marcos Virtual e
  * Configurações ficam de fora, e a decisão vive no `explorer` do registry.
  *
  * O APP CONTINUA AGNÓSTICO DE CONTAINER, como o cabeçalho de registry.js
@@ -236,7 +237,7 @@ const ExplorerChrome = ({ win, children }) => {
                         onClick={() => navigate(win.key, app.id, null)}
                       >
                         {Icon ? <Icon size={14} strokeWidth={1.9} /> : null}
-                        <span>{rotuloDe(app)}</span>
+                        <TextoCortado texto={rotuloDe(app)} focavel={false} />
                       </button>
                     </li>
                   )
@@ -343,7 +344,7 @@ const ExplorerChrome = ({ win, children }) => {
                         onClick={() => open(app.id)}
                       >
                         {Icon ? <Icon size={15} strokeWidth={1.9} /> : null}
-                        <span>{os.windows[app.titleKey]}</span>
+                        <TextoCortado texto={os.windows[app.titleKey]} focavel={false} />
                       </button>
                     </li>
                   )

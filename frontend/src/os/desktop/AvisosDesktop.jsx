@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react'
 import { AnimatePresence } from 'motion/react'
 import { useReducedMotion } from 'motion/react'
-import { Expand, Palette } from 'lucide-react'
+import { Expand, Palette, PackageOpen } from 'lucide-react'
 import Balao from '../../ui/Balao'
 import { useWindowActions } from '../WindowManagerContext'
 import { useLanguage } from '../../contexts/LanguageContext'
@@ -12,13 +12,21 @@ import './AvisosDesktop.css'
 /**
  * OS AVISOS DA ÁREA DE TRABALHO
  * --------------------------------------------------
- * Dois balões no canto inferior direito, empilhados. Cada um existe porque há
+ * Três balões no canto inferior direito, empilhados. Cada um existe porque há
  * algo neste projeto que o visitante não descobre sozinho:
  *
  *   TELA CHEIA  isto é um sistema operacional dentro de uma aba, e a barra do
  *               navegador em volta é a única coisa que denuncia a moldura.
  *   TEMAS       o seletor de papel de parede muda o sistema inteiro, e vive
  *               dentro de um app que ninguém abre sem motivo.
+ *   CONTEXTO    dá para levar o portfólio inteiro embora num arquivo, e esse app
+ *               NÃO tem ícone na área de trabalho — sem este balão, a única porta
+ *               para ele seria o menu Iniciar.
+ *
+ * A ORDEM DA PILHA É INTENCIONAL, e o de contexto entra por último: os dois
+ * primeiros ensinam a máquina, e quem chegou agora precisa entendê-la antes de ser
+ * convidado a levá-la embora. Como o `movimento(indice)` escalona a entrada, "por
+ * último na pilha" também significa "por último no tempo".
  *
  * NÃO PERSISTEM. Voltam a cada recarga, por decisão do dono do projeto: são
  * convites, não alertas, e um portfólio é visitado uma vez — quem fechou nesta
@@ -59,7 +67,7 @@ const AvisosDesktop = () => {
   const { open } = useWindowActions()
   const prefereMovimentoReduzido = useReducedMotion()
 
-  const [fechados, setFechados] = useState({ telaCheia: false, temas: false })
+  const [fechados, setFechados] = useState({ telaCheia: false, temas: false, contexto: false })
   const fechar = (qual) => setFechados((f) => ({ ...f, [qual]: true }))
 
   const [emTelaCheia, setEmTelaCheia] = useState(estaEmTelaCheia)
@@ -121,6 +129,25 @@ const AvisosDesktop = () => {
   return (
     <div className="avisos-desktop">
       <AnimatePresence>
+        {/* O de CONTEXTO é o único que leva a um app sem ícone na área de trabalho,
+            então ele não é só um convite: é a porta principal daquela janela. Como os
+            outros, ele some ao levar o visitante onde ele queria chegar. */}
+        {!fechados.contexto && t.contexto && (
+          <Balao
+            key="contexto"
+            Icone={PackageOpen}
+            titulo={t.contexto.titulo}
+            corpo={t.contexto.corpo}
+            rotuloFechar={t.fechar}
+            onFechar={() => fechar('contexto')}
+            acao={() => {
+              open('contexto')
+              fechar('contexto')
+            }}
+            transicao={movimento(2)}
+          />
+        )}
+
         {/* O `%d` do balão de temas é o número de papéis de parede, e vem de
             `contarPresets()` — a mesma função que a ficha "Este sistema" do
             "Sobre este PC" usa. O texto era literal no i18n, dizia "Doze", e a

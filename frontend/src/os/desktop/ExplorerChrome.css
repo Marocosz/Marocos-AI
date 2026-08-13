@@ -448,11 +448,12 @@
   transition: background 0.15s ease, color 0.15s ease;
 }
 
+/* O TRIO DE CORTE SAIU DAQUI: o rótulo do lugar é um `ui/TextoCortado`, que corta e
+   revela o nome inteiro num balão quando a lateral aperta — e ela aperta de verdade,
+   porque "Gerenciador de Dispositivos" e "Baixar meu contexto" não cabem na largura
+   dela. O que fica é o `flex`, que é geometria desta lista e não do componente. */
 .explorer-lugar > span {
   flex: 1 1 auto;
-  overflow: hidden;
-  white-space: nowrap;
-  text-overflow: ellipsis;
 }
 
 .explorer-lugar:hover {

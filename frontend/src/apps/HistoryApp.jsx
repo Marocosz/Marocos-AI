@@ -7,6 +7,7 @@ import { useLanguage } from '../contexts/LanguageContext'
 import { useTheme } from '../contexts/ThemeContext'
 import { getJourneyData, posicaoNaLinha } from '../content/journey'
 import { MOVIMENTO } from '../config/system'
+import TextoCortado from '../ui/TextoCortado'
 import './HistoryApp.css'
 
 /**
@@ -81,6 +82,11 @@ const HistoryApp = () => {
      a nota em `posicaoNaLinha`. */
   const anoAtual = new Date().getFullYear()
 
+  /* O primeiro ano da trajetória, para a legenda dizer quantos anos ela cobre sem
+     ninguém escrever o número. `filter` porque a entrada de roadmap não tem `ano` —
+     um `Math.min` sobre `undefined` devolveria `NaN` e a frase sairia "NaN anos". */
+  const primeiroAno = Math.min(...faixas.filter((f) => !f.futuro).map((f) => f.ano))
+
   /**
    * O PASSEIO SÓ EXISTE SE HOUVER MOVIMENTO, e aqui ele SOME em vez de parar.
    *
@@ -151,7 +157,17 @@ const HistoryApp = () => {
           lista de faixas rola, como a fila de um player de verdade. */}
       <header className="history-cabecalho">
         <p className="history-eyebrow">{content.sectionLabel}</p>
-        <p className="history-legenda">{content.subtitle}</p>
+        {/* OS DOIS NÚMEROS DA LEGENDA SÃO DERIVADOS — ver a nota em
+            `content/journey.js`. Esta frase já disse "sete anos em seis faixas"
+            enquanto eram oito e sete: envelheceu nas DUAS pontas ao mesmo tempo,
+            o que é o argumento final contra escrever quantidade à mão.
+            `%a` conta do primeiro ano da trajetória até hoje, e não até a última
+            entrada — é a mesma leitura que a barra faz. */}
+        <p className="history-legenda">
+          {content.subtitle
+            .replace('%a', String(anoAtual - primeiroAno))
+            .replace('%b', String(faixas.length))}
+        </p>
       </header>
 
       <div className="history-corpo">
@@ -380,7 +396,11 @@ const HistoryApp = () => {
                     aria-hidden="true"
                   />
                   <span className="history-faixa-data">{f.date}</span>
-                  <span className="history-faixa-titulo">{f.title}</span>
+                  {/* Os títulos de faixa são longos ("Técnico em Eletrônica, e o
+                      primeiro curso que dei") e a lista é estreita, então eles
+                      cortam. O balão revela o título inteiro no hover e no foco —
+                      só quando de fato cortou. Ver `ui/TextoCortado.jsx`. */}
+                  <TextoCortado texto={f.title} className="history-faixa-titulo" focavel={false} />
                   {i === indice && (
                     <Disc3 size={14} className="history-faixa-agora" aria-hidden="true" />
                   )}

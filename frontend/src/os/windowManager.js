@@ -96,11 +96,11 @@ export function areaUtil(larguraTela, alturaTela) {
  * tem breakpoint nenhum. As contas, com barra de tarefas (52) e margens (2x16):
  *
  *   settings  660 de altura  ->  exige 744 de viewport
- *   about / history / devices  626  ->  710
+ *   about / history / devices / services  626  ->  710
  *   assistant 620  ->  704
  *
  * Um notebook de 1366x768 com o navegador em janela normal dá ~620-650 de
- * viewport. Sete dos nove apps não cabiam lá. Em 1920x1080 todos cabem, que é
+ * viewport. Oito dos onze apps não cabiam lá. Em 1920x1080 todos cabem, que é
  * onde isto foi construído — daí o bug ter sobrevivido.
  *
  * Encolher é seguro porque `.marocos-window-body` já rola (`overflow-y: auto`):

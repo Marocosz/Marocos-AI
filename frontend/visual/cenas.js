@@ -80,20 +80,43 @@ export const CENAS = [
   { nome: 'sobre-escuro', rota: '/sobre', tema: 'dark', cristal3d: true },
   { nome: 'sobre-claro', rota: '/sobre', tema: 'light', cristal3d: true },
 
-  // Os outros oito apps, no tema escuro — nenhum tem canvas, só DOM.
+  // Os outros nove apps, no tema escuro — nenhum tem canvas, só DOM.
   { nome: 'projetos', rota: '/projetos', tema: 'dark' },
   { nome: 'projeto-detalhe', rota: '/projetos/bussola-v2', tema: 'dark' },
   { nome: 'jornada', rota: '/jornada', tema: 'dark' },
   { nome: 'stack', rota: '/stack', tema: 'dark' },
+  { nome: 'servicos', rota: '/servicos', tema: 'dark' },
   { nome: 'contato', rota: '/contato', tema: 'dark' },
   { nome: 'assistente', rota: '/assistente', tema: 'dark' },
   { nome: 'leia-me', rota: '/leia-me', tema: 'dark' },
+  /**
+   * `contexto` é a janela que entrega o portfólio como arquivo, e ela entra na
+   * fotografia por um motivo específico: das três superfícies preenchidas dela, duas
+   * são os botões de download e uma é a faixa `--sup-faixa` da porta do agente — a
+   * mesma receita de destaque que o "Sobre este PC" e a lateral do explorador usam.
+   * É o quarto consumidor daqueles tokens, e o lugar onde uma regressão de dose de
+   * vidro apareceria sem ninguém procurar.
+   *
+   * O que a foto NÃO cobre é o download em si, que é o que aquela janela existe para
+   * fazer — isso vive em `rotas.spec.js`, onde há um teste que clica, espera o evento
+   * e lê o arquivo do disco.
+   */
+  { nome: 'contexto', rota: '/contexto', tema: 'dark' },
   { nome: 'config', rota: '/config', tema: 'dark' },
 
-  // Tema claro nos dois apps de tipografia mais densa — é onde uma regressão
-  // de peso de fonte ou de cor herdada apareceria primeiro.
+  /**
+   * TEMA CLARO nos apps de tipografia mais densa — é onde uma regressão de peso
+   * de fonte ou de cor herdada apareceria primeiro.
+   *
+   * `servicos-claro` entrou com a janela nova, e não por simetria: aquele app é o
+   * terceiro consumidor dos tokens `--sup-*`, e as doses de vidro do dia divergem
+   * das da noite de propósito (ver `VIDRO.superficie` no config). O marcador
+   * opaco do fluxograma e a faixa de destaque são exatamente o tipo de superfície
+   * que já lavou no tema claro antes — a lição de `--icon-tile-bg`.
+   */
   { nome: 'stack-claro', rota: '/stack', tema: 'light' },
   { nome: 'jornada-claro', rota: '/jornada', tema: 'light' },
+  { nome: 'servicos-claro', rota: '/servicos', tema: 'light' },
 
   // A tela de bloqueio, sem destrancar — o cristal aparece atrás dela.
   { nome: 'bloqueio', rota: '/', tema: 'dark', ficarNoBloqueio: true, cristal3d: true },

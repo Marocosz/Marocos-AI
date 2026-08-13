@@ -3,16 +3,16 @@
 Harness de teste permanente, isolado em `frontend/visual/` com `package.json`
 próprio. Dois specs, dois tipos de regressão diferentes:
 
-- **`visual.spec.js`** — fotografa 21 cenas fixas do Marocos OS e compara
+- **`visual.spec.js`** — fotografa 24 cenas fixas do Marocos OS e compara
   pixel a pixel com referências versionadas em `__screenshots__/`. Pega
   mudança de cor, espaçamento, layout — qualquer coisa que altere o frame
   final renderizado.
-- **`rotas.spec.js`** — entra por deep link em cada uma das nove rotas do
+- **`rotas.spec.js`** — entra por deep link em cada uma das onze rotas do
   `os/registry.js` e em quatro comportamentos de carregamento sob demanda
   (Suspense/`React.lazy`), afirmando com `expect()` que a janela certa abriu,
   com título certo e CONTEÚDO real no corpo. Não tira screenshot nenhum.
 
-**Por que os dois, e não um só:** desde que os nove apps e o `react-markdown`
+**Por que os dois, e não um só:** desde que os onze apps e o `react-markdown`
 do assistente passaram a ser carregados via `import()` dinâmico
 (`React.lazy`), um `import('./caminho/errado')` **compila sem erro** — só
 falha em runtime, quando alguém navega até aquele caminho. `npm run build`
@@ -80,7 +80,7 @@ npm run report         # abre o último relatório HTML (screenshots de diff do 
 
 ## Regressor visual (`visual.spec.js`)
 
-Fotografa 21 cenas fixas do Marocos OS e compara pixel a pixel com
+Fotografa 24 cenas fixas do Marocos OS e compara pixel a pixel com
 referências versionadas em `__screenshots__/`.
 
 ### As quatro coisas que mudam sozinhas, e como cada uma foi congelada
@@ -427,7 +427,7 @@ limiar nem aumentando um sleep cego.
 
 ## Verificação funcional das rotas (`rotas.spec.js`)
 
-Entra por deep link em cada uma das nove rotas do registry (`os/registry.js`)
+Entra por deep link em cada uma das onze rotas do registry (`os/registry.js`)
 e afirma, com Chromium real, que a janela certa abriu, com o título certo na
 taskbar e CONTEÚDO real no corpo — prova de que o chunk lazy resolveu e o
 `Suspense` entregou algo de verdade, não só que a casca da janela montou
@@ -445,9 +445,9 @@ motivou.
 
 ### O que cada teste prova
 
-**As nove rotas** (`test.describe('deep link nas nove rotas')`), uma por
+**As onze rotas** (`test.describe('deep link nas onze rotas')`), uma por
 `/sobre`, `/projetos`, `/projetos/bussola-v2`, `/contato`, `/assistente`,
-`/config`, `/leia-me`, `/jornada` e `/stack`: para cada uma,
+`/config`, `/leia-me`, `/jornada`, `/stack` e `/servicos`: para cada uma,
 
 - o corpo do app (`.about-app`, `.projects-app-list`, etc.) fica visível e
   **não vazio** — o teste lê o conteúdo, não só a existência do seletor;
@@ -490,7 +490,7 @@ Não é um substituto do regressor visual — os dois têm buracos diferentes:
 
 - nenhuma regressão de CSS/layout/cor é pega aqui (isso é trabalho do
   `visual.spec.js`);
-- não testa viewport mobile (as nove rotas e os quatro comportamentos só
+- não testa viewport mobile (as onze rotas e os quatro comportamentos só
   foram exercitados em desktop);
 - não testa idioma inglês (os títulos afirmados são os em PT-BR);
 - a suíte inteira roda contra o `dist/` do último `npm run build:frontend`

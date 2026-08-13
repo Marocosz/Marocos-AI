@@ -412,6 +412,12 @@ describe('config do sistema', () => {
     // O passeio tem de ser MUITO mais longo que a troca, senão a entrada nova aparece
     // já saindo e o passeio lê como falha em vez de movimento.
     expect(MOVIMENTO.jornadaPasseioS).toBeGreaterThan(MOVIMENTO.jornadaTrocaS * 10)
+
+    // O pulso do fluxograma de Serviços é uma TRAVESSIA, não uma piscada: ele
+    // precisa durar mais que a volta do anel de luz, porque o percurso é maior.
+    // Ver a faixa documentada no config.
+    expect(MOVIMENTO.pipelineServicosS).toBe(4.8)
+    expect(MOVIMENTO.pipelineServicosS).toBeGreaterThan(MOVIMENTO.luzDaBordaS)
   })
 
   it('o chrome assenta ANTES do wallpaper, nunca depois', () => {
@@ -537,11 +543,17 @@ describe('config do sistema', () => {
   /**
    * O CHROME DE EXPLORADOR TEM CONTRATO COM O TAMANHO DAS JANELAS.
    *
-   * Os seis apps com `explorer: true` cresceram exatamente a largura da lateral
-   * e a soma das duas barras, para o conteúdo manter a área útil que tinha antes
-   * do chrome. Mudar o config sem mudar o registry (ou o contrário) encolhe o
-   * conteúdo de seis janelas sem nada avisar — é o tipo de deriva que só aparece
+   * Os apps com `explorer: true` carregam a largura da lateral e a soma das duas
+   * barras POR CIMA da área útil que querem, para o chrome emoldurar o conteúdo em
+   * vez de comê-lo. Mudar o config sem mudar o registry (ou o contrário) encolhe o
+   * conteúdo de sete janelas sem nada avisar — é o tipo de deriva que só aparece
    * meses depois, quando alguém estranha que a tabela do Stack ficou apertada.
+   *
+   * O laço exige uma base declarada para CADA app de explorador, e isso é
+   * deliberado: um app novo com `explorer: true` reprova aqui até alguém escrever
+   * qual área útil ele quer. É a pergunta certa a forçar — sem ela o tamanho de
+   * janela vira um número escolhido a olho, e o chrome come a diferença em
+   * silêncio.
    */
   it('o chrome de explorador bate com o crescimento dos tamanhos de janela', () => {
     const px = (v) => Number.parseInt(v, 10)
@@ -574,6 +586,9 @@ describe('config do sistema', () => {
       project: { w: 560, h: 500 },
       history: { w: 700, h: 520 },
       devices: { w: 620, h: 520 },
+      /* O fluxograma de cinco etapas é o que pede a largura: em menos de ~700 de
+         área útil a esteira deixa de caber lado a lado e vira uma coluna. */
+      services: { w: 700, h: 520 },
       readme: { w: 520, h: 400 },
     }
 

@@ -9,6 +9,7 @@ import { MOVIMENTO } from '../../config/system'
 import { useSystemToggles } from '../../ui/useSystemToggles'
 import Clock from '../../ui/Clock'
 import StartMenu from './StartMenu'
+import TextoCortado from '../../ui/TextoCortado'
 import './Taskbar.css'
 
 /**
@@ -92,7 +93,12 @@ const Taskbar = ({ onShutdown }) => {
                     title={title}
                   >
                     {Icon ? <Icon size={18} strokeWidth={isFocused ? 2.5 : 2} /> : null}
-                    <span className="taskbar-window-label">{title}</span>
+                    {/* O título da janela corta na taskbar, como no Windows de verdade — e o
+                  balão devolve o nome inteiro no hover, que é o que o Windows
+                  também faz. `focavel={false}`: o botão da taskbar já é o alvo
+                  de teclado, e um nó focável dentro dele seria controle
+                  aninhado (ver `ui/TextoCortado.jsx`). */}
+              <TextoCortado texto={title} className="taskbar-window-label" focavel={false} />
 
                     {isFocused && (
                       <motion.div

@@ -159,11 +159,10 @@
   color: var(--accent-color);
 }
 
+/* O trio de corte vem de `ui/TextoCortado.css` — este elemento é um
+   `TextoCortado`, que revela o nome inteiro num balão quando a coluna aperta.
+   Aqui fica só a tipografia. */
 .projects-app-item-title {
-  min-width: 0;
-  overflow: hidden;
-  white-space: nowrap;
-  text-overflow: ellipsis;
   font-size: 0.86rem;
   color: var(--text-primary);
 }

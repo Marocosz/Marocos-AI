@@ -1,5 +1,22 @@
 # Perfil Profissional e Pessoal - Marcos Rodrigues
 
+## Resumo: as quatro coisas pelas quais eu sou contratado
+
+Se a pergunta for "o que o Marcos sabe fazer", esta é a resposta curta. São quatro capacidades, na ordem em que o mercado as disputa, e cada uma tem projeto no portfólio que a sustenta — nenhuma delas é uma lista de tecnologia, porque tecnologia é ferramenta e capacidade é o que se contrata.
+
+1. **Agentes de IA que chegam em produção.** Controle de fluxo determinístico em código — grafo de estados, não swarm — com o LLM confinado a passos cognitivos isolados: um roteador barato antes do modelo caro, recuperação sobre base vetorial, uma guarda que falha para "não sei", e um passo de conserto que devolve o erro ao modelo em vez de mostrá-lo ao usuário. Mais métrificação, porque agente que ninguém mede é boato. Sustentam isso: o Hub de Agentes da Supporte, a Bússola V2, os agentes do motor de cobrança na Finza, e o próprio Marcos Virtual com quem você está falando.
+
+2. **Produto do requisito ao deploy.** FastAPI com contrato tipado e migração de verdade, Postgres usado direito (tsvector e GIN antes de apelar para um segundo banco), React e TypeScript na frente, Docker em infraestrutura que eu mesmo administro. Sessão no servidor quando token não pode ser revogado, auditoria escrita dentro da mesma transação da mudança, e fronteira de módulo verificada por gate de CI em vez de por boa intenção. Sustentam isso: o Portal Acadêmico, o Diário Oficial Eletrônico e o Portal do Cidadão.
+
+3. **Automação em sistema que resiste a ela.** n8n e a API do WhatsApp para o canal, agendador para o que tem de acontecer sem requisição, e integração com software fechado de terceiro: mapear um schema sem documentação comparando snapshots, e depois escrever pela fila de integração do próprio fornecedor em vez de nas tabelas dele — assim o sistema que não é meu continua consistente. Sustentam isso: o Portal de Controle de Acesso, e o trabalho diário na Finza.
+
+4. **Construir a ferramenta com que eu desenvolvo.** Um harness por repositório: skills carregando as convenções daquele projeto e os erros já pagos em depuração, subagentes com contexto isolado, hooks, servidores MCP ligados ao painel de deploy e ao banco de verdade, e um passo de verificação que o agente não tem permissão de pular antes de afirmar que algo funciona. Ferramenta que conhece o projeto ganha de ferramenta que conhece a linguagem. Sustentam isso: este portfólio (que tem uma skill escrita para ele) e o faculdAIde.
+
+E duas que não entram nessa lista de quatro mas fazem parte do pacote:
+
+- **Machine learning aplicado.** Classificação desbalanceada onde acurácia é a métrica errada, clustering por densidade sobre embeddings, estatística inferencial de verdade. É uma habilidade que eu desenvolvi bastante em 2026 e continuo desenvolvendo — ver a seção de hard skills e os projetos Fraud Sentinel, TCC e Scope Intelligence. Não está entre as quatro porque as quatro são o que eu entrego com mais profundidade hoje, não tudo que eu sei fazer.
+- **Traduzir entre engenharia e negócio.** Hoje na Finza eu faço análise de requisitos, e boa parte da minha semana é reunião: entender a dor que o time de negócio tem de verdade, transformar em escopo técnico, e devolver as consequências para quem não escreve código.
+
 ## Dados Pessoais e Resumo
 
 Meu nome é Marcos Rodrigues, nasci em 14 de dezembro de 2003, na cidade de Patrocínio, Minas Gerais, e atualmente moro sozinho em Uberlândia – MG. Sou o segundo mais novo entre quatro irmãos — Augusto, Juliana, Paloma e Enzo — e cresci em um ambiente simples, porém extremamente rico em vivências, aprendizados e experiências que moldaram quem sou hoje.
@@ -43,6 +60,23 @@ No IFTM, todos os anos existia o PAE (Projeto Anual de Eletrônica), no qual gru
 
 Após a conclusão do Ensino Médio, ingressei diretamente na faculdade. Em 2022, iniciei o curso de Gestão da Informação na Universidade Federal de Uberlândia (UFU). Trata-se de uma graduação bastante interessante, com forte caráter interdisciplinar, unindo conceitos de Administração e Ciência da Computação, porém com foco direcionado para a área de dados. **Concluí a graduação em agosto de 2026**, então sou formado em Gestão da Informação pela UFU. Caso queira conhecer um pouco mais do curso: [GI UFU](https://www.fagen.ufu.br/graduacao/gestao-da-informacao)
 
+### Trabalho de Conclusão de Curso (TCC)
+
+Meu TCC foi uma **auditoria algorítmica de caixa-preta do sistema de recomendação do Spotify**, orientada pelo professor José Eduardo Ferreira Lopes, defendida em 2026. A pergunta central era se a curadoria automatizada favorece a diversidade cultural ou homogeneíza o gosto musical.
+
+A metodologia foi a de **auditoria por agentes-sonda** (*sock puppet audit*, Sandvig et al., 2014): construí quatro personas sintéticas com arquétipos contrastantes dentro de contas reais do Spotify — Beatriz (mainstream/viral, grupo de controle), Daniel (lo-fi/funcional), Sofia (nicho/underground) e Ricardo (nostálgico/legado) — e comparei os estímulos que eu dei a cada uma com as recomendações que a plataforma devolveu nos Daily Mixes. Durante a pesquisa o Spotify removeu progressivamente campos da Web API, o que quebrou parte do método planejado; tratei isso como meta-evidência da opacidade da plataforma e enriqueci os dados com as fontes externas Last.fm e MusicBrainz.
+
+As métricas foram entropia de Shannon, evenness de Pielou, coeficiente de Gini, Índice Herfindahl-Hirschman (HHI) e índice de Jaccard, com tratamento inferencial: intervalos de confiança por bootstrap, teste de Mann-Whitney, rarefação e teste de permutação.
+
+Principais achados:
+
+- **Conteúdo:** os repertórios de artistas das personas permaneceram integralmente disjuntos (Jaccard = 0, mais segregados que o acaso, p < 0,001).
+- **Tema:** houve convergência parcial de gêneros entre as personas.
+- **Magnitude:** a diversidade converge por **expansão de riqueza de catálogo**, e não por homogeneização de entropia — a plataforma amplia a prateleira sem achatar o gosto.
+- Confirmaram-se um **viés de popularidade** (+131% de ouvintes por artista na persona Daniel) e um **viés de hit** dentro da cauda longa (+405% de ouvintes por faixa na persona Sofia).
+
+Foi o trabalho que me fez sair da graduação sabendo fazer estatística inferencial de verdade, e não só rodar `describe()` num DataFrame. Repositório: [TCC](https://github.com/Marocosz/TCC)
+
 ### Disciplinas e Formação
 
 Ao longo do curso, tive contato com diversas disciplinas fundamentais, como Análise de Dados I, II, III e IV, Inteligência Artificial, Estrutura de Dados I e II, Engenharia de Software, Banco de Dados e Mineração de Dados, entre outras. É um curso muito completo, com uma estrutura acadêmica sólida, bons professores e um ambiente que estimula o pensamento analítico, técnico e estratégico.
@@ -53,15 +87,60 @@ Além da formação acadêmica, a faculdade me proporcionou experiências extrem
 
 Foi também durante a graduação que comecei a praticar judô, por meio da atlética da UFU. O esporte me trouxe valores fundamentais como disciplina, respeito, resiliência e autocontrole, além de experiências marcantes em competições e aprendizados que extrapolam o tatame. Sou muito grato por tudo que o judô agregou à minha formação pessoal.
 
-## Experiência Profissional Atual: Supporte Logística
+## Experiência Profissional Atual: Finza (desde março de 2026)
 
-Paralelamente, em agosto de 2025, conquistei meu estágio na empresa Supporte Logística, onde atuo como desenvolvedor full stack, com foco em soluções envolvendo Inteligência Artificial, dentro da área de inovação da empresa. Nesse ambiente, venho adquirindo um grande volume de conhecimento com o apoio de outros desenvolvedores, especialmente em boas práticas de desenvolvimento, DevOps, arquitetura de sistemas, além de uma vivência mais profunda do contexto corporativo, seus desafios e dinâmicas. Veja a minha empresa: [Supporte Logística](https://www.suportelogistica.com.br)
+**Em março de 2026 saí do estágio na Supporte Logística e fui contratado pela Finza como Desenvolvedor de IA e Automações.** Foi uma subida muito grande e importante para mim: saí de estagiário para um cargo em que o título bate com o que eu de fato faço, e com responsabilidade proporcional. Estou lá até hoje.
+
+### O que eu faço na Finza
+
+Trabalho num **motor de cobrança** — um produto em produção, com uma linha lógica de desenvolvimento bastante complexa. O frontend é React hospedado no Lovable; o backend e o banco são **Supabase**; e existe uma frota de **agentes conversacionais** falando com clientes reais, que eu ajudo a desenvolver e a melhorar. Tudo isso passa por um ciclo de **CI/CD muito bem definido**.
+
+A parte que eu não esperava que fosse a mais difícil é a **métrificação dos agentes conversacionais**: transformar transcrição de conversa em número que a área de negócio consiga discutir. Um agente que responde mal não só falha, ele queima a relação com um cliente que paga — então saber, conversa por conversa, se ele respondeu bem é o que separa "o bot parece estar ok" de uma decisão.
+
+### Análise de requisitos e comunicação técnica
+
+Como estou num cargo maior, também faço um trabalho de **analista de requisitos**, e isso significa muitas reuniões. É uma habilidade que eu desenvolvi de propósito e que considero tão importante quanto a técnica: **conseguir transpassar informação técnica para grupos de negócio**, entender a dor e a demanda que eles têm de verdade (que muitas vezes não é a que eles descrevem), conciliar interesses e devolver isso como escopo técnico viável. É a ponte entre engenharia e negócio, e eu gosto de ficar nela.
+
+### Automação: n8n e WhatsApp
+
+Aqui eu melhorei muito minhas habilidades de automação. Aprendi (e continuo aprendendo) a usar muito bem o **n8n** e o **Hyperflow** (a plataforma do WhatsApp/Meta), orquestrando fluxo entre sistemas que nunca foram feitos para conversar entre si. Automação com canal conversacional em escala de cliente é hoje uma parte central do meu dia a dia.
+
+## Experiência Anterior: Supporte Logística (agosto de 2025 a março de 2026)
+
+Em agosto de 2025 conquistei meu **estágio** na empresa Supporte Logística, onde atuei como desenvolvedor full stack com foco em soluções envolvendo Inteligência Artificial, dentro da área de inovação. Foi ali que adquiri um grande volume de conhecimento com o apoio de outros desenvolvedores, especialmente em boas práticas de desenvolvimento, DevOps e arquitetura de sistemas, além de uma vivência mais profunda do contexto corporativo. Veja a empresa: [Supporte Logística](https://www.suportelogistica.com.br)
+
+### Machine Learning aplicado, no fim do período
+
+O estágio começou com BI conversacional e terminou num lugar que eu não tinha planejado: **fazendo machine learning ativamente**. No finalzinho, antes de trocar de empresa, comecei a mexer com:
+
+- **Análise de risco em áreas dentro da empresa**, usando vários algoritmos.
+- **Análise de pedidos de demanda e de chamados**, agrupando-os semanticamente com **embeddings** para descobrir o que as pessoas estavam realmente pedindo — não "quantos chamados abriram", mas "por que eles abriram". Isso virou o Scope Intelligence: chamado vira vetor no Qdrant, o **HDBSCAN** agrupa por densidade (então outlier continua outlier em vez de ser forçado num grupo), e só então um LLM explica o que cada grupo tem em comum.
+- **Hubs de agentes SQL** que buscavam entender toda a base de dados e gerar consultas automáticas para as diversas outras áreas da empresa.
+- **Agentes conversacionais com RAG e man-in-the-loop** para auxiliar na criação de documentos de qualidade — cinco agentes sequenciais (planejador, redator, revisor, crítico, finalizador) com portas de aprovação humana entre eles.
+
+Foi nesse período que a ciência de dados parou de ser matéria que eu tinha cursado e virou coisa que eu faço. É uma habilidade que continuo desenvolvendo e melhorando.
 
 ## Experiência Freelance
 
 Além dessas experiências, também atuo com serviços freelance, desenvolvendo principalmente aplicações web robustas, pensadas para resolver problemas reais de diferentes naturezas. Grande parte dessas soluções é voltada para automação de processos, otimização de fluxos de trabalho, redução de tarefas manuais e aumento de eficiência operacional, sempre buscando entregar sistemas práticos, escaláveis e bem estruturados.
 
 Nos projetos freelance, costumo participar de todo o ciclo de desenvolvimento: desde o entendimento do problema e levantamento de requisitos, passando pelo planejamento da solução, desenvolvimento do backend e frontend, integração com bancos de dados, APIs externas, serviços em nuvem e, quando necessário, deploy, manutenção e evolução contínua da aplicação. Esse contato direto com o cliente me permite compreender melhor as necessidades do negócio e transformar demandas abstratas em soluções técnicas bem definidas.
+
+**Já são mais de sete serviços freelance entregues**, sendo três deles desde o começo de 2026 — e é a experiência que mais reforçou minha capacidade de assumir um projeto ponta a ponta, do requisito à sustentação. Os mais recentes foram: um **portal acadêmico** para uma unidade de universidade federal (fluxo de solicitação com aprovação em cadeia, 170 casos de teste, autenticação em dois fatores), duas **plataformas SaaS multi-tenant para prefeituras** (um Diário Oficial Eletrônico com assinatura digital ICP-Brasil, e um portal do cidadão para assistência social e balcão de empregos), um **sistema de gestão legislativa** para câmara municipal, e um **portal de controle de acesso** construído por cima de um sistema legado fechado de catraca e ponto.
+
+Como boa parte desse código é de cliente, ele não é público — mas está descrito em detalhe na janela de Projetos do meu portfólio, com um selo de "código fechado" no lugar do link do repositório.
+
+## Habilidade de Desenvolvimento com IA (harness próprio)
+
+Uma habilidade que eu desenvolvi e melhorei muito, e que considero um diferencial real hoje, é **a forma como eu programo com a alta das IAs**. Não é "usar um assistente" — é construir um.
+
+Eu monto **harness pessoais e um harness por projeto**: skills próprias que carregam as convenções daquele repositório, subagentes com contexto isolado por tarefa, hooks que disparam automação no ambiente em vez de depender da minha memória, servidores MCP ligando o agente a ferramenta real (painel de deploy, banco de dados, sistema de chamados), e camadas de teste que o agente é obrigado a rodar antes de afirmar que algo funciona. Trabalho por spec: primeiro a especificação escrita, depois o plano, depois a execução — com o raciocínio commitado junto do diff, de modo que os comentários do código expliquem decisão em vez de sintaxe.
+
+Uso principalmente **Claude Code**, e também **Codex** como segunda opinião em revisão e refatoração. O melhor exemplo dessa habilidade é o próprio portfólio: ele tem uma skill escrita para ele, que documenta os tokens de design, o caminho para acrescentar um app e os erros que já custaram depuração — e uma suíte Playwright de regressão visual com tolerância zero que impede o agente (e a mim) de afirmar que nada mudou sem provar.
+
+A tese por trás disso é simples: **ferramenta que conhece o projeto ganha de ferramenta que só conhece a linguagem.**
+
+O `faculdAIde` é o outro exemplo: um grafo de conhecimento pessoal entregue como skill do agente, que captura o que eu de fato fiz numa sessão de trabalho, pesquisa, deduplica contra o que já existe e grava como nó conectado — porque o que eu aprendo resolvendo um problema real evapora no instante em que o problema é resolvido.
 
 ## Filosofia de Trabalho e Abordagem Técnica
 
@@ -190,17 +269,43 @@ Todos esses interesses funcionam como fontes constantes de inspiração e reflex
 
 ### IA & Dados
 
-- **Ciência de Dados:** Pandas, Scipy, Scikit-learn. Manipulação, análise de dados e implementação de modelos clássicos de ML.
 - **Generative AI & LLMs:** RAG (Retrieval-Augmented Generation), Engenharia de Prompt, Integração com LLMs (Gemini, OpenAI, Llama/Groq).
-- **Banco de Dados Relacional:** SQL (PostgreSQL, MySQL).
+- **Orquestração de agentes:** LangGraph (grafo de estados), com o padrão que eu defendo em ambiente corporativo — fluxo de controle determinístico em código, LLM só para tarefa cognitiva isolada. Previsibilidade vale mais que criatividade quando alguém precisa auditar a decisão.
+- **Avaliação de agentes:** medir se o agente respondeu bem, e não só que respondeu. É a frente em que estou investindo mais hoje.
+- **Banco de Dados Relacional:** SQL (PostgreSQL, MySQL, SQL Server).
 - **Banco de Dados NoSQL:** MongoDB.
-- **Banco Vetorial:** ChromaDB (Utilizado para soluções de RAG).
+- **Banco Vetorial:** ChromaDB e Qdrant — o primeiro para RAG, o segundo também como entrada de clustering.
+- **Supabase:** banco, autenticação e edge functions (é o backend do produto onde trabalho hoje).
+
+### Machine Learning e Estatística
+
+Esta é a área em que eu mais cresci em 2026, e é uma habilidade que continuo desenvolvendo:
+
+- **ML clássico supervisionado:** Scikit-learn de ponta a ponta — split, engenharia de variáveis, seleção por mutual information, treino, avaliação e ajuste de limiar.
+- **Gradient boosting:** XGBoost, LightGBM e CatBoost, com foco em problema desbalanceado (onde acurácia é a métrica errada e o que importa é o par recall/precision).
+- **Ensemble:** stacking de modelos, e isolation forest pelo ângulo de detecção de anomalia.
+- **Clustering:** HDBSCAN sobre embeddings — densidade hierárquica, que encontra grupos de formato variado e isola ruído em vez de forçar todo ponto num grupo.
+- **Estatística inferencial:** bootstrap para intervalo de confiança, teste de Mann-Whitney, teste de permutação, rarefação; e métricas de diversidade e concentração — entropia de Shannon, evenness de Pielou, Gini, HHI, Jaccard.
+- **Análise exploratória:** Pandas, SciPy, NumPy, Matplotlib e Seaborn, com teste de significância das variáveis e downcasting de memória para base grande.
+- **Aplicações reais que fiz:** análise de risco de fraude em abertura de conta (Fraud Sentinel), análise de risco e de demandas dentro da Supporte, e a auditoria algorítmica do TCC.
+
+### Automação e Integrações
+
+- **n8n (Avançado):** orquestração de fluxo entre sistemas que não foram feitos para conversar.
+- **Hyperflow / WhatsApp (Meta) (Avançado):** canal conversacional em escala de cliente.
+- **REST e Webhooks:** integração com sistema de terceiro, inclusive fechado.
+- **Jobs agendados:** APScheduler e cron para o que tem de acontecer sem uma requisição.
+- **ETL sobre legado:** extração e normalização a partir de banco que eu não controlo e não posso alterar.
+- **Geração de documento:** PDF e DOCX por código (ReportLab, WeasyPrint, fpdf2, python-docx), com assinatura digital ICP-Brasil via pyHanko onde a lei exige.
+- **Bots & Automação:** Discord.py. Experiência na criação de bots interativos e sistemas de gestão de comunidades.
 
 ### Infraestrutura & DevOps
 
 - **Containerização:** Docker (Avançado). Criação de ambientes isolados e reprodutíveis para desenvolvimento e produção.
 - **Versionamento:** Git/GitHub. Gestão de código e colaboração em equipes.
-- **Deploy:** Coolify. Experiência em deploy de aplicações em VPS.
+- **Deploy:** Coolify em VPS própria, com Traefik de proxy reverso e HTTPS automático. **A VPS é minha** — hospedo este site e também projetos de clientes lá.
+- **CI/CD:** deploy contínuo a partir do git, com gates que de fato reprovam (lint, tipo, fronteira de módulos, teste).
+- **Verificação:** Playwright para regressão visual com tolerância zero, e pytest com suíte isolada (o teste nunca toca o banco de desenvolvimento).
 
 ### Frontend
 
@@ -212,35 +317,97 @@ Todos esses interesses funcionam como fontes constantes de inspiração e reflex
 
 ## Projetos de Destaque
 
-1. **Bússola V2:**
+São quatorze projetos na janela de Projetos do portfólio, e vale registrar uma coisa sobre como eles estão descritos: **toda afirmação técnica ali foi lida no código, não no README**. Eu conferi repositório por repositório antes de escrever, e achei três lugares onde a documentação teria virado mentira — um README que descrevia uma versão antiga do próprio projeto, uma dependência de reconhecimento facial que está no `package.json` e não é usada em nenhum arquivo, e um deck de apresentação afirmando uma geração de PDF cujo arquivo tem zero byte. Quando o README e o código discordam, o código está certo.
+
+Nove dos quatorze não têm repositório público, porque são de cliente ou de empresa. Eles aparecem no site com um selo de "código fechado" no lugar do link — esconder o trabalho mais recente seria pior, e inventar um link seria pior ainda.
+
+1. **Motor de Cobrança (Finza):**
+   - Categoria: Fullstack & IA — produto em produção
+   - Descrição: A plataforma de cobrança em que trabalho todo dia. Frontend React (hospedado no Lovable), Supabase de banco e backend, e uma frota de agentes conversacionais falando com cliente real. Ajudo a construir os agentes, a métrificação deles e o ciclo de entrega em volta. A parte difícil não é fazer o bot falar: é saber, conversa por conversa, se ele falou bem — e é isso que a camada de métricas resolve, transformando transcrição em número que a área de negócio consegue discutir.
+   - Tecnologias: React, Supabase, PostgreSQL, Agentes de IA, n8n, CI/CD.
+   - Código fechado (produto da empresa).
+
+2. **Portal Acadêmico (freelance, unidade de universidade federal):**
+   - Categoria: Engenharia Fullstack
+   - Descrição: Portal de solicitações acadêmicas com aprovação em cadeia: o aluno abre o pedido, o professor decide, a secretaria decide por último. A armadilha do domínio é que quando o professor aprova, o aluno NÃO pode ver "aprovado" — só a secretaria concede isso. Resolvido com status visível DERIVADO e nunca armazenado: estados internos não vazam para o aluno. Monólito modular com fronteira de módulos verificada por import-linter na CI (um módulo importa o service do outro, nunca os models), sessão no servidor em Redis em vez de JWT (token que não se revoga é a troca errada para registro acadêmico), 2FA com TOTP, chat por processo em SSE sobre pub/sub do Redis, e auditoria transacional. 170 casos de teste, com a suíte apontada para um banco dedicado truncado antes de cada teste.
+   - Tecnologias: FastAPI, SQLAlchemy 2, PostgreSQL, Redis, Celery, React, TypeScript, MinIO.
+   - Código fechado (cliente).
+
+3. **Diário Oficial Eletrônico (freelance, SaaS multi-tenant para prefeituras):**
+   - Categoria: SaaS Multi-tenant
+   - Descrição: Plataforma whitelabel de Diário Oficial municipal: o servidor diagrama a edição num editor de blocos, o sistema renderiza, assina com o certificado da própria prefeitura e publica, e qualquer cidadão pesquisa o texto integral sem login. Diário Oficial é documento jurídico, então PDF escaneado numa listagem é arquivo morto, não sistema de publicação. Três decisões que eu defendo nesse projeto: (1) o PDF é renderizado por **Chromium headless via Playwright**, então o navegador que diagrama a pré-visualização é o mesmo que produz o arquivo — uma pré-visualização em HTML que pagina diferente do PDF final faz do editor um mentiroso; (2) **assinatura ICP-Brasil PAdES B-B via pyHanko** com certificado por prefeitura e assinador resolvido por fábrica, então a suíte roda contra um assinador falso; (3) uma **guarda de SSRF** no conteúdo, porque o Chromium do servidor busca toda imagem do documento e uma URL apontando para endereço interno viraria um GET de dentro da rede. Busca textual em tsvector + índice GIN do próprio Postgres em vez de acrescentar Elasticsearch. Geração de PDF como job, leitor de PDF embutido, e importador de acervo legado.
+   - Tecnologias: FastAPI, asyncpg, PostgreSQL, Alembic, pyHanko, Playwright, pypdf, S3/MinIO, React, TypeScript, BlockNote.
+   - Código fechado (cliente).
+
+4. **Bússola V2:**
    - Categoria: Fullstack & IA
-   - Descrição: Aplicação Web Pessoal que unifica Finanças, Saúde e Produtividade. Usa Agentes de IA orquestrados (LangGraph) para gerar insights e otimizar rotinas em uma plataforma segura e reativa. Bússola V2 é a resposta definitiva para a fragmentação da vida moderna. Elimina a necessidade de alternar entre múltiplos apps desconectados, unificando todos os aspectos vitais da sua rotina em uma plataforma inteligente.
-   - Tecnologias: React 19, FastAPI, LangChain, Docker, Redis, SQLAlchemy, Agentes de IA.
-   - Link: [GitHub](https://github.com/Marocosz/bussola-v2)
+   - Descrição: Meu sistema operacional pessoal — finanças, registros, treino e planejamento numa aplicação só, com 18 agentes de IA em cinco domínios que leem o dado de verdade e sugerem ação em vez de conversar sobre ela. O problema interessante: assistente que responde em texto livre é inútil dentro de uma aplicação, porque a interface não sabe desenhar um parágrafo como botão. A solução é um contrato universal de resposta — schema Pydantic com sugestão tipada, severidade e payload de ação, com validadores que fazem fuzzy matching da saída solta do LLM para enum rígido. O frontend desenha cards e botões a partir do contrato sem saber qual agente produziu. Três providers de LLM intercambiáveis atrás de uma fábrica, cache em Redis, 74 testes, e um bot de Discord companheiro.
+   - Tecnologias: React 19, FastAPI, LangGraph, LangChain, PostgreSQL, Redis, Docker, discord.py.
+   - Link: [GitHub](https://github.com/Marocosz/Bussola-v2)
 
-2. **DataChat BI:**
-   - Categoria: IA & Analytics
-   - Descrição: DataChat BI é uma solução de Business Intelligence conversacional para logística, baseada em IA generativa. O sistema usa LLMs para interpretar perguntas em linguagem natural, gerar consultas SQL dinâmicas e entregar respostas precisas e contextualizadas. Com arquitetura de prompt modular e memória de conversação, o DataChat BI oferece uma interface inteligente para análise avançada de dados logísticos.
-   - Tecnologias: FastAPI, LangChain, React, PostgreSQL, LLaMA 3, Agentes de IA.
-   - Link: [GitHub](https://github.com/Marocosz/DataChat-BI)
+5. **Auditoria Algorítmica do Spotify (TCC):**
+   - Categoria: Ciência de Dados & Pesquisa
+   - Descrição: Ver a seção do TCC acima. Auditoria de caixa-preta do recomendador do Spotify com quatro personas sintéticas construídas em contas reais, 28 scripts de pipeline em quatro fases, e estatística inferencial completa.
+   - Tecnologias: Python, API do Spotify, pandas, SciPy, NumPy, Matplotlib, Last.fm, MusicBrainz.
+   - Link: [GitHub](https://github.com/Marocosz/TCC)
 
-3. **Code Doc Generator:**
-   - Categoria: IA & Ferramentas
-   - Descrição: API Web que usa Inteligência Artificial para analisar arquivos de código fonte em Python (.py) e Pascal (.pas) e gerar documentação técnica completa em formato .docx. O objetivo é automatizar e agilizar o processo de documentação, tornando-o mais eficiente para desenvolvedores e equipes.
-   - Tecnologias: Python, Flask, LangChain, Agentes de IA, Docker.
-   - Link: [GitHub](https://github.com/Marocosz/gerador_doc_robos)
+6. **Hub de Agentes de IA (Supporte Logística):**
+   - Categoria: Plataforma de IA
+   - Descrição: Plataforma interna com quatro backends de agente especializados atrás de um gateway nginx, cada um atendendo uma área da empresa: text-to-SQL sobre a base operacional, análise semântica de chamados (Scope Intelligence), redação assistida de documentos de qualidade, e documentação de robôs legados. A tese arquitetural é que agente autônomo conversando com agente é a resposta errada numa empresa — swarm gera loop infinito, custo imprevisível e decisão que ninguém audita. Então o controle de fluxo é uma máquina de estados em Python determinístico e o LLM só faz tarefa cognitiva isolada. Destaques: roteador barato classificando intenção em cinco categorias antes de tocar modelo caro; guarda inspecionando o SQL antes do banco; **agente corretor (Fixer) que recebe o SQL quebrado junto com o erro do Postgres e reescreve**, elevando a taxa de sucesso final sem o usuário ver a falha; segurança por linha injetada no prompt; e HDBSCAN sobre embeddings de chamado no Qdrant.
+   - Tecnologias: FastAPI, LangChain, Qdrant, HDBSCAN, PostgreSQL, OpenAI, React, Docker.
+   - Link: [GitHub](https://github.com/Marocosz/Supporte-Agents)
 
-4. **Contract Analyzer:**
-   - Categoria: IA & Ferramentas
-   - Descrição: API RESTful que usa Inteligência Artificial para extrair e organizar informações chave de contratos em PDF e DOCX. O objetivo é agilizar a análise de documentos, tornando o processo mais eficiente para profissionais que lidam com grandes volumes de contratos!
-   - Tecnologias: Python, Flask, LangChain, Agentes de IA, Docker.
-   - Link: [GitHub](https://github.com/Marocosz/Analisador_Contrato)
+7. **Fraud Sentinel:**
+   - Categoria: Machine Learning
+   - Descrição: Pipeline completo de ML para detectar fraude em abertura de conta bancária, sobre a base Bank Account Fraud publicada no NeurIPS 2022. Fraude é ~1% da base, então um modelo que responde "legítimo" para tudo acerta 99% e não serve para nada — acurácia é a métrica errada. CRISP-DM de ponta a ponta: EDA com teste de significância e mutual information, downcasting de memória, e oito algoritmos treinados e comparados (regressão logística, árvore, random forest, XGBoost, LightGBM, MLP, isolation forest e um ensemble por stacking). A decisão não é o modelo, é o limiar: um módulo dedicado move o corte para atingir uma precisão-alvo, que é como a restrição de negócio entra na matemática em vez de ser discutida depois.
+   - Tecnologias: Python, scikit-learn, XGBoost, LightGBM, pandas, CRISP-DM, Docker.
+   - Link: [GitHub](https://github.com/Marocosz/fraud-sentinel)
 
-5. **Marocos Bot 2.0:**
-   - Categoria: Gaming & Automação
-   - Descrição: Sistema de automação para comunidades competitivas de League of Legends. Gerencia o ciclo de vida completo de partidas personalizadas: realiza validação de Elo em tempo real via Riot API, executa algoritmos de permutação para balanceamento matemático de times e gerencia dinamicamente canais de voz.
-   - Tecnologias: Python, Discord.py, Riot API, Algoritmos, AsyncIO.
-   - Link: [GitHub](https://github.com/Marocosz/Marocos-BOT-2)
+8. **Portal do Cidadão (freelance, SaaS multi-tenant para prefeituras):**
+   - Categoria: SaaS Multi-tenant
+   - Descrição: Plataforma whitelabel para municípios receberem solicitações de assistência social e rodarem um balcão de empregos. O cidadão usa sem criar conta. O risco central é que uma consulta que esquece o filtro de tenant vaza o registro de assistência social de um município na tela de outro — então toda entidade carrega a coluna de tenant, um middleware prende o tenant na requisição, e há slugs reservados para nenhum tenant reivindicar rota administrativa. Módulos são feature flags por tenant, com um teste cujo trabalho é provar que feature desligada está FECHADA na API e não só escondida na interface. Quatro papéis, identidade visual dinâmica por prefeitura, 42 testes.
+   - Tecnologias: FastAPI, SQLAlchemy, PostgreSQL, React, TypeScript, Zustand, Docker.
+   - Código fechado (cliente).
+
+9. **Portal de Controle de Acesso (freelance):**
+   - Categoria: Integração de Legado & IA
+   - Descrição: Freelance que eu considero um dos mais interessantes, porque o trabalho foi **transformar sistema legado em algo útil**. O dado valioso estava trancado num sistema comercial fechado de catraca e ponto, sem documentação de schema, e o cliente não podia trocar de sistema. Mapeei o schema legado tirando snapshots repetidos e comparando um com o outro, o que gerou um changelog do que de fato se move quando uma pessoa passa pela catraca. Sobre essa superfície de leitura o portal acrescenta banco próprio com duas tabelas de usuário deliberadamente segregadas, fluxo de visitante que o produto original não tinha, monitoramento ao vivo por WebSocket, e um agendador com cinco jobs: relatório diário/semanal/mensal em que o **Gemini escreve a análise sobre os KPIs calculados** e o PDF é gerado e arquivado, mais varredura de retenção de 60 dias e uma passada horária que expira solicitação vencida e avisa por e-mail.
+   - Tecnologias: FastAPI, SQL Server, LangChain, Gemini, APScheduler, ReportLab, Nuxt 4, Vue 3.
+   - Código fechado (cliente).
+
+10. **faculdAIde:**
+    - Categoria: Ferramentas de IA
+    - Descrição: Grafo de conhecimento pessoal que se preenche sozinho, entregue como skill do meu agente de código. Ver a seção de desenvolvimento com IA acima. Um conceito é um arquivo JSON validado com ajv, o grafo é derivado e não guardado, há prefiltro de deduplicação (o modo de falha da captura automática é quarenta nós para a mesma ideia), e a skill vive no repositório como espelho versionado. 38 nós de conceito e 12 arquivos de teste.
+    - Tecnologias: Node.js, TypeScript, ajv, Vite, Skills do Claude Code.
+    - Código fechado (repositório privado).
+
+11. **Cine Sessão:**
+    - Categoria: Mobile & Backend
+    - Descrição: Clube de cinema mobile-first: a comunidade roda uma campanha em três fases temporizadas (sugerir, votar, assistir e resenhar). A regra que parece detalhe e é o produto inteiro: numa campanha encerrada, as notas exibidas vêm de quem PARTICIPOU daquela campanha, não de todo membro da comunidade — participação é conjunto derivado (votou, sugeriu, ou marcou como já assistido). Filmes vêm do TMDB pelo meu próprio backend, então a chave de API nunca chega no aparelho. 25 rotas em Expo Router, cross-platform por regra.
+    - Tecnologias: React Native, Expo, TypeScript, NativeWind, Zustand, FastAPI, PostgreSQL, TMDB.
+    - Código fechado (projeto pessoal, repositório privado).
+
+12. **Gestão Legislativa (freelance, câmara municipal):**
+    - Categoria: Fluxo & Documentos
+    - Descrição: Vereadores protocolam proposições, elas percorrem uma cadeia definida de análise (vereador, secretaria, comissão de justiça, diretoria, plenário), e a diretoria monta a ordem do dia de cada sessão. Reprovar é impossível sem motivo escrito que o autor consiga ler — numa casa legislativa isso não é usabilidade, é questão jurídica. A montagem da pauta é uma visão dividida, com o documento da sessão pré-visualizado enquanto é construído, e toda ação (inclusive copidesque silencioso da secretaria) cai num histórico de auditoria por proposição.
+    - Tecnologias: FastAPI, SQLAlchemy, PostgreSQL, Alembic, React, TypeScript, Docker, nginx.
+    - Código fechado (cliente).
+
+13. **DataChat BI (Supporte Logística):**
+    - Categoria: IA & Analytics
+    - Descrição: Business Intelligence conversacional para logística: você pergunta em linguagem natural, o sistema escreve o SQL, executa e responde com número e gráfico. A maior parte das perguntas de um gestor está a uma consulta de ser respondida, e a consulta nunca é escrita porque exige conhecer o schema. Um roteador classifica a mensagem antes e um desvio manda por um de dois caminhos — conversa fiada nunca chega na cadeia de SQL. A memória de conversa é o que faz acompanhamento funcionar: a segunda pergunta é reescrita contra a primeira antes de qualquer geração. Prompts como arquivos modulares, afinados independentemente da cadeia. Duas superfícies sobre o mesmo motor: chatbot e dashboard.
+    - Tecnologias: FastAPI, LangChain, React, PostgreSQL, LLaMA 3, Groq.
+    - Link: [GitHub](https://github.com/Marocosz/DataChat-BI)
+
+14. **Marocos Bot 2.0:**
+    - Categoria: Automação & Comunidade
+    - Descrição: Bot de Discord que administra uma comunidade competitiva de League of Legends. Partida personalizada desanda antes de começar: alguém mente o elo, os times saem desequilibrados, e quem organiza passa o lobby movendo gente entre canais de voz na mão. A identidade é verificada contra a API da Riot em vez de acreditada, e o balanceamento é uma busca por permutação sobre os inscritos, escolhendo a divisão com a menor diferença de força — problema pequeno o bastante para busca exaustiva ganhar de heurística, e mais fácil de defender quando alguém reclama. 10 módulos de comando, com lobby e ranking como os mais pesados.
+    - Tecnologias: Python, discord.py, Riot API, PostgreSQL, AsyncIO, Docker.
+    - Link: [GitHub](https://github.com/Marocosz/Marocos-BOT-2)
+
+### Projetos que eu tirei do portfólio, e por quê
+
+Se alguém perguntar pelo **Code Doc Generator** ou pelo **Contract Analyzer**: eles existiram e foram entregues, mas saíram da lista nesta atualização. O Code Doc Generator foi absorvido pelo `backend-doc-robos` do Hub de Agentes — mantê-lo separado é exibir a versão antiga da mesma ideia ao lado da nova. O Contract Analyzer era o desafio técnico da Biofy (Flask com um prompt de extração) e hoje é o item mais simples do conjunto, num portfólio onde o menor projeto tem suíte de teste.
 
 # Arquitetura do Sistema: Portfolio (Este Projeto)
 
@@ -276,10 +443,11 @@ O **Meu Portfolio** é uma aplicação **Agentica** moderna que serve como o por
   tudo como variáveis `--cfg-*`, e o CSS só lê. Não usa TailwindCSS.
 - **Animações:** biblioteca `motion` (a sucessora do Framer Motion), importada
   como `motion/react`.
-- **3D e shaders:** o papel de parede são dois fragment shaders escritos à mão
-  sobre `ogl` (seda no tema escuro, iridescência no claro), com teto de fps e
-  parada seca quando invisíveis. A marca é um cristal em `three.js` via
-  react-three-fiber, carregado sob demanda para ficar fora do caminho crítico.
+- **3D e shaders:** o papel de parede são dois fragment shaders sobre `ogl`, e a
+  marca é um cristal em `three.js` via react-three-fiber, carregado sob demanda
+  para ficar fora do caminho crítico. (Isso é detalhe de implementação, e o site
+  deliberadamente NÃO faz disso um argumento: o visitante vê o papel de parede,
+  então explicar como ele é feito não muda a decisão de ninguém.)
 - **A interface simula um sistema operacional:** área de trabalho com janelas
   arrastáveis, barra de tarefas, menu Iniciar, cerimônia de boot e tela de
   bloqueio. O gerenciador de janelas é um reducer puro que separa a identidade
@@ -287,8 +455,12 @@ O **Meu Portfolio** é uma aplicação **Agentica** moderna que serve como o por
   mesmo estado — um como conjunto, o outro como pilha.
 - **Comunicação:** API REST customizada (`/api/chat`), com a resposta chegando
   por streaming SSE, nó a nó.
-- **Verificação:** suíte Playwright com 21 cenas visuais em tolerância zero e
-  testes funcionais de rota.
+- **Verificação:** suíte Playwright de regressão visual em tolerância zero, nos
+  dois temas e no mobile, mais testes funcionais de rota — estes últimos pegam o
+  que build nenhum pega, porque `import()` dinâmico quebrado só falha em runtime e
+  todo app do sistema é carregado sob demanda. A regra que vale mais que a suíte:
+  o agente com que eu trabalho é proibido de afirmar que uma mudança não alterou a
+  interface sem rodar isso antes.
 
 ### Infraestrutura & DevOps
 

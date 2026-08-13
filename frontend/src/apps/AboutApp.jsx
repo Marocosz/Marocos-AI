@@ -4,6 +4,9 @@ import { useLanguage } from '../contexts/LanguageContext'
 import { getProfileData, idadeEm } from '../content/profile'
 import { getContactData } from '../content/contact'
 import { getSistemaData } from '../content/sistema'
+/* Só para CONTAR os projetos na porta correspondente — ver a nota em `portas`. A
+   resposta dizia "Cinco projetos" em literal, e eram catorze. */
+import { getProjectsData } from '../content/projects'
 import { getOsData } from '../i18n/os'
 import { getApp, APPS } from '../os/registry'
 import { useAbrir } from '../os/NavegacaoContext'
@@ -90,6 +93,11 @@ const AboutApp = () => {
 
   const idade = idadeEm(profile.nascimento)
 
+  /* Derivado, e não escrito: a resposta da porta de projetos dizia "Cinco projetos"
+     e eram catorze. O idioma não altera a contagem, mas os dados são por idioma —
+     então lê do mesmo lugar que a janela de Projetos vai ler. */
+  const totalDeProjetos = getProjectsData(language).items.length
+
   /**
    * A LISTA DA FAIXA — triplicada quando ela anda, única quando ela para.
    *
@@ -124,19 +132,25 @@ const AboutApp = () => {
 
   /**
    * A ORDEM É A DO INTERESSE, não a do menu: primeiro se ele sabe construir,
-   * depois há quanto tempo, depois esta máquina, e por fim se dá para perguntar
-   * direto a ele.
+   * depois há quanto tempo, depois esta máquina, depois se dá para perguntar
+   * direto a ele — e por último se dá para contratá-lo.
    *
    * O TERMINAL SAIU DAQUI e virou a ação do topo; o MARCOS VIRTUAL entrou no
-   * lugar dele. Quatro continua sendo quatro, mas o conjunto é outro — e o
-   * `rotas.spec.js` diz quais quatro, para o número não parecer provar o que não
-   * prova.
+   * lugar dele. Depois entrou SERVIÇOS, que é a única janela do portfólio cujo
+   * trabalho é converter e não era porta nenhuma — o visitante só a achava pelo
+   * ícone da área de trabalho ou adivinhando um comando no terminal. Fica em
+   * último de propósito: contratar é a pergunta de quem já se convenceu.
+   *
+   * ESTA LISTA É A FONTE DA CONTAGEM na headline da seção. Ela dizia "Quatro
+   * perguntas, quatro janelas" em literal, que é exatamente o tipo de número que
+   * este projeto já viu envelhecer cinco vezes — e envelheceria aqui no mesmo
+   * commit que acrescentou a quinta.
    *
    * O ícone vem do `registry` em vez de ser escolhido aqui — ele é a fonte
    * única do ícone de cada app, e uma segunda escolha aqui sairia do lugar na
    * primeira vez que alguém trocasse o do desktop.
    */
-  const portas = ['projects', 'history', 'readme', 'assistant']
+  const portas = ['projects', 'history', 'readme', 'assistant', 'services']
 
   return (
     /**
@@ -274,7 +288,37 @@ const AboutApp = () => {
         <ArrowRight size={18} className="about-acao-seta" aria-hidden="true" />
       </button>
 
-      {/* --- 3. STACK: o carrossel, de volta por decisão do dono do projeto ---
+      {/* --- 3. O QUE ELE FAZ: o bloco de capacidades ---
+              SEGUNDO BLOCO DE INFORMAÇÃO DA JANELA, e a posição é o argumento. A
+              ordem em que esta janela apresenta as três coisas passou a ser QUEM ele
+              é (o herói), O QUE ele resolve (aqui) e só então COM O QUE (a faixa
+              logo abaixo). Antes ela ia direto do nome para a lista de tecnologias,
+              o que obriga o leitor a inferir a capacidade a partir de logotipos.
+
+              SEM SUPERFÍCIE PREENCHIDA, e isto não é economia de estilo: são cinco
+              itens de mesma largura, e cinco retângulos com fundo e borda em
+              sequência é exatamente o desenho que esta janela pagou um redesenho
+              inteiro para desaprender ("parece um site qualquer, fundos chapados dos
+              itens"). Quem estrutura aqui é o filete, o contraste de tamanho e o
+              marcador de acento — as duas únicas superfícies preenchidas da janela
+              continuam sendo as duas AÇÕES. */}
+      <section className="about-secao about-forte">
+        <p className="about-eyebrow about-secao-eyebrow">{os.about.forteLabel}</p>
+        {/* A contagem sai da própria lista — ver a nota em `i18n/os.js`. */}
+        <h3 className="about-headline">
+          {os.about.forteHeadline.replace('%d', String(profile.capacidades.length))}
+        </h3>
+        <ul className="about-fortes">
+          {profile.capacidades.map((cap) => (
+            <li key={cap.id} className={`about-forte-item about-forte-item--${cap.id}`}>
+              <h4 className="about-forte-titulo">{cap.titulo}</h4>
+              <p className="about-forte-texto">{cap.texto}</p>
+            </li>
+          ))}
+        </ul>
+      </section>
+
+      {/* --- 4. STACK: o carrossel, de volta por decisão do dono do projeto ---
               Ele já existiu aqui e saiu numa passada anterior. Voltou, e com dois
               consertos: o laço fecha sem salto (ver o CSS) e ele obedece ao
               interruptor de Movimento, que a versão antiga ignorava.
@@ -297,7 +341,7 @@ const AboutApp = () => {
         </ul>
       </div>
 
-      {/* --- 4. O CORPO, EM DUAS COLUNAS QUANDO HÁ LARGURA ---
+      {/* --- 5. O CORPO, EM DUAS COLUNAS QUANDO HÁ LARGURA ---
               E a divisão tem significado, não é só simetria quebrada: a coluna
               larga é a VOZ HUMANA (o que ele escreveu, as perguntas que ele
               imagina) e o trilho estreito é a VOZ DA MÁQUINA (números e registro
@@ -324,7 +368,13 @@ const AboutApp = () => {
                   que fazia esta janela parecer qualquer site. */}
           <section className="about-secao">
             <p className="about-eyebrow about-secao-eyebrow">{os.about.guideLabel}</p>
-            <h3 className="about-headline">{os.about.guideHeadline}</h3>
+            {/* AS DUAS CONTAGENS SAEM DA MESMA LISTA que desenha as portas logo
+                abaixo — `replaceAll` porque a frase usa o número duas vezes ("N
+                perguntas, N janelas") e são sempre o mesmo N: uma pergunta que não
+                abre janela não é porta. */}
+            <h3 className="about-headline">
+              {os.about.guideHeadline.replaceAll('%d', String(portas.length))}
+            </h3>
             <ul className="about-guide">
               {portas.map((id) => {
                 const app = getApp(id)
@@ -343,7 +393,12 @@ const AboutApp = () => {
                       {Icone && <Icone size={17} className="about-door-icon" aria-hidden="true" />}
                       <span className="about-door-text">
                         <span className="about-door-question">{texto.question}</span>
-                        <span className="about-door-answer">{texto.answer}</span>
+                        {/* A resposta da porta de projetos traz `%d` e as outras
+                            não; o `replace` é inofensivo numa frase sem marcador,
+                            então não há caso especial por porta aqui. */}
+                        <span className="about-door-answer">
+                          {texto.answer.replace('%d', String(totalDeProjetos))}
+                        </span>
                       </span>
                       <ChevronRight size={16} className="about-door-seta" aria-hidden="true" />
                     </button>

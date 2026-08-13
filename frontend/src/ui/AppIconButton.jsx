@@ -65,8 +65,19 @@ const AppIconButton = forwardRef(function AppIconButton(
    * Iniciar). Passar por prop obrigaria os quatro a conhecer a regra, e o
    * primeiro que esquecesse ficaria com um ícone fora do conjunto.
    *
-   * App sem ícone XP cai no lucide de sempre — `IconeXp` devolve `null` nesse
-   * caso, e o `??` abaixo cobre.
+   * App sem ícone XP CAI NO LUCIDE DE SEMPRE, e isto era uma promessa que o código
+   * não cumpria.
+   *
+   * O comentário aqui já dizia "`IconeXp` devolve `null` nesse caso, e o `??` abaixo
+   * cobre" — mas não havia `??` nenhum: era um ternário `usaXp ? <IconeXp/> : ...`,
+   * então no preset XP um app sem entrada no mapa renderizava NADA. O defeito ficou
+   * latente porque todos os nove apps daquele momento tinham ícone desenhado; ele
+   * apareceu no décimo, e apareceu do pior jeito possível — um ícone invisível na
+   * área de trabalho, que ninguém procura porque não há nada ali para ver.
+   *
+   * Agora o fallback é real: `IconeXp` continua devolvendo `null`, e quando devolve,
+   * o lucide entra. É o comportamento certo — app novo aparece com o ícone padrão até
+   * alguém desenhar o dele, em vez de sumir.
    */
   const { preset } = useTheme()
   const usaXp = !!preset?.xp
@@ -83,8 +94,16 @@ const AppIconButton = forwardRef(function AppIconButton(
       {/* Os ícones do XP são desenhos com volume, não traços: eles pedem mais
           área que o glifo lucide para a silhueta ficar legível no mesmo tile. */}
       <span className="app-icon-btn-glifo">
+        {/* O FALLBACK VIAJA JUNTO: é `IconeXp` quem sabe se existe desenho para este
+            app, então é ele quem decide. Passar o lucide por prop é o que permite a
+            decisão acontecer lá dentro sem este arquivo consultar o mapa. */}
         {usaXp ? (
-          <IconeXp appId={app.id} size={TAMANHO_ICONE[tamanho] + 8} />
+          <IconeXp
+            appId={app.id}
+            size={TAMANHO_ICONE[tamanho] + 8}
+            Fallback={Icon}
+            espessuraFallback={ESPESSURA_ICONE[tamanho]}
+          />
         ) : Icon ? (
           <Icon size={TAMANHO_ICONE[tamanho]} strokeWidth={ESPESSURA_ICONE[tamanho]} />
         ) : null}

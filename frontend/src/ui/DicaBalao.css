@@ -1,0 +1,138 @@
+/* --------------------------------------------------
+   O BALÃO — a superfície, sem o alvo.
+
+   ESTE ARQUIVO EXISTE POR CAUSA DE UM BUG REAL, e a causa vale registrar porque
+   ela é invisível em desenvolvimento e reproduzível só no build.
+
+   As regras abaixo moravam em `ui/Dica.css`, importado por `ui/Dica.jsx`. Quando o
+   balão ganhou um segundo consumidor (`ui/TextoCortado.jsx`), o JSX passou a
+   emitir as classes `.dica-balao*` em rotas onde a `Dica` NUNCA é renderizada — e
+   o Vite divide CSS por chunk. Na rota `/stack` o `Dica.css` simplesmente não
+   entrava no bundle: o balão montava sem `position: fixed`, sem `opacity: 0` e sem
+   `z-index`, virando um pedaço de texto solto no fim da div de tema. Do lado de
+   fora, o sintoma era "o balão não funciona".
+
+   A lição, e ela vale para qualquer componente compartilhado deste projeto: o CSS
+   tem de ser importado por QUEM EMITE A CLASSE, não por quem a inventou primeiro.
+   Aqui, quem emite é o `useBalao`.
+
+   O nome da classe continua `dica-balao` de propósito: `.balao` já pertence ao
+   balão de aviso da área de trabalho (ver `os/desktop`), e renomear criaria uma
+   colisão real para ganhar nada.
+
+   Segue a linguagem do chrome: superfície sólida do sistema, borda de janela, raio
+   de controle, sombra de janela. Sem `backdrop-filter` — o balão é pequeno,
+   aparece por cima de conteúdo já translúcido, e empilhar filtro sobre filtro é o
+   custo que `Window.css` documenta. Fundo sólido também é o que garante leitura
+   sobre qualquer coisa.
+   -------------------------------------------------- */
+
+/* FIXO, E FORA DE QUALQUER RECORTE.
+   Era `absolute`, e por isso ficava preso ao corpo da janela — que rola. Com
+   `overflow-y: auto` o CSS deixa de tratar o eixo X como `visible`, então o balão
+   era cortado E fazia a janela de Configurações ganhar uma barra de rolagem
+   horizontal sem nada para rolar. As coordenadas vêm do JS, medidas a partir do
+   alvo; ver o cabeçalho de `ui/useBalao.jsx`. */
+.dica-balao {
+  position: fixed;
+  left: 0;
+  top: 0;
+  z-index: var(--z-dica, 2100);
+  width: max-content;
+  max-width: 240px;
+  padding: 6px 9px;
+  border: var(--win-border);
+  border-radius: var(--win-control-radius);
+  background: var(--win-body-solid);
+  box-shadow: var(--win-shadow);
+  color: var(--text-primary);
+  font-family: inherit;
+  font-size: 0.72rem;
+  line-height: 1.45;
+  text-align: left;
+  /* O texto do balão NUNCA herda o corte de quem o abriu. Sem isto, o balão do
+     `TextoCortado` herdaria `white-space: nowrap` e `text-overflow: ellipsis` do
+     alvo e exibiria a mesma reticência que ele existe para resolver. */
+  white-space: normal;
+  text-overflow: clip;
+  overflow: visible;
+  /* Nunca rouba o clique de quem tenta alcançar o que está atrás. */
+  pointer-events: none;
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.15s ease, transform 0.15s ease, visibility 0s linear 0.15s;
+}
+
+/* `visibility` volta a ser imediata ao aparecer (o `0s` sem atraso), e só o
+   desaparecimento espera a transição terminar — sem isso o balão fica na
+   árvore de acessibilidade depois de invisível. */
+.dica-balao--visivel {
+  opacity: 1;
+  visibility: visible;
+  transition: opacity 0.15s ease, transform 0.15s ease, visibility 0s;
+}
+
+/* --- A seta do balão, que é o que o faz ler como balão e não como caixa --- */
+.dica-balao::after {
+  content: '';
+  position: absolute;
+  left: 50%;
+  width: 8px;
+  height: 8px;
+  transform: translateX(-50%) rotate(45deg);
+  background: var(--win-body-solid);
+  /* Só duas bordas: as outras duas ficariam por dentro do balão, atravessando
+     o texto. */
+  border-right: var(--win-border);
+  border-bottom: var(--win-border);
+}
+
+/* O JS põe `left`/`top` no PONTO DE ANCORAGEM (o meio do alvo, logo acima ou
+   logo abaixo dele). O deslocamento do balão em relação a esse ponto é destas
+   transformações — assim a medida em JS fica sendo só "onde está o alvo", sem
+   precisar conhecer o tamanho do balão. */
+
+/* --- Acima (padrão) --- */
+.dica-balao--acima {
+  transform: translate(-50%, calc(-100% + 4px));
+}
+
+.dica-balao--acima.dica-balao--visivel {
+  transform: translate(-50%, -100%);
+}
+
+.dica-balao--acima::after {
+  top: 100%;
+  margin-top: -5px;
+}
+
+/* --- Abaixo --- */
+.dica-balao--abaixo {
+  transform: translate(-50%, -4px);
+}
+
+.dica-balao--abaixo.dica-balao--visivel {
+  transform: translate(-50%, 0);
+}
+
+.dica-balao--abaixo::after {
+  bottom: 100%;
+  margin-bottom: -5px;
+  border: none;
+  border-left: var(--win-border);
+  border-top: var(--win-border);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .dica-balao--acima,
+  .dica-balao--acima.dica-balao--visivel {
+    transition: opacity 0.01s linear, visibility 0s;
+    transform: translate(-50%, -100%);
+  }
+
+  .dica-balao--abaixo,
+  .dica-balao--abaixo.dica-balao--visivel {
+    transition: opacity 0.01s linear, visibility 0s;
+    transform: translate(-50%, 0);
+  }
+}

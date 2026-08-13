@@ -1,0 +1,44 @@
+/* --------------------------------------------------
+   TEXTO CORTADO — reticências, e um balão só quando há o que revelar
+
+   O CORTE MORA AQUI, e não na regra de quem usa o componente. Antes cada lugar
+   repetia o trio `overflow/text-overflow/white-space` — e um deles esquecendo o
+   `overflow: hidden` faz o `text-overflow` não ter efeito nenhum, que é o tipo de
+   defeito silencioso que ninguém percebe até a palavra vazar por cima do vizinho.
+
+   `min-width: 0` é OBRIGATÓRIO e é a parte que costuma faltar. Dentro de um
+   `grid` ou `flex`, o tamanho mínimo automático de um item é o conteúdo dele:
+   sem esta linha o span simplesmente EMPURRA a coluna e nada é cortado, e o
+   `text-overflow` fica inerte porque nunca há transbordo. Foi assim que o chip da
+   Stack passou a caber — a coluna cedia em vez de o texto ceder.
+   -------------------------------------------------- */
+
+.texto-cortado {
+  display: block;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/**
+ * SÓ O CORTADO É INTERATIVO, e o estado vem do JS porque só ele sabe medir.
+ *
+ * `cursor: help` é a mesma affordance do alvo da `Dica` — o visitante já
+ * aprendeu nela que aquele cursor significa "há mais texto aqui". Sem
+ * `text-decoration`: sublinhar pontilhado meia dúzia de chips na mesma grade
+ * transforma a lista num campo minado visual, e a informação que o sublinhado
+ * daria (existe balão) o cursor já dá no instante em que ela é útil.
+ */
+.texto-cortado--cortado {
+  cursor: help;
+}
+
+/* O foco é visível porque este nó SÓ entra na ordem de tabulação quando há corte
+   — quem chegou aqui pelo teclado está procurando o texto que falta, e precisa
+   ver onde está. Anel do acento, como o resto do sistema. */
+.texto-cortado--cortado:focus-visible {
+  outline: none;
+  border-radius: 3px;
+  box-shadow: 0 0 0 2px var(--accent-color);
+}

@@ -33,8 +33,8 @@
 
 import { lazy } from 'react'
 import {
-  MonitorCog, FolderGit2, Disc3, Cpu,
-  SquareTerminal, FileText, Bot, Settings,
+  MonitorCog, FolderGit2, Disc3, Cpu, Server,
+  SquareTerminal, FileText, Bot, Settings, PackageOpen,
 } from 'lucide-react'
 
 /**
@@ -46,7 +46,7 @@ import {
  * os ícones aparecem na taskbar e no menu Iniciar sem que o app tenha montado.
  * Só o `component` pode esperar.
  *
- * Antes, os 9 apps e todo o CSS deles entravam no bundle inicial, mesmo para
+ * Antes, os onze apps e todo o CSS deles entravam no bundle inicial, mesmo para
  * quem abrisse um só.
  */
 const AboutApp = lazy(() => import('../apps/AboutApp'))
@@ -54,18 +54,29 @@ const ProjectsApp = lazy(() => import('../apps/ProjectsApp'))
 const ProjectDetailApp = lazy(() => import('../apps/ProjectDetailApp'))
 const HistoryApp = lazy(() => import('../apps/HistoryApp'))
 const DevicesApp = lazy(() => import('../apps/DevicesApp'))
+const ServicesApp = lazy(() => import('../apps/ServicesApp'))
 const TerminalApp = lazy(() => import('../apps/TerminalApp'))
 const ReadmeApp = lazy(() => import('../apps/ReadmeApp'))
 const AssistantApp = lazy(() => import('../apps/AssistantApp'))
 const SettingsApp = lazy(() => import('../apps/SettingsApp'))
+/* Este é o app cujo `lazy` mais se paga: abrir ele traz junto TODOS os módulos de
+   conteúdo do portfólio, porque é isso que ele exporta num arquivo. Ninguém abre
+   esta janela por acidente, então o chunk é buscado só por quem vai usar. */
+const ContextoApp = lazy(() => import('../apps/ContextoApp'))
 
 /**
  * O CHROME DE EXPLORADOR CUSTA ESPAÇO, E O `defaultSize` PAGOU.
  *
  * Lateral de 184px, e TRÊS faixas horizontais: navegação 40, comandos 40,
- * status 26. Os seis apps com `explorer: true` cresceram exatamente isso (+184
- * na largura, +106 na altura) para o conteúdo continuar com a mesma área útil
- * de antes — sem isso o chrome comeria a janela em vez de emoldurá-la.
+ * status 26. Os seis apps que já existiam quando o chrome entrou cresceram
+ * exatamente isso (+184 na largura, +106 na altura) para o conteúdo continuar com
+ * a mesma área útil de antes — sem isso o chrome comeria a janela em vez de
+ * emoldurá-la.
+ *
+ * APP NOVO COM `explorer: true` JÁ NASCE COM A SOMA FEITA. O de Serviços é o
+ * primeiro: os 884×626 dele são 700×520 de conteúdo mais o chrome. Declarar o
+ * tamanho "que parece bom" numa janela com chrome é declarar um conteúdo menor do
+ * que se imagina, e há teste em `config/system.test.js` guardando a conta.
  *
  * O painel de detalhes NÃO entra nesta conta: ele nasce fechado, e quem o abre
  * aceita o conteúdo estreitar. Somá-lo aqui deixaria seis janelas largas demais
@@ -175,6 +186,47 @@ export const APPS = [
     inDock: false,
   },
   {
+    /**
+     * O `services.msc` desta máquina — e o trocadilho é o desenho todo: serviço do
+     * sistema e serviço profissional são a mesma palavra, e os dois têm status e
+     * tipo de inicialização. Era o app que faltava na família (`winver`,
+     * `explorer`, `devmgmt.msc`, `cmd`, `notepad` já estão citados).
+     *
+     * O ÍCONE É `Server`, E NÃO `ServerCog`. A escolha óbvia para "serviços" seria
+     * uma engrenagem, mas `Settings` já é a engrenagem do sistema e o "Sobre este
+     * PC" já usa `MonitorCog` — duas engrenagens a 26px na mesma grade se
+     * confundem. Sobra o glifo de silhueta mais distinta (barras empilhadas com um
+     * LED), e ele diz "hospedagem" de imediato; a amplitude ("também faço
+     * software") é carregada pelo TÍTULO da janela, não pelo glifo.
+     *
+     * Descartado `BriefcaseBusiness`: maleta numa grade de ícones de sistema
+     * operacional lê como clip-art, não como app.
+     *
+     * A POSIÇÃO NO ARRAY É NARRATIVA, porque a ordem daqui é a ordem dos ícones no
+     * desktop e no menu Iniciar. Entre a Stack e o Terminal a grade passa a ler:
+     * quem sou -> o que fiz -> há quanto tempo -> com o quê -> O QUE EU VENDO ->
+     * como falar comigo. O contato vem logo depois da oferta, que é onde ele
+     * converte.
+     *
+     * `inDock: false` porque o dock do mobile tem quatro apps e um quinto muda o
+     * layout de lá. É um `true` de uma linha se algum dia isso valer a pena.
+     */
+    id: 'services',
+    route: '/servicos',
+    titleKey: 'services',
+    icon: Server,
+    component: ServicesApp,
+    /* O teto que o sistema já pratica, e aqui ele é pedido pelo fluxograma: cinco
+       etapas lado a lado precisam da largura, senão a esteira vira uma coluna. */
+    defaultSize: { w: 884, h: 626 },
+    singleton: true,
+    dynamic: false,
+    explorer: true,
+    onDesktop: true,
+    inStartMenu: true,
+    inDock: false,
+  },
+  {
     // Sem chrome de explorador: um terminal com lateral de navegação de arquivos
     // seria duas metáforas brigando na mesma janela.
     id: 'terminal',
@@ -224,6 +276,43 @@ export const APPS = [
     // como atalho na bandeja da taskbar, então o ícone seria redundante. E sem
     // chrome de explorador — é painel de preferências, e uma lateral de
     // navegação para três linhas ficaria maior que o conteúdo.
+    /**
+     * BAIXAR O CONTEXTO — o portfólio inteiro num arquivo, para a IA de quem visita.
+     *
+     * SEM CHROME DE EXPLORADOR, por decisão explícita do dono do projeto ("uma
+     * janela bem simples, não precisa ter o morphism de explorer"): esta janela não
+     * é um LUGAR na máquina, é uma AÇÃO. Lateral de navegação e breadcrumb
+     * sugeririam que há algo para percorrer aqui dentro, e não há.
+     *
+     * COM ÍCONE NA ÁREA DE TRABALHO, por decisão do dono do projeto — e a primeira
+     * versão errou nisso. Ela deixou o app fora da grade com o argumento de que o
+     * balão de aviso e o menu Iniciar bastavam, e o argumento estava errado por um
+     * motivo simples: balão se fecha e menu Iniciar não se abre por acidente. Um app
+     * cuja única porta desaparece no primeiro clique de dispensar não tem porta.
+     *
+     * O TÍTULO É LONGO PARA A LEGENDA, então ele tem entrada em `iconLabels` — sem
+     * isso "Baixar meu contexto" quebra em duas linhas, o item cresce, e uma coluna
+     * com alturas diferentes e `gap` uniforme deixa de ser grade. Ver a nota daquele
+     * bloco em `i18n/os.js`.
+     */
+    id: 'contexto',
+    route: '/contexto',
+    titleKey: 'contexto',
+    icon: PackageOpen,
+    component: ContextoApp,
+    defaultSize: { w: 620, h: 640 },
+    singleton: true,
+    dynamic: false,
+    explorer: false,
+    onDesktop: true,
+    inStartMenu: true,
+    inDock: false,
+  },
+  {
+    // Fora da grade do desktop de propósito: os três controles dele já estão
+    // como atalho na bandeja da taskbar, então o ícone seria redundante. E sem
+    // chrome de explorador — é painel de preferências, e uma lateral de
+    // navegação para três linhas ficaria maior que o conteúdo.
     id: 'settings',
     route: '/config',
     titleKey: 'settings',
@@ -257,6 +346,7 @@ export function prefetchAppsDoDesktop() {
   import('../apps/ProjectsApp')
   import('../apps/HistoryApp')
   import('../apps/DevicesApp')
+  import('../apps/ServicesApp')
   import('../apps/TerminalApp')
   import('../apps/ReadmeApp')
   import('../apps/AssistantApp')

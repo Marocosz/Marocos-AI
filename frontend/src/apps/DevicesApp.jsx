@@ -7,6 +7,7 @@ import { getTechData, contarNiveis } from '../content/tech'
 import { getOsData } from '../i18n/os'
 import { MOVIMENTO } from '../config/system'
 import AppHeader from '../ui/AppHeader'
+import TextoCortado from '../ui/TextoCortado'
 import './DevicesApp.css'
 
 /**
@@ -250,7 +251,14 @@ const DevicesApp = () => {
                             style={{ backgroundColor: tech.color, color: tech.color }}
                             aria-hidden="true"
                           />
-                          <span className="devices-item-nome">{tech.name}</span>
+                          {/* O NOME PODE NÃO CABER, e a coluna é estreita de
+                              propósito (190px na grade). `TextoCortado` mantém as
+                              reticências e revela o nome inteiro num balão do
+                              sistema no hover e no foco — mas SÓ quando o texto
+                              foi de fato cortado, senão metade dos chips ganharia
+                              um balão sem ter o que mostrar. Ver o cabeçalho de
+                              `ui/TextoCortado.jsx`. */}
+                          <TextoCortado texto={tech.name} className="devices-item-nome" />
                           <span
                             className={`devices-item-nivel level-${tech.level.toLowerCase()}`}
                           >

@@ -1018,6 +1018,35 @@ export const MOVIMENTO = {
 
   /** A troca entre entradas da jornada: o painel de "agora tocando" e o playhead. */
   jornadaTrocaS: 0.32,
+
+  /**
+   * O PULSO QUE ATRAVESSA O FLUXOGRAMA DE SERVIÇOS, de ponta a ponta do trilho.
+   * Em segundos, porque vira `animation-duration` no CSS.
+   *
+   * É a única animação daquela janela, e ela é o argumento visual da página: um
+   * pacote atravessando estágios é o desenho de um pipeline de deploy, que é
+   * literalmente o diferencial que os serviços vendem.
+   *
+   * 4,8s é UMA TRAVESSIA, não uma piscada. Abaixo de ~2s o olho não acompanha o
+   * percurso — lê como um brilho aleatório em cada nó, e some a única coisa que a
+   * animação existe para dizer, que é a DIREÇÃO. Acima de ~8s o visitante lê as
+   * cinco etapas e vai embora antes de a luz chegar no fim, e efeito que nunca é
+   * visto inteiro não paga o custo de existir. (É a mesma faixa de raciocínio da
+   * volta do anel em `luzDaBordaS`, com mais tempo porque o percurso é maior.)
+   *
+   * SUBIU DE 3,4 PARA 4,8 quando o fluxograma virou vertical alternado. Dois
+   * motivos somados: o percurso ficou bem mais longo (cinco cards empilhados, não
+   * cinco colunas lado a lado) e apenas 80% do ciclo é travessia — o resto é a
+   * pausa que separa uma passagem da outra. Em 3,4s o dono do projeto leu como
+   * "passando mais rápido", e estava certo: a velocidade efetiva tinha aumentado
+   * sem o número mudar.
+   *
+   * NÃO EXISTE UM SEGUNDO VALOR AQUI, e a ausência é decisão: o ponto de "em
+   * execução" de cada serviço reusa `pulsoStatusS` — é o mesmo pulso do "aberto a
+   * freelance" do "Sobre este PC", e é o mesmo significado ("isto está vivo").
+   * Um valor próprio seria dois números para a mesma ideia.
+   */
+  pipelineServicosS: 4.8,
 }
 
 /* --------------------------------------------------

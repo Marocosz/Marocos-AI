@@ -93,7 +93,18 @@ const profileDataEn = {
    * primeira linha tem de dizer o que a pessoa faz, não repetir o nome do app
    * que o visitante acabou de abrir.
    */
-  role: 'Full Stack Developer & AI',
+  /**
+   * O CARGO MORA EM QUATRO SUPERFÍCIES e elas têm de dizer a mesma coisa: este
+   * campo (o eyebrow do herói do "Sobre este PC"), `signature.role` em
+   * `i18n/os.js` (a assinatura da área de trabalho), o `whoami` do Terminal e o
+   * "Main Processor" do POST de BIOS. Já divergiram uma vez — a assinatura dizia
+   * "AI Developer & Full-Stack Engineer" enquanto o guia dizia outra coisa.
+   *
+   * "AI Software Engineer" NÃO É TRADUZIDO no bloco português, e é decisão do dono
+   * do projeto: é assim que o cargo é escrito no mercado, nos dois idiomas. O que
+   * traduz é a segunda metade.
+   */
+  role: 'AI Software Engineer | Full-Stack Developer',
 
   /**
    * UMA FRASE, E ELA PROVA EM VEZ DE VENDER. A anterior — "I transform data
@@ -106,32 +117,121 @@ const profileDataEn = {
    */
   bio_highlight: 'I build AI systems that reach production. This site is one of them.',
 
+  /**
+   * ESTE PARÁGRAFO REPETIA A PRÓPRIA HEADLINE, e era o defeito mais visível da
+   * janela. A seção tem `bioHeadline: "I got here through hardware."` e o texto
+   * abaixo dela terminava em "I got here through hardware: my first job was
+   * technical support at 14" — a headline existe para dar a ideia, e o parágrafo
+   * devia DESENVOLVÊ-LA, não dizê-la de novo com mais palavras.
+   *
+   * A versão nova assume que a headline já foi lida (ela está dois centímetros
+   * acima) e conta o que aconteceu depois. Também conserta o fato desatualizado:
+   * o emprego é a Finza desde março de 2026, e esta frase passou oito meses
+   * dizendo Supporte Logística.
+   */
   bio_full:
-    "I hold a degree in Information Management from UFU — a course that sits between Administration and Computer Science with data in the middle — completed in August 2026. I work on the innovation team at Supporte Logística building full stack solutions with AI, and I freelance on the side — owning the whole cycle, from understanding the problem to the deploy and whatever breaks after it. I got here through hardware: my first job was technical support at 14.",
+    "That first job was technical support, at 14 — someone else's machine in my hands and a problem that had to actually be solved. Electronics came next, then a degree in Information Management at UFU, which sits between Administration and Computer Science with data in the middle, finished in August 2026. Today I am an AI and automation developer at Finza, working on a collections engine with conversational agents in production — and doing requirements analysis, which turns out to be half the job: sitting in the meeting where a business pain becomes a technical scope. In parallel I keep freelancing, owning the whole cycle from the first conversation to the deploy and whatever breaks after it.",
 
-  /** Ver o histórico no cabeçalho do arquivo antes de mexer: estes três já saíram
-   *  uma vez e voltaram por decisão do dono do projeto. */
+  /**
+   * O QUE ELE É CONTRATADO PARA FAZER — o bloco que faltava.
+   * ==================================================
+   * Pedido do dono do projeto, e o diagnóstico dele estava certo: o site mostrava
+   * PROJETOS (o que ele fez) e STACK (as ferramentas que ele usa), e em nenhum lugar
+   * dizia numa frase a CAPACIDADE. Quem lê um portfólio precisa dos três, e o do
+   * meio é o que um recrutador procura primeiro — ele não contrata um repositório,
+   * contrata alguém que resolve uma classe de problema.
+   *
+   * CINCO, E A ORDEM É A DO MERCADO. A primeira é a que o mercado mais disputa hoje
+   * e é onde ele tem mais profundidade; a última é a que quase ninguém lista e por
+   * isso diferencia. Nenhuma delas é uma tecnologia — tecnologia é a faixa logo
+   * abaixo desta seção, e repetir a lista aqui seria dizer a mesma coisa duas vezes
+   * na mesma tela.
+   *
+   * CADA UMA TEM DE SER SUSTENTADA POR ALGO QUE EXISTE NO SITE. É a regra que
+   * impede a seção de virar anúncio: se uma capacidade não tem projeto, jornada ou
+   * janela que a comprove, ela sai. O mapa hoje:
+   *
+   *   agentes    → Hub de Agentes, Bússola V2, e o próprio Marcos Virtual
+   *   ml         → Fraud Sentinel, o TCC, o Scope Intelligence dentro do Hub
+   *   produto    → Portal Acadêmico, Diário Oficial, Portal do Cidadão
+   *   automacao  → Portal de Controle de Acesso, e a entrada da Finza na jornada
+   *   harness    → o leia-me deste site, e o faculdAIde nos projetos
+   *
+   * `id` é chave e não rótulo, como no resto do projeto: ele vira modificador de
+   * classe no CSS. O texto é que traduz.
+   */
+  capacidades: [
+    {
+      id: 'agentes',
+      titulo: 'AI agents that reach production',
+      texto:
+        'Deterministic control flow in code — a state graph, not a swarm — with the LLM confined to isolated cognitive steps: a cheap router before an expensive model, retrieval over a vector store, a guard that fails to "I do not know", and a repair step that takes the error back to the model instead of showing it to the user. Plus instrumentation, because an agent nobody measures is a rumour.',
+    },
+    {
+      id: 'produto',
+      titulo: 'Product from requirement to deploy',
+      texto:
+        'FastAPI with typed contracts and real migrations, Postgres used properly (tsvector and GIN before reaching for a second data store), React and TypeScript in front, Docker on infrastructure I run myself. Server-side sessions when a token cannot be revoked, audit written inside the same transaction as the change, and the module boundary enforced by a CI gate rather than by good intentions.',
+    },
+    {
+      id: 'automacao',
+      titulo: 'Automation over systems that resist it',
+      texto:
+        'n8n and the WhatsApp Cloud API for the channel, schedulers for what has to happen without a request, and integration with closed third-party software: mapping an undocumented schema by diffing snapshots, then writing through the vendor\'s own integration queue instead of into its tables, so the system I do not own stays consistent.',
+    },
+    {
+      id: 'harness',
+      titulo: 'Building the tooling I develop with',
+      texto:
+        'A harness per repository: skills carrying that project\'s conventions and the mistakes already paid for, subagents with isolated context, hooks, MCP servers wired to the real deploy panel and database — and a verification step the agent is not allowed to skip before claiming something works. Tooling that knows the project beats tooling that knows the language.',
+    },
+  ],
+
+  /**
+   * Ver o histórico no cabeçalho do arquivo antes de mexer: estes três já saíram
+   * uma vez e voltaram por decisão do dono do projeto.
+   *
+   * O QUE MUDOU AQUI FOI O `sublabel`, e é o outro conserto de texto desta passada.
+   * Eram "delivered with excellence", "continuous learning" e "innovative
+   * solutions" — três frases que não dizem nada verificável, ocupando o lugar mais
+   * nobre do trilho técnico da janela. Um número grande seguido de elogio genérico
+   * lê como banner; seguido de um FATO, lê como ficha.
+   *
+   * Os números são os que o dono do projeto confirmou: 7+ freelance (quatro
+   * antigos mais três desde a última atualização), 4+ anos contando a experiência
+   * como DESENVOLVEDOR — e é por isso que o `whoami` do terminal pode dizer "na
+   * área desde 2018" sem contradizer esta ficha: são duas contagens diferentes de
+   * duas coisas diferentes.
+   */
   stats: [
-    { number: '4+', label: 'Freelance services', sublabel: 'delivered with excellence' },
-    { number: '4+', label: 'Years of experience', sublabel: 'continuous learning' },
-    { number: '20+', label: 'Projects in total', sublabel: 'innovative solutions' },
+    { number: '7+', label: 'Freelance services', sublabel: 'requirements to deploy' },
+    { number: '4+', label: 'Years of experience', sublabel: 'employed since 2025' },
+    { number: '30+', label: 'Projects in total', sublabel: 'across 40 repositories' },
   ],
 
   /**
    * DOIS CONSUMIDORES, e é bom saber disso antes de mexer na ordem: o carrossel
    * de stack do "Sobre este PC" e o `neofetch` do Terminal, que junta tudo numa
-   * linha só. Nove itens é o que faz uma cópia da faixa ser mais larga que a
-   * janela, que é o que o laço do carrossel precisa para não abrir buraco.
+   * linha só. Nove itens era o PISO — é o que faz uma cópia da faixa ser mais larga
+   * que a janela, que é o que o laço do carrossel precisa para não abrir buraco.
+   * Onze continua acima do piso, então a faixa segue fechando o laço.
+   *
+   * Entraram três, e cada um por um motivo: `Machine Learning` porque virou
+   * trabalho de verdade (ver a entrada da Supporte na jornada e o Fraud Sentinel
+   * nos projetos), `Supabase` e `n8n` porque são o dia a dia na Finza e não
+   * apareciam em superfície nenhuma do site.
    */
   skills_highlight: [
     'Python',
     'FastAPI',
-    'LangChain',
+    'LangGraph',
     'GenAI & RAG',
-    'Docker',
+    'Machine Learning',
     'PostgreSQL',
+    'Supabase',
     'React',
-    'Data Science',
+    'n8n',
+    'Docker',
     'DevOps',
   ],
 };
@@ -143,30 +243,67 @@ const profileDataPt = {
   nascimento: '2003-12-14',
   status: 'aberto a freelance',
 
-  role: 'Desenvolvedor Full Stack & IA',
+  /** Ver a nota no bloco em inglês: quatro superfícies, e "AI Software Engineer"
+   *  não traduz de propósito. */
+  role: 'AI Software Engineer | Desenvolvedor Full-Stack',
 
   bio_highlight: 'Construo sistemas com IA que chegam em produção. Este site é um deles.',
 
+  /** Ver a nota no bloco em inglês: o parágrafo anterior repetia a headline da
+   *  própria seção, e dizia Supporte quando já era Finza. */
   bio_full:
-    'Sou formado em Gestão da Informação pela UFU — uma graduação que fica entre Administração e Ciência da Computação com dados no meio — concluída em agosto de 2026. Trabalho na área de inovação da Supporte Logística construindo soluções full stack com IA, e sigo com freelance em paralelo — assumindo o ciclo inteiro, de entender o problema ao deploy e ao que quebra depois dele. Cheguei aqui pelo hardware: meu primeiro emprego foi suporte técnico, aos 14 anos.',
+    'Esse primeiro emprego foi suporte técnico, aos 14 anos — equipamento dos outros na minha mão e um problema que precisava ser resolvido de verdade. Depois veio a eletrônica, e depois a graduação em Gestão da Informação na UFU, que fica entre Administração e Ciência da Computação com dados no meio, concluída em agosto de 2026. Hoje sou desenvolvedor de IA e automações na Finza, num motor de cobrança com agentes conversacionais em produção — e fazendo análise de requisitos, que acabou sendo metade do trabalho: estar na reunião onde uma dor de negócio vira escopo técnico. Em paralelo sigo com freelance, assumindo o ciclo inteiro, da primeira conversa ao deploy e ao que quebra depois dele.',
 
-  /** Ver o histórico no cabeçalho do arquivo antes de mexer. */
-  stats: [
-    { number: '4+', label: 'Serviços freelance', sublabel: 'entregues com excelência' },
-    { number: '4+', label: 'Anos de experiência', sublabel: 'aprendizado contínuo' },
-    { number: '20+', label: 'Projetos totais', sublabel: 'soluções inovadoras' },
+  /** Ver a nota longa no bloco em inglês: cinco capacidades, na ordem do mercado, e
+   *  cada uma tem de ter no site algo que a comprove. */
+  capacidades: [
+    {
+      id: 'agentes',
+      titulo: 'Agentes de IA que chegam em produção',
+      texto:
+        'Controle de fluxo determinístico em código — grafo de estados, não swarm — com o LLM confinado a passos cognitivos isolados: um roteador barato antes do modelo caro, recuperação sobre base vetorial, uma guarda que falha para "não sei", e um passo de conserto que devolve o erro ao modelo em vez de mostrá-lo ao usuário. Mais métrificação, porque agente que ninguém mede é boato.',
+    },
+    {
+      id: 'produto',
+      titulo: 'Produto do requisito ao deploy',
+      texto:
+        'FastAPI com contrato tipado e migração de verdade, Postgres usado direito (tsvector e GIN antes de apelar para um segundo banco), React e TypeScript na frente, Docker em infraestrutura que eu mesmo administro. Sessão no servidor quando token não pode ser revogado, auditoria escrita dentro da mesma transação da mudança, e fronteira de módulo verificada por gate de CI em vez de por boa intenção.',
+    },
+    {
+      id: 'automacao',
+      titulo: 'Automação em sistema que resiste a ela',
+      texto:
+        'n8n e a API do WhatsApp para o canal, agendador para o que tem de acontecer sem requisição, e integração com software fechado de terceiro: mapear um schema sem documentação comparando snapshots, e depois escrever pela fila de integração do próprio fornecedor em vez de nas tabelas dele — assim o sistema que não é meu continua consistente.',
+    },
+    {
+      id: 'harness',
+      titulo: 'Construir a ferramenta com que eu desenvolvo',
+      texto:
+        'Um harness por repositório: skills carregando as convenções daquele projeto e os erros já pagos em depuração, subagentes com contexto isolado, hooks, servidores MCP ligados ao painel de deploy e ao banco de verdade — e um passo de verificação que o agente não tem permissão de pular antes de afirmar que algo funciona. Ferramenta que conhece o projeto ganha de ferramenta que conhece a linguagem.',
+    },
   ],
 
-  /** Ver a nota no bloco em inglês: dois consumidores, e nove itens por motivo. */
+  /** Ver o histórico no cabeçalho do arquivo e a nota no bloco em inglês: os três
+   *  `sublabel` eram elogio genérico e viraram fato. */
+  stats: [
+    { number: '7+', label: 'Serviços freelance', sublabel: 'do requisito ao deploy' },
+    { number: '4+', label: 'Anos de experiência', sublabel: 'empregado desde 2025' },
+    { number: '30+', label: 'Projetos totais', sublabel: 'em 40 repositórios' },
+  ],
+
+  /** Ver a nota no bloco em inglês: dois consumidores, nove é o piso do laço, e os
+   *  três que entraram têm cada um o seu motivo. */
   skills_highlight: [
     'Python',
     'FastAPI',
-    'LangChain',
+    'LangGraph',
     'GenAI & RAG',
-    'Docker',
+    'Machine Learning',
     'PostgreSQL',
+    'Supabase',
     'React',
-    'Ciência de Dados',
+    'n8n',
+    'Docker',
     'DevOps',
   ],
 };

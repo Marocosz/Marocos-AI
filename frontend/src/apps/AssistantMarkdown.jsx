@@ -6,7 +6,7 @@ import remarkGfm from 'remark-gfm'
  * próprio para poder ser carregado sob demanda.
  *
  * react-markdown + remark-gfm + micromark somam dezenas de KB e serviam a UM
- * dos nove apps — e, dentro dele, só depois da primeira resposta. O estado
+ * dos onze apps — e, dentro dele, só depois da primeira resposta. O estado
  * vazio do assistente é texto puro e não precisa de nada disso.
  */
 const AssistantMarkdown = ({ children }) => (

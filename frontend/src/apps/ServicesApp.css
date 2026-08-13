@@ -1,0 +1,1254 @@
+/* src/apps/ServicesApp.css
+   "Serviços" — o services.msc do Marocos OS, e a única janela do portfólio cujo
+   trabalho é converter.
+
+   ==================================================
+   AS REGRAS HERDADAS, e este arquivo não reabre nenhuma delas.
+
+   1. PREENCHIMENTO É AÇÃO — com duas exceções mecânicas, ambas documentadas onde
+      vivem: o marcador do fluxograma (fundo OPACO porque ele mascara o trilho que
+      passa por trás) e o monitor (arte desenhada, a mesma categoria dos gradientes
+      da cerimônia). Os quatro cards de serviço têm superfície porque são AÇÕES —
+      cada um abre a janela que prova o que ele afirma.
+
+   2. A JANELA É O CONTAINER, NÃO A VIEWPORT. Todos os breakpoints são
+      `@container`. `@media` num app é bug latente: janela estreita numa tela
+      grande não colapsaria, e janela maximizada numa tela pequena colapsaria sem
+      precisar.
+
+   3. A MEDIDA MORA NO CONTAINER. Um teto só, na raiz. Nenhum `max-width` em `ch`
+      nos parágrafos — dois limites para a mesma coisa fazem o de dentro vencer
+      sempre, e o texto passa a parar antes da borda do próprio container.
+
+   ==================================================
+   O AR ENTRE OS BLOCOS É DECISÃO, e não sobra.
+
+   A primeira versão usava 20px na raiz, 14 de padding de seção e 6 de gap
+   interno — os mesmos números do "Sobre este PC". O dono do projeto leu as duas
+   janelas e disse que o conteúdo estava "muito grudado". Os vãos daqui subiram
+   para 30 / 26 / 10, e o `AboutApp.css` recebeu a mesma correção no mesmo commit:
+   dois apps com o mesmo defeito não se consertam um de cada vez, senão o segundo
+   vira dívida esquecida.
+
+   Sem `backdrop-filter` em lugar nenhum: a janela já paga um blur, e filtro sobre
+   filtro é o custo que `Window.css` documenta ter derrubado de 20 para 6px. */
+
+.services-app {
+  container-type: inline-size;
+
+  display: flex;
+  flex-direction: column;
+  /* Ver a nota de AR no cabeçalho: era 20. */
+  gap: 30px;
+
+  /* 1040 porque esta janela tem GRADE (os cards 2x2, o fluxograma em três colunas
+     e a ficha do monitor em duas) — a mesma faixa do "Sobre", da Jornada e da
+     Stack. Prosa do começo ao fim usaria 780, e ali o leia-me é o exemplo. */
+  max-width: 1040px;
+  margin-inline: auto;
+  width: 100%;
+}
+
+/* ==================================================
+   AS DUAS VOZES — a receita de `ui/AppHeader.css`, em nível de seção.
+
+   Não é o componente compartilhado porque `AppHeader` emite um <h2> e estas
+   seções são <h3>. Mesma decisão (e mesma nota) do `AboutApp.css`.
+
+   SÓ GANHA HEADLINE A SEÇÃO QUE AFIRMA: "Como funciona" e "A máquina" ganham —
+   a segunda passou a ganhar quando deixou de ser ficha pura e virou o argumento
+   comercial da VPS própria.
+   ================================================== */
+.services-eyebrow {
+  margin: 0;
+  font-family: 'Courier New', monospace;
+  font-size: 0.66rem;
+  /* 'Courier New' só tem 400 e 700, e o index.css tem font-synthesis: none —
+     700 é peso real aqui. */
+  font-weight: 700;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: var(--accent-color);
+}
+
+.services-secao-eyebrow::before {
+  content: '// ';
+}
+
+.services-headline {
+  margin: 0;
+  font-size: 1.05rem;
+  font-weight: 700;
+  line-height: 1.3;
+  letter-spacing: -0.2px;
+  color: var(--text-primary);
+}
+
+/* O filete que esvanece antes de alcançar a outra borda: separa sem desenhar uma
+   tabela, e é o que faz o trabalho que os fundos de card fariam mal. */
+.services-secao {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding-top: 26px;
+}
+
+.services-secao::before {
+  content: '';
+  position: absolute;
+  inset: 0 0 auto;
+  height: 1px;
+  background: var(--filete-secao);
+}
+
+/* O parágrafo de abertura de uma seção — mais forte que o corpo, mais leve que a
+   headline. */
+.services-lead {
+  margin: 0;
+  font-size: 0.86rem;
+  line-height: 1.7;
+  color: var(--text-secondary);
+}
+
+/* ==================================================
+   1. O HERÓI — uma pergunta, não um rótulo de janela.
+
+   TEXTO À ESQUERDA, GLIFO À DIREITA. A ordem é a lição registrada no
+   `AboutApp.css`: com a arte antes do texto, o herói nasce ~200px para dentro e a
+   janela perde a espinha esquerda que alinha título, cards e seções.
+   ================================================== */
+.services-heroi {
+  display: flex;
+  align-items: center;
+  gap: 28px;
+  flex-wrap: wrap;
+}
+
+.services-heroi-texto {
+  flex: 1 1 320px;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+/**
+ * A PERGUNTA, no gesto de destaque do projeto.
+ *
+ * O TAMANHO ACOMPANHA A JANELA, não a tela: `cqi` é 1% da largura do container de
+ * consulta, então arrastar a janela para 500px encolhe a frase e maximizar a faz
+ * crescer até o teto. A primeira declaração é fallback para navegador sem
+ * container query — sem ela, um `clamp` com unidade não suportada invalida a
+ * propriedade inteira e o título cairia no tamanho herdado.
+ *
+ * Menor que o `.about-nome` (que vai a 3.3rem) de propósito: lá é um NOME, a
+ * primeira coisa que identifica a pessoa. Aqui é uma frase de quatro palavras, e
+ * no mesmo tamanho ela quebraria em três linhas numa janela estreita.
+ */
+.services-titulo {
+  margin: 0;
+  font-size: 1.9rem;
+  font-size: clamp(1.6rem, 5cqi, 2.6rem);
+  font-weight: 900;
+  line-height: 1.02;
+  letter-spacing: -0.03em;
+  background: linear-gradient(135deg, var(--text-primary) 30%, var(--accent-color) 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* Sem `max-width` próprio: quem limita a linha é a coluna do herói, que já divide
+   espaço com o glifo. Ver a nota sobre medida no cabeçalho do arquivo. */
+.services-sub {
+  margin: 0;
+  font-size: 0.92rem;
+  line-height: 1.65;
+  color: var(--text-secondary);
+}
+
+.services-heroi-status {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  margin: 2px 0 0;
+  font-family: 'Courier New', monospace;
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--accent-color);
+}
+
+/**
+ * O GLIFO — o "?" SOZINHO, sem disco atrás.
+ *
+ * A primeira versão o punha dentro de um círculo com `--sup-fundo` e borda. O dono
+ * do projeto cortou o disco: com ele o glifo lia como um BOTÃO desabilitado (um
+ * ícone dentro de uma pílula é o vocabulário de controle), e não como a marca da
+ * pergunta. Sozinho e grande, ele vira tipografia — que é a mesma decisão do nome
+ * gigante na assinatura da área de trabalho.
+ *
+ * O HALO FICOU, e é sutil de propósito: sem nada atrás, um glifo em gradiente
+ * sobre o vidro da janela perde peso e parece flutuar solto. O halo não é um
+ * círculo — não tem borda nem aresta, é só luz caindo a zero.
+ *
+ * SÃO DOIS ELEMENTOS por necessidade técnica: o "?" usa `background-clip: text`,
+ * que recorta o fundo do PRÓPRIO elemento. Com halo e glifo no mesmo nó, o recorte
+ * comeria o halo e sobraria só a letra.
+ */
+.services-glifo {
+  position: relative;
+  flex: 0 0 auto;
+  display: grid;
+  place-items: center;
+}
+
+.services-glifo::before {
+  content: '';
+  position: absolute;
+  /* Em `em` para o halo crescer junto com o glifo — o tamanho dele é um `clamp`
+     que responde à largura da janela, e um `inset` percentual mediria a caixa do
+     texto, que muda de proporção com a fonte do preset. */
+  inset: -0.45em;
+  border-radius: 999px;
+  background: radial-gradient(circle, rgb(var(--accent-rgb) / 0.18), transparent 66%);
+  pointer-events: none;
+}
+
+/**
+ * O "?" — o mesmo gradiente clipado do `.about-nome`, do `.devices-numero` e da
+ * capa da Jornada. É o gesto de "destaque tipográfico" do projeto, e reusá-lo é o
+ * que faz o glifo pertencer ao sistema em vez de parecer arte importada.
+ *
+ * Herda a família da raiz, então o preset XP troca para Tahoma e o "?" acompanha
+ * — que é exatamente o que um SVG desenhado NÃO faria.
+ */
+.services-glifo-marca {
+  position: relative;
+  /* Sem o disco em volta, ele pode (e deve) crescer: é o contrapeso visual do
+     título, e pequeno demais vira pontuação solta em vez de marca. */
+  font-size: 5rem;
+  font-size: clamp(4rem, 14cqi, 7.5rem);
+  font-weight: 900;
+  line-height: 0.9;
+  background: linear-gradient(140deg, var(--accent-color) 10%, var(--text-primary) 120%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* ==================================================
+   O PONTO DE STATUS — um só desenho, três consumidores.
+
+   O herói, o badge de cada card e a barra do monitor usam o mesmo elemento. Ele
+   REUSA `--cfg-pulso-status`, a duração do "aberto a freelance" do "Sobre este
+   PC": é o mesmo significado ("isto está vivo") e o mesmo fato dito de outro
+   jeito. Um valor próprio no config seria dois números para a mesma ideia.
+   ================================================== */
+.services-status-ponto {
+  flex: 0 0 auto;
+  width: 6px;
+  height: 6px;
+  border-radius: 999px;
+  background: var(--accent-color);
+  animation: servicosPulso var(--cfg-pulso-status, 2.4s) ease-in-out infinite;
+}
+
+/* O interruptor de Movimento chega pela classe na RAIZ do app; o
+   `prefers-reduced-motion` pelo bloco no fim do arquivo. OS DOIS precisam
+   funcionar — o cristal do "Sobre" já foi o único elemento do sistema a ignorar
+   o próprio interruptor, e não se repete o erro. */
+.services-app--sem-movimento .services-status-ponto {
+  animation: none;
+}
+
+@keyframes servicosPulso {
+  0%, 100% { box-shadow: 0 0 0 0 rgb(var(--accent-rgb) / 0.45); }
+  50% { box-shadow: 0 0 0 5px rgb(var(--accent-rgb) / 0); }
+}
+
+/* ==================================================
+   2. A GRADE 2x2
+
+   A ANATOMIA É A DAS PASTAS DA STACK — tile de ícone com gradiente do acento,
+   badge no topo direito, ícone fantasma recortado no canto, lavagem radial
+   ancorada embaixo à direita. Aquele desenho já foi aprovado pelo dono do projeto
+   e já é linguagem do sistema; quatro retângulos de mesma largura, mesmo raio e
+   mesma borda seriam template.
+
+   SEM A ABA das pastas: lá ela diz "isto é uma pasta e abre". Aqui o card leva a
+   OUTRA janela, e prometer pasta seria mentir.
+   ================================================== */
+.services-grade {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 14px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+@container (min-width: 560px) {
+  .services-grade {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+.services-card {
+  /* `relative` porque o fantasma e os dois anéis de luz são absolutos — sem isto
+     eles se posicionariam contra a janela inteira. */
+  position: relative;
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  /* A terceira linha estica: é ela que faz os quatro cards terminarem na mesma
+     altura com o rodapé colado embaixo, em vez de flutuando no meio. */
+  grid-template-rows: auto auto 1fr auto;
+  grid-template-areas:
+    'tile badge'
+    'nome nome'
+    'desc desc'
+    'pe   pe';
+  align-items: start;
+  gap: 8px 12px;
+  width: 100%;
+  height: 100%;
+  padding: 15px 16px 14px;
+  text-align: left;
+  font-family: inherit;
+  border-radius: 14px;
+  border: 1px solid transparent;
+  /**
+   * A LAVAGEM É ANCORADA EMBAIXO À DIREITA, e não a `--sup-lavagem` do sistema
+   * (que é diagonal a 160°). Ancorada no canto do fantasma, ela acompanha a marca
+   * d'água em vez de brigar com ela — é a mesma escolha, pelo mesmo motivo, que o
+   * `.devices-corpo` documenta.
+   *
+   * `background-color` EXPLÍCITO junto do `background-image`: `<button>` tem
+   * `buttonface` (um cinza claro do navegador) como fundo próprio, e declarar só
+   * a imagem deixa esse cinza aparecendo por baixo — foi o que lavou o texto do
+   * `.about-acao` até ficar ilegível na primeira tentativa daquele arquivo.
+   */
+  background-color: var(--sup-fundo);
+  /**
+   * A DOSE CAIU DE 0.13 PARA 0.05, por decisão do dono do projeto ("cores de fundo
+   * menos chamativas"). A lavagem existe para dar volume ao canto onde o fantasma
+   * mora, não para tingir o card: a 0.13 os quatro blocos liam como superfícies
+   * coloridas e brigavam com a faixa do destacado, que é quem deveria carregar a
+   * cor. A 0.05 ela some da leitura consciente e continua fazendo o volume.
+   */
+  background-image: radial-gradient(
+    120% 90% at 100% 100%,
+    rgb(var(--accent-rgb) / 0.05),
+    transparent 62%
+  );
+  color: var(--text-primary);
+  cursor: pointer;
+  transition: border-color 0.16s ease;
+}
+
+/**
+ * O CARD EM DESTAQUE recebe a FAIXA — o gradiente que nasce na borda esquerda e se
+ * apaga para a direita, a marca de "este é o item em destaque" que a lateral do
+ * explorador e as duas ações do "Sobre" já compartilham.
+ *
+ * Ela entra POR CIMA da lavagem, não no lugar dela: as duas juntas dão um card com
+ * luz entrando pela esquerda e volume no canto inferior direito, que é o que
+ * separa "o principal" dos outros três sem precisar de borda grossa.
+ */
+/* SÓ A FAIXA, sem somar a lavagem por baixo. Empilhadas, as duas davam ao card
+   destacado quase o dobro de acento dos outros três, e o resultado era um bloco
+   roxo no meio de uma grade sóbria — o oposto de destacar, que é diferenciar sem
+   gritar. */
+.services-card--destaque {
+  background-image: var(--sup-faixa);
+  border-color: var(--sup-faixa-borda);
+}
+
+.services-card:focus-visible {
+  outline: 2px solid var(--accent-color);
+  outline-offset: 2px;
+}
+
+/* Fora de um container de navegação (`useAbrir()` devolve null) o card não leva a
+   lugar nenhum — então ele para de se anunciar como clicável em vez de mentir com
+   o cursor. Mesma regra das portas do "Sobre". */
+.services-card:disabled {
+  cursor: default;
+  opacity: 0.75;
+}
+
+/**
+ * A CAMADA DE RECORTE do fantasma.
+ *
+ * Ela existe porque `overflow: hidden` no BOTÃO mataria o anel de luz do hover:
+ * o anel vive em `inset: -1px` para cobrir a borda, e overflow clipa no padding
+ * box. A Stack pode se dar ao luxo do overflow porque o hover dela é uma luz de
+ * RODAPÉ; aqui é o anel, e a lição de que os dois não convivem está escrita em
+ * `.about-acao` — custou 88 pixels de referência visual.
+ */
+.services-card-recorte {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  border-radius: inherit;
+  pointer-events: none;
+}
+
+/* O TILE — gradiente do acento para o tom fundo dele. `--cfg-accent-profundo` vem
+   da ponte e é o MESMO valor que o cristal 3D usa, então a peça e os tiles não
+   divergem. Segue o preset: escolher Brasa repinta os quatro. */
+.services-tile {
+  grid-area: tile;
+  display: grid;
+  place-items: center;
+  width: 42px;
+  height: 42px;
+  border-radius: 12px;
+  background-image: linear-gradient(
+    160deg,
+    var(--accent-color),
+    var(--cfg-accent-profundo, #4c1d95)
+  );
+  color: #ffffff;
+  box-shadow: 0 4px 12px rgb(var(--accent-rgb) / 0.28);
+}
+
+/* Pílula de 999px porque NÃO é interativo — a regra de raio do projeto. */
+.services-card-badge {
+  grid-area: badge;
+  justify-self: end;
+  align-self: start;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 10px;
+  border-radius: 999px;
+  border: 1px solid var(--sup-borda);
+  font-family: 'Courier New', monospace;
+  font-size: 0.6rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--text-secondary);
+  white-space: nowrap;
+}
+
+.services-card-nome {
+  grid-area: nome;
+  margin-top: 2px;
+  font-size: 0.95rem;
+  font-weight: 700;
+  line-height: 1.25;
+  color: var(--text-primary);
+}
+
+.services-card-desc {
+  grid-area: desc;
+  font-size: 0.78rem;
+  line-height: 1.55;
+  color: var(--text-secondary);
+}
+
+/* O RODAPÉ DO CARD: o tipo de inicialização à esquerda (voz de máquina) e a prova
+   à direita (a ação). Duas vozes na mesma linha, e é de propósito — uma diz o que
+   o sistema sabe, a outra convida a conferir. */
+.services-card-pe {
+  grid-area: pe;
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin-top: 6px;
+  padding-top: 10px;
+  border-top: 1px solid var(--sup-borda);
+}
+
+.services-card-inicio {
+  font-family: 'Courier New', monospace;
+  font-size: 0.6rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--text-secondary);
+  white-space: nowrap;
+}
+
+.services-card-prova {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 0.73rem;
+  font-weight: 700;
+  color: var(--accent-color);
+}
+
+.services-card-prova svg {
+  flex: 0 0 auto;
+  opacity: 0.6;
+  transition: transform 0.16s ease, opacity 0.16s ease;
+}
+
+.services-card:hover:not(:disabled) .services-card-prova svg {
+  opacity: 1;
+  transform: translateX(3px);
+}
+
+/* O FANTASMA — a marca d'água. Nasce meio para fora da caixa de propósito: é o
+   recorte que o faz ler como marca d'água em vez de segundo ícone. */
+.services-fantasma {
+  position: absolute;
+  right: -13%;
+  bottom: -24%;
+  width: 48%;
+  height: auto;
+  color: var(--text-primary);
+  opacity: 0.05;
+  stroke-width: 1;
+}
+
+/* ==================================================
+   3. O FLUXOGRAMA — timeline VERTICAL ALTERNADA.
+
+   O trilho fica no meio e as etapas caem alternadas: a 1 à esquerda, a 2 à
+   direita, a 3 à esquerda. Pedido do dono do projeto, e ele conserta um problema
+   real da versão horizontal: lá cada etapa tinha ~130px de coluna — duas linhas de
+   texto — para explicar um processo de contratação. Em zigue-zague cada uma tem
+   quase metade da janela, e a venda cabe.
+
+   CONTINUA SENDO UM PIPELINE, e não uma linha do tempo: a Jornada já é uma
+   timeline com playhead. O que separa as duas é o PULSO atravessando o trilho —
+   um pacote passando por estágios, que é o desenho de um deploy.
+   ================================================== */
+.services-fluxo {
+  /**
+   * O EIXO DO FIO MORA NUMA VARIÁVEL: três regras precisam do mesmo número (o
+   * trilho, o pulso e a posição no modo estreito), e ele é derivado do tamanho do
+   * marcador — metade da altura, menos metade da espessura do fio, para o fio
+   * passar pelo CENTRO do círculo. Escrito à mão nos três lugares, mudar o
+   * marcador deixaria a luz viajando fora do trilho.
+   */
+  --marca-tamanho: 30px;
+  --via-eixo: calc(var(--marca-tamanho) / 2 - 1px);
+
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  margin: 14px 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+/**
+ * O TRILHO E O PULSO.
+ *
+ * FULL-BLEED COM AS PONTAS ESVANECENDO, em vez de começar no primeiro marcador e
+ * terminar no último. Isso resolve a geometria sem nenhuma conta: o centro do
+ * primeiro e do último marcador não caem em porcentagens redondas, então qualquer
+ * `top: X%` erraria — e erraria de novo a cada mudança de gap ou de número de
+ * etapas. A máscara também é mais bonita: a luz entra e sai da cena em vez de
+ * bater numa parede.
+ */
+.services-fluxo::before,
+.services-fluxo::after {
+  content: '';
+  position: absolute;
+  /* Estreito é o PADRÃO: o fio desce encostado à esquerda, alinhado com os
+     marcadores. O modo centrado é o container query lá embaixo. */
+  left: var(--via-eixo);
+  top: 0;
+  width: 2px;
+  pointer-events: none;
+}
+
+.services-fluxo::before {
+  bottom: 0;
+  background: rgb(var(--accent-rgb) / 0.22);
+  mask-image: linear-gradient(to bottom, transparent, #000 6%, #000 94%, transparent);
+  -webkit-mask-image: linear-gradient(to bottom, transparent, #000 6%, #000 94%, transparent);
+}
+
+/**
+ * O PULSO. Um trecho curto e luminoso do fio, viajando.
+ *
+ * A ANIMAÇÃO É `transform`, e não `top`: só transform e opacity são compostos sem
+ * refazer layout nem pintura, e esta janela roda com um shader animado atrás e um
+ * `backdrop-filter` no meio — animar geometria aqui cobraria o blur inteiro a cada
+ * quadro.
+ *
+ * ==================================================
+ * O PERCURSO, EM TRÊS CORREÇÕES — e vale ler as três, porque cada uma desfez o
+ * efeito colateral da anterior.
+ *
+ * 1. A PRIMEIRA VERSÃO ia de `translateY(-100%)` a `455%`: o feixe nascia FORA do
+ *    trilho e atravessava a região que a máscara apaga. "Esse feixe tá começando
+ *    bem antes, não tá seguindo essa lógica" — era luz onde não há fio.
+ *
+ * 2. TRAZÊ-LO PARA DENTRO DO FIO tirou o fade. Vindo de fora, a entrada e a saída
+ *    eram consequência do movimento; nascendo em 6% ele aparece já aceso e some
+ *    de repente ao reiniciar. Por isso a OPACIDADE agora é animada junto — o fade
+ *    virou explícito em vez de acidental.
+ *
+ * 3. O PERCURSO PRECISA COBRIR OS MARCADORES, não o fio. O primeiro círculo fica
+ *    a ~5% da altura e o último a ~97%; um feixe indo de 6% a 94% (medido pela
+ *    PONTA) tem o CENTRO viajando de 17% a 83% e nunca chega em nenhum dos dois
+ *    extremos. Como é o centro que lê como "a luz está aqui", é ele que tem de
+ *    percorrer 5% → 97%:
+ *
+ *        centro = topo + metade da altura = topo + 11%
+ *        topo inicial = 5% - 11% = -6%
+ *        topo final   = 97% - 11% = 86%
+ *        deslocamento = 92% do trilho = 92 / 22 = 418% do próprio elemento
+ *
+ * ==================================================
+ * O PERCURSO OCUPA 80% DO CICLO, E OS OUTROS 20% SÃO SILÊNCIO.
+ *
+ * Isso não é ritmo, é ARITMÉTICA — e conserta a dessincronia que o dono do projeto
+ * viu ("totalmente dessincronizado com o brilho dos círculos").
+ *
+ * Os marcadores acendem com `animation-delay` proporcional à posição. Se o feixe
+ * usasse o ciclo INTEIRO, o último acenderia com delay igual à duração — e numa
+ * animação `infinite`, atrasar exatamente um ciclo é o mesmo que não atrasar
+ * nada: o círculo 5 piscava junto com o círculo 1, no instante em que a luz estava
+ * no topo.
+ *
+ * Com o percurso em 80%, o último acende em 0,8 do ciclo e ninguém colide. A
+ * pausa ainda vale por si: um pulso de deploy tem intervalo entre passagens.
+ *
+ * OS 80% APARECEM EM DOIS LUGARES — aqui e no `animation-delay` do marcador. Eles
+ * TÊM de ser iguais; mudar um sem o outro devolve o descasamento.
+ */
+.services-fluxo::after {
+  top: -6%;
+  height: 22%;
+  background: linear-gradient(180deg, transparent, rgb(var(--accent-rgb) / 0.95), transparent);
+  animation: servicosPulsoTrilho var(--cfg-pipeline-servicos, 4.8s) linear infinite;
+}
+
+@keyframes servicosPulsoTrilho {
+  0% {
+    transform: translateY(0);
+    opacity: 0;
+  }
+  /* O fade acompanha a máscara do fio: aceso só onde há trilho desenhado. */
+  7% {
+    opacity: 1;
+  }
+  73% {
+    opacity: 1;
+  }
+  80% {
+    transform: translateY(418%);
+    opacity: 0;
+  }
+  /* Os 20% finais: o feixe fica parado e invisível no fim do trilho. Sem este
+     trecho o `to` seria o próprio 100% e a pausa não existiria. */
+  100% {
+    transform: translateY(418%);
+    opacity: 0;
+  }
+}
+
+/* ESTREITO É O PADRÃO: marcador à esquerda, texto à direita, sem alternância. */
+.services-etapa {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  column-gap: 16px;
+  align-items: start;
+}
+
+.services-etapa-marca {
+  grid-column: 1;
+  /* `relative` + z-index para ficar ACIMA dos pseudo-elementos do trilho: sem
+     isso o pulso passaria por cima do número em vez de por trás. */
+  position: relative;
+  z-index: 1;
+  display: grid;
+  place-items: center;
+  width: var(--marca-tamanho, 30px);
+  height: var(--marca-tamanho, 30px);
+  border-radius: 999px;
+  /**
+   * O FUNDO OPACO NÃO É DECORAÇÃO, É MECÂNICA: `--sup-fundo` é derivada de
+   * `--win-body-base` e não é `--card-bg` com mais alpha, então ela TAPA o trilho
+   * que passa por trás. Com uma superfície translúcida o fio atravessaria o
+   * número.
+   */
+  background: var(--sup-fundo);
+  border: 1px solid var(--sup-faixa-borda);
+  font-family: 'Courier New', monospace;
+  font-size: 0.74rem;
+  font-weight: 700;
+  color: var(--accent-color);
+  /**
+   * O CÍRCULO ACENDE QUANDO O FEIXE CHEGA NELE.
+   *
+   * Faltava, e o dono do projeto apontou: "ele não está iluminando os círculos com
+   * os números das etapas". Sem isso o feixe passa POR TRÁS de marcadores inertes
+   * (eles têm fundo opaco para tapar o fio), e a luz vira um enfeite que atravessa
+   * a cena em vez de percorrer um caminho.
+   *
+   * A SINCRONIA É POR `animation-delay`, proporcional à posição na fila: mesma
+   * duração do feixe, começando na fração do ciclo em que ele passa por aqui. Os
+   * dois valores vêm do JSX (`--etapa-i`, `--etapa-n`) e são DERIVADOS, então uma
+   * etapa nova entra na conta sozinha.
+   *
+   * `i / (n - 1)` e não `i / n`: o primeiro marcador está no COMEÇO do trilho e o
+   * último no FIM, então a fração tem de ir de 0 a 1 inclusive.
+   *
+   * O FATOR 0.8 É O MESMO 80% DO PERCURSO DO FEIXE, e é o que impede o último
+   * marcador de colidir com o primeiro (ver a nota longa em `.services-fluxo::after`:
+   * atrasar um ciclo inteiro numa animação `infinite` é o mesmo que não atrasar).
+   * Os dois números TÊM de ser iguais.
+   */
+  animation: servicosAcende var(--cfg-pipeline-servicos, 4.8s) linear infinite;
+  animation-delay: calc(
+    var(--cfg-pipeline-servicos, 4.8s) * 0.8 * var(--etapa-i, 0) / (var(--etapa-n, 5) - 1)
+  );
+}
+
+/**
+ * O PICO FICA EM 0%, e não no meio do keyframe.
+ *
+ * `animation-delay` positivo faz o elemento esperar no estado da REGRA BASE (que
+ * aqui é o círculo apagado) e só então entrar no keyframe. Com o pico em 0%, o
+ * brilho acontece exatamente no instante calculado pelo delay — se ele estivesse
+ * em 7%, todo marcador acenderia 7% do ciclo depois de a luz já ter passado, e o
+ * conjunto inteiro ficaria arrastado.
+ *
+ * A janela acesa é curta pelo mesmo motivo: um brilho longo deixaria os cinco
+ * círculos acesos ao mesmo tempo, e some a ideia de percurso.
+ */
+@keyframes servicosAcende {
+  0% {
+    border-color: var(--accent-color);
+    box-shadow: 0 0 15px 1px rgb(var(--accent-rgb) / 0.55);
+  }
+  14%, 100% {
+    border-color: var(--sup-faixa-borda);
+    box-shadow: 0 0 0 0 rgb(var(--accent-rgb) / 0);
+  }
+}
+
+/**
+ * O CORPO DA ETAPA — com bordinha, e alinhado pelo TOPO.
+ *
+ * A BORDA é pedido do dono do projeto ("colocar apenas uma bordinha nos textos"),
+ * e é só borda: sem preenchimento. O bloco precisa ler como um card na linha do
+ * tempo sem virar mais uma superfície tingida — a regra de que preenchimento é
+ * ação continua valendo, e a etapa não é clicável.
+ *
+ * O ALINHAMENTO ESTAVA INCONSISTENTE, e a causa era um `padding-top: 4px` que
+ * tentava centrar o título no círculo por cálculo. Isso só funciona enquanto o
+ * título tem exatamente uma linha e exatamente aquela `line-height` — bastava um
+ * título quebrar em duas para o bloco descer sozinho, e era o que o dono via
+ * ("tem um que tá alinhando topo, tem outros que tá mais pra baixo").
+ *
+ * A regra agora é geométrica e não depende de fonte nenhuma: `align-items: start`
+ * na etapa põe o TOPO do card na mesma linha do TOPO do marcador. Sempre igual,
+ * para qualquer texto.
+ */
+.services-etapa-corpo {
+  grid-column: 2;
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  min-width: 0;
+  padding: 12px 14px;
+  border: 1px solid var(--sup-borda);
+  border-radius: var(--win-control-radius);
+}
+
+.services-etapa-titulo {
+  font-size: 0.92rem;
+  font-weight: 700;
+  line-height: 1.25;
+  color: var(--text-primary);
+}
+
+.services-etapa-texto {
+  margin: 0;
+  font-size: 0.79rem;
+  line-height: 1.65;
+  color: var(--text-secondary);
+}
+
+/* ==================================================
+   4. O MONITOR — arte desenhada, a mesma categoria dos gradientes da cerimônia.
+
+   Chassi, tela, pé e base em CSS, sem imagem. Ele existe porque uma ficha técnica
+   solta no meio de uma página de venda lê como rodapé; dentro de uma tela, ela lê
+   como a máquina se reportando.
+   ================================================== */
+.services-monitor {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin: 16px 0 0;
+}
+
+/**
+ * O CHASSI, E O QUEIXO.
+ *
+ * A moldura de baixo é MAIS GROSSA que as outras três, e é ela que faz a silhueta
+ * ler como monitor. Com padding uniforme (a primeira versão usava 10px nos quatro
+ * lados) o resultado é um card com borda larga: o pé e a base ficam pendurados
+ * numa forma que não parece um aparelho.
+ *
+ * É o mesmo detalhe que o ícone XP de Meu Computador desenha — lá o corpo do
+ * monitor tem a tela recuada para cima, deixando a faixa inferior visível.
+ */
+.services-monitor-chassi {
+  position: relative;
+  width: 100%;
+  padding: 11px 11px 26px;
+  border-radius: 16px;
+  background-color: var(--sup-fundo);
+  border: 1px solid var(--sup-borda);
+  /* A sombra é o que separa o monitor do corpo da janela — sem ela o chassi some
+     no fundo, porque os dois saem da mesma base opaca. Discreta de propósito: ela
+     dá profundidade, não cor. */
+  box-shadow: 0 12px 30px rgb(var(--accent-rgb) / 0.08);
+}
+
+/* O LED DE ENERGIA no queixo. Ele não pulsa: um monitor ligado tem luz constante,
+   e um segundo ponto piscando competiria com o `● ONLINE` da barra, que é o que
+   de fato reporta estado. */
+.services-monitor-chassi::after {
+  content: '';
+  position: absolute;
+  left: 50%;
+  bottom: 9px;
+  width: 6px;
+  height: 6px;
+  margin-left: -3px;
+  border-radius: 999px;
+  background: var(--accent-color);
+  box-shadow: 0 0 9px rgb(var(--accent-rgb) / 0.75);
+}
+
+.services-monitor-tela {
+  overflow: hidden;
+  border-radius: 9px;
+  border: 1px solid var(--sup-borda);
+  /**
+   * A TELA É `--card-bg`, a superfície PLANA — e é a escolha certa aqui pelo motivo
+   * exato que o token existe: ela RECUA. O chassi é opaco (`--sup-fundo`) e a tela
+   * afunda dentro dele, que é a relação física entre moldura e display.
+   *
+   * O brilho diagonal por cima é o mesmo gesto do ícone XP de Meu Computador ("brilho
+   * diagonal na tela"), e é o que impede a tela de ler como um retângulo vazio.
+   */
+  background-color: var(--card-bg);
+  /* Mesma correção dos cards: era 0.16 e tingia a tela inteira de roxo. A 0.06 o
+     brilho continua dizendo "esta tela está ligada" sem virar cor de fundo. */
+  background-image: linear-gradient(
+    152deg,
+    rgb(var(--accent-rgb) / 0.06),
+    transparent 58%
+  );
+}
+
+.services-monitor-barra {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 9px 13px;
+  border-bottom: 1px solid var(--sup-borda);
+  font-family: 'Courier New', monospace;
+  font-size: 0.62rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--text-secondary);
+}
+
+/* As três luzinhas da barra de título, num elemento só: dois `box-shadow`
+   deslocados desenham a segunda e a terceira. Três <span> para três pontos
+   decorativos seria markup a mais para a mesma tinta. */
+.services-monitor-luzes {
+  flex: 0 0 auto;
+  width: 7px;
+  height: 7px;
+  margin-right: 20px;
+  border-radius: 999px;
+  background: var(--sup-borda);
+  box-shadow: 12px 0 0 var(--sup-borda), 24px 0 0 var(--sup-borda);
+}
+
+.services-monitor-nome {
+  flex: 1 1 auto;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  text-transform: none;
+  letter-spacing: 0.04em;
+}
+
+.services-monitor-status {
+  flex: 0 0 auto;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--accent-color);
+}
+
+/* O PÉ e a BASE são o que fazem a caixa ler como MONITOR em vez de mais um card
+   com borda grossa. Trapézio por `clip-path` — e sem borda de propósito: clip-path
+   corta a borda no meio do caminho e o resultado fica com as arestas serrilhadas. */
+.services-monitor-pe {
+  width: 104px;
+  height: 20px;
+  background: var(--sup-fundo);
+  clip-path: polygon(20% 0, 80% 0, 100% 100%, 0 100%);
+}
+
+.services-monitor-base {
+  width: 178px;
+  height: 9px;
+  border-radius: 0 0 8px 8px;
+  background: var(--sup-fundo);
+  box-shadow: 0 6px 14px rgb(var(--accent-rgb) / 0.14);
+}
+
+/* A FICHA DENTRO DA TELA. Rótulo em mono à esquerda, valor em Poppins à direita
+   sobre linha pontilhada — a forma do "Este sistema" do "Sobre este PC", porque as
+   duas são o sistema falando de si.
+
+   SEM DIVISOR ENTRE AS LINHAS: cada uma já tem o pontilhado que liga rótulo a
+   valor, e um traço cheio por cima disso daria dois horizontais por linha — o
+   bloco leria como planilha. */
+.services-ficha {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 0 26px;
+  margin: 0;
+  padding: 12px 14px 14px;
+}
+
+.services-ficha-row {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  min-width: 0;
+  padding: 5px 0;
+}
+
+.services-ficha-row dt {
+  flex: 0 0 auto;
+  font-family: 'Courier New', monospace;
+  font-size: 0.63rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--text-secondary);
+}
+
+.services-ficha-row dd {
+  flex: 1 1 auto;
+  min-width: 0;
+  margin: 0;
+  text-align: right;
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  border-bottom: 1px dotted var(--sup-borda);
+}
+
+/* ==================================================
+   5. A AÇÃO
+   ================================================== */
+.services-acao {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  width: 100%;
+  padding: 15px 16px;
+  text-align: left;
+  font-family: inherit;
+  border-radius: var(--win-control-radius);
+  /* `transparent` explícito — ver a nota em `.services-card`. */
+  background-color: transparent;
+  background-image: var(--sup-faixa);
+  border: 1px solid var(--sup-faixa-borda);
+  color: var(--text-primary);
+  cursor: pointer;
+}
+
+.services-acao:focus-visible {
+  outline: 2px solid var(--accent-color);
+  outline-offset: 2px;
+}
+
+.services-acao:disabled {
+  cursor: default;
+  opacity: 0.75;
+}
+
+.services-acao-texto {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  min-width: 0;
+  flex: 1 1 auto;
+}
+
+.services-acao-titulo {
+  font-size: 0.95rem;
+  font-weight: 700;
+  line-height: 1.2;
+  color: var(--text-primary);
+}
+
+.services-acao-sub {
+  font-size: 0.76rem;
+  line-height: 1.4;
+  color: var(--text-secondary);
+}
+
+.services-acao-seta {
+  flex: 0 0 auto;
+  color: var(--accent-color);
+  transition: transform 0.16s ease;
+}
+
+.services-acao:hover:not(:disabled) .services-acao-seta {
+  transform: translateX(3px);
+}
+
+/* ==================================================
+   O HOVER: A LUZ QUE PERCORRE A BORDA
+
+   Mesma receita do `AboutApp.css` — gradiente cônico girando dentro de uma máscara
+   em anel, em duas camadas (núcleo nítido + halo desfocado). O `@property
+   --giro-da-luz` que a torna animável vive em `os/tokens.css`, global, justamente
+   para que um segundo app possa usá-la sem depender de o primeiro ter sido
+   carregado (os dois entram por `lazy()`).
+
+   `inset: -1px` para o anel cobrir a BORDA do elemento, e não o lado de dentro
+   dela — senão aparecem duas linhas concêntricas.
+   ================================================== */
+.services-card::before,
+.services-card::after,
+.services-acao::before,
+.services-acao::after {
+  content: '';
+  position: absolute;
+  inset: -1px;
+  border-radius: inherit;
+  padding: var(--cfg-luz-espessura, 2px);
+  background: conic-gradient(
+    from var(--giro-da-luz),
+    transparent 0turn,
+    transparent 0.58turn,
+    var(--sup-luz-nucleo) 0.75turn,
+    transparent 0.92turn
+  );
+  mask:
+    linear-gradient(#000 0 0) content-box,
+    linear-gradient(#000 0 0);
+  mask-composite: exclude;
+  -webkit-mask:
+    linear-gradient(#000 0 0) content-box,
+    linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor;
+  opacity: 0;
+  /* A animação vive AQUI, pausada. Declarada só no `:hover`, ela seria REMOVIDA ao
+     sair o mouse e `--giro-da-luz` voltaria ao valor inicial no mesmo quadro: o
+     feixe saltaria para o ângulo 0 e só depois desapareceria. */
+  animation: giroDaLuz var(--cfg-luz-volta, 2.6s) linear infinite;
+  animation-play-state: paused;
+  /* A duração de SAÍDA mora na regra base — é ela que vale quando o mouse sai. A
+     de entrada está na regra de `:hover`. São assimétricas de propósito: apagar
+     rápido faz o efeito "sumir" em vez de "se apagar". */
+  transition: opacity var(--cfg-luz-saida, 0.5s) ease;
+  pointer-events: none;
+}
+
+.services-card::before,
+.services-acao::before {
+  padding: var(--cfg-luz-halo, 6px);
+  filter: blur(var(--cfg-luz-desfoque, 7px));
+}
+
+/* `:not(:disabled)` no ELEMENTO em vez de um par de regras desfazendo o efeito
+   depois: desfazer exigiria repetir o valor base de cada alvo (o card comum tem
+   borda transparente, o destacado tem a da faixa, a ação também), e três valores
+   repetidos é três lugares para divergir. */
+.services-card:hover:not(:disabled)::before,
+.services-card:hover:not(:disabled)::after,
+.services-acao:hover:not(:disabled)::before,
+.services-acao:hover:not(:disabled)::after {
+  opacity: 1;
+  animation-play-state: running;
+  transition: opacity var(--cfg-luz-entrada, 0.18s) ease;
+}
+
+.services-card:hover:not(:disabled)::before,
+.services-acao:hover:not(:disabled)::before {
+  opacity: var(--cfg-luz-alfa-halo, 0.5);
+}
+
+/* A borda fininha que fecha a forma: o feixe é um arco curto, então em qualquer
+   instante três quartos do contorno estão apagados. Ela entra e sai com as MESMAS
+   durações assimétricas da luz, senão o contorno apaga antes do feixe e o bloco
+   pisca. */
+.services-acao {
+  transition: border-color var(--cfg-luz-saida, 0.5s) ease;
+}
+
+.services-card:hover:not(:disabled),
+.services-acao:hover:not(:disabled) {
+  border-color: rgb(var(--accent-rgb) / var(--cfg-luz-borda-hover, 0.45));
+  transition: border-color var(--cfg-luz-entrada, 0.18s) ease;
+}
+
+/* ==================================================
+   O ZIGUE-ZAGUE, quando há largura.
+
+   640px de CONTAINER: abaixo disso duas colunas de texto dariam menos de ~280px
+   cada, e um parágrafo de venda em coluna estreita alternando lado a lado fica
+   mais difícil de ler do que a mesma coisa empilhada.
+
+   `left: calc(50% - 1px)` e NÃO `left: 50%` com `translateX(-50%)`: o pulso já usa
+   `transform` para viajar, e somar as duas transformações exigiria repetir o
+   `-50%` dentro dos keyframes — dois lugares para o mesmo número.
+   ================================================== */
+@container (min-width: 640px) {
+  .services-fluxo {
+    gap: 28px;
+  }
+
+  .services-fluxo::before,
+  .services-fluxo::after {
+    left: calc(50% - 1px);
+  }
+
+  /* Três colunas com os dois lados iguais: é o que põe a coluna do marcador
+     exatamente no centro, sem nenhuma conta de largura. */
+  .services-etapa {
+    grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
+    column-gap: 22px;
+  }
+
+  /**
+   * `grid-row: 1` NOS DOIS, E ELE É O CONSERTO DE UM BUG REAL — não redundância.
+   *
+   * Sem ele, os itens ÍMPARES nasciam 30px abaixo dos pares (exatamente a altura
+   * do marcador), e o dono do projeto viu: "tem um que tá alinhando topo, tem
+   * outros que tá mais pra baixo".
+   *
+   * A causa é o auto-placement do grid. O marcador vem ANTES no DOM e pede a
+   * coluna 2, ocupando a linha 1. Quando o corpo pede a coluna 1 — que fica ATRÁS
+   * dele —, o algoritmo padrão (`sparse`) nunca retrocede: ele desce para a linha
+   * 2. Nos itens pares o corpo pede a coluna 3, que ainda está livre à frente, e
+   * por isso aqueles alinhavam.
+   *
+   * `grid-auto-flow: dense` também resolveria, mas mudaria o comportamento de
+   * qualquer item futuro desta grade. Declarar a linha é local e explícito.
+   */
+  .services-etapa-marca {
+    grid-column: 2;
+    grid-row: 1;
+  }
+
+  .services-etapa-corpo {
+    grid-column: 1;
+    grid-row: 1;
+    text-align: right;
+  }
+
+  /* A ALTERNÂNCIA. `nth-child(even)` e não uma classe no JSX: a posição é uma
+     propriedade da LISTA, não da etapa — acrescentar uma etapa no meio deve
+     reordenar os lados sozinho, e com classe no dado alguém teria de reescrever
+     todas. */
+  .services-etapa:nth-child(even) .services-etapa-corpo {
+    grid-column: 3;
+    text-align: left;
+  }
+
+  /* A ficha do monitor em duas colunas: sete linhas numa coluna só deixam o
+     pontilhado atravessando ~1000px, e aí ele deixa de conduzir o olho e vira
+     régua. */
+  .services-ficha {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+/* ==================================================
+   JANELA ESTREITA
+   ================================================== */
+@container (max-width: 420px) {
+  .services-heroi {
+    gap: 18px;
+  }
+
+  /* O rodapé do card empilha: em coluna estreita o tipo de inicialização e a prova
+     brigavam pela mesma linha, e a prova (que é a ação) quebrava no meio. */
+  .services-card-pe {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 6px;
+  }
+}
+
+/* Respeita quem pede menos movimento. ESTA É A SEGUNDA REDE — a primeira é o
+   interruptor de Movimento das Configurações, que chega pela classe na raiz.
+
+   O PULSO DO TRILHO PARA, e não some: o fio continua desenhado, só sem a luz
+   viajando. Apagar o trilho junto tiraria a estrutura do fluxograma de quem só
+   pediu menos animação.
+
+   Os anéis de luz ficam de fora do `animation: none` de propósito: eles PAUSAM,
+   porque remover a animação faria o feixe saltar para o ângulo 0 em vez de
+   congelar onde está. E sem movimento a luz do hover continua ACENDENDO — ela é o
+   único sinal de que o alvo é clicável, e apagá-la para respeitar uma preferência
+   de MOVIMENTO seria tirar informação de quem não pediu isso. */
+.services-app--sem-movimento .services-fluxo::after {
+  animation: none;
+  opacity: 0;
+}
+
+/* O CÍRCULO PARA ACESO NO ESTADO NEUTRO, não apagado no meio de um pulso: sem a
+   animação, o `box-shadow` volta ao valor da regra base (nenhum) e a borda ao
+   `--sup-faixa-borda`, que é exatamente o repouso. É também o que torna a captura
+   do regressor determinística — o harness desliga a animação antes do primeiro
+   render, então é sempre este estado que ele fotografa. */
+.services-app--sem-movimento .services-etapa-marca {
+  animation: none;
+}
+
+/* O `:not(:disabled)` REPETIDO aqui não é cosmético: sem ele este seletor empata
+   em especificidade com a regra de hover (três classes e um pseudo-elemento cada)
+   e quem ganha passa a ser a ordem no arquivo. Empate resolvido por ordem quebra
+   na primeira reorganização. */
+.services-app--sem-movimento .services-card:hover:not(:disabled)::before,
+.services-app--sem-movimento .services-card:hover:not(:disabled)::after,
+.services-app--sem-movimento .services-acao:hover:not(:disabled)::before,
+.services-app--sem-movimento .services-acao:hover:not(:disabled)::after {
+  animation-play-state: paused;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .services-fluxo::after {
+    animation: none;
+    opacity: 0;
+  }
+
+  .services-etapa-marca,
+  .services-status-ponto {
+    animation: none;
+  }
+
+  .services-card:hover:not(:disabled)::before,
+  .services-card:hover:not(:disabled)::after,
+  .services-acao:hover:not(:disabled)::before,
+  .services-acao:hover:not(:disabled)::after {
+    animation-play-state: paused;
+  }
+}

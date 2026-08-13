@@ -9,6 +9,20 @@
   display: flex;
   flex-direction: column;
   gap: 20px;
+  /**
+   * A MEDIDA MORA AQUI, NO CONTAINER — e não em cada parágrafo. Ver a nota longa em
+   * `.readme-app`: dois limites para a mesma coisa deixavam o texto parando antes da
+   * borda do próprio container.
+   *
+   * 900px e não os 780 do leia-me: esta página tem prosa, mas também cabeçalho em card,
+   * lista de tecnologias e botão — não é só coluna de texto.
+   *
+   * A LISTA de projetos fica de fora de propósito: ela é full-bleed, porque numa lista de
+   * explorador as linhas vão de borda a borda.
+   */
+  max-width: 900px;
+  margin-inline: auto;
+  width: 100%;
 }
 
 .project-detail-header {
@@ -18,18 +32,61 @@
   border-radius: 10px;
 }
 
+/* A CATEGORIA E O CONTEXTO DIVIDEM UMA LINHA, e o `wrap` não é enfeite: em
+   janela estreita "SaaS Multi-tenant" + "Freelance" não cabem lado a lado, e
+   quebrar é melhor que reticências num rótulo de quatro palavras. */
+.project-detail-meta {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 6px 10px;
+  margin-bottom: 8px;
+}
+
 .project-detail-category {
-  display: block;
   font-size: 0.72rem;
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 1.5px;
   color: var(--accent-color);
-  margin-bottom: 6px;
 }
 
 .theme-light .project-detail-category {
   color: var(--accent-color);
+}
+
+/**
+ * O CHIP DE CONTEXTO — "Freelance", "Produto em produção", "Acadêmico".
+ *
+ * PÍLULA DE 999px porque ele NÃO é interativo: é a exceção que a regra de raio
+ * do projeto declara (`--win-control-radius` em qualquer coisa clicável, pílula
+ * só para badge e tag).
+ *
+ * A cor vem de `--accent-rgb` e não de um `rgba()` literal, senão este chip
+ * ficaria roxo depois que o visitante trocasse o preset e todo o resto já tivesse
+ * mudado de cor. Ele é deliberadamente MAIS FRACO que a categoria ao lado: a
+ * categoria diz o que o projeto é, o contexto diz de quem ele é, e o segundo é
+ * metadado.
+ */
+.project-detail-contexto {
+  font-size: 0.66rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  color: var(--text-secondary);
+  background: rgb(var(--accent-rgb) / 0.1);
+  border: 1px solid rgb(var(--accent-rgb) / 0.22);
+  border-radius: 999px;
+  padding: 3px 9px;
+}
+
+/* O produto em produção é o único que ganha a cor cheia, porque é o único cujo
+   contexto é o argumento: "isto está no ar, com gente usando". Os outros quatro
+   contextos são classificação, e classificação não pede destaque. */
+.project-detail-contexto--produto {
+  color: var(--accent-color);
+  background: rgb(var(--accent-rgb) / 0.16);
+  border-color: rgb(var(--accent-rgb) / 0.4);
 }
 
 .project-detail-title {
@@ -57,11 +114,79 @@
   color: var(--text-secondary);
 }
 
+/* Sem `max-width` próprio: quem limita a linha é o container. */
 .project-detail-description {
   margin: 0;
   font-size: 0.9rem;
   line-height: 1.7;
   color: var(--text-primary);
+}
+
+/**
+ * OS DESTAQUES — lista com filete, e sem preenchimento nenhum.
+ *
+ * PREENCHIMENTO É AÇÃO: são de três a cinco fatos, e fato não é clicável. Cinco
+ * retângulos preenchidos em sequência é exatamente o desenho que o "Sobre este
+ * PC" pagou um redesenho inteiro para desaprender ("parece um site qualquer,
+ * fundos chapados dos itens"). Aqui quem estrutura é o filete de seção e o
+ * marcador de acento.
+ *
+ * O marcador é `::before` e não `list-style`, para poder ser o acento do preset
+ * e ficar alinhado com a primeira linha do texto — um bullet nativo herda a cor
+ * do texto e não acompanha `line-height` grande.
+ */
+.project-detail-destaques {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.project-detail-destaques li {
+  position: relative;
+  padding: 9px 0 9px 20px;
+  font-size: 0.85rem;
+  line-height: 1.6;
+  color: var(--text-secondary);
+}
+
+/**
+ * O DIVISOR É UM `::after` COM `background`, e não uma borda — porque
+ * `--filete-secao` é um GRADIENTE (o filete que esvanece para a direita), e
+ * gradiente não é valor válido para `border-color`. Declarar
+ * `border-top: 1px solid var(--filete-secao)` compila e não desenha nada.
+ *
+ * É a mesma receita de `.about-secao::before`, e ela existe justamente para o
+ * separador poder esvanecer em vez de cortar o bloco de lado a lado.
+ */
+.project-detail-destaques li + li::after {
+  content: '';
+  position: absolute;
+  inset: 0 0 auto;
+  height: 1px;
+  background: var(--filete-secao);
+}
+
+.project-detail-destaques li:first-child {
+  padding-top: 0;
+}
+
+.project-detail-destaques li:first-child::before {
+  top: 0.55em;
+}
+
+.project-detail-destaques li::before {
+  content: '';
+  position: absolute;
+  left: 3px;
+  /* Alinhado com a primeira LINHA e não com o topo da caixa: um item de duas
+     linhas tem o marcador na altura do texto, não flutuando acima dele. */
+  top: calc(9px + 0.55em);
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: var(--accent-color);
 }
 
 .project-detail-techs {
@@ -110,6 +235,56 @@
 .theme-light .project-detail-github-btn:hover {
   background: #333;
   box-shadow: 0 5px 15px rgba(0, 0, 0, 0.15);
+}
+
+/**
+ * O SELO DE CÓDIGO FECHADO — o lugar do botão quando não há repositório.
+ *
+ * NÃO é um botão desabilitado. Nove dos quatorze projetos são de cliente ou de
+ * empresa, então este estado é comum, não excepcional — e um alvo que aceita o
+ * olho e não leva a lugar nenhum lê como defeito. Sem fundo, pela mesma regra
+ * dos destaques logo acima: isto não é ação.
+ *
+ * O `--card-border` à esquerda faz o papel de um filete vertical: dá ao bloco a
+ * presença que a ausência de fundo tira, sem transformá-lo num card.
+ */
+.project-detail-fechado {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  align-self: flex-start;
+  margin: 0;
+  padding: 2px 0 2px 12px;
+  border-left: 2px solid var(--card-border);
+  color: var(--text-secondary);
+}
+
+.project-detail-fechado svg {
+  flex-shrink: 0;
+  margin-top: 1px;
+  opacity: 0.75;
+}
+
+.project-detail-fechado-texto {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+/* Mono e caixa alta: é o sistema falando sobre o próprio arquivo, e não uma frase
+   que uma pessoa escreveu — a mesma voz da ficha técnica do "Sobre este PC". */
+.project-detail-fechado-titulo {
+  font-family: 'Courier New', monospace;
+  font-size: 0.68rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 1.2px;
+  color: var(--text-primary);
+}
+
+.project-detail-fechado-hint {
+  font-size: 0.78rem;
+  line-height: 1.5;
 }
 
 .project-detail-empty {

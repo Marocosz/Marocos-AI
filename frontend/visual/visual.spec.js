@@ -177,6 +177,30 @@ for (const cena of CENAS) {
       }
 
       /**
+       * O PONTEIRO SAI DE CIMA DO CONTEÚDO ANTES DA FOTO.
+       *
+       * `page.click('.porta')` destranca o sistema e DEIXA o mouse parado no
+       * centro da tela — que é exatamente onde a janela nasce. Tudo que caísse sob
+       * aquele ponto era fotografado em `:hover`, e o Playwright desliga
+       * transições, então o estado de hover aparecia no seu valor FINAL, sem
+       * nenhum fade que denunciasse o que era.
+       *
+       * Descoberto na entrada da janela de Serviços: a segunda linha da lista
+       * aparecia com borda de acento a 45% na referência — que é exatamente
+       * `--cfg-luz-borda-hover`. Parecia decisão de design e era o cursor.
+       *
+       * DUAS RAZÕES PARA CONSERTAR, e a segunda é a que importa: (1) a referência
+       * passa a registrar o repouso, que é o que ela promete registrar; (2) a
+       * escolha de QUAL elemento fica sob o cursor dependia da altura de tudo
+       * acima dele — mexer no padding de um cabeçalho movia o hover para outra
+       * linha e produzia um diff enorme, sem relação nenhuma com a mudança.
+       *
+       * (0, 0) é o canto morto: a grade de ícones começa em 20,20 (ver
+       * `LAYOUT.icones`), e no mobile não há nada ali também.
+       */
+      await page.mouse.move(0, 0)
+
+      /**
        * Folga final, pequena: o conteúdo real já foi confirmado acima, então
        * isto não está mais fazendo o trabalho de sincronização — só dá ao
        * shader/cristal um instante de sobra para compor o frame depois do

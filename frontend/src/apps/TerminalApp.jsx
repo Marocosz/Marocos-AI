@@ -3,6 +3,7 @@ import { useLanguage } from '../contexts/LanguageContext'
 import { useWindowActions } from '../os/WindowManagerContext'
 import { getContactData } from '../content/contact'
 import { getProfileData } from '../content/profile'
+import { getServicosData } from '../content/servicos'
 import { getOsData } from '../i18n/os'
 import './TerminalApp.css'
 
@@ -15,9 +16,9 @@ import './TerminalApp.css'
  * (motion anima o "digitar" de um comando fixo). Aqui o mesmo visual vira de
  * verdade interativo: quem abre a janela digita os comandos.
  *
- * A única dependência de `os/` é `useWindowActions`, usada só por dois
- * comandos (`projetos` e `stack`) para abrir outras janelas — o resto do app
- * continua cego a janelas.
+ * A única dependência de `os/` é `useWindowActions`, usada só por três
+ * comandos (`projetos`, `stack` e `servicos`) para abrir outras janelas — o
+ * resto do app continua cego a janelas.
  */
 
 // Contador simples para chaves React estáveis das linhas de saída. Vive no
@@ -34,7 +35,7 @@ const uid = () => {
  * `clear` não tem o que descobrir, e uma fileira com os oito viraria a mesma
  * parede de opções que a lista do `help` já é.
  */
-const COMANDOS_SUGERIDOS = ['whoami', 'neofetch', 'projetos', 'stack', 'help']
+const COMANDOS_SUGERIDOS = ['whoami', 'neofetch', 'projetos', 'stack', 'servicos', 'help']
 
 /**
  * O QUE A JANELA MOSTRA ANTES DE ALGUÉM DIGITAR — e é aqui que estava o único
@@ -128,17 +129,38 @@ const buildContatoEntries = ({ content, strings }) => [
   },
 ]
 
-const buildVpsEntries = ({ content }) => {
-  const { hosting } = content
+/**
+ * `vps` VIROU MANCHETE MAIS PONTEIRO, e essa é a mudança que impede o site de se
+ * repetir.
+ *
+ * Ele imprimia a ficha da infraestrutura ("Docker, Traefik com HTTPS automático,
+ * deploy contínuo a partir do git") e quatro tags. Isso é exatamente a seção "A
+ * máquina" da janela de Serviços — dois lugares dizendo a mesma coisa, que é o
+ * que aquela janela existe para não fazer. Aqui ficam duas linhas; a ficha inteira
+ * mora lá.
+ *
+ * O PONTEIRO É UM `cmds`, e não um tipo de linha novo: aquele bloco já renderiza
+ * chips que EXECUTAM um comando de verdade. Um "clique aqui" que roda `servicos`
+ * é mais honesto que um link decorativo, e não custou nenhuma máquina nova.
+ *
+ * O texto vem de `content/servicos.js` — fonte única com a janela.
+ */
+const buildVpsEntries = ({ servicos, strings }) => {
+  const t = servicos.terminal
   return [
-    { id: uid(), kind: 'line', text: hosting.badge, accent: true },
-    { id: uid(), kind: 'line', text: hosting.title, strong: true },
-    { id: uid(), kind: 'line', text: hosting.description },
-    { id: uid(), kind: 'tags', items: hosting.features },
+    { id: uid(), kind: 'line', text: t.badge, accent: true },
+    { id: uid(), kind: 'line', text: t.titulo, strong: true },
+    { id: uid(), kind: 'line', text: t.descricao },
+    {
+      id: uid(),
+      kind: 'cmds',
+      text: t.ponteiro,
+      items: [{ nome: 'servicos', rotulo: strings.helpNames?.servicos ?? 'servicos' }],
+    },
   ]
 }
 
-// Os dois únicos comandos que saem do terminal: abrem outra janela do
+// Os três únicos comandos que saem do terminal: abrem outra janela do
 // Marocos OS via `open` (vindo de useWindows, injetado no ctx pelo componente)
 // e imprimem uma linha de confirmação na própria transcrição.
 const buildProjetosEntries = ({ strings, open }) => {
@@ -149,6 +171,11 @@ const buildProjetosEntries = ({ strings, open }) => {
 const buildStackEntries = ({ strings, open }) => {
   open('devices')
   return [{ id: uid(), kind: 'line', text: strings.openingStack }]
+}
+
+const buildServicosEntries = ({ strings, open }) => {
+  open('services')
+  return [{ id: uid(), kind: 'line', text: strings.openingServicos }]
 }
 
 // Sentinela devolvida pelo handler de `clear`: o comando não produz linhas
@@ -169,6 +196,7 @@ const COMMANDS = {
   clear: () => CLEAR_SIGNAL,
   projetos: buildProjetosEntries,
   stack: buildStackEntries,
+  servicos: buildServicosEntries,
 }
 
 // Aliases em inglês, só reconhecidos quando a UI está em 'en' — o app é
@@ -177,6 +205,7 @@ const COMMANDS = {
 // quem está lendo a interface em inglês.
 const EN_ALIASES = {
   contact: 'contato', who: 'whoami', projects: 'projetos', devices: 'stack',
+  services: 'servicos',
 }
 
 const resolveCommandName = (typed, language) => {
@@ -241,14 +270,11 @@ const renderEntry = (entry, executar) => {
         </div>
       )
 
-    case 'tags':
-      return (
-        <div className="terminal-tags" key={entry.id}>
-          {entry.items.map((tag, i) => (
-            <span className="terminal-tag" key={i}>{tag}</span>
-          ))}
-        </div>
-      )
+    /* O `case 'tags'` SAIU JUNTO com as quatro tags do `vps` (Docker, Traefik,
+       CI/CD, Linux), que viraram linhas da ficha "A máquina" na janela de
+       Serviços. Ele era o único consumidor deste tipo de entrada, e um `case`
+       inalcançável é pior que nenhum: parece vivo, e a próxima pessoa tenta
+       mantê-lo funcionando sem saber que ninguém o alcança. */
 
     // Clicáveis porque digitar não pode ser o pedágio para descobrir o que
     // existe. Quem prefere digitar continua digitando — o clique só roda o
@@ -311,13 +337,18 @@ const TerminalApp = () => {
   const { open } = useWindowActions()
   const content = getContactData(language)
   const profile = getProfileData(language)
+  // Só a manchete do `vps` sai daqui — a ficha inteira da infraestrutura mora na
+  // janela de Serviços, e este arquivo lê a mesma fonte que ela.
+  const servicos = getServicosData(language)
   const os = getOsData(language)
   const strings = os.terminal || {}
 
   // Estado inicial "preguiçoso": o boot só roda uma vez, na primeira
   // renderização, capturando o idioma que estava ativo quando a janela abriu
   // — não precisa de useEffect nem entra em conflito com exhaustive-deps.
-  const [output, setOutput] = useState(() => buildBootEntries({ content, profile, strings, open }))
+  const [output, setOutput] = useState(
+    () => buildBootEntries({ content, profile, servicos, strings, open }),
+  )
   const [commandHistory, setCommandHistory] = useState([])
   const [historyIndex, setHistoryIndex] = useState(-1)
   const [draft, setDraft] = useState('')
@@ -354,7 +385,7 @@ const TerminalApp = () => {
       return
     }
 
-    const result = COMMANDS[name]({ content, profile, strings, open })
+    const result = COMMANDS[name]({ content, profile, servicos, strings, open })
     if (result === CLEAR_SIGNAL) {
       setOutput([])
       return
