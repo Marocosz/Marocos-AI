@@ -66,9 +66,11 @@ class ModelTier(str, Enum):
 # Para alterar o modelo usado em toda a aplicação (ex: upgrade de gpt-4 para gpt-5),
 # basta alterar a string aqui, sem necessidade de refatorar o código dos agentes.
 MODEL_REGISTRY = {
-    (LLMProvider.OPENAI, ModelTier.FAST): "gpt-4.1-nano",
-    (LLMProvider.OPENAI, ModelTier.MEDIUM): "gpt-4.1-mini",
-    (LLMProvider.OPENAI, ModelTier.STRONG): "gpt-5-nano", 
+    # A família gpt-4.1 foi descontinuada pela OpenAI; gpt-5-mini é o único modelo de chat
+    # liberado para a chave do projeto, então os 3 tiers apontam para ele.
+    (LLMProvider.OPENAI, ModelTier.FAST): "gpt-5-mini",
+    (LLMProvider.OPENAI, ModelTier.MEDIUM): "gpt-5-mini",
+    (LLMProvider.OPENAI, ModelTier.STRONG): "gpt-5-mini",
     
     (LLMProvider.GROQ, ModelTier.FAST): "llama-3.1-8b-instant",
     (LLMProvider.GROQ, ModelTier.MEDIUM): "llama-3.1-70b-versatile",

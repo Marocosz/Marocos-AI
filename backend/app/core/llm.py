@@ -87,6 +87,11 @@ def get_llm(provider: LLMProvider | str, tier: ModelTier | str, temperature: flo
     # Seleciona a classe correta do LangChain e injeta as credenciais apropriadas.
     
     if provider == LLMProvider.OPENAI:
+        # A família gpt-5 é de raciocínio: ignora temperature e, no esforço padrão, leva ~7s
+        # por chamada. O grafo encadeia 4-5 chamadas contra o timeout de 60s do cliente,
+        # então o esforço mínimo (~1s) é o que mantém o pipeline dentro do teto.
+        if model_name.startswith("gpt-5"):
+            kwargs.setdefault("reasoning_effort", "minimal")
         return ChatOpenAI(
             model=model_name,
             temperature=temperature,
